@@ -2,9 +2,8 @@
 
 namespace Entity.Entities.Mains;
 
-internal class QuizQuestion:Entity<int>
+public class QuizQuestion:Entity<int>
 {
-
     public int ExamId { get; set; }
     public required string Question { get; set; }
     public string? QuestionImage { get; set; }

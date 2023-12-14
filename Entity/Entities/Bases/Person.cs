@@ -2,8 +2,9 @@
 
 namespace Entity.Entities.Bases
 {
-    internal class Person : Entity<int>
+    public class Person : Entity<int>
     {
+        public required string Name { get; set; }
+        public required string SurName { get; set; }
     }
 }
- 
