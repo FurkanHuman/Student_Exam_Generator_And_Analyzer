@@ -5,56 +5,106 @@ using QuestPDF.Fluent;
 using QuestPDF.Previewer;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using App.ExamPage;
+using Entity.Entities.Mains;
 
 
 Console.WriteLine("Hello, World!");
 ServiceProvider serviceProvider = new ServiceCollection()
     .AddAppServiceRegistration()
     .BuildServiceProvider();
-Document.Create(document =>
+Random r = new(1234);
+for (int i = 0; i < 5; i++)
+    Console.WriteLine(r.Next(0xFFFF).ToString("X3"));
+
+QuestPDF.Settings.CheckIfAllTextGlyphsAreAvailable = false;
+IDocument document = Document.Create(document =>
 {
     document.Page(page =>
     {
+        page.DefaultTextStyle(ts => ts.FontFamily(Fonts.Arial));
         page.Margin(0.5f, Unit.Centimetre);
         page.Size(pageSize: PageSizes.A4);
-        page.Header().Background(Colors.Cyan.Darken2).Height(3, Unit.Centimetre).Row(headerRow =>
+        page.Header().DebugArea($"Header", Colors.Black).Height(3, Unit.Centimetre).Row(headerRow =>
         {
-            headerRow.RelativeItem(2).Padding(0.2f, Unit.Centimetre).Background(Colors.Brown.Darken2).Column(nametag =>
+            headerRow.RelativeItem(2).Padding(0.2f, Unit.Centimetre).Column(nametag =>
             {
-                    nametag.Item().AlignCenter().Text("name of Student").FontSize(11);
-                    nametag.Item().AlignCenter().Text("surname of Student").FontSize(11);
-                    nametag.Item().AlignCenter().Text("class of str").FontSize(11);
-                    nametag.Item().AlignCenter().Text("Student number").FontSize(11);
+                nametag.Item().DefaultTextStyle(ts => ts.FontSize(11));
+                nametag.Item().AlignCenter().Text("Furkan");
+                nametag.Item().AlignCenter().Text("Bozkurt");
+                nametag.Item().AlignCenter().Text("1:D");
+                nametag.Item().AlignCenter().Text("9999");
             });
 
-            headerRow.RelativeItem(5).Background(Colors.LightBlue.Darken2).Padding(0.2f, Unit.Centimetre).Column(generalInfo =>
+            headerRow.RelativeItem(5).Padding(0.2f, Unit.Centimetre).Column(generalInfo =>
             {
-                generalInfo.Item().AlignCenter().Text("2023 - 2024").FontSize(13).FontFamily(Fonts.Arial);
-                generalInfo.Item().AlignCenter().Text("HACIİLBEY MENSUCAT SANTRAL ORTAOKULU").FontSize(13).FontFamily(Fonts.Arial);
-                generalInfo.Item().AlignCenter().Text("BİLİŞİM TEKNOLOJİLERİ ve YAZILIM ").FontSize(13).FontFamily(Fonts.Arial);
-                generalInfo.Item().AlignCenter().Text("1. dönem 1. yazılı sınavı").FontSize(12).FontFamily(Fonts.Arial);
+                generalInfo.Item().DefaultTextStyle(ts => ts.FontSize(13));
+                generalInfo.Item().AlignCenter().Text("2023 - 2024");
+                generalInfo.Item().AlignCenter().Text("DEMODEMODEMODEMODEMO  ORTAOKULU");
+                generalInfo.Item().AlignCenter().Text("DEMO BILIŞIM TEKNOLOJİLERI ve YAZILIM 159");
+                generalInfo.Item().AlignCenter().Text("DEMO 1. dönem 1. yazılı sınavı").FontSize(12);
             });
 
-            headerRow.RelativeItem(1.5f).Padding(0.2f, Unit.Centimetre).Background(Colors.Green.Darken2).Column(examSummary => 
+            headerRow.RelativeItem(1.5f).Padding(0.2f, Unit.Centimetre).Column(examSummary =>
             {
-                examSummary.Item().AlignCenter().Text("Code: F09");
-                examSummary.Item().AlignCenter().Text("Score").Underline();
-                examSummary.Item().AlignCenter().Text("Digital score this is visible text").FontSize(5);
+                examSummary.Item().AlignCenter().Text("Code: F09").FontSize(10);
+                examSummary.Item().AlignCenter().Text("Score").Underline().FontSize(14);
+                examSummary.Item().AlignCenter().Text("100").FontSize(25);
             });
         });
 
-        page.Content().Background(Colors.Blue.Darken2).PaddingTop(0.4f, Unit.Centimetre).PaddingBottom(0.4f, Unit.Centimetre)
+        page.Content().PaddingTop(0.4f, Unit.Centimetre).PaddingBottom(0.4f, Unit.Centimetre)
         .Column(column =>
         {
             column.Spacing(0.4f, Unit.Centimetre);
             for (int i = 0; i < 10; i++)
-                column.Item().DebugArea($"box {i}", Colors.Grey.Medium).Background(Colors.DeepOrange.Accent4).Height(2, Unit.Centimetre).Text($"{i + 1}) Soru");
+                column.Item().DebugArea($"box {i}", Colors.Black).Height(2, Unit.Centimetre).Text($"{i + 1}) " + Placeholders.Question());
         });
 
-        page.Footer().Background(Colors.Lime.Darken2).Height(1, Unit.Centimetre).Column(footerNotes =>
+        page.Footer().Height(1, Unit.Centimetre).Row(footerNotes =>
         {
-            footerNotes.Item().Text("this area other notes in the footer").FontSize(9).LineHeight(2);
+            footerNotes.RelativeItem(16).DebugArea("Footer", Colors.Black).Text("this area other notes in the footer").FontSize(9);
+            footerNotes.RelativeItem(1).DebugArea("c a", Colors.Black).AlignMiddle().AlignCenter().Text("FFF").FontSize(10);
         });
     });
-}).ShowInPreviewer();
-//var examCodes = serviceProvider.GetService<IExamCodeGenerator>().GenerateExamCodes(-1);
+
+    document.Page(page =>
+    {
+        page.Margin(0.5f, Unit.Centimetre);
+        page.Size(pageSize: PageSizes.A4);
+
+        page.Content().PaddingTop(0.4f, Unit.Centimetre).PaddingBottom(0.4f, Unit.Centimetre)
+        .Column(column =>
+        {
+            column.Spacing(0.4f, Unit.Centimetre);
+            for (int i = 10; i < 20; i++)
+                column.Item().DebugArea($"box {i}", Colors.Black).Height(2, Unit.Centimetre).Text($"{i + 1}) " + Placeholders.Question());
+        });
+
+        page.Footer().Height(1, Unit.Centimetre).Row(footerNotes =>
+        {
+                footerNotes.RelativeItem(16).DebugArea("Footer", Colors.Black).Text("this area other notes in the footer").FontSize(9);
+                footerNotes.RelativeItem(1).DebugArea("c a",Colors.Black).AlignMiddle().AlignCenter().Text("FFF").FontSize(10);
+        });
+    });
+});
+
+//document.ShowInPreviewer();
+
+
+
+//Exam exam=new() 
+//{
+
+
+//};
+
+
+//IPage page = serviceProvider.GetRequiredService<IPage>();
+//IList<IDocument> documents = new List<IDocument>()
+//{
+//    page.FrontPageGenerate(),
+//    page.BackPageGenerate()
+//};
+
+//Document.Merge(documents).ShowInPreviewer();
