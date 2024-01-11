@@ -4,7 +4,7 @@ namespace Entity.Entities.Bases
 {
     public class Person : Entity<int>
     {
-        public required string Name { get; set; }
-        public required string SurName { get; set; }
+        public string Name { get; set; }
+        public string SurName { get; set; }
     }
 }

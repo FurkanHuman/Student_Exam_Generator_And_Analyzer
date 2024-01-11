@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace App.AddSchool;
 
-public interface IAddSchool
+public interface ISchool
 {
-    School AddSchool(Exam exam);
+    School AddSchool(ref Exam exam);
 }

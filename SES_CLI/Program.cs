@@ -5,106 +5,204 @@ using QuestPDF.Fluent;
 using QuestPDF.Previewer;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using App.ExamPage;
 using Entity.Entities.Mains;
+using App.AddSchool;
+using App.AddStudent;
+using System.Text.Json;
+using App.QuizPoolFeature;
+using App.PdfPageProduct.AnalysisPageFeature;
+using App.PdfPageProduct.ExamPageFeature;
 
 
 Console.WriteLine("Hello, World!");
 ServiceProvider serviceProvider = new ServiceCollection()
     .AddAppServiceRegistration()
     .BuildServiceProvider();
-Random r = new(1234);
+
+QuestPDF.Settings.CheckIfAllTextGlyphsAreAvailable = false;
+QuestPDF.Settings.License = LicenseType.Community;
+
+//Document.Create(document =>
+//{
+//    document.Page(page =>
+//    {
+//        page.DefaultTextStyle(ts => ts.FontFamily(Fonts.Arial));
+//        page.Margin(0.5f, Unit.Centimetre);
+//        page.Size(pageSize: PageSizes.A4);
+//        page.Header().Height(3, Unit.Centimetre).Row(headerRow =>
+//        {
+//            headerRow.RelativeItem(2).Padding(0.2f, Unit.Centimetre).Column(nametag =>
+//            {
+//                nametag.Item().DefaultTextStyle(ts => ts.FontSize(9));
+
+//                nametag.Item().AlignCenter().Text(Placeholders.Name());
+//                nametag.Item().AlignCenter().Text(Placeholders.Name());
+//                nametag.Item().AlignCenter().Text($"{Placeholders.Decimal()}");
+
+//            });
+
+//            headerRow.RelativeItem(5).Padding(0.2f, Unit.Centimetre).Column(generalInfo =>
+//            {
+//                generalInfo.Item().DefaultTextStyle(ts => ts.FontSize(13));
+
+//                generalInfo.Item().AlignCenter().Text("2023 - 2024");
+//                generalInfo.Item().AlignCenter().Text(Placeholders.Label());
+//                generalInfo.Item().AlignCenter().Text(Placeholders.Label());
+//                generalInfo.Item().AlignCenter().Text(Placeholders.PhoneNumber()).FontSize(12);
+//            });
+
+//            headerRow.RelativeItem(1.5f).Padding(0.2f, Unit.Centimetre).Column(examSummary =>
+//            {
+//                examSummary.Item().AlignCenter().Text("FFF").FontSize(10);
+//                examSummary.Item().AlignCenter().Text("Puan").Underline().FontSize(14); // Note: ingilizce sonra gelecek
+//                examSummary.Item().AlignCenter().Text("").FontSize(25); // note : boş çünkü otomatik analizci yapılmadı.
+//            });
+//        });
+
+//        page.Content().PaddingTop(0.4f, Unit.Centimetre).PaddingBottom(0.4f, Unit.Centimetre)
+//        .Column(questionContentColumn =>
+//        {
+//            questionContentColumn.Spacing(0.4f, Unit.Centimetre);
+
+//            for (int i = 0; i < 10; i++)
+
+//            questionContentColumn.Item().Row(questionContentColumnRow =>
+//            {
+
+//                if (i % 4 == 0)
+//                {
+//                    questionContentColumnRow.RelativeItem(14).Height(2,Unit.Centimetre).AlignMiddle().AlignLeft().Text($"{i + 1}) " + Placeholders.Question());
+//                }
+//                else
+//                {
+
+//                    if (i % 2 == 0)
+//                    {
+//                        questionContentColumnRow.RelativeItem(1.8f).AlignMiddle().AlignCenter().Image("C:\\Users\\furka\\Desktop\\kelebek.png").WithCompressionQuality(ImageCompressionQuality.Best);
+//                    }
+//                    else
+//                        questionContentColumnRow.RelativeItem(1.8f).AlignMiddle().AlignCenter().Image("C:\\Users\\furka\\Desktop\\tasarim.jpg").FitArea().WithCompressionQuality(ImageCompressionQuality.Best);
+
+//                    questionContentColumnRow.RelativeItem(0.2f);
+//                    questionContentColumnRow.RelativeItem(14).AlignMiddle().AlignLeft().Text($"{i + 1}) " + Placeholders.Question());
+//                }
+//            });
+
+//        });
+
+//        page.Footer().Height(1, Unit.Centimetre).Row(footerNotes =>
+//        {
+//            footerNotes.RelativeItem(16).Text("TEST TEST TEST ").FontSize(9);
+//            footerNotes.RelativeItem(1).AlignMiddle().AlignCenter().Text("FFF").FontSize(10);
+//        });
+//    });
+//}).ShowInPreviewer();
+IAnalsysPage analsysPage = serviceProvider.GetRequiredService<IAnalsysPage>();
+
+IList<StudentQuizAnswer> quizForAnswers = new List<StudentQuizAnswer>();
+
+// analsysPage.PageGenerate(quizForAnswers).ShowInPreviewer();
+
+IQuizPool quizPool = serviceProvider.GetRequiredService<IQuizPool>();
+
+//Console.Write("Lütfen sınav adını girin: ");
+//string? quizName = Console.ReadLine();
+
+
+//Console.Write("Lütfen okul adını girin: ");
+//string? schoolName = Console.ReadLine();
+
+//Console.Write("Lütfen SEED girin: ");
+//int seed = int.Parse(Console.ReadLine());
+
+string? quizName = "BİLİŞİM 6.SINIFLAR 1.DÖNEM 2.YAZILI";
+string? schoolName = "HACIİLBEY MENSUCAT SANTRAL ORTAOKULU";
+IList<Student> students = serviceProvider.GetRequiredService<IAddStudent>().AddStudentsLoadFromJsonFile("C:\\Users\\furka\\Desktop\\students.json").Where(s => s.ClassAge == 6).ToList();
+
+
+quizPool.QuestionPoolAddQuiz(quizName);
+IList<QuizQuestion> quizPoolLoad = quizPool.GetQuestionPoolForName(quizName);
+
+List<QuizQuestion> quizQuestions = new();
+
+IExamPage page = serviceProvider.GetRequiredService<IExamPage>();
+School school = new() { Id = 1, Name = schoolName };
+List<School> schools = [school];
+Teacher teacher = new() { Id = 1, Name = "Emre", SurName = "Dumancı", Schools = schools, Students = students, SchoolId = 1 };
+
+Random r = new(0);
 for (int i = 0; i < 5; i++)
     Console.WriteLine(r.Next(0xFFFF).ToString("X3"));
 
-QuestPDF.Settings.CheckIfAllTextGlyphsAreAvailable = false;
-IDocument document = Document.Create(document =>
+IList<Exam> exams = new List<Exam>();
+
+int examId = 0;
+    int examCode = r.Next(0xABC);
+foreach (Student student in students)
 {
-    document.Page(page =>
+    Random r2 = new(examCode);
+    examId++;
+
+    Exam exam = new()
     {
-        page.DefaultTextStyle(ts => ts.FontFamily(Fonts.Arial));
-        page.Margin(0.5f, Unit.Centimetre);
-        page.Size(pageSize: PageSizes.A4);
-        page.Header().DebugArea($"Header", Colors.Black).Height(3, Unit.Centimetre).Row(headerRow =>
-        {
-            headerRow.RelativeItem(2).Padding(0.2f, Unit.Centimetre).Column(nametag =>
-            {
-                nametag.Item().DefaultTextStyle(ts => ts.FontSize(11));
-                nametag.Item().AlignCenter().Text("Furkan");
-                nametag.Item().AlignCenter().Text("Bozkurt");
-                nametag.Item().AlignCenter().Text("1:D");
-                nametag.Item().AlignCenter().Text("9999");
-            });
+        Id = examId,
+        ExamSemesterYear = "2023 - 2024",
+        LessonName = "BİLİŞİM DERSİ",
+        Semester = "1. Dönem",
+        SemesterSesion = "2. Sınav",
+        ExamCode = examCode.ToString("X3"),
+        FooterNote = "Başarılar",
 
-            headerRow.RelativeItem(5).Padding(0.2f, Unit.Centimetre).Column(generalInfo =>
-            {
-                generalInfo.Item().DefaultTextStyle(ts => ts.FontSize(13));
-                generalInfo.Item().AlignCenter().Text("2023 - 2024");
-                generalInfo.Item().AlignCenter().Text("DEMODEMODEMODEMODEMO  ORTAOKULU");
-                generalInfo.Item().AlignCenter().Text("DEMO BILIŞIM TEKNOLOJİLERI ve YAZILIM 159");
-                generalInfo.Item().AlignCenter().Text("DEMO 1. dönem 1. yazılı sınavı").FontSize(12);
-            });
+        TeacherId = teacher.Id,
+        StudentId = student.Id,
+        SchoolId = school.Id,
 
-            headerRow.RelativeItem(1.5f).Padding(0.2f, Unit.Centimetre).Column(examSummary =>
-            {
-                examSummary.Item().AlignCenter().Text("Code: F09").FontSize(10);
-                examSummary.Item().AlignCenter().Text("Score").Underline().FontSize(14);
-                examSummary.Item().AlignCenter().Text("100").FontSize(25);
-            });
-        });
+        Teacher = teacher,
+        Student = student,
+        School = school,
+        QuizQuestions = quizPoolLoad.OrderBy(_ => r2.Next(quizPoolLoad.Count)).Take(14).ToList()
+    };
 
-        page.Content().PaddingTop(0.4f, Unit.Centimetre).PaddingBottom(0.4f, Unit.Centimetre)
-        .Column(column =>
-        {
-            column.Spacing(0.4f, Unit.Centimetre);
-            for (int i = 0; i < 10; i++)
-                column.Item().DebugArea($"box {i}", Colors.Black).Height(2, Unit.Centimetre).Text($"{i + 1}) " + Placeholders.Question());
-        });
+    exams.Add(exam);
+}
 
-        page.Footer().Height(1, Unit.Centimetre).Row(footerNotes =>
-        {
-            footerNotes.RelativeItem(16).DebugArea("Footer", Colors.Black).Text("this area other notes in the footer").FontSize(9);
-            footerNotes.RelativeItem(1).DebugArea("c a", Colors.Black).AlignMiddle().AlignCenter().Text("FFF").FontSize(10);
-        });
-    });
+IList<IDocument> documents = new List<IDocument>();
+Console.Clear();
+foreach (Exam exam in exams)
+{
+    string s = JsonSerializer.Serialize(exam);
+    documents.Add(page.FrontPageGenerate(exam));
+    documents.Add(page.BackPageGenerate(exam));
 
-    document.Page(page =>
-    {
-        page.Margin(0.5f, Unit.Centimetre);
-        page.Size(pageSize: PageSizes.A4);
-
-        page.Content().PaddingTop(0.4f, Unit.Centimetre).PaddingBottom(0.4f, Unit.Centimetre)
-        .Column(column =>
-        {
-            column.Spacing(0.4f, Unit.Centimetre);
-            for (int i = 10; i < 20; i++)
-                column.Item().DebugArea($"box {i}", Colors.Black).Height(2, Unit.Centimetre).Text($"{i + 1}) " + Placeholders.Question());
-        });
-
-        page.Footer().Height(1, Unit.Centimetre).Row(footerNotes =>
-        {
-                footerNotes.RelativeItem(16).DebugArea("Footer", Colors.Black).Text("this area other notes in the footer").FontSize(9);
-                footerNotes.RelativeItem(1).DebugArea("c a",Colors.Black).AlignMiddle().AlignCenter().Text("FFF").FontSize(10);
-        });
-    });
-});
-
-//document.ShowInPreviewer();
+    Console.WriteLine(s);
+}
 
 
 
-//Exam exam=new() 
-//{
 
 
+
+
+
+
+//Exam exam = new();
+
+//IList<Student> sts = serviceProvider.GetRequiredService<IAddStudent>().AddStudentsLoadFromJsonFile("C:\\Users\\furka\\Desktop\\students.json");
+
+//exam.School = schoolService.AddSchool(ref exam);
+
+//Console.WriteLine(exam.School.Name);
+
+//exam.ExamCode = "fff".ToUpper();
+//exam.ExamSemesterYear = "Demo Year";
+//exam.QuizQuestions = quizPool;
+
+//    page.BackPageGenerate(exam)
 //};
+string sumaryExam = JsonSerializer.Serialize(exams);
 
+File.WriteAllText(Environment.CurrentDirectory + "\\Exam2.json", sumaryExam);
+Console.WriteLine(sumaryExam);
 
-//IPage page = serviceProvider.GetRequiredService<IPage>();
-//IList<IDocument> documents = new List<IDocument>()
-//{
-//    page.FrontPageGenerate(),
-//    page.BackPageGenerate()
-//};
-
-//Document.Merge(documents).ShowInPreviewer();
+Document.Merge(documents).ShowInPreviewer();
+Console.Clear();

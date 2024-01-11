@@ -8,8 +8,8 @@ public class Teacher : Person
     public int StudentId { get; set; }
     public int SchoolId { get; set; }
 
-    public required IList<Exam> Exams { get; set; }
-    public required IList<Student> Students { get; set; }
-    public required IList<School> Schools { get; set; }
+    public IList<Exam> Exams { get; set; }
+    public IList<Student> Students { get; set; }
+    public IList<School> Schools { get; set; }
 
 }
