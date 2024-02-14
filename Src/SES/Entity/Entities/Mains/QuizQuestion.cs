@@ -16,9 +16,6 @@ public class QuizQuestion : Entity<int>
     public string Question { get; set; }
     public string QuestionImage { get; set; }
 
-
-
     public virtual IList<Exam> Exams { get; set; }
-    public virtual IList<ReferenceBenefit> ReferenceBenefits { get; set; }
-
+    public virtual IList<Benefit> Benefits { get; set; }
 }

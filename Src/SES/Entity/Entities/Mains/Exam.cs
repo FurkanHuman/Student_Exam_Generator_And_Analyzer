@@ -18,6 +18,6 @@ public class Exam : Entity<int>
     public Teacher Teacher { get; set; }
     public Student Student { get; set; }
     public School School { get; set; }
+    public ReferenceBenefit ReferenceBenefit { get; set; }
     public IList<QuizQuestion> QuizQuestions { get; set; }
-
 }

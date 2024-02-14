@@ -21,6 +21,7 @@ public class ReferenceBenefit : Entity<int>
      */
 
     public string ReferenceBenefitName { get; set; }
+    public string ReferenceBenefitSeason { get; set; }
     public int SchoolYear { get; set; }
     public int EndSchcoolYear { get; set; }
 
@@ -60,4 +61,5 @@ public class Benefit : Entity<int>
 
     public virtual SubLearningArea SubLearningArea { get; set; }
 
+    public virtual IList<QuizQuestion> QuizQuestions { get; set; }
 }
