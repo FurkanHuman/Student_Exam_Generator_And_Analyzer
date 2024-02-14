@@ -14,6 +14,7 @@ public class Exam : Entity<int>
     public int TeacherId { get; set; }
     public int StudentId { get; set; }
     public int SchoolId { get; set; }
+    public int ReferenceBenefitId { get; set; }
 
     public Teacher Teacher { get; set; }
     public Student Student { get; set; }
