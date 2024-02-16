@@ -13,8 +13,6 @@ public class AnalysisHeader : Entity<int>
 
     public int BenefitId { get; set; }
     public int[] RefScorePerQuestions { get; set; }
-    public string[] RefBeneFitsNo { get; set; }
-    public string[] RefBeneFitCommets { get; set; }
 
     public string ExamCode { get; set; }
     public string FooterNote { get; set; }

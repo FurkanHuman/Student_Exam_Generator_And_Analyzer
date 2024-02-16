@@ -11,6 +11,7 @@ public class Exam : Entity<int>
     public string ExamCode { get; set; }
     public string FooterNote { get; set; }
 
+    public int AnalysisHeaderId { get; set; }
     public int TeacherId { get; set; }
     public int StudentId { get; set; }
     public int SchoolId { get; set; }
@@ -21,4 +22,5 @@ public class Exam : Entity<int>
     public School School { get; set; }
     public ReferenceBenefit ReferenceBenefit { get; set; }
     public IList<QuizQuestion> QuizQuestions { get; set; }
+    public virtual AnalysisHeader AnalysisHeader { get; set; }
 }

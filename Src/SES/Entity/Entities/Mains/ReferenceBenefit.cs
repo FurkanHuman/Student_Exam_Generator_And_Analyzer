@@ -34,32 +34,3 @@ public class ReferenceBenefit : Entity<int>
     public virtual School School { get; set; }
     public virtual Exam Exam { get; set; }
 }
-
-public class LearningArea : Entity<int>
-{
-    public required string Name { get; set; }
-
-    public int SubLearningAreaId { get; set; }
-
-    public IList<SubLearningArea> SubLearningAreas { get; set; }
-}
-public class SubLearningArea : Entity<int>
-{
-    public required string Name { get; set; }
-
-    public int BenefitId { get; set; }
-
-    public virtual IList<Benefit> Benefits { get; set; }
-}
-
-public class Benefit : Entity<int>
-{
-    public int SubLearningAreaId { get; set; }
-
-    public string ReferenceBenefitNumber { get; set; }
-    public string ReferenceBenefitComments { get; set; }
-
-    public virtual SubLearningArea SubLearningArea { get; set; }
-
-    public virtual IList<QuizQuestion> QuizQuestions { get; set; }
-}
