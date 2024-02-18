@@ -1,20 +1,11 @@
 ﻿using App.PdfPageProduct.AnalysisPageFeature;
-using Entity.Entities.Bases;
 using Entity.Entities.Mains;
+using Microsoft.Extensions.DependencyInjection;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 using QuestPDF.Previewer;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Diagnostics.Eventing.Reader;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace SES_GUI;
 
@@ -22,24 +13,23 @@ public partial class Analysis_Full : Form
 {
     private readonly IAnalsysPage _analsysPage;
 
-
     public IList<Student> Students { get; set; }
     public IList<Student> SelectedStudents { get; set; }
-    public School School { get; set; } // Note: ku8lalanıcı dolduracak
     public IList<StudentQuizAnswer> StudentQuizAnswers { get; set; }
-    public Teacher Teacher { get; set; } // Note: ku8lalanıcı dolduracak
-    public Exam Exam { get; set; } // Note: ku8lalanıcı dolduracak
     private int[] RefScores { get; set; }
     public string[] RefBenefitNumbers { get; set; }
     public string[] RefBenefitComments { get; private set; }
+    public bool IsOneShootRefTable { get; set; }
 
-    public Analysis_Full(IAnalsysPage analsysPage)
+    private readonly string SnapshotFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SES_Snapshots");
+
+    public Analysis_Full([FromKeyedServices(1)] IAnalsysPage analsysPage)
     {
         InitializeComponent();
         _analsysPage = analsysPage;
     }
     // Todo : referans tablosu korunup diğer sınıfa geçilebilecek 
-    // TODO : pasta grafiğini düzelt
+    // TODO : pasta grafiğini düzelt +
     // kopyala yapıştır deteğini gelişştir.
     // Todo : exel like yapı
     // todo : çık tıkla otamatik ref puanını getir.
@@ -51,13 +41,26 @@ public partial class Analysis_Full : Form
     // ünvanlar olacak adların altında olacak.
     // top info ya dikkat
     // sınııf listesini çekme. 
-    // todo : öğrenci numarasına göre sırala
+    // todo : öğrenci numarasına göre sırala +
     private void Analysis_Full_Load(object sender, EventArgs e)
     {
         LoadSemesterYears();
         LoadSemester();
         LoadSemesterSession();
         StudentQuizAnswers = new List<StudentQuizAnswer>();
+        IsOneShootRefTable = false;
+
+        if (!Directory.Exists(SnapshotFolderPath))
+        {
+            try
+            {
+                Directory.CreateDirectory(SnapshotFolderPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Klasör oluşturma hatası: " + ex.Message);
+            }
+        }
     }
 
     private void LoadSemesterSession()
@@ -115,7 +118,6 @@ public partial class Analysis_Full : Form
             catch (Exception ex)
             {
                 MessageBox.Show("Dosya okuma hatası: " + ex.Message);
-                return;
             }
 
         else
@@ -159,7 +161,7 @@ public partial class Analysis_Full : Form
         for (int i = 0; i < count; i++)
         {
             StudentsNotesDataGridView.Columns.Add($"#n{i}", $"#{i + 1}");
-            StudentsNotesDataGridView.Columns[$"#n{i}"].ValueType = typeof(int);
+            StudentsNotesDataGridView.Columns[$"#n{i}"].ValueType = typeof(string);
         }
         foreach (Student student in SelectedStudents)
         {
@@ -177,6 +179,7 @@ public partial class Analysis_Full : Form
 
     private void SelectStudentForComboBox()
     {
+
         int sClass = (int)ClassAgeComboBox.SelectedItem;
         char sAClass = (char)AltClassComboBox.SelectedItem;
 
@@ -199,6 +202,8 @@ public partial class Analysis_Full : Form
 
     private void QuestionAcept_Click(object sender, EventArgs e)
     {
+        ScoreReferenceDGW.Rows.Clear();
+        StudentsNotesDataGridView.Rows.Clear();
         int count = int.Parse(HowMuchQuestion.Text ?? "1");
 
         SelectStudentForComboBox();
@@ -206,10 +211,36 @@ public partial class Analysis_Full : Form
         StudentScoreDGWLoad(count);
         MakeReadOnlyDGWs();
         QuestionScoreLoad.Enabled = true;
+        IsOneShootRefTable = true;
         ScoreReferenceDGW.AutoResizeColumns();
+        AutomaticSavingTenM.Start();
     }
 
-    private void GenAnalisys_Click(object sender, EventArgs e)
+    private void SnapshotSaveButton_Click(object sender, EventArgs e)
+    {
+        SaveDataGridViews(Path.Combine(SnapshotFolderPath, $"SES_DGW_SS_{DateTime.Now}.DGWSS"));
+    }
+
+
+    private void LoadSnapshotFromFileButton_Click(object sender, EventArgs e)
+    {
+        OpenFileDialog openFileDialog = new()
+        {
+            Filter = "Anlık Kayıt Dosyası|*.DGWSS",
+            Title = "Anlık Dosya Seç",
+            DefaultExt = "DGWSS",
+            InitialDirectory = SnapshotFolderPath,
+            Multiselect = false
+        };
+
+        if (openFileDialog.ShowDialog() == DialogResult.OK)
+        {
+            LoadDataGridViews(openFileDialog.FileName);
+        }
+    }
+
+
+    private async void GenAnalisys_Click(object sender, EventArgs e)
     {
         CollectDataFromDGWs();
         DialogResult msgBox = MessageBox.Show("Şimdi kaydeceğin yeri seçeceksin!", "Dikkat Et!!!", MessageBoxButtons.OKCancel);
@@ -233,8 +264,6 @@ public partial class Analysis_Full : Form
             SchoolId = -1,
             StudentQuizAnswers = StudentQuizAnswers,
             RefScorePerQuestions = RefScores,
-            RefBeneFitsNo = RefBenefitNumbers,
-            RefBeneFitCommets = RefBenefitComments,
             SqaId = -1,
             Teacher = new() { Id = -1, Name = teacherNames.name, SurName = teacherNames.surname },
             Principal = new() { Id = -1, Name = principleNames.name, SurName = principleNames.surname },
@@ -246,6 +275,14 @@ public partial class Analysis_Full : Form
         analysispage.ShowInPreviewerAsync();
         SaveFile(analysisHeader, analysispage);
         // todo : sıfırlanacaklar ve üste binmeleri engelle
+
+        StudentQuizAnswers = new List<StudentQuizAnswer>();
+        SelectedStudents = new List<Student>();
+    }
+
+    private void AutomaticSavingTenM_Tick(object sender, EventArgs e)
+    {
+        SaveDataGridViews(Path.Combine(SnapshotFolderPath, $"SES_DGW_SS_{DateTime.Now}.DGWSS"));
     }
 
     private static (string name, string surname) NameSplit(TextBox textBox)
@@ -300,7 +337,14 @@ public partial class Analysis_Full : Form
                 string? getSS = StudentsNotesDataGridView.Rows[i].Cells["#s"].Value.ToString() ?? "";
 
                 if (string.IsNullOrWhiteSpace(getScore.ToString()))
+                {
+                    if (int.TryParse(getScore.ToString(), out int cellScore))
+                        getScore = cellScore;
+                    else
+                        StudentsNotesDataGridView.Rows[i].Cells[$"#n{j}"].Value = 0;
                     getScore = 0;
+                }
+
                 if (!string.IsNullOrWhiteSpace(getSS))
                     getSSC.AddRange(getSS);
 
@@ -317,6 +361,7 @@ public partial class Analysis_Full : Form
 
     private void ScoreReferenceDGWLoadData()
     {
+
         List<int> rSList = [];
         List<string> refBenefits = [];
         List<string> refBenefitsComments = [];
@@ -394,6 +439,9 @@ public partial class Analysis_Full : Form
         //}
     }
 
+
+
+
     //private void TextBox_KeyPress(object sender, KeyPressEventArgs e)
     //{
     //    char[] allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.()/ ".ToCharArray();
@@ -406,5 +454,75 @@ public partial class Analysis_Full : Form
     //    //if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && !allowedChars.Contains(e.KeyChar) && !allowedCharsOfStatus.Contains(e.KeyChar) && (ScoreReferenceDGW.Columns["#rn"].Index == ScoreReferenceDGW.CurrentCell.ColumnIndex))
     //    //    e.Handled = false;
     //}
+
+
+    private void SaveDataGridViews(string fileName)
+    {
+
+        //using StreamWriter sw = new(fileName);
+        //// İlk DataGridView verisini dosyaya kaydet
+        //SaveDataGridView(ScoreReferenceDGW, sw);
+
+        //// İkinci DataGridView verisini dosyaya kaydet
+        //SaveDataGridView(StudentsNotesDataGridView, sw);
+    }
+
+    private static void SaveDataGridView(DataGridView dataGridView, StreamWriter sw)
+    {
+        if (IsDataGridViewEmpty(dataGridView))
+            return;
+
+        sw.WriteLine($"[{dataGridView.Name}]");
+
+        foreach (DataGridViewRow row in dataGridView.Rows)
+        {
+            if (!row.IsNewRow)
+            {
+                string rowValues = string.Join(",", row.Cells.Cast<DataGridViewCell>().Select(cell => cell.Value));
+                sw.WriteLine(rowValues);
+            }
+        }
+
+        sw.WriteLine(); // Bölümleri birbirinden ayırmak için bir satır boşluk bırak
+    }
+
+
+    private void LoadDataGridViews(string fileName)
+    {
+        using StreamReader sr = new(fileName);
+        LoadDataGridView(ScoreReferenceDGW, sr);
+        LoadDataGridView(StudentsNotesDataGridView, sr);
+    }
+
+    private static void LoadDataGridView(DataGridView dataGridView, StreamReader sr)
+    {
+        dataGridView.Rows.Clear();
+
+        while (!sr.EndOfStream)
+        {
+            string line = sr.ReadLine();
+
+            if (line == $"[{dataGridView.Name}]")
+            {
+                // İlgili bölüme ulaşıldı, verileri yükle
+                while (!sr.EndOfStream)
+                {
+                    line = sr.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(line))
+                        // Bölüm bitti
+                        break;
+
+                    string[] rowValues = line.Split(',');
+                    dataGridView.Rows.Add(rowValues);
+                }
+            }
+        }
+    }
+
+    private static bool IsDataGridViewEmpty(DataGridView dataGridView)
+    {
+        return (dataGridView == null || dataGridView.Rows.Count == 0);
+    }
 
 }

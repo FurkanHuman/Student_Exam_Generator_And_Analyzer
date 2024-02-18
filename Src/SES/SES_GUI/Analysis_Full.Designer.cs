@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             Btn_StudentLoad = new Button();
             ClassAgeComboBox = new ComboBox();
             AltClassComboBox = new ComboBox();
@@ -59,6 +60,9 @@
             TeacherTextbox = new TextBox();
             PrincipalTextBox = new TextBox();
             PrincipalLabel = new Label();
+            SnapshotSaveButton = new Button();
+            LoadSnapshotFromFileButton = new Button();
+            AutomaticSavingTenM = new System.Windows.Forms.Timer(components);
             ((System.ComponentModel.ISupportInitialize)StudentsNotesDataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)ScoreReferenceDGW).BeginInit();
             SuspendLayout();
@@ -238,7 +242,7 @@
             // SemesterSessionComboBox
             // 
             SemesterSessionComboBox.FormattingEnabled = true;
-            SemesterSessionComboBox.Location = new Point(477, 554);
+            SemesterSessionComboBox.Location = new Point(485, 554);
             SemesterSessionComboBox.Name = "SemesterSessionComboBox";
             SemesterSessionComboBox.Size = new Size(121, 23);
             SemesterSessionComboBox.TabIndex = 21;
@@ -340,11 +344,38 @@
             PrincipalLabel.TabIndex = 31;
             PrincipalLabel.Text = "Müdür";
             // 
+            // SnapshotSaveButton
+            // 
+            SnapshotSaveButton.Location = new Point(697, 531);
+            SnapshotSaveButton.Name = "SnapshotSaveButton";
+            SnapshotSaveButton.Size = new Size(96, 22);
+            SnapshotSaveButton.TabIndex = 34;
+            SnapshotSaveButton.Text = "Anlık Kayıt";
+            SnapshotSaveButton.UseVisualStyleBackColor = true;
+            SnapshotSaveButton.Click += SnapshotSaveButton_Click;
+            // 
+            // LoadSnapshotFromFileButton
+            // 
+            LoadSnapshotFromFileButton.Location = new Point(697, 559);
+            LoadSnapshotFromFileButton.Name = "LoadSnapshotFromFileButton";
+            LoadSnapshotFromFileButton.Size = new Size(96, 24);
+            LoadSnapshotFromFileButton.TabIndex = 35;
+            LoadSnapshotFromFileButton.Text = "Anlık Yükle";
+            LoadSnapshotFromFileButton.UseVisualStyleBackColor = true;
+            LoadSnapshotFromFileButton.Click += LoadSnapshotFromFileButton_Click;
+            // 
+            // AutomaticSavingTenM
+            // 
+            AutomaticSavingTenM.Interval = 600000;
+            AutomaticSavingTenM.Tick += AutomaticSavingTenM_Tick;
+            // 
             // Analysis_Full
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(804, 700);
+            Controls.Add(LoadSnapshotFromFileButton);
+            Controls.Add(SnapshotSaveButton);
             Controls.Add(PrincipalTextBox);
             Controls.Add(PrincipalLabel);
             Controls.Add(TeacherTextbox);
@@ -420,5 +451,8 @@
         private ComboBox SemesterSessionComboBox;
         private DataGridView StudentsNotesDataGridView;
         private DataGridView ScoreReferenceDGW;
+        private Button SnapshotSaveButton;
+        private Button LoadSnapshotFromFileButton;
+        private System.Windows.Forms.Timer AutomaticSavingTenM;
     }
 }

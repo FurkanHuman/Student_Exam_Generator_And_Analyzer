@@ -1,5 +1,4 @@
 using App.PdfPageProduct.AnalysisPageFeature;
-using Entity.Entities.Mains;
 using Microsoft.Extensions.DependencyInjection;
 using QuestPDF.Infrastructure;
 
@@ -18,8 +17,7 @@ namespace SES_GUI
 
         private void Analsys_Click(object sender, EventArgs e)
         {
-            IAnalsysPage analsysPage = _serviceProvider.GetRequiredService<IAnalsysPage>();
-            Analysis_Full f = new(analsysPage);
+            Analysis_Full f = _serviceProvider.GetRequiredService<Analysis_Full>();
             f.Show();
         }
 
@@ -32,7 +30,7 @@ namespace SES_GUI
 
         private void StudentAddButton_Click(object sender, EventArgs e)
         {
-            Student_Add student_Add = new();
+            Student_Add student_Add = _serviceProvider.GetRequiredService<Student_Add>();
             student_Add.Show();
         }
     }

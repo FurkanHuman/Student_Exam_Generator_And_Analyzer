@@ -1,5 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using App;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SES_GUI
 {
@@ -20,7 +20,7 @@ namespace SES_GUI
                 .AddAppServiceRegistration()
                 .AddSesGUIServiceRegistration()
                 .BuildServiceProvider();
-            
+
             Application.Run(serviceProvider.GetRequiredService<SES_Main>());
         }
     }

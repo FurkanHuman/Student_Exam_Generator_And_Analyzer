@@ -40,6 +40,7 @@
             StudentNumberLabel = new Label();
             StudentNameLabel = new Label();
             StudentSurNameLabel = new Label();
+            DefaultPathLocationButton = new Button();
             SuspendLayout();
             // 
             // ClassComboBox
@@ -48,7 +49,7 @@
             ClassComboBox.Location = new Point(54, 51);
             ClassComboBox.Name = "ClassComboBox";
             ClassComboBox.Size = new Size(45, 23);
-            ClassComboBox.TabIndex = 0;
+            ClassComboBox.TabIndex = 2;
             // 
             // AltClassComboBox
             // 
@@ -56,26 +57,28 @@
             AltClassComboBox.Location = new Point(72, 88);
             AltClassComboBox.Name = "AltClassComboBox";
             AltClassComboBox.Size = new Size(45, 23);
-            AltClassComboBox.TabIndex = 1;
+            AltClassComboBox.TabIndex = 3;
             // 
             // LoadButton
             // 
             LoadButton.Location = new Point(12, 12);
             LoadButton.Name = "LoadButton";
             LoadButton.Size = new Size(75, 23);
-            LoadButton.TabIndex = 2;
+            LoadButton.TabIndex = 1;
             LoadButton.Text = "Yükle";
             LoadButton.UseVisualStyleBackColor = true;
             LoadButton.Click += LoadButton_Click;
             // 
             // SaveButton
             // 
+            SaveButton.Enabled = false;
             SaveButton.Location = new Point(117, 240);
             SaveButton.Name = "SaveButton";
             SaveButton.Size = new Size(75, 23);
-            SaveButton.TabIndex = 3;
+            SaveButton.TabIndex = 7;
             SaveButton.Text = "Kaydet";
             SaveButton.UseVisualStyleBackColor = true;
+            SaveButton.Click += SaveButton_Click;
             // 
             // ClassAgeLabel
             // 
@@ -100,21 +103,21 @@
             StudentNameTextBox.Location = new Point(55, 162);
             StudentNameTextBox.Name = "StudentNameTextBox";
             StudentNameTextBox.Size = new Size(100, 23);
-            StudentNameTextBox.TabIndex = 6;
+            StudentNameTextBox.TabIndex = 5;
             // 
             // StudentSchoolNumberTextBox
             // 
             StudentSchoolNumberTextBox.Location = new Point(110, 125);
             StudentSchoolNumberTextBox.Name = "StudentSchoolNumberTextBox";
             StudentSchoolNumberTextBox.Size = new Size(45, 23);
-            StudentSchoolNumberTextBox.TabIndex = 7;
+            StudentSchoolNumberTextBox.TabIndex = 4;
             // 
             // StudentSurNameTextBox
             // 
             StudentSurNameTextBox.Location = new Point(66, 199);
             StudentSurNameTextBox.Name = "StudentSurNameTextBox";
             StudentSurNameTextBox.Size = new Size(100, 23);
-            StudentSurNameTextBox.TabIndex = 8;
+            StudentSurNameTextBox.TabIndex = 6;
             // 
             // StudentNumberLabel
             // 
@@ -143,11 +146,22 @@
             StudentSurNameLabel.TabIndex = 11;
             StudentSurNameLabel.Text = "Soyadı :";
             // 
+            // DefaultPathLocationButton
+            // 
+            DefaultPathLocationButton.Location = new Point(12, 240);
+            DefaultPathLocationButton.Name = "DefaultPathLocationButton";
+            DefaultPathLocationButton.Size = new Size(20, 23);
+            DefaultPathLocationButton.TabIndex = 8;
+            DefaultPathLocationButton.Text = "V";
+            DefaultPathLocationButton.UseVisualStyleBackColor = true;
+            DefaultPathLocationButton.Click += DefaultPathLocationButton_Click;
+            // 
             // Student_Add
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(204, 275);
+            Controls.Add(DefaultPathLocationButton);
             Controls.Add(StudentSurNameLabel);
             Controls.Add(StudentNameLabel);
             Controls.Add(StudentNumberLabel);
@@ -184,5 +198,6 @@
         private Label StudentNumberLabel;
         private Label StudentNameLabel;
         private Label StudentSurNameLabel;
+        private Button DefaultPathLocationButton;
     }
 }
