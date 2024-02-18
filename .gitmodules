@@ -1,0 +1,3 @@
+[submodule "Src/nArchitecture.Core"]
+	path = Src/nArchitecture.Core
+	url = https://github.com/kodlamaio-projects/nArchitecture.Core.git
