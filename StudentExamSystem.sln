@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Persistence.Dependency
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Persistence", "Src\nArchitecture.Core\Core.Persistence\Core.Persistence.csproj", "{1DFB3D38-B890-4F7D-A6AC-905F76C4C630}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistence", "Src\SES\Persistence\Persistence.csproj", "{648BB40A-BAB1-474A-832C-8A6D48DF7790}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{1DFB3D38-B890-4F7D-A6AC-905F76C4C630}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DFB3D38-B890-4F7D-A6AC-905F76C4C630}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DFB3D38-B890-4F7D-A6AC-905F76C4C630}.Release|Any CPU.Build.0 = Release|Any CPU
+		{648BB40A-BAB1-474A-832C-8A6D48DF7790}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{648BB40A-BAB1-474A-832C-8A6D48DF7790}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{648BB40A-BAB1-474A-832C-8A6D48DF7790}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{648BB40A-BAB1-474A-832C-8A6D48DF7790}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +72,7 @@ Global
 		{DC18B253-AA53-4F46-9D29-81AB72EE0917} = {404DE638-8DE2-4B40-A02A-BE41DD267D5F}
 		{5453A693-3978-456F-B163-B387ECA29FC9} = {E2283CEC-AA60-4128-8058-E05E1652CB79}
 		{1DFB3D38-B890-4F7D-A6AC-905F76C4C630} = {E2283CEC-AA60-4128-8058-E05E1652CB79}
+		{648BB40A-BAB1-474A-832C-8A6D48DF7790} = {404DE638-8DE2-4B40-A02A-BE41DD267D5F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {39CF152C-4BD0-42A7-A568-9F7F8F2749E3}

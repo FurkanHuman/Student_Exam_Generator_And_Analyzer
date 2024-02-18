@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\nArchitecture.Core\Core.Persistence.DependencyInjection\Core.Persistence.DependencyInjection.csproj" />
     <ProjectReference Include="..\App\App.csproj" />
   </ItemGroup>
   <ItemGroup>
