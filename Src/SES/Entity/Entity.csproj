@@ -11,4 +11,8 @@
     <Folder Include="Entities\Infos\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\nArchitecture.Core\Core.Persistence\Core.Persistence.csproj" />
+  </ItemGroup>
+
 </Project>
