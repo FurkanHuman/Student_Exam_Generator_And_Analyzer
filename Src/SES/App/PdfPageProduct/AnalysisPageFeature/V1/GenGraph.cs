@@ -2,7 +2,7 @@
 using ScottPlot.Plottable;
 using System.Drawing;
 
-namespace App.PdfPageProduct.AnalysisPageFeature
+namespace App.PdfPageProduct.AnalysisPageFeature.V1
 {
     public static class GenGraph
     {
@@ -42,7 +42,7 @@ namespace App.PdfPageProduct.AnalysisPageFeature
 
             // add random data to the histogram
             Random rand = new(0);
-            double[] heights = ScottPlot.DataGen.RandomNormal(rand, pointCount: 1234, mean: 178.4, stdDev: 7.6);
+            double[] heights = DataGen.RandomNormal(rand, pointCount: 1234, mean: 178.4, stdDev: 7.6);
             hist.AddRange(heights);
 
             // display histogram probabability as a bar plot
@@ -67,19 +67,28 @@ namespace App.PdfPageProduct.AnalysisPageFeature
         }
 
 
-        public static byte[] LabeledClassStudendSegmentPie(double[] values)
+        public static byte[] LabeledClassStudendSegmentPie(int[] scores)
         {
-            // grafik 3 : öğrencilerin sınıf başarı grubu grafiği.N kadar aralık üzerinden.
-            
+
+            int excellentCount = scores.Count(score => score == 5);
+            int goodCount = scores.Count(score => score == 4);
+            int averageCount = scores.Count(score => score == 3);
+            int passCount = scores.Count(score => score == 2);
+            int failCount = scores.Count(score => score == 1);
+
             Plot plot = new(750, 750);
-            plot.Title("Sınıf başarı durumu pasta grafiği");
+            plot.Title("Sınıf Başarı Dağılımı");
             plot.Legend();
-            
-            PiePlot pie = plot.AddPie(values);
+
+            PiePlot pie = plot.AddPie([excellentCount, goodCount, averageCount, passCount, failCount]);
+
             pie.Explode = true;
             pie.ShowPercentages = true;
             pie.ShowValues = true;
             pie.ShowLabels = true;
+            pie.SliceFillColors = [Color.Green, Color.GreenYellow, Color.Yellow, Color.Orange, Color.Red];
+            pie.SliceLabelColors = [Color.FromArgb(255, Color.Black), Color.FromArgb(255, Color.Black), Color.FromArgb(255, Color.Black), Color.FromArgb(255, Color.Black), Color.FromArgb(255, Color.Black)];
+            pie.SliceLabels = ["5 Alan", "4 Alan", "3 Alan", "2 Alan", "1 Alan"];
 
             return plot.GetImageBytes();
         }
@@ -95,7 +104,7 @@ namespace App.PdfPageProduct.AnalysisPageFeature
 
             Plot plot = new(750, 750);
             plot.Title("Soru Bazında Ortalama Puan");
-            
+
             for (int i = 0; i < values.Length; i++)
             {
                 labelsOfQuest.Add($"#{i + 1}");
@@ -104,12 +113,9 @@ namespace App.PdfPageProduct.AnalysisPageFeature
 
             BarPlot barPlot = plot.AddBar(roundedValues, [.. positionsOfQuest]);
             barPlot.ShowValuesAboveBars = true;
-          
-
-
 
             plot.XTicks([.. positionsOfQuest], [.. labelsOfQuest]);
-            plot.SetAxisLimits(yMin: 0, yMax: roundedValues.Max()+1);
+            plot.SetAxisLimits(yMin: 0, yMax: roundedValues.Max() + 1);
             return plot.GetImageBytes();
 
         }

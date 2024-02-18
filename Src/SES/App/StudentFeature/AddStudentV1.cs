@@ -1,6 +1,5 @@
 ﻿
 using Entity.Entities.Mains;
-using System.Text;
 using System.Text.Json;
 
 namespace App.AddStudent;
@@ -37,7 +36,7 @@ public class AddStudentV1 : IAddStudent
             });
             count++;
         }
-        
+
         return new List<Student>();
     }
 

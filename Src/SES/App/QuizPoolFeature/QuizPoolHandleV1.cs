@@ -1,28 +1,25 @@
 ﻿using Entity.Entities.Mains;
-using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Unicode;
 
 namespace App.QuizPoolFeature;
 
 public class QuizPoolHandleV1 : IQuizPool
 {
-    private IList<QuizQuestion> QuizQuestions { get; set; }
+    private IList<QuizQuestionOlder> QuizQuestions { get; set; }
     private int Id { get; set; }
 
-    public IList<QuizQuestion>? GetQuestionPoolForName(string quizName)
+    public IList<QuizQuestionOlder>? GetQuestionPoolForName(string quizName)
     {
         string path = $@"{Environment.CurrentDirectory}\{quizName}\{quizName}.json";
         Console.WriteLine(path);
 
-        IList<QuizQuestion>? loadedQuizQuestions = new List<QuizQuestion>();
+        IList<QuizQuestionOlder>? loadedQuizQuestions = new List<QuizQuestionOlder>();
 
         try
         {
             string fs = File.ReadAllText(path);
 
-            loadedQuizQuestions = JsonSerializer.Deserialize<IList<QuizQuestion>?>(fs);
+            loadedQuizQuestions = JsonSerializer.Deserialize<IList<QuizQuestionOlder>?>(fs);
         }
         catch (Exception)
         {
@@ -61,7 +58,7 @@ public class QuizPoolHandleV1 : IQuizPool
         Console.WriteLine("Çıkmak için F2 tuşuna basın...");
         while (Console.ReadKey().Key != ConsoleKey.F2)
         {
-            QuizQuestion quizQuestion = new();
+            QuizQuestionOlder quizQuestion = new();
 
             Console.Write("Soruyu girin: ");
             string? quiz = Console.ReadLine();
@@ -83,7 +80,7 @@ public class QuizPoolHandleV1 : IQuizPool
         File.WriteAllText(pathF, jsonStr);
     }
 
-    private static void ImputLuckyFactor(QuizQuestion quizQuestion)
+    private static void ImputLuckyFactor(QuizQuestionOlder quizQuestion)
     {
         Console.Write("şans faktorü (varsayılan 50) : ");
         string? lucky = Console.ReadLine();
@@ -107,16 +104,16 @@ public class QuizPoolHandleV1 : IQuizPool
 
     public void QuestionPoolUpdateQuiz(string quizName)
     {
-            string pathD = $@"{Environment.CurrentDirectory}\{quizName}\";
-            string pathF = pathD + $@"{quizName}.json";
+        string pathD = $@"{Environment.CurrentDirectory}\{quizName}\";
+        string pathF = pathD + $@"{quizName}.json";
         QuizQuestions = GetQuestionPoolForName(quizName);
 
         while (Console.ReadKey().Key != ConsoleKey.F2)
         {
             Console.Write("Id: ");
-            int quizId =int.Parse(Console.ReadLine());
+            int quizId = int.Parse(Console.ReadLine());
 
-            QuizQuestion quizQuestion = QuizQuestions.First(x => x.Id==quizId);
+            QuizQuestionOlder quizQuestion = QuizQuestions.First(x => x.Id == quizId);
 
             Console.WriteLine(quizQuestion.Question);
             Console.Write("Yeni Girdi: ");
