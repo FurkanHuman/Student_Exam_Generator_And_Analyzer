@@ -10,7 +10,10 @@ public class BaseDbContext : DbContext
 {
     protected IConfiguration Configuration { get; set; }
 
+    public DbSet<AnalysisHeader> AnalysisHeaders { get; set; }
+    public DbSet<Benefit> Benefits { get; set; }
     public DbSet<Exam> Exams { get; set; }
+    public DbSet<LearningArea> LearningAreas { get; set; }
     public DbSet<Principal> Principals { get; set; }
     public DbSet<QuestionScore> QuestionScores { get; set; }
     public DbSet<QuizForAnswers> QuizForAnswers { get; set; }
@@ -19,6 +22,7 @@ public class BaseDbContext : DbContext
     public DbSet<School> Schools { get; set; }
     public DbSet<Student> Students { get; set; }
     public DbSet<StudentQuizAnswer> StudentQuizAnswers { get; set; }
+    public DbSet<SubLearningArea> subLearningAreas { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
 
 
