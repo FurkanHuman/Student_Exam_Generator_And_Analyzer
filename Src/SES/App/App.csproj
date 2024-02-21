@@ -10,7 +10,7 @@
     <PackageReference Include="MediatR" Version="12.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
     <PackageReference Include="QuestPDF" Version="2023.12.2" />
-    <PackageReference Include="ScottPlot" Version="4.1.70" />
+    <PackageReference Include="ScottPlot" Version="5.0.21" />
   </ItemGroup>
 
   <ItemGroup>
