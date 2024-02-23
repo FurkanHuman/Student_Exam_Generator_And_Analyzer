@@ -1,0 +1,6 @@
+@MigApi_HostAddress = http://localhost:5071
+
+GET {{MigApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
