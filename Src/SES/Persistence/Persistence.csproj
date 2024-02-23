@@ -6,7 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\nArchitecture.Core\Core.Persistence.DependencyInjection\Core.Persistence.DependencyInjection.csproj" />
-    <ProjectReference Include="..\..\nArchitecture.Core\Core.Persistence\Core.Persistence.csproj" />
     <ProjectReference Include="..\App\App.csproj" />
   </ItemGroup>
   <ItemGroup>
