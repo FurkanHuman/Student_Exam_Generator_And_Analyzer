@@ -26,7 +26,7 @@ public class BaseDbContext : DbContext
     public DbSet<Teacher> Teachers { get; set; }
 
 
-    public BaseDbContext(DbContextOptions dbContextOptions, IConfiguration configuration)
+    public BaseDbContext(DbContextOptions<BaseDbContext> dbContextOptions, IConfiguration configuration)
         : base(dbContextOptions)
     {
         Configuration = configuration;

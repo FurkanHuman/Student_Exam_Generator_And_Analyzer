@@ -12,20 +12,14 @@ public static class PersistenceServiceRegistration
 {
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services)
     {
-
-
-
         _ = services.AddDbContext<BaseDbContext>(options => options.UseInMemoryDatabase("BaseDb"));
+        _ = services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<BaseDbContext>());
 
         _ = services.AddDbContext<PostgreSqlDbContext>(opt =>
-        {
-            opt.UseNpgsql("").UseSnakeCaseNamingConvention();
-        });
-        _ = services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<BaseDbContext>());
+            {
+                opt.UseNpgsql("Host=192.168.1.11;Username=postgres;Password=12345;Database=SES_DB").UseSnakeCaseNamingConvention();
+            });
         _ = services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<PostgreSqlDbContext>());
-
-
-
 
         _ = services.AddScoped<IAnalysisHeaderRepository, AnalysisHeaderRepository>();
         _ = services.AddScoped<IBenefitRepository, BenefitRepository>();
