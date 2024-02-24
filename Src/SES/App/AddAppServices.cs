@@ -15,10 +15,6 @@ public static class AppRegistration
 {
     public static IServiceCollection AddAppServiceRegistration(this IServiceCollection services)
     {
-        services.AddMediatR(config=>
-        {
-            config.RegisterServicesFromAssemblies();
-        });
 
         services.AddKeyedTransient<IExamPage, ExamPageWrittenV1>(1);
         services.AddKeyedTransient<IAnalsysPage, AnalsysPageWrittenV1>(1);
