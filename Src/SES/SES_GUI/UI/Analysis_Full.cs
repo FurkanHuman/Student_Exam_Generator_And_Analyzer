@@ -264,7 +264,7 @@ public partial class Analysis_Full : Form
             SchoolId = -1,
             StudentQuizAnswers = StudentQuizAnswers,
             RefScorePerQuestions = RefScores,
-            SqaId = -1,
+            StudentQuizAnswerId= -1,
             Teacher = new() { Id = -1, Name = teacherNames.name, SurName = teacherNames.surname },
             Principal = new() { Id = -1, Name = principleNames.name, SurName = principleNames.surname },
             PrincipalId = -1,
