@@ -12,7 +12,6 @@ public class PostgreSqlDbContext : DbContext
     public DbSet<LearningArea> LearningAreas { get; set; }
     public DbSet<Principal> Principals { get; set; }
     public DbSet<QuestionScore> QuestionScores { get; set; }
-    public DbSet<QuizForAnswers> QuizForAnswers { get; set; }
     public DbSet<QuizQuestion> QuizQuestions { get; set; }
     public DbSet<ReferenceBenefit> ReferenceBenefits { get; set; }
     public DbSet<School> Schools { get; set; }

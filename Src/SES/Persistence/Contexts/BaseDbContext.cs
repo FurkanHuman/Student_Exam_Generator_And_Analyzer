@@ -22,7 +22,7 @@ public class BaseDbContext : DbContext
     public DbSet<School> Schools { get; set; }
     public DbSet<Student> Students { get; set; }
     public DbSet<StudentQuizAnswer> StudentQuizAnswers { get; set; }
-    public DbSet<SubLearningArea> subLearningAreas { get; set; }
+    public DbSet<SubLearningArea> SubLearningAreas { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
 
 

@@ -23,7 +23,7 @@ internal class AnalysisHeaderConfiguration : IEntityTypeConfiguration<AnalysisHe
         builder.Property(e => e.QuestionId).IsRequired();
         builder.Property(e => e.TeacherId).IsRequired();
         builder.Property(e => e.PrincipalId).IsRequired();
-        builder.Property(e => e.SqaId).IsRequired();
+        builder.Property(e => e.StudentQuizAnswerId).IsRequired();
         builder.Property(e => e.RefScorePerQuestions).IsRequired();
 
         builder.HasOne(e => e.Teacher);

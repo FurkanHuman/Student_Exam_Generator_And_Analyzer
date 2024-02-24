@@ -31,5 +31,6 @@ public class ReferenceBenefit : Entity<int>
 
     public virtual IList<QuizQuestion> QuizQuestions { get; set; }
     public virtual IList<LearningArea> LearningAreas { get; set; }
+    public  IList<Exam> Exams { get; set; }
     public virtual School School { get; set; }
 }

@@ -18,7 +18,7 @@ public class AnalysisHeader : Entity<int>
     public int QuestionId { get; set; }
     public int TeacherId { get; set; }
     public int PrincipalId { get; set; }
-    public int SqaId { get; set; }
+    public int StudentQuizAnswerId { get; set; }
     public int SchoolId { get; set; }
 
     public Teacher Teacher { get; set; }

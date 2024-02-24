@@ -22,7 +22,7 @@ internal class ExamConfiguration : IEntityTypeConfiguration<Exam>
         builder.Property(e => e.TeacherId).IsRequired();
         builder.Property(e => e.StudentId).IsRequired();
         builder.Property(e => e.SchoolId);
-        builder.Property(e => e.ReferenceBenefit).IsRequired();
+        builder.Property(e => e.ReferenceBenefitId).IsRequired();
 
         builder.HasOne(e => e.Teacher);
         builder.HasOne(e => e.Student);

@@ -21,6 +21,6 @@ public class Exam : Entity<int>
     public Student Student { get; set; }
     public School School { get; set; }
     public ReferenceBenefit ReferenceBenefit { get; set; }
-    public IList<QuizQuestion> QuizQuestions { get; set; }
     public virtual AnalysisHeader AnalysisHeader { get; set; }
+    public IList<QuizQuestion> QuizQuestions { get; set; }
 }
