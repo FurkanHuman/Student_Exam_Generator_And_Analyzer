@@ -17,6 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\" />
+    <Folder Include="Services\" />
     <Folder Include="QuizQuestion\" />
     <Folder Include="SchoolFeature\AddFeature\" />
   </ItemGroup>

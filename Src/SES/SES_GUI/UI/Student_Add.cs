@@ -1,12 +1,15 @@
-﻿using Entity.Entities.Mains;
+﻿using App.Repositories;
+using Entity.Entities.Mains;
 using System.Text.Json;
 
 namespace SES_GUI;
 
 public partial class Student_Add : Form
 {
-    public Student_Add()
+    private readonly IStudentRepository _StudentRepository;
+    public Student_Add(IStudentRepository studentRepository)
     {
+        _StudentRepository = studentRepository;
         InitializeComponent();
     }
 
@@ -73,9 +76,26 @@ public partial class Student_Add : Form
         if (!IsControlForm())
             return;
 
-        CollectDataFromFormObjectsAndSaveStudent();
+        Student student = new()
+        {
+            ClassAge = int.TryParse(ClassComboBox.SelectedItem.ToString(), out int result) ? result : -1,
+            ClassBranch = AltClassComboBox.SelectedItem.ToString()[0],
+            SchoolNumber = StudentSchoolNumberTextBox.Text.ToUpperInvariant().ToString(),
+            Name = StudentNameTextBox.Text.ToUpperInvariant().ToString(),
+            SurName = StudentSurNameTextBox.Text.ToUpperInvariant().ToString(),
+            ExamId=-1,
+            SchoolId=-1,
+            TeacherId = -1, 
+            
 
-        UpdateFile();
+
+        };
+
+        _StudentRepository.Add(student);
+
+        //CollectDataFromFormObjectsAndSaveStudent();
+
+        //UpdateFile();
     }
 
     private void ClearForm()

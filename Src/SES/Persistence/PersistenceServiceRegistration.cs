@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Persistence.Contexts;
 using App.Repositories;
 using Persistence.Repositories;
+using SES_GUI;
 
 namespace Persistence;
 
@@ -17,7 +18,8 @@ public static class PersistenceServiceRegistration
 
         _ = services.AddDbContext<PostgreSqlDbContext>(opt =>
             {
-                opt.UseNpgsql("Host=192.168.1.11;Username=postgres;Password=12345;Database=SES_DB").UseSnakeCaseNamingConvention();
+                //opt.UseNpgsql("Host=192.168.1.11;Port=5432;Username=postgres;Password=12345;Database=SES_DB").UseSnakeCaseNamingConvention();
+                opt.UseNpgsql(Paths.GetConfFile()).UseSnakeCaseNamingConvention();
             });
         _ = services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<PostgreSqlDbContext>());
 
