@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Features\SchoolFeature\AddFeature\**" />
+    <EmbeddedResource Remove="Features\SchoolFeature\AddFeature\**" />
+    <None Remove="Features\SchoolFeature\AddFeature\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+    <PackageReference Include="QuestPDF" Version="2024.3.6" />
+    <PackageReference Include="ScottPlot" Version="5.0.34" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Entity\Entity.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\" />
+    <Folder Include="QuizQuestion\" />
+    <Folder Include="StudentFeature\" />
+  </ItemGroup>
+
+</Project>
