@@ -19,11 +19,14 @@
 	<PackageReference Include="NArchitecture.Core.Localization.Resource.Yaml.DependencyInjection" Version="1.0.2" />
 	<PackageReference Include="NArchitecture.Core.ElasticSearch" Version="1.0.1" />
 	<PackageReference Include="NArchitecture.Core.Security.DependencyInjection" Version="1.2.1" />
-	<PackageReference Include="QuestPDF" Version="2024.3.10" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Features\**\Resources\Locales\*.*.yaml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Features\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 </Project>
