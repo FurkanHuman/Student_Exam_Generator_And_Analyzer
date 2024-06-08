@@ -1,4 +1,4 @@
-﻿using Entity.Entities.Mains;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,20 +11,18 @@ internal class ReferenceBenefitConfiguration : IEntityTypeConfiguration<Referenc
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Id).IsRequired();
         builder.Property(e => e.ReferenceBenefitName).IsRequired();
-        builder.Property(e => e.ReferenceBenefitSeason).IsRequired();
-        builder.Property(e => e.SchoolYear).IsRequired();
-        builder.Property(e => e.EndSchcoolYear);
 
         builder.Property(e => e.SchoolId).IsRequired();
         builder.Property(e => e.ExamId);
         builder.Property(e => e.LearningAreaId).IsRequired();
+        builder.Property(e => e.SemesterId).IsRequired();
 
         builder.HasOne(e => e.School);
+        builder.HasOne(e => e.Semester);
 
         builder.HasMany(e => e.QuizQuestions);
         builder.HasMany(e => e.LearningAreas);
         builder.HasMany(e => e.Exams);
-
 
         builder.Property(e => e.CreatedDate).IsRequired();
         builder.Property(e => e.UpdatedDate);

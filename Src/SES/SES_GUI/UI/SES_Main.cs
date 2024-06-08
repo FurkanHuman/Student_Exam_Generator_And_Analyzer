@@ -1,6 +1,6 @@
-using App.PdfPageProduct.AnalysisPageFeature;
 using Microsoft.Extensions.DependencyInjection;
 using QuestPDF.Infrastructure;
+using SES_GUI.UI;
 
 namespace SES_GUI
 {
@@ -32,6 +32,13 @@ namespace SES_GUI
         {
             Student_Add student_Add = _serviceProvider.GetRequiredService<Student_Add>();
             student_Add.Show();
+        }
+
+        private void SchoolName_Click(object sender, EventArgs e)
+        {
+            SchoolAdd schoolAdd = _serviceProvider.GetRequiredService<SchoolAdd>();
+            MessageBox.Show("DÝKKAT OKUL ADINI DÜZENLEYECEKSÝN!!!");
+            schoolAdd.Show();
         }
     }
 }

@@ -1,11 +1,22 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using Application;
+using Persistence;
+using Microsoft.Extensions.DependencyInjection;
+using Application.Features.SchoolFeature;
+
 Console.WriteLine("Hello, World!");
 
 
-//ServiceProvider serviceProvider = new ServiceCollection()
-//    .AddAppServiceRegistration()
-//    .BuildServiceProvider();
+ServiceProvider serviceProvider = new ServiceCollection()
+    .AddAppicationServiceRegistration()
+    .AddPersistenceServiceRegistration()
+    .BuildServiceProvider();
+
+ISchoolService schoolService = serviceProvider.GetRequiredService<ISchoolService>();
+
+Console.WriteLine(schoolService.GetLastId());
+
 
 //QuestPDF.Settings.CheckIfAllTextGlyphsAreAvailable = false;
 //QuestPDF.Settings.License = LicenseType.Community;
@@ -105,7 +116,7 @@ Console.WriteLine("Hello, World!");
 
 //string? quizName = "BİLİŞİM 6.SINIFLAR 1.DÖNEM 2.YAZILI";
 //string? schoolName = "HACIİLBEY MENSUCAT SANTRAL ORTAOKULU";
-//IList<Student> students = serviceProvider.GetRequiredService<IAddStudent>().AddStudentsLoadFromJsonFile("C:\\Users\\furka\\Desktop\\students.json").Where(s => s.ClassAge == 6).ToList();
+//IList<Student> students = serviceProvider.GetRequiredService<IAddStudent>().CreateStudentsLoadFromJsonFile("C:\\Users\\furka\\Desktop\\students.json").Where(s => s.ClassAge == 6).ToList();
 
 
 //quizPool.QuestionPoolAddQuiz(quizName);
@@ -175,7 +186,7 @@ Console.WriteLine("Hello, World!");
 
 ////Exam exam = new();
 
-////IList<Student> sts = serviceProvider.GetRequiredService<IAddStudent>().AddStudentsLoadFromJsonFile("C:\\Users\\furka\\Desktop\\students.json");
+////IList<Student> sts = serviceProvider.GetRequiredService<IAddStudent>().CreateStudentsLoadFromJsonFile("C:\\Users\\furka\\Desktop\\students.json");
 
 ////exam.School = schoolService.AddSchool(ref exam);
 

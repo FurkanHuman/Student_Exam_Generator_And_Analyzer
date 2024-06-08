@@ -1,32 +1,86 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
   <ItemGroup>
-    <Compile Remove="Features\SchoolFeature\AddFeature\**" />
-    <EmbeddedResource Remove="Features\SchoolFeature\AddFeature\**" />
-    <None Remove="Features\SchoolFeature\AddFeature\**" />
+    <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
-    <PackageReference Include="QuestPDF" Version="2024.3.6" />
-    <PackageReference Include="ScottPlot" Version="5.0.34" />
+    <PackageReference Include="MediatR" Version="12.3.0" />
+    <PackageReference Include="NArchitecture.Core.Application" Version="1.0.5" />
+    <PackageReference Include="NArchitecture.Core.Mailing" Version="1.0.2" />
+    <PackageReference Include="NArchitecture.Core.Mailing.Mailkit" Version="1.0.2" />
+	<PackageReference Include="NArchitecture.Core.CrossCuttingConcerns.Exception" Version="1.0.1" />
+	<PackageReference Include="NArchitecture.Core.CrossCuttingConcerns.Logging.Serilog.File" Version="1.0.1" />
+	<PackageReference Include="NArchitecture.Core.Localization.Abstraction" Version="1.0.1" />
+	<PackageReference Include="NArchitecture.Core.Localization.Resource.Yaml.DependencyInjection" Version="1.0.2" />
+	<PackageReference Include="NArchitecture.Core.ElasticSearch" Version="1.0.1" />
+	<PackageReference Include="NArchitecture.Core.Security.DependencyInjection" Version="1.2.1" />
+	<PackageReference Include="QuestPDF" Version="2024.3.10" />
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\Entity\Entity.csproj" />
+    <None Update="Features\**\Resources\Locales\*.*.yaml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
-
   <ItemGroup>
-    <Folder Include="Services\" />
-    <Folder Include="QuizQuestion\" />
-    <Folder Include="StudentFeature\" />
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\OFL.txt" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-ThinItalic.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-Thin.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-SemiBoldItalic.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-SemiBold.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-Regular.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-MediumItalic.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-Medium.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-LightItalic.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-Light.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-Italic.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-ExtraLightItalic.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-ExtraLight.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-ExtraBoldItalic.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-ExtraBold.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-BoldItalic.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-Bold.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-BlackItalic.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="C:\Users\furka\.nuget\packages\questpdf\2024.3.10\buildTransitive\..\LatoFont\Lato-Black.ttf" />
+  </ItemGroup>
 </Project>

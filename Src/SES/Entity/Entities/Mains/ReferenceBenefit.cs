@@ -1,4 +1,5 @@
-﻿using Entity.Base;
+﻿using Entity.Entities.Infos;
+using NArchitecture.Core.Persistence.Repositories;
 
 namespace Entity.Entities.Mains;
 
@@ -21,16 +22,15 @@ public class ReferenceBenefit : Entity<int>
      */
 
     public string ReferenceBenefitName { get; set; }
-    public string ReferenceBenefitSeason { get; set; }
-    public int SchoolYear { get; set; }
-    public int EndSchcoolYear { get; set; }
-
+    public int SemesterId { get; set; }
     public int SchoolId { get; set; }
     public int ExamId { get; set; }
     public int LearningAreaId { get; set; }
 
     public virtual IList<QuizQuestion> QuizQuestions { get; set; }
     public virtual IList<LearningArea> LearningAreas { get; set; }
-    public  IList<Exam> Exams { get; set; }
+    public IList<Exam> Exams { get; set; }
     public virtual School School { get; set; }
+    public Semester Semester { get; set; }
+
 }

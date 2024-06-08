@@ -1,4 +1,4 @@
-﻿using App.PdfPageProduct.AnalysisPageFeature;
+﻿using Application.PdfPageProduct.AnalysisPageFeature;
 using Entity.Entities.Mains;
 using Microsoft.Extensions.DependencyInjection;
 using QuestPDF.Fluent;
@@ -250,21 +250,21 @@ public partial class Analysis_Full : Form
         (string name, string surname) teacherNames = NameSplit(TeacherTextbox);
         (string name, string surname) principleNames = NameSplit(PrincipalTextBox);
 
-        AnalysisHeader analysisHeader = new()
+        Analysis analysisHeader = new()
         {
             ClassAge = (int)ClassAgeComboBox.SelectedItem,
             AltClass = (char)AltClassComboBox.SelectedItem,
             ExamSemesterYear = (string)SemesterYearComboBox.SelectedItem,
             LessonName = LessonNameTextBox.Text.ToUpper(),
-            Semester = (string)SemesterComboBox.SelectedItem,
-            SemesterSession = (string)SemesterComboBox.SelectedItem,
+            // Semester = (string)SemesterComboBox.SelectedItem,
+            LessonSession = (string)SemesterComboBox.SelectedItem,
             ExamCode = ExamCodeTextbox.Text,
             FooterNote = FooterTextBox.Text,
             School = new School() { Name = SchoolTextBox.Text, Id = -1 },
             SchoolId = -1,
             StudentQuizAnswers = StudentQuizAnswers,
             RefScorePerQuestions = RefScores,
-            StudentQuizAnswerId= -1,
+            StudentQuizAnswerId = -1,
             Teacher = new() { Id = -1, Name = teacherNames.name, SurName = teacherNames.surname },
             Principal = new() { Id = -1, Name = principleNames.name, SurName = principleNames.surname },
             PrincipalId = -1,
@@ -292,14 +292,14 @@ public partial class Analysis_Full : Form
         return (string.Join(" ", names.Take(names.Length - 1)), names.Last());
     }
 
-    private static void SaveFile(AnalysisHeader analysisHeader, IDocument analysispage)
+    private static void SaveFile(Analysis analysisHeader, IDocument analysispage)
     {
         SaveFileDialog saveFileDialog = new()
         {
             Filter = "PDF Dosyası|*.pdf",
             Title = "Analiz dosyasını kaydet",
             DefaultExt = "pdf",
-            FileName = $"{analysisHeader.ExamSemesterYear} {analysisHeader.Semester} {analysisHeader.SemesterSession} {analysisHeader.LessonName} Analizi",
+            FileName = $"{analysisHeader.ExamSemesterYear} {analysisHeader.Semester} {analysisHeader.LessonSession} {analysisHeader.LessonName} Analizi",
             CheckFileExists = false,
             InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
         };

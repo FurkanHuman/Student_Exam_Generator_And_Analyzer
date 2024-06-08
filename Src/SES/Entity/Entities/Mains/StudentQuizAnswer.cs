@@ -1,8 +1,8 @@
-﻿using Entity.Base;
+﻿using NArchitecture.Core.Persistence.Repositories;
 
 namespace Entity.Entities.Mains;
 
-public class StudentQuizAnswer : Entity<int>
+public class StudentQuizAnswer : Entity<int> // todo : eski kaldır
 {
     public string StudentNumber { get; set; }
     public int ExamId { get; set; }

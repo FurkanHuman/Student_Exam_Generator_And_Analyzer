@@ -1,9 +1,6 @@
-using App;
+using Application;
 using Microsoft.Extensions.DependencyInjection;
 using SES_GUI.UI;
-using System;
-using System.IO;
-using System.Windows.Forms;
 
 namespace SES_GUI
 {
@@ -21,19 +18,18 @@ namespace SES_GUI
 
             ApplicationConfiguration.Initialize();
             using ServiceProvider serviceProvider = new ServiceCollection()
-                .AddAppServiceRegistration()
+                .AddAppicationServiceRegistration()
                 .AddSesGUIServiceRegistration()
                 .BuildServiceProvider();
- 
+
             string ConfPath = Paths.GetConfPath();
             string ConfFile = Paths.GetConfFile();
 
             if (!Directory.Exists(ConfPath))
                 Directory.CreateDirectory(ConfPath);
             if (!File.Exists(ConfFile))
-                Application.Run(serviceProvider.GetRequiredService<DbConnectionBuilder>());
-
-            Application.Run(serviceProvider.GetRequiredService<SES_Main>());
+                System.Windows.Forms.Application.Run(serviceProvider.GetRequiredService<DbConnectionBuilder>());
+            System.Windows.Forms.Application.Run(serviceProvider.GetRequiredService<SES_Main>());
         }
     }
 }

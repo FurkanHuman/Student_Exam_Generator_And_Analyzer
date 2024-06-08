@@ -1,4 +1,4 @@
-﻿using Entity.Base;
+﻿using NArchitecture.Core.Persistence.Repositories;
 
 namespace Entity.Entities.Mains;
 
@@ -11,5 +11,5 @@ public class Benefit : Entity<int>
 
     public virtual SubLearningArea SubLearningArea { get; set; }
 
-    public virtual IList<QuizQuestion> QuizQuestions { get; set; }
+    public virtual IList<StudentAnswer> QuizQuestions { get; set; }
 }

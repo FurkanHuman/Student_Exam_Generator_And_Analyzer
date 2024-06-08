@@ -1,0 +1,97 @@
+﻿@page "/SemesterAdd"
+@using Application.Features.SemesterFeature.CRUD
+<PageTitle>Dönem ekle</PageTitle>
+<h3>Dönem Ekle</h3>
+
+
+
+
+
+<EditForm method="post" OnValidSubmit="Submit" Model="semesterDTO" FormName="SemesterAdd">
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="input-group mb-3" style="width:15rem;">
+
+        <label class="input-group-text">
+            Dönem Başlangıc Tarihi :
+            <InputDate id="BDate" EnableMinMax="true" Min="1920-01-01" Placeholder="Tarih Giriniz:" @bind-Value="semesterDTO.BeginSemesterDate" />
+        </label>
+    </div>
+
+    <div class="input-group mb-3" style="width:15rem;">
+        <label class="input-group-text">
+            Dönem Bitiş Tarihi :
+            <InputDate id="EDate" EnableMinMax="true" Min="1920-01-01" Placeholder="Tarih Giriniz:" @bind-Value="semesterDTO.EndSemesterDate" />
+        </label>
+    </div>
+
+    <div class="mb-3" style="width:15rem;">
+        <label class="input-group-text">
+            Dönem Adı :
+            <InputText type="Text" class="form-control" id="SName" @bind-Value="semesterDTO.Name" />
+        </label>
+    </div>
+
+
+    <div class="mb-3" style="width:15rem;">
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+    </div>
+
+</EditForm>
+
+<br />
+
+<br />
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Dönem Adı</th>
+            <th scope="col">Başlangıç Tarihi</th>
+            <th scope="col">Bitiş Tarihi</th>
+        </tr>
+    </thead>
+        <tbody>
+    
+    @foreach (RequestSemesterDTO semester in prewSemester)
+    {
+            <tr>
+                <td>@semester.Name</td>
+                <td>@semester.BeginSemesterDate</td>
+                <td>@semester.EndSemesterDate</td>
+            </tr>
+    }
+        </tbody>
+</table>
+
+
+
+
+
+
+
+
+@inject ISemesterService _SemesterService;
+
+@code {
+    [SupplyParameterFromForm]
+    private CreateSemesterDTO semesterDTO { get; set; } = new();
+
+    List<RequestSemesterDTO> prewSemester= new();
+
+    
+
+    protected override Task OnInitializedAsync()
+    {
+        prewSemester = _SemesterService.GetRequestSemesters().ToList();
+
+        return base.OnInitializedAsync();
+    }
+
+    private void Submit()
+    {
+        _SemesterService.AddSemester(semesterDTO);
+    }
+}

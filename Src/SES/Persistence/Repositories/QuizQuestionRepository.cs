@@ -1,6 +1,4 @@
-﻿
-using App.Repositories;
-using Entity.Entities.Mains;
+﻿using Domain.Entities;
 using NArchitecture.Core.Persistence.Repositories;
 using Persistence.Contexts;
 

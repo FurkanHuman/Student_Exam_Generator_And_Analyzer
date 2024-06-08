@@ -1,4 +1,4 @@
-﻿using Entity.Entities.Mains;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,6 +12,13 @@ internal class SchoolConfiguration : IEntityTypeConfiguration<School>
         builder.Property(e => e.Id).IsRequired();
         builder.Property(e => e.Name).IsRequired();
 
+        //builder.HasOne(s => s.Principal);
+
+        //builder.HasMany(s => s.Students);
+        //builder.HasMany(s => s.Teachers);
+        //builder.HasMany(s => s.Exams);
+        //builder.HasMany(s => s.Analysis);
+        //builder.HasMany(s => s.ReferenceBenefits);
 
         builder.Property(e => e.CreatedDate).IsRequired();
         builder.Property(e => e.UpdatedDate);

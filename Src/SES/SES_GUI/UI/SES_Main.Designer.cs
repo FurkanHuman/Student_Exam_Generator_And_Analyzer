@@ -48,6 +48,7 @@
             button14 = new Button();
             button15 = new Button();
             button16 = new Button();
+            SchoolName = new Button();
             studentBox.SuspendLayout();
             questBox.SuspendLayout();
             examBox.SuspendLayout();
@@ -252,11 +253,22 @@
             button16.Text = "button16";
             button16.UseVisualStyleBackColor = true;
             // 
+            // SchoolName
+            // 
+            SchoolName.Location = new Point(313, 195);
+            SchoolName.Name = "SchoolName";
+            SchoolName.Size = new Size(75, 23);
+            SchoolName.TabIndex = 4;
+            SchoolName.Text = "Okul Adı";
+            SchoolName.UseVisualStyleBackColor = true;
+            SchoolName.Click += SchoolName_Click;
+            // 
             // SES_Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(400, 230);
+            Controls.Add(SchoolName);
             Controls.Add(groupBox4);
             Controls.Add(examBox);
             Controls.Add(questBox);
@@ -296,5 +308,6 @@
         private Button button14;
         private Button button15;
         private Button button16;
+        private Button SchoolName;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.Features.QuizPoolFeature;
 using Application.Features.SchoolFeature;
+using Application.Features.SemesterFeature.CRUD;
 using Application.Features.Students.CRUD.Create;
 using Application.PdfPageProduct.AnalysisPageFeature;
 using Application.PdfPageProduct.AnalysisPageFeature.V1;
@@ -18,9 +19,12 @@ public static class AppicationServiceRegistration
 
         services.AddKeyedTransient<IExamPage, ExamPageWrittenV1>(1);
         services.AddKeyedTransient<IAnalsysPage, AnalsysPageWrittenV1>(1);
-        services.AddSingleton<ISchool, SchoolV1>();
+      
         services.AddSingleton<IQuizPool, QuizPoolHandleV1>();
+        services.AddTransient<ISchoolService, SchoolV1>();
         services.AddTransient<ICreateStudent, CreateStudentV1>();
+        services.AddTransient<ISemesterService, SemesterManager>();
+
         return services;
     }
 }

@@ -1,4 +1,4 @@
-﻿using Entity.Base;
+﻿using NArchitecture.Core.Persistence.Repositories;
 
 namespace Entity.Entities.Bases
 {

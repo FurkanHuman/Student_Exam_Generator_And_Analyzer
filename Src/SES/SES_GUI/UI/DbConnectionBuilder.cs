@@ -1,4 +1,5 @@
-﻿using Npgsql;
+﻿using Application;
+using Npgsql;
 
 namespace SES_GUI.UI;
 
@@ -89,6 +90,6 @@ public partial class DbConnectionBuilder : Form
 
     private void DbConnectionBuilder_FormClosing(object sender, FormClosingEventArgs e)
     {
-        Application.Exit();
+        System.Windows.Forms.Application.Exit();
     }
 }

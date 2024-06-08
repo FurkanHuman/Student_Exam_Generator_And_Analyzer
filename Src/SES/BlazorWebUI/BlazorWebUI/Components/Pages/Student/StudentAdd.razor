@@ -1,0 +1,91 @@
+﻿@page "/StudentAdd";
+@namespace BlazorWebUI.Components.Pages.Students
+@using Application.Features.Students.CRUD.Create;
+
+<PageTitle>Öğrenci Ekle</PageTitle>
+
+<h3>Tekli öğrenci Ekleme</h3>
+
+<br />
+
+<EditForm method="post" OnValidSubmit="Submit" Model="studentDTO" FormName="StudentSingleAdd">
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    
+
+    <div class="input-group mb-3" style="width:12rem;">
+        <label class="input-group-text">Sınıf :</label>
+        <InputSelect class="form-select" id="classAge" @bind-Value="studentDTO.ClassAge">
+            <option selected>Seçiniz...</option>
+            @for (int classAge = 1; classAge <= 12; classAge++)
+            {
+                <option value="@classAge">@classAge</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="input-group mb-3" style="width:12rem;">
+
+        <label class="input-group-text">Alt Sınıf :</label>
+        <InputSelect class="form-select" id="altClasss" @bind-Value="studentDTO.ClassBranch">
+            <option selected>Seçiniz...</option>
+            @for (char altClassAge = 'A'; altClassAge <= 'Z'; altClassAge++)
+            {
+                <option value="@altClassAge">@altClassAge</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="input-group mb-3" style="width:12rem;">
+        <label class="input-group-text">Cinsiyet :</label>
+        <InputSelect class="form-select" id="gender" @bind-Value="studentDTO.Gender">
+            <option selected>Seçiniz...</option>
+            <option value="K">Kız</option>
+            <option value="E">Erkek</option>
+        </InputSelect>
+    </div>
+
+    <div class="input-group mb-3" style="width:15rem;">
+        <label class="input-group-text">Okul Numarası :</label>
+        <InputText type="Text" class="form-control" id="schoolNumber" @bind-Value="studentDTO.SchoolNumber" />
+    </div>
+
+    <div class="input-group mb-3" style="width:15rem;">
+        <label class="input-group-text">Adı :</label>
+        <InputText type="Text" class="form-control" id="name" @bind-Value="studentDTO.Name" />
+    </div>
+
+    <div class="input-group mb-3" style="width:15rem;">
+        <label class="input-group-text">Soyadı :        </label>
+        <InputText type="Text" class="form-control" id="surname" @bind-Value="studentDTO.SurName" />
+    </div>
+
+    <div class="input-group mb-3" style="width:15rem;">
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+    </div>
+
+</EditForm>
+
+
+@inject ICreateStudent _CreateStudent;
+
+@code {
+    [SupplyParameterFromForm]
+    CreateStudentDTO studentDTO { get; set; }
+
+    protected override void OnInitialized() => studentDTO ??= new();
+
+
+    private void Submit()
+    {
+        _CreateStudent.CreateStudent(studentDTO);
+
+        // is here is running
+        // ...
+        // ...
+        // ...
+        //if form reset use it new(); keyword
+        studentDTO = new();// resetting form
+    }
+}

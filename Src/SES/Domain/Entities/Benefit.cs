@@ -1,0 +1,15 @@
+﻿using NArchitecture.Core.Persistence.Repositories;
+
+namespace Domain.Entities;
+
+public class Benefit : Entity<int>
+{
+    public int SubLearningAreaId { get; set; }
+
+    public string ReferenceBenefitNumber { get; set; }
+    public string ReferenceBenefitComments { get; set; }
+
+    public virtual SubLearningArea SubLearningArea { get; set; }
+
+    public virtual IList<StudentAnswer> QuizQuestions { get; set; }
+}

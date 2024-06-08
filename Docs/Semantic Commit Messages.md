@@ -13,7 +13,6 @@
 - `test`: (adding missing tests, refactoring tests; no production code change)
 - `build`: (updating grunt tasks etc; no production code change)
 - `ci`: (changes to identify development changes related to the continuous integration and deployment system - involving scripts, configurations or tools)
-- `pu`: (Package version updates - Reason: [Reason for the update])
 
 ## 💡 Example
 

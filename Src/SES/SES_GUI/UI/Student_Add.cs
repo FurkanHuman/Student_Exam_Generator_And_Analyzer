@@ -1,4 +1,4 @@
-﻿using App.Repositories;
+﻿using Application.Repositories;
 using Entity.Entities.Mains;
 using System.Text.Json;
 
@@ -83,10 +83,10 @@ public partial class Student_Add : Form
             SchoolNumber = StudentSchoolNumberTextBox.Text.ToUpperInvariant().ToString(),
             Name = StudentNameTextBox.Text.ToUpperInvariant().ToString(),
             SurName = StudentSurNameTextBox.Text.ToUpperInvariant().ToString(),
-            ExamId=-1,
-            SchoolId=-1,
-            TeacherId = -1, 
-            
+            ExamId = -1,
+            SchoolId = -1,
+            TeacherId = -1,
+
 
 
         };

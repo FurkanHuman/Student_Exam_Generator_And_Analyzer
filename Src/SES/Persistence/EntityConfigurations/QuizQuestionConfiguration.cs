@@ -1,4 +1,4 @@
-﻿using Entity.Entities.Mains;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,22 +8,27 @@ internal class QuizQuestionConfiguration : IEntityTypeConfiguration<QuizQuestion
 {
     public void Configure(EntityTypeBuilder<QuizQuestion> builder)
     {
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).IsRequired();
-        builder.Property(e => e.Question).IsRequired();
-        builder.Property(e => e.QuestionImage).IsRequired();
+        builder.HasKey(qq => qq.Id);
+        builder.Property(qq => qq.Id).IsRequired();
+        builder.Property(qq => qq.Score).IsRequired();
+        builder.Property(qq => qq.Question).IsRequired();
+        builder.Property(qq => qq.QuestionBody).IsRequired();
+        builder.Property(qq => qq.QuestionImage).IsRequired();
+        builder.Property(qq => qq.QuestionType).IsRequired();
 
-        builder.Property(e => e.BenefitId).IsRequired();
-        builder.Property(e => e.ExamId).IsRequired();
+        builder.Property(qq => qq.BenefitId).IsRequired();
+        builder.Property(qq => qq.ExamId).IsRequired();
 
-        builder.HasMany(e => e.Exams);
-        builder.HasMany(e => e.Benefits);
+        builder.HasMany(qq => qq.Exams);
+        builder.HasMany(qq => qq.Benefits);
+        builder.HasMany(qq => qq.Options);
+        builder.HasMany(qq => qq.StudentAnswers);
 
-        builder.Property(e => e.CreatedDate).IsRequired();
-        builder.Property(e => e.UpdatedDate);
-        builder.Property(e => e.DeletedDate);
+        builder.Property(qq => qq.CreatedDate).IsRequired();
+        builder.Property(qq => qq.UpdatedDate);
+        builder.Property(qq => qq.DeletedDate);
 
-        builder.HasQueryFilter(e => !e.DeletedDate.HasValue);
+        builder.HasQueryFilter(qq => !qq.DeletedDate.HasValue);
     }
 }
 

@@ -1,6 +1,5 @@
-﻿
-using App.Repositories;
-using Entity.Entities.Mains;
+using Application.Services.Repositories;
+using Domain.Entities;
 using NArchitecture.Core.Persistence.Repositories;
 using Persistence.Contexts;
 
@@ -12,4 +11,3 @@ public class SchoolRepository : EfRepositoryBase<School, int, PostgreSqlDbContex
     {
     }
 }
-
