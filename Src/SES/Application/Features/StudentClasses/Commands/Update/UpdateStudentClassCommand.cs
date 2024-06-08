@@ -22,6 +22,7 @@ public class UpdateStudentClassCommand : IRequest<UpdatedStudentClassResponse>, 
     public required int SchoolId { get; set; }
     public required int SemesterId { get; set; }
     public required int RefTeacherId { get; set; }
+    public required School School { get; set; }
     public required Semester Semester { get; set; }
     public required Teacher RefTeacher { get; set; }
 

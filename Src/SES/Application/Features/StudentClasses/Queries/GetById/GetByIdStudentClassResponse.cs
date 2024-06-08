@@ -12,4 +12,5 @@ public class GetByIdStudentClassResponse : IResponse
     public int SchoolId { get; set; }
     public int SemesterId { get; set; }
     public int RefTeacherId { get; set; }
+
 }

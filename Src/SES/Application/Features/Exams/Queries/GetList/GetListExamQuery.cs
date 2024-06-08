@@ -1,12 +1,13 @@
+using Application.Features.Exams.Constants;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
-using MediatR;
 using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Requests;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
+using MediatR;
 using static Application.Features.Exams.Constants.ExamsOperationClaims;
 
 namespace Application.Features.Exams.Queries.GetList;
@@ -37,7 +38,7 @@ public class GetListExamQuery : IRequest<GetListResponse<GetListExamListItemDto>
         {
             IPaginate<Exam> exams = await _examRepository.GetListAsync(
                 index: request.PageRequest.PageIndex,
-                size: request.PageRequest.PageSize,
+                size: request.PageRequest.PageSize, 
                 cancellationToken: cancellationToken
             );
 

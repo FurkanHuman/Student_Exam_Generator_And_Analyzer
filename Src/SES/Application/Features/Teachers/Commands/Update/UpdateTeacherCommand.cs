@@ -21,6 +21,8 @@ public class UpdateTeacherCommand : IRequest<UpdatedTeacherResponse>, ISecuredRe
     public required int ExamId { get; set; }
     public required int StudentId { get; set; }
     public required int SchoolId { get; set; }
+    public required int UserId { get; set; }
+    public required User User { get; set; }
     public required School School { get; set; }
     public required Semester Semester { get; set; }
 

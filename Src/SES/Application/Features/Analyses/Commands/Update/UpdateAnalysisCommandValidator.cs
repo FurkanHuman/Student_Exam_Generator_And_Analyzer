@@ -19,7 +19,7 @@ public class UpdateAnalysisCommandValidator : AbstractValidator<UpdateAnalysisCo
         RuleFor(c => c.QuestionId).NotEmpty();
         RuleFor(c => c.TeacherId).NotEmpty();
         RuleFor(c => c.PrincipalId).NotEmpty();
-        RuleFor(c => c.StudentQuizAnswerId).NotEmpty();
+        RuleFor(c => c.StudentAnswerId).NotEmpty();
         RuleFor(c => c.SchoolId).NotEmpty();
         RuleFor(c => c.Semester).NotEmpty();
         RuleFor(c => c.Teacher).NotEmpty();

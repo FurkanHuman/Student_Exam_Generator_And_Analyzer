@@ -6,6 +6,7 @@ public class CreateSchoolCommandValidator : AbstractValidator<CreateSchoolComman
 {
     public CreateSchoolCommandValidator()
     {
-        RuleFor(c => c.Name).NotEmpty().NotNull();
+        RuleFor(c => c.Name).NotEmpty();
+        RuleFor(c => c.Principal).NotEmpty();
     }
 }

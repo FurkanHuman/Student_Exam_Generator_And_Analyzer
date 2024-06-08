@@ -1,12 +1,13 @@
+using Application.Features.QuestionScores.Constants;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
-using MediatR;
 using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Requests;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
+using MediatR;
 using static Application.Features.QuestionScores.Constants.QuestionScoresOperationClaims;
 
 namespace Application.Features.QuestionScores.Queries.GetList;
@@ -37,7 +38,7 @@ public class GetListQuestionScoreQuery : IRequest<GetListResponse<GetListQuestio
         {
             IPaginate<QuestionScore> questionScores = await _questionScoreRepository.GetListAsync(
                 index: request.PageRequest.PageIndex,
-                size: request.PageRequest.PageSize,
+                size: request.PageRequest.PageSize, 
                 cancellationToken: cancellationToken
             );
 

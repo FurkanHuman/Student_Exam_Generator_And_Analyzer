@@ -3,11 +3,11 @@ using Application.Features.Analyses.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
-using MediatR;
 using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
+using MediatR;
 using static Application.Features.Analyses.Constants.AnalysesOperationClaims;
 
 namespace Application.Features.Analyses.Commands.Update;
@@ -27,7 +27,7 @@ public class UpdateAnalysisCommand : IRequest<UpdatedAnalysisResponse>, ISecured
     public required int QuestionId { get; set; }
     public required int TeacherId { get; set; }
     public required int PrincipalId { get; set; }
-    public required int StudentQuizAnswerId { get; set; }
+    public required int StudentAnswerId { get; set; }
     public required int SchoolId { get; set; }
     public required Semester Semester { get; set; }
     public required Teacher Teacher { get; set; }

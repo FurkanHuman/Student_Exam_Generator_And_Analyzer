@@ -11,6 +11,7 @@ public class CreateStudentClassCommandValidator : AbstractValidator<CreateStuden
         RuleFor(c => c.SchoolId).NotEmpty();
         RuleFor(c => c.SemesterId).NotEmpty();
         RuleFor(c => c.RefTeacherId).NotEmpty();
+        RuleFor(c => c.School).NotEmpty();
         RuleFor(c => c.Semester).NotEmpty();
         RuleFor(c => c.RefTeacher).NotEmpty();
     }

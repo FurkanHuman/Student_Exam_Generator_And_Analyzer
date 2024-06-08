@@ -1,4 +1,3 @@
-using Domain.Entities;
 using NArchitecture.Core.Application.Responses;
 
 namespace Application.Features.Analyses.Queries.GetById;
@@ -18,10 +17,7 @@ public class GetByIdAnalysisResponse : IResponse
     public int QuestionId { get; set; }
     public int TeacherId { get; set; }
     public int PrincipalId { get; set; }
-    public int StudentQuizAnswerId { get; set; }
+    public int StudentAnswerId { get; set; }
     public int SchoolId { get; set; }
-    public Semester Semester { get; set; }
-    public Teacher Teacher { get; set; }
-    public Principal Principal { get; set; }
-    public School School { get; set; }
+
 }

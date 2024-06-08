@@ -1,4 +1,3 @@
-using Domain.Entities;
 using NArchitecture.Core.Application.Dtos;
 
 namespace Application.Features.Teachers.Queries.GetList;
@@ -12,6 +11,5 @@ public class GetListTeacherListItemDto : IDto
     public int ExamId { get; set; }
     public int StudentId { get; set; }
     public int SchoolId { get; set; }
-    public School School { get; set; }
-    public Semester Semester { get; set; }
+    public int UserId { get; set; }
 }

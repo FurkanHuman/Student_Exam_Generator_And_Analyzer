@@ -1,4 +1,3 @@
-using Domain.Entities;
 using NArchitecture.Core.Application.Responses;
 
 namespace Application.Features.Exams.Commands.Create;
@@ -17,9 +16,4 @@ public class CreatedExamResponse : IResponse
     public int StudentId { get; set; }
     public int SchoolId { get; set; }
     public int ReferenceBenefitId { get; set; }
-    public Semester Semester { get; set; }
-    public Teacher Teacher { get; set; }
-    public Student Student { get; set; }
-    public School School { get; set; }
-    public ReferenceBenefit ReferenceBenefit { get; set; }
 }
