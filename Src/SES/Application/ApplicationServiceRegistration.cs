@@ -35,6 +35,7 @@ using Application.Services.StudentAnswers;
 using Application.Services.SubLearningAreas;
 using Application.Services.Teachers;
 using Application.Services.StudentClasses;
+using Application.Services.QuizQuestions;
 
 namespace Application;
 
@@ -92,6 +93,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<ISubLearningAreaService, SubLearningAreaManager>();
         services.AddScoped<ITeacherService, TeacherManager>();
         services.AddScoped<IStudentClassService, StudentClassManager>();
+        services.AddScoped<IQuizQuestionService,QuizQuestionManager>();
         return services;
     }
 
