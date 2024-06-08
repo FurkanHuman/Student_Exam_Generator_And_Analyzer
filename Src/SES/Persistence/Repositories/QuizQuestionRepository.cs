@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using NArchitecture.Core.Persistence.Repositories;
 using Persistence.Contexts;
 
