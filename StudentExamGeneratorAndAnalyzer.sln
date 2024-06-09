@@ -28,9 +28,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistence", "Src\SES\Pers
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPI", "Src\SES\WebAPI\WebAPI.csproj", "{FBFC1429-D0A3-40B1-9071-F6EFA1FBB853}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWebUI", "Src\SES\BlazorWebUI\BlazorWebUI\BlazorWebUI.csproj", "{E067FF9C-07DD-4F2F-A33B-D5E2078C4E13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWebUI", "Src\SES\BlazorWebUI\BlazorWebUI\BlazorWebUI.csproj", "{E067FF9C-07DD-4F2F-A33B-D5E2078C4E13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWebUI.Client", "Src\SES\BlazorWebUI\BlazorWebUI.Client\BlazorWebUI.Client.csproj", "{8D7A34D4-CC8C-4B9B-87CD-13E02B92EF7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWebUI.Client", "Src\SES\BlazorWebUI\BlazorWebUI.Client\BlazorWebUI.Client.csproj", "{8D7A34D4-CC8C-4B9B-87CD-13E02B92EF7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
