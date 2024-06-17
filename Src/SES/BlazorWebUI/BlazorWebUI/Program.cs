@@ -1,7 +1,6 @@
 using Application;
 using Persistence;
 using Infrastructure;
-using BlazorWebUI.Client.Pages;
 using BlazorWebUI.Components;
 using NArchitecture.Core.CrossCuttingConcerns.Logging.Configurations;
 using NArchitecture.Core.ElasticSearch.Models;
@@ -34,6 +33,7 @@ builder.Services.AddApplicationServices(
 );
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddInfrastructureServices();
+builder.Services.AddBlazorWebUIServiceRegistration();
 builder.Services.AddHttpContextAccessor();
 
 const string tokenOptionsConfigurationSection = "TokenOptions";
@@ -56,6 +56,9 @@ builder
         };
     });
 
+builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -97,11 +100,11 @@ app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(BlazorWebUI.Client._Imports).Assembly);
 
-//const string webApiConfigurationSection = "BlazorConfiguration";
-//BlazorConfiguration webApiConfiguration =
-//    app.Configuration.GetSection(webApiConfigurationSection).Get<BlazorConfiguration>()
-//    ?? throw new InvalidOperationException($"\"{webApiConfigurationSection}\" section cannot found in configuration.");
-//app.UseCors(opt => opt.WithOrigins(webApiConfiguration.AllowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
+const string webApiConfigurationSection = "BlazorConfiguration";
+BlazorConfiguration webApiConfiguration =
+    app.Configuration.GetSection(webApiConfigurationSection).Get<BlazorConfiguration>()
+    ?? throw new InvalidOperationException($"\"{webApiConfigurationSection}\" section cannot found in configuration.");
+app.UseCors(opt => opt.WithOrigins(webApiConfiguration.AllowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
 
 app.UseResponseLocalization();
 
