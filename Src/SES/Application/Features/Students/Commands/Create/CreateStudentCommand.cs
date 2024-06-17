@@ -21,12 +21,8 @@ public class CreateStudentCommand : IRequest<CreatedStudentResponse>, ISecuredRe
     public required string SchoolNumber { get; set; }
     public required char Gender { get; set; }
     public string? Description { get; set; }
-    public required int SchoolId { get; set; }
-    public required int TeacherId { get; set; }
-    public required int ExamId { get; set; }
-    public required int SemesterId { get; set; }
-    public required School School { get; set; }
-    public required Semester Semester { get; set; }
+    public int SemesterId { get; set; }
+    public int SchoolId { get; set; }
 
     public string[] Roles => [Admin, Write, StudentsOperationClaims.Create];
 

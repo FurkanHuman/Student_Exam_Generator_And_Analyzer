@@ -13,10 +13,6 @@ public class CreateStudentCommandValidator : AbstractValidator<CreateStudentComm
         RuleFor(c => c.SchoolNumber).NotEmpty();
         RuleFor(c => c.Gender).NotEmpty();
         RuleFor(c => c.SchoolId).NotEmpty();
-        RuleFor(c => c.TeacherId).NotEmpty();
-        RuleFor(c => c.ExamId).NotEmpty();
         RuleFor(c => c.SemesterId).NotEmpty();
-        RuleFor(c => c.School).NotEmpty();
-        RuleFor(c => c.Semester).NotEmpty();
     }
 }
