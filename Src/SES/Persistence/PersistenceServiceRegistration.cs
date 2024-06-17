@@ -14,7 +14,7 @@ public static class PersistenceServiceRegistration
     {
         services.AddDbContext<BaseDbContext>(options => options.UseInMemoryDatabase("BaseDb"));
         services.AddDbContext<PostgreSqlDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("PostgreSqlDbConnectionStrings")).UseSnakeCaseNamingConvention());
-       // services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<BaseDbContext>());
+        services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<BaseDbContext>());
         services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<PostgreSqlDbContext>());
 
         services.AddScoped<IEmailAuthenticatorRepository, EmailAuthenticatorRepository>();
@@ -39,7 +39,8 @@ public static class PersistenceServiceRegistration
         services.AddScoped<IStudentAnswerRepository, StudentAnswerRepository>();
         services.AddScoped<ISubLearningAreaRepository, SubLearningAreaRepository>();
         services.AddScoped<ITeacherRepository, TeacherRepository>();
-       services.AddScoped<IStudentClassRepository, StudentClassRepository>();
+        services.AddScoped<IStudentClassRepository, StudentClassRepository>();
+        services.AddScoped<IQuizQuestionRepository, QuizQuestionRepository>();
         return services;
     }
 }
