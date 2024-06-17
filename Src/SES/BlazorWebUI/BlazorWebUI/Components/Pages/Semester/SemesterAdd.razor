@@ -1,13 +1,11 @@
 ﻿@page "/SemesterAdd"
-@using Application.Features.SemesterFeature.CRUD
+@using Application.Features.Semesters.Commands.Create
+@using Application.Features.Semesters.Queries.GetList
+@using NArchitecture.Core.Application.Responses
 <PageTitle>Dönem ekle</PageTitle>
 <h3>Dönem Ekle</h3>
 
-
-
-
-
-<EditForm method="post" OnValidSubmit="Submit" Model="semesterDTO" FormName="SemesterAdd">
+<EditForm method="post" OnValidSubmit="Submit" Model="semesterForm" FormName="SemesterAddForm">
 
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -16,21 +14,21 @@
 
         <label class="input-group-text">
             Dönem Başlangıc Tarihi :
-            <InputDate id="BDate" EnableMinMax="true" Min="1920-01-01" Placeholder="Tarih Giriniz:" @bind-Value="semesterDTO.BeginSemesterDate" />
+            <InputDate id="BDate" EnableMinMax="true" Min="1920-01-01" Placeholder="Tarih Giriniz:" @bind-Value="semesterForm.BeginSemesterDate" />
         </label>
     </div>
 
     <div class="input-group mb-3" style="width:15rem;">
         <label class="input-group-text">
             Dönem Bitiş Tarihi :
-            <InputDate id="EDate" EnableMinMax="true" Min="1920-01-01" Placeholder="Tarih Giriniz:" @bind-Value="semesterDTO.EndSemesterDate" />
+            <InputDate id="EDate" EnableMinMax="true" Min="1920-01-01" Placeholder="Tarih Giriniz:" @bind-Value="semesterForm.EndSemesterDate" />
         </label>
     </div>
 
     <div class="mb-3" style="width:15rem;">
         <label class="input-group-text">
             Dönem Adı :
-            <InputText type="Text" class="form-control" id="SName" @bind-Value="semesterDTO.Name" />
+            <InputText type="Text" class="form-control" id="SName" @bind-Value="semesterForm.Name" />
         </label>
     </div>
 
@@ -53,45 +51,55 @@
             <th scope="col">Bitiş Tarihi</th>
         </tr>
     </thead>
-        <tbody>
-    
-    @foreach (RequestSemesterDTO semester in prewSemester)
-    {
+    <tbody>
+
+        @foreach (GetListSemesterListItemDto semester in prewSemester.Items)
+        {
             <tr>
                 <td>@semester.Name</td>
                 <td>@semester.BeginSemesterDate</td>
                 <td>@semester.EndSemesterDate</td>
             </tr>
-    }
-        </tbody>
+        }
+    </tbody>
 </table>
 
-
-
-
-
-
-
-
-@inject ISemesterService _SemesterService;
+@inject IMediator _IMediator
 
 @code {
     [SupplyParameterFromForm]
-    private CreateSemesterDTO semesterDTO { get; set; } = new();
+    private SemesterForm semesterForm { get; set; } = new();
 
-    List<RequestSemesterDTO> prewSemester= new();
+    GetListResponse<GetListSemesterListItemDto> prewSemester = new();
 
-    
-
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        prewSemester = _SemesterService.GetRequestSemesters().ToList();
+        semesterForm.BeginSemesterDate = DateOnly.FromDateTime(DateTime.Now.Date);
+        semesterForm.EndSemesterDate = DateOnly.FromDateTime(DateTime.Now.Date.AddMonths(6));
 
-        return base.OnInitializedAsync();
+        GetListSemesterQuery getListSemesterQuery = new();
+        getListSemesterQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
+        prewSemester = await _IMediator.Send(getListSemesterQuery);
+
+        await base.OnInitializedAsync();
     }
 
-    private void Submit()
+    private async Task Submit()
     {
-        _SemesterService.AddSemester(semesterDTO);
+        CreateSemesterCommand semesterCommand = new()
+        {
+            Name=semesterForm.Name,
+            BeginSemesterDate=semesterForm.BeginSemesterDate,
+            EndSemesterDate= semesterForm.EndSemesterDate
+        };
+
+        CreatedSemesterResponse result = await _IMediator.Send(semesterCommand);
+    }
+
+    private class SemesterForm
+    {
+        public string Name { get; set; } = string.Empty;
+        public DateOnly BeginSemesterDate { get; set; }
+        public DateOnly EndSemesterDate { get; set; }
     }
 }

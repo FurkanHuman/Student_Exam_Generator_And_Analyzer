@@ -1,0 +1,34 @@
+﻿@page "/Logout"
+@using Application.Features.Auth.Commands.RevokeToken
+@using Application.Services.AuthService
+
+<AuthorizeView>
+    <Authorized>
+        <PageTitle>Başarıyla çıkış yaptınız...</PageTitle>
+    </Authorized>
+    <NotAuthorized>
+        <PageTitle>Zaten çıkış yaptınız</PageTitle>
+    </NotAuthorized>
+</AuthorizeView>
+
+@inject IAuthService _IAuthService
+@inject AuthenticationStateProvider _State
+@inject NavigationManager nav
+@inject IMediator _IMediator;
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await (_State as CustomAuthenticationStateProvider).GetAuthenticationStateAsync();
+        RevokeTokenCommand revokeTokenCommand = new()
+            {
+                IpAddress = await _IAuthService.GetIpV4AndIpV6Client(),
+                Token = await _IAuthService.GetTokenValueToCookie("refreshToken")
+            };
+
+        await _IMediator.Send(revokeTokenCommand);
+        (_State as CustomAuthenticationStateProvider).NotifyUserLogout();
+        nav.NavigateTo("/");
+        await base.OnInitializedAsync();
+    }
+}

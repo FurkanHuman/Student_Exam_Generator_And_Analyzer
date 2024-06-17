@@ -1,6 +1,10 @@
 ﻿@page "/StudentAdd";
 @namespace BlazorWebUI.Components.Pages.Students
-@using Application.Features.Students.CRUD.Create;
+@using Application.Features.Schools.Queries.GetList
+@using Application.Features.Semesters.Queries.GetList
+@using Application.Features.Students.Commands.Create
+@using Application.Features.Students.Queries.GetList
+@using NArchitecture.Core.Application.Responses
 
 <PageTitle>Öğrenci Ekle</PageTitle>
 
@@ -12,7 +16,28 @@
 
     <DataAnnotationsValidator />
     <ValidationSummary />
-    
+
+    <div class="input-group mb-3" style="width:12rem;">
+        <label class="input-group-text">Okul :</label>
+        <InputSelect class="form-select" id="schoolDD" @bind-Value="studentDTO.SchoolId">
+            <option selected>Seçiniz...</option>
+            @foreach (GetListSchoolListItemDto school in SchoolResponse.Items)
+            {
+                <option value="@school.Id">@school.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="input-group mb-3" style="width:12rem;">
+        <label class="input-group-text">Dönem :</label>
+        <InputSelect class="form-select" id="schoolSemester" @bind-Value="studentDTO.SemesterId">
+            <option selected>Seçiniz...</option>
+            @foreach (GetListSemesterListItemDto semester in SemesterResponse.Items)
+            {
+                <option value="@semester.Id">@semester.BeginSemesterDate @semester.EndSemesterDate @semester.Name</option>
+            }
+        </InputSelect>
+    </div>
 
     <div class="input-group mb-3" style="width:12rem;">
         <label class="input-group-text">Sınıf :</label>
@@ -57,8 +82,12 @@
     </div>
 
     <div class="input-group mb-3" style="width:15rem;">
-        <label class="input-group-text">Soyadı :        </label>
+        <label class="input-group-text">Soyadı : </label>
         <InputText type="Text" class="form-control" id="surname" @bind-Value="studentDTO.SurName" />
+    </div>
+    <div class="input-group mb-3" style="width:15rem;">
+        <label class="input-group-text">Açıklama : </label>
+        <InputTextArea type="Text" class="form-control" id="surname" @bind-Value="studentDTO.Description" />
     </div>
 
     <div class="input-group mb-3" style="width:15rem;">
@@ -67,25 +96,77 @@
 
 </EditForm>
 
-
-@inject ICreateStudent _CreateStudent;
+@inject IMediator _mediator
 
 @code {
     [SupplyParameterFromForm]
-    CreateStudentDTO studentDTO { get; set; }
+    StudentCreateForm studentDTO { get; set; }
+    GetListResponse<GetListSchoolListItemDto> SchoolResponse = new();
+    GetListResponse<GetListSemesterListItemDto> SemesterResponse = new();
 
-    protected override void OnInitialized() => studentDTO ??= new();
 
-
-    private void Submit()
+    protected override async Task OnInitializedAsync()
     {
-        _CreateStudent.CreateStudent(studentDTO);
+        studentDTO ??= new();
+        SchoolResponse = await _mediator.Send(new GetListSchoolQuery()
+            {
+                PageRequest = new()
+                {
+                    PageIndex = 0,
+                    PageSize = int.MaxValue
+                }
+            });
 
-        // is here is running
-        // ...
-        // ...
-        // ...
-        //if form reset use it new(); keyword
-        studentDTO = new();// resetting form
+        SemesterResponse = await _mediator.Send(new GetListSemesterQuery()
+            {
+                PageRequest = new()
+                {
+                    PageIndex = 0,
+                    PageSize = int.MaxValue
+                }
+            });
+        await base.OnInitializedAsync();
+    }
+
+    private async Task Submit()
+    {
+        CreateStudentCommand createStudentCommand = new()
+            {
+                Name = studentDTO.Name,
+                SurName = studentDTO.SurName,
+                ClassAge = studentDTO.ClassAge,
+                ClassBranch = studentDTO.ClassBranch,
+                SchoolNumber = studentDTO.SchoolNumber,
+                Gender = studentDTO.Gender,
+                Description = studentDTO.Description,
+                SchoolId = studentDTO.SchoolId,
+                SemesterId = studentDTO.SemesterId
+
+            };
+
+        CreatedStudentResponse response = await _mediator.Send(createStudentCommand);
+        studentDTO = new();
+    }
+
+    public class StudentCreateForm
+    {
+        public string Name { get; set; }
+
+        public string SurName { get; set; }
+
+        public string SchoolNumber { get; set; }
+
+        public int ClassAge { get; set; }
+
+        public char ClassBranch { get; set; }
+
+        public char Gender { get; set; }
+
+        public string? Description { get; set; }
+
+        public int SchoolId { get; set; }
+
+        public int SemesterId { get; set; }
+
     }
 }

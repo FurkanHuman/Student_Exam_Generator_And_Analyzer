@@ -1,0 +1,93 @@
+﻿@page "/Login"
+@using Application.Features.Auth.Commands.Login
+@using Application.Services.AuthService
+@using Domain.Entities
+@using MediatR
+@using Microsoft.AspNetCore.Authentication
+@using NArchitecture.Core.Application.Dtos
+@using System.IdentityModel.Tokens.Jwt
+@using System.Text.Json
+@using static Application.Features.Auth.Commands.Login.LoggedResponse
+<PageTitle> Lütfen Giriş Yapın...</PageTitle>
+
+
+<div class="mb-3" style="width:25rem;">
+    <EditForm method="post" OnValidSubmit="LoginSubmit" Model="_LoginDto" FormName="LoginForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-floating mb-3">
+            <InputText type="tex" class="form-control" id="floatingInput" placeholder="name@example.com" @bind-Value="_LoginDto.Email" />
+            <label for="floatingInput">E posta Adresi</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputText type="Password" class="form-control" id="floatingPassword" placeholder="Şifre" @bind-Value="_LoginDto.Password" />
+            <label for="floatingPassword">Şifre</label>
+        </div>
+
+        <div class="form-check mb-3 ">
+            <InputCheckbox type="Checkbox" class="form-check-input" id="CheckRemember" @bind-Value="IsRemember" />
+            <label class="form-check-label" for="CheckRemember">Beni Hatırla</label>
+        </div>
+        <div class="form-">
+            <button type="submit" class="btn btn-primary text-lg-end">Giriş yap</button>
+        </div>
+    </EditForm>
+</div>
+
+@inject IMediator _IMediator;
+@inject IAuthService _authSer;
+@inject IHttpContextAccessor _HttpContextAccessor;
+@inject NavigationManager nav
+@inject AuthenticationStateProvider _AuthenticationStateProvider;
+
+@code {
+    private string ClientIpAddress;
+
+    [SupplyParameterFromForm]
+    private LoginFormDto _LoginDto { get; set; } = new() { Email = "furkan@human.app", Password = "Passw0rd!" };
+
+    private LoginCommand _LoginCommand = new();
+
+    private bool IsRemember { get; set; } = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        ClientIpAddress = await _authSer.GetIpV4AndIpV6Client();
+        (_AuthenticationStateProvider as CustomAuthenticationStateProvider).NotifyAuthState();
+        await base.OnInitializedAsync(); 
+
+    }
+
+    private async Task LoginSubmit()
+    {
+        _LoginCommand.UserForLoginDto = new()
+            {
+                Email = _LoginDto.Email,
+                Password = _LoginDto.Password,
+                AuthenticatorCode = _LoginDto.AuthenticatorCode
+            };
+
+        _LoginCommand.IpAddress = ClientIpAddress;
+
+        LoggedResponse response = await _IMediator.Send(_LoginCommand);
+
+        await _authSer.SetAccessTokenToCookies(response.AccessToken);
+        await _authSer.SetRefreshTokenToCookies(response.RefreshToken);
+
+        (_AuthenticationStateProvider as CustomAuthenticationStateProvider).NotifyAuthState();
+        nav.NavigateTo("/");
+    }
+
+
+    private class LoginFormDto
+    {
+        public string Email { get; set; }
+
+        public string Password { get; set; }
+
+        public string? AuthenticatorCode { get; set; }
+
+    }
+}

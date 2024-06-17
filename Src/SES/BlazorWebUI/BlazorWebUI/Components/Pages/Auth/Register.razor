@@ -1,0 +1,93 @@
+﻿@page "/Register"
+@using Application.Features.Auth.Commands.Register
+
+
+<AuthorizeView Roles="Admin" Context="RegisterContext">
+    <Authorized>
+        <PageTitle> Kayıt Et</PageTitle>
+
+        <div class="mb-3" style="width:25rem;">            
+        
+            <EditForm method="post" OnValidSubmit="RegisterSubmit" Model="_RegisterDto" FormName="RegisterForm">                
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-floating mb-3">
+                    <InputText type="tex" class="form-control" id="floatingInput" placeholder="name@example.com" @bind-Value="_RegisterDto.Email" />
+                    <label for="floatingInput">E posta Adresi</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <InputText type="Password" class="form-control" id="floatingPassword" placeholder="Şifre" @bind-Value="_RegisterDto.Password" />
+                    <label for="floatingPassword">Şifre</label>
+                </div>
+
+                <div class="form-">
+                    <button type="submit" class="btn btn-primary text-lg-end">Kayıt Et</button>
+                </div>
+
+            </EditForm>
+
+        </div>
+
+    </Authorized>
+    <NotAuthorized>
+        <PageTitle>Yetkisiz erişim </PageTitle>
+        <h3>yetkili değilsiniz </h3>
+    </NotAuthorized>
+</AuthorizeView>
+@inject IMediator _IMediator;
+@inject IHttpContextAccessor _HttpContextAccessor
+
+@code {
+    private string ClientIpAddress;
+
+    [SupplyParameterFromForm]
+    private RegisterFormDto _RegisterDto { get; set; } = new();
+    private RegisterCommand _RegisterCommand = new();
+
+
+    protected override Task OnInitializedAsync()
+    {
+        System.Net.IPAddress? ips = _HttpContextAccessor.HttpContext.Connection.RemoteIpAddress;
+        ClientIpAddress = $"IPv4: {ips.MapToIPv4().ToString()}, IPv6: {ips.MapToIPv6().ToString()}";
+        return base.OnInitializedAsync();
+    }
+
+
+    private async Task RegisterSubmit()
+    {
+        _RegisterCommand.UserForRegisterDto = new()
+            {
+                Email = _RegisterDto.Email,
+                Password = _RegisterDto.Password
+            };
+        _RegisterCommand.IpAddress = ClientIpAddress;
+
+        RegisteredResponse response = await _IMediator.Send(_RegisterCommand);
+
+        return;
+    }
+
+
+    // private void setRefreshTokenToCookie(RefreshToken refreshToken)
+    // {
+    //     CookieOptions cookieOptions = new() { HttpOnly = true, Secure = true, Expires = DateTime.UtcNow.AddHours(8) };
+
+    //     _HttpContextAccessor.HttpContext.Response.Cookies.Append(key: "refreshToken", refreshToken.Token, cookieOptions);
+    // }
+
+    // private void setAccessTokenToCookie(LoggedResponse response)
+    // {
+    //     CookieOptions cookieOptions = new() { HttpOnly = true, Secure = true, Expires = DateTime.UtcNow.AddHours(8) };
+
+    //     _HttpContextAccessor.HttpContext.Response.Cookies.Append(key: "Bearer", response.AccessToken.Token, cookieOptions);
+    // }
+
+    private class RegisterFormDto
+    {
+        public string Email { get; set; }
+
+        public string Password { get; set; }
+    }
+}
