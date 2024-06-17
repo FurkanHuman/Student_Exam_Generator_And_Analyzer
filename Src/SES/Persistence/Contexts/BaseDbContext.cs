@@ -32,14 +32,9 @@ public class BaseDbContext : DbContext
     public DbSet<StudentAnswer> StudentAnswers { get; set; }
     public DbSet<Analysis> Analyses { get; set; }
 
-    public BaseDbContext(DbContextOptions dbContextOptions, IConfiguration configuration)
-        : base(dbContextOptions)
-    {
-        Configuration = configuration;
-    }
+    public BaseDbContext(DbContextOptions dbContextOptions, IConfiguration configuration) : base(dbContextOptions) => Configuration = configuration;
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder) => modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
 }
