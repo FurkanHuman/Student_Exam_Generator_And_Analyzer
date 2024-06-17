@@ -6,9 +6,9 @@ using Persistence.Contexts;
 
 namespace Persistence.Repositories;
 
-public class RefreshTokenRepository : EfRepositoryBase<RefreshToken, Guid, BaseDbContext>, IRefreshTokenRepository
+public class RefreshTokenRepository : EfRepositoryBase<RefreshToken, Guid, PostgreSqlDbContext>, IRefreshTokenRepository
 {
-    public RefreshTokenRepository(BaseDbContext context)
+    public RefreshTokenRepository(PostgreSqlDbContext context)
         : base(context) { }
 
     public async Task<List<RefreshToken>> GetOldRefreshTokensAsync(Guid userId, int refreshTokenTtl)

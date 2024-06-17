@@ -7,10 +7,10 @@ using Persistence.Contexts;
 namespace Persistence.Repositories;
 
 public class UserOperationClaimRepository
-    : EfRepositoryBase<UserOperationClaim, Guid, BaseDbContext>,
+    : EfRepositoryBase<UserOperationClaim, Guid, PostgreSqlDbContext>,
         IUserOperationClaimRepository
 {
-    public UserOperationClaimRepository(BaseDbContext context)
+    public UserOperationClaimRepository(PostgreSqlDbContext context)
         : base(context) { }
 
     public async Task<IList<OperationClaim>> GetOperationClaimsByUserIdAsync(Guid userId)
