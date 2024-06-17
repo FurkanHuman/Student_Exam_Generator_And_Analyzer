@@ -53,7 +53,7 @@ public static class ApplicationServiceRegistration
         services.AddMediatR(configuration =>
         {
             configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-            configuration.AddOpenBehavior(typeof(AuthorizationBehavior<,>));
+            // configuration.AddOpenBehavior(typeof(AuthorizationBehavior<,>)); // Note: MediatR Blazor auth Problem !
             configuration.AddOpenBehavior(typeof(CachingBehavior<,>));
             configuration.AddOpenBehavior(typeof(CacheRemovingBehavior<,>));
             configuration.AddOpenBehavior(typeof(LoggingBehavior<,>));
@@ -93,7 +93,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<ISubLearningAreaService, SubLearningAreaManager>();
         services.AddScoped<ITeacherService, TeacherManager>();
         services.AddScoped<IStudentClassService, StudentClassManager>();
-        services.AddScoped<IQuizQuestionService,QuizQuestionManager>();
+        services.AddScoped<IQuizQuestionService, QuizQuestionManager>();
         return services;
     }
 
