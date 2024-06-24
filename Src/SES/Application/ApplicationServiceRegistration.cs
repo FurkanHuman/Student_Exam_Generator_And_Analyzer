@@ -53,7 +53,7 @@ public static class ApplicationServiceRegistration
         services.AddMediatR(configuration =>
         {
             configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-            // configuration.AddOpenBehavior(typeof(AuthorizationBehavior<,>)); // Note: MediatR Blazor auth Problem !
+            configuration.AddOpenBehavior(typeof(AuthorizationBehavior<,>)); // Note: MediatR Blazor auth Problem ! 25.06.2024 solved this case
             configuration.AddOpenBehavior(typeof(CachingBehavior<,>));
             configuration.AddOpenBehavior(typeof(CacheRemovingBehavior<,>));
             configuration.AddOpenBehavior(typeof(LoggingBehavior<,>));

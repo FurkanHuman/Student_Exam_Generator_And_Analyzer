@@ -2,6 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Application.Services.AuthService;
+using Microsoft.AspNetCore.Http;
 
 namespace BlazorWebUI;
 
@@ -25,6 +26,8 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
         IEnumerable<Claim> claims = jwt.Claims.Where(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
 
         ClaimsPrincipal user = new ClaimsPrincipal(new ClaimsIdentity(claims, "Bearer"));
+
+        await _authService.AddUserToAuthPipeline(user);
 
         return new AuthenticationState(user);
     }

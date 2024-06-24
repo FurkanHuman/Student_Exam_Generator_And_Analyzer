@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Security.Claims;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
@@ -155,6 +156,12 @@ public class AuthManager : IAuthService
         _httpContextAccessor.HttpContext.Response.Cookies.Delete("refreshToken");
         _httpContextAccessor.HttpContext.Response.Cookies.Delete("accessToken");
 
+        return Task.CompletedTask;
+    }
+
+    public Task AddUserToAuthPipeline(ClaimsPrincipal user)
+    {
+        _httpContextAccessor.HttpContext.User = user; // note: this code auth mediatr pipeline problem solver.
         return Task.CompletedTask;
     }
 }

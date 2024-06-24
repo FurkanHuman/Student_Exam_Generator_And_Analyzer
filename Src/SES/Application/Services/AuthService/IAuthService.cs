@@ -1,6 +1,7 @@
 ﻿using Application.Features.Auth.Commands.Login;
 using Domain.Entities;
 using NArchitecture.Core.Security.JWT;
+using System.Security.Claims;
 
 namespace Application.Services.AuthService;
 
@@ -19,4 +20,5 @@ public interface IAuthService
     public Task<string> GetTokenValueToCookie(string val);
     public Task<string> GetIpV4AndIpV6Client();
     public Task Logout();
+    public Task AddUserToAuthPipeline(ClaimsPrincipal user);
 }
