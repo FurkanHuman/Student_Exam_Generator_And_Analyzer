@@ -121,11 +121,6 @@ public class AuthManager : IAuthService
     {
         CookieOptions cookieOptions = new() { HttpOnly = true, Secure = true, Expires = accessToken.ExpirationDate };
 
-        //string cookieValue = GetTokenValueToCookie(nameof(accessToken)).Result;
-
-        //if (cookieValue != null)
-        //    _httpContextAccessor.HttpContext.Response.Cookies.Delete(nameof(accessToken));
-
         _httpContextAccessor.HttpContext.Response.Cookies.Append(nameof(accessToken), accessToken.Token);
         return Task.CompletedTask;
     }
