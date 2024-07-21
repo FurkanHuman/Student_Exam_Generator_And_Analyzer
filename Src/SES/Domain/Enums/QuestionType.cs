@@ -3,7 +3,7 @@
 public enum QuestionType : byte
 
 {
-    None = 0,
+    None,
     OpenendedQuestions,
     ClosedendedQuestions,
     MultipleChoiceQuestions,
