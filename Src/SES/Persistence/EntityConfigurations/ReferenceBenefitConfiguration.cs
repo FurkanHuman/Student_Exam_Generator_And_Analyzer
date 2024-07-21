@@ -8,27 +8,26 @@ internal class ReferenceBenefitConfiguration : IEntityTypeConfiguration<Referenc
 {
     public void Configure(EntityTypeBuilder<ReferenceBenefit> builder)
     {
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).IsRequired();
-        builder.Property(e => e.ReferenceBenefitName).IsRequired();
+        builder.HasKey(rb => rb.Id);
+        builder.Property(rb => rb.Id).IsRequired();
+        builder.Property(rb => rb.ReferenceBenefitName).IsRequired();
+        builder.Property(rb => rb.LessonId).IsRequired();
+        builder.Property(rb => rb.SchoolId).IsRequired();
+        builder.Property(rb => rb.SemesterId).IsRequired();
 
-        builder.Property(e => e.SchoolId).IsRequired();
-        builder.Property(e => e.ExamId);
-        builder.Property(e => e.LearningAreaId).IsRequired();
-        builder.Property(e => e.SemesterId).IsRequired();
+        builder.HasOne(rb => rb.Lesson);
+        builder.HasOne(rb => rb.School);
+        builder.HasOne(rb => rb.Semester);
+        
+        builder.HasMany(rb => rb.Exams);
+        builder.HasMany(rb => rb.QuizQuestions);
+        builder.HasMany(rb => rb.LearningAreas);
 
-        builder.HasOne(e => e.School);
-        builder.HasOne(e => e.Semester);
+        builder.Property(rb => rb.CreatedDate).IsRequired();
+        builder.Property(rb => rb.UpdatedDate);
+        builder.Property(rb => rb.DeletedDate);
 
-        builder.HasMany(e => e.QuizQuestions);
-        builder.HasMany(e => e.LearningAreas);
-        builder.HasMany(e => e.Exams);
-
-        builder.Property(e => e.CreatedDate).IsRequired();
-        builder.Property(e => e.UpdatedDate);
-        builder.Property(e => e.DeletedDate);
-
-        builder.HasQueryFilter(e => !e.DeletedDate.HasValue);
+        builder.HasQueryFilter(rb => !rb.DeletedDate.HasValue);
     }
 }
 

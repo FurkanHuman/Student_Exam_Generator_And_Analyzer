@@ -10,15 +10,15 @@ internal class QuizQuestionConfiguration : IEntityTypeConfiguration<QuizQuestion
     {
         builder.HasKey(qq => qq.Id);
         builder.Property(qq => qq.Id).IsRequired();
-        builder.Property(qq => qq.Score).IsRequired();
+        builder.Property(qq => qq.QuestionScoreId).IsRequired();
         builder.Property(qq => qq.Question).IsRequired();
         builder.Property(qq => qq.QuestionBody).IsRequired();
-        builder.Property(qq => qq.QuestionImage).IsRequired();
+        builder.Property(qq => qq.QuestionImageURL).IsRequired();
         builder.Property(qq => qq.QuestionType).IsRequired();
 
-        builder.Property(qq => qq.BenefitId).IsRequired();
-        builder.Property(qq => qq.ExamId).IsRequired();
-
+        
+        builder.HasOne(qq => qq.QuestionScore);
+        
         builder.HasMany(qq => qq.Exams);
         builder.HasMany(qq => qq.Benefits);
         builder.HasMany(qq => qq.Options);

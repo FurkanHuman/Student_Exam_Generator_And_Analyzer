@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using MailKit.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,13 +11,15 @@ namespace Persistence.EntityConfigurations
         {
             builder.HasKey(sa => sa.Id);
             builder.Property(sa => sa.AnswerText);
-            builder.Property(sa => sa.Score).IsRequired();
+            builder.Property(sa => sa.QuestionScoreId).IsRequired();
             builder.Property(sa => sa.IsCorrect).IsRequired();
 
             builder.Property(sa => sa.StudentId).IsRequired();
             builder.Property(sa => sa.QuizQuestionId).IsRequired();
             builder.Property(sa => sa.QuestionOptionId);
 
+
+            builder.HasOne(sa => sa.QuestionScore);
             builder.HasOne(sa => sa.Student);
             builder.HasOne(sa => sa.QuizQuestion);
             builder.HasOne(sa => sa.QuestionOption);

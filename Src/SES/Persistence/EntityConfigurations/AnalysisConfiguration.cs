@@ -1,43 +1,37 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using NArchitecture.Core.Persistence.Repositories;
 
 namespace Persistence.EntityConfigurations;
 
 internal class AnalysisConfiguration : IEntityTypeConfiguration<Analysis>
 {
-    public void Configure(EntityTypeBuilder<Analysis> builder) // todo: büyük değüişiklikler yolda
+    public void Configure(EntityTypeBuilder<Analysis> builder)
     {
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).IsRequired();
-        builder.Property(e => e.ClassAge).IsRequired();
-        builder.Property(e => e.AltClass).IsRequired();
-        builder.Property(e => e.ExamSemesterYear).IsRequired();
-        builder.Property(e => e.LessonName).IsRequired();
-        builder.Property(e => e.LessonSession).IsRequired();
-        builder.Property(e => e.ExamCode);
-        builder.Property(e => e.FooterNote);
+        builder.HasKey(a => a.Id);
+        builder.Property(a => a.Id).IsRequired();
+        builder.Property(a => a.FooterNote);
+        builder.Property(a => a.SemesterId).IsRequired();
+        builder.Property(a => a.PrincipalId).IsRequired();
+        builder.Property(a => a.SchoolId).IsRequired();
+        builder.Property(a => a.LessonId).IsRequired();
+        builder.Property(a => a.ReferenceBenefitId).IsRequired();
 
+        builder.HasOne(a => a.Semester);
+        builder.HasOne(a => a.Principal);
+        builder.HasOne(a => a.School);
+        builder.HasOne(a => a.Lesson);
+        builder.HasOne(a => a.ReferenceBenefit);
 
-        builder.Property(e => e.SemesterId).IsRequired();
-        builder.Property(e => e.BenefitId).IsRequired();
-        builder.Property(e => e.QuestionId).IsRequired();
-        builder.Property(e => e.TeacherId).IsRequired();
-        builder.Property(e => e.PrincipalId).IsRequired();
+        builder.HasMany(a => a.Exams);
+        builder.HasMany(a => a.StudentAnswers);
+        builder.HasMany(a => a.Teachers);
 
-        builder.HasOne(e => e.Semester);
-        builder.HasOne(e => e.Teacher);
-        builder.HasOne(e => e.Principal);
-        builder.HasOne(e => e.School);
+        builder.Property(a => a.CreatedDate).IsRequired();
+        builder.Property(a => a.UpdatedDate);
+        builder.Property(a => a.DeletedDate);
 
-
-        builder.HasMany(e => e.StudentAnswers);
-        builder.HasMany(e => e.Benefits);
-
-        builder.Property(e => e.CreatedDate).IsRequired();
-        builder.Property(e => e.UpdatedDate);
-        builder.Property(e => e.DeletedDate);
-
-        builder.HasQueryFilter(e => !e.DeletedDate.HasValue);
+        builder.HasQueryFilter(a => !a.DeletedDate.HasValue);
     }
 }

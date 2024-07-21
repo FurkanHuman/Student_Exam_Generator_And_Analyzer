@@ -21,6 +21,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NArchitecture.Core.Security.Constants;
 using Application.Features.StudentClasses.Constants;
+using System.IO;
+using Application.Features.Personels.Constants;
+using Application.Features.Lessons.Constants;
 
 namespace Persistence.EntityConfigurations;
 
@@ -61,6 +64,19 @@ public class OperationClaimConfiguration : IEntityTypeConfiguration<OperationCla
     {
         int lastId = initialId;
         List<OperationClaim> featureOperationClaims = new();
+
+        #region Real world claims
+        featureOperationClaims.AddRange(
+            [
+                new() { Id = ++lastId, Name = "Unauthorized" },
+                new() { Id = ++lastId, Name="Director" },
+                new() { Id = ++lastId, Name="AssistantDirector" },
+                new() { Id = ++lastId, Name="Teacher" },
+                new() { Id = ++lastId, Name="HeadTeacher" },
+                new() { Id = ++lastId, Name="Officer" }
+            ]
+        );
+        #endregion
 
         #region Auth
         featureOperationClaims.AddRange(
@@ -322,7 +338,7 @@ public class OperationClaimConfiguration : IEntityTypeConfiguration<OperationCla
         );
         #endregion
 
-        
+
         #region StudentClasses CRUD
         featureOperationClaims.AddRange(
             [
@@ -332,6 +348,48 @@ public class OperationClaimConfiguration : IEntityTypeConfiguration<OperationCla
                 new() { Id = ++lastId, Name = StudentClassesOperationClaims.Create },
                 new() { Id = ++lastId, Name = StudentClassesOperationClaims.Update },
                 new() { Id = ++lastId, Name = StudentClassesOperationClaims.Delete },
+            ]
+        );
+        #endregion
+
+        
+        #region Personels CRUD
+        featureOperationClaims.AddRange(
+            [
+                new() { Id = ++lastId, Name = PersonelsOperationClaims.Admin },
+                new() { Id = ++lastId, Name = PersonelsOperationClaims.Read },
+                new() { Id = ++lastId, Name = PersonelsOperationClaims.Write },
+                new() { Id = ++lastId, Name = PersonelsOperationClaims.Create },
+                new() { Id = ++lastId, Name = PersonelsOperationClaims.Update },
+                new() { Id = ++lastId, Name = PersonelsOperationClaims.Delete },
+            ]
+        );
+        #endregion
+        
+        
+        #region Lessons CRUD
+        featureOperationClaims.AddRange(
+            [
+                new() { Id = ++lastId, Name = LessonsOperationClaims.Admin },
+                new() { Id = ++lastId, Name = LessonsOperationClaims.Read },
+                new() { Id = ++lastId, Name = LessonsOperationClaims.Write },
+                new() { Id = ++lastId, Name = LessonsOperationClaims.Create },
+                new() { Id = ++lastId, Name = LessonsOperationClaims.Update },
+                new() { Id = ++lastId, Name = LessonsOperationClaims.Delete },
+            ]
+        );
+        #endregion
+        
+        
+        #region Personels CRUD
+        featureOperationClaims.AddRange(
+            [
+                new() { Id = ++lastId, Name = PersonelsOperationClaims.Admin },
+                new() { Id = ++lastId, Name = PersonelsOperationClaims.Read },
+                new() { Id = ++lastId, Name = PersonelsOperationClaims.Write },
+                new() { Id = ++lastId, Name = PersonelsOperationClaims.Create },
+                new() { Id = ++lastId, Name = PersonelsOperationClaims.Update },
+                new() { Id = ++lastId, Name = PersonelsOperationClaims.Delete },
             ]
         );
         #endregion

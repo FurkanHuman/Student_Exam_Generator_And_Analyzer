@@ -8,29 +8,29 @@ internal class StudentConfiguration : IEntityTypeConfiguration<Student>
 {
     public void Configure(EntityTypeBuilder<Student> builder)
     {
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).IsRequired();
-        builder.Property(e => e.Name).IsRequired();
-        builder.Property(e => e.SurName).IsRequired();
-        builder.Property(e => e.ClassAge).IsRequired();
-        builder.Property(e => e.ClassBranch).IsRequired();
-        builder.Property(e => e.SchoolNumber).IsRequired();
-        builder.Property(e => e.Description);
+        builder.HasKey(s => s.Id);
+        builder.Property(s => s.Id).IsRequired();
+        builder.Property(s => s.Name).IsRequired();
+        builder.Property(s => s.SurName).IsRequired();
+        builder.Property(s => s.SchoolNumber).IsRequired();
+        builder.Property(s => s.Gender).IsRequired();
+        builder.Property(s => s.Description);
 
-        builder.Property(e => e.SchoolId).IsRequired();
-        builder.Property(e => e.TeacherId).IsRequired();
-        builder.Property(e => e.ExamId).IsRequired();
+        builder.Property(s => s.SchoolId);
+        builder.Property(s => s.StudentClassId);
+       
 
-        builder.HasOne(e => e.School);
+        builder.HasOne(s => s.School);
+        builder.HasOne(s => s.StudentClass);
 
-        builder.HasMany(e => e.Exams);
-        builder.HasMany(e => e.Teachers);
+        builder.HasMany(s => s.Exams);
+        builder.HasMany(s => s.Teachers);
 
-        builder.Property(e => e.CreatedDate).IsRequired();
-        builder.Property(e => e.UpdatedDate);
-        builder.Property(e => e.DeletedDate);
+        builder.Property(s => s.CreatedDate).IsRequired();
+        builder.Property(s => s.UpdatedDate);
+        builder.Property(s => s.DeletedDate);
 
-        builder.HasQueryFilter(e => !e.DeletedDate.HasValue);
+        builder.HasQueryFilter(s => !s.DeletedDate.HasValue);
     }
 }
 

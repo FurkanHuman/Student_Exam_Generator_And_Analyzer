@@ -8,16 +8,19 @@ internal class QuestionScoreConfiguration : IEntityTypeConfiguration<QuestionSco
 {
     public void Configure(EntityTypeBuilder<QuestionScore> builder)
     {
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).IsRequired();
-        builder.Property(e => e.Score).IsRequired();
-        builder.Property(e => e.MaxScore).IsRequired();
+        builder.HasKey(qs => qs.Id);
+        builder.Property(qs => qs.Id).IsRequired();
+        builder.Property(qs => qs.Score).IsRequired();
+        builder.Property(qs => qs.MaxScore).IsRequired();
 
-        builder.Property(e => e.CreatedDate).IsRequired();
-        builder.Property(e => e.UpdatedDate);
-        builder.Property(e => e.DeletedDate);
+        builder.HasMany(qs => qs.QuizQuestions);
+        builder.HasMany(qs => qs.StudentAnswers);
 
-        builder.HasQueryFilter(e => !e.DeletedDate.HasValue);
+        builder.Property(qs => qs.CreatedDate).IsRequired();
+        builder.Property(qs => qs.UpdatedDate);
+        builder.Property(qs => qs.DeletedDate);
+
+        builder.HasQueryFilter(qs => !qs.DeletedDate.HasValue);
     }
 }
 

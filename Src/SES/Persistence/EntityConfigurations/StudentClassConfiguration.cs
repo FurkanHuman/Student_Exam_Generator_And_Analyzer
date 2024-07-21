@@ -8,16 +8,16 @@ public class StudentClassConfiguration : IEntityTypeConfiguration<StudentClass>
 {
     public void Configure(EntityTypeBuilder<StudentClass> builder)
     {
-        builder.ToTable("StudentClasses").HasKey(sc => sc.Id);
+        builder.HasKey(sc => sc.Id);
 
-        builder.Property(sc => sc.Id).HasColumnName("Id").IsRequired();
-        builder.Property(sc => sc.Name).HasColumnName("Name");
-        builder.Property(sc => sc.ClassAge).HasColumnName("ClassAge").IsRequired();
-        builder.Property(sc => sc.ClassBranch).HasColumnName("ClassBranch").IsRequired();
-        builder.Property(sc => sc.Decription).HasColumnName("Decription");
-        builder.Property(sc => sc.SchoolId).HasColumnName("SchoolId").IsRequired();
-        builder.Property(sc => sc.SemesterId).HasColumnName("SemesterId").IsRequired();
-        builder.Property(sc => sc.RefTeacherId).HasColumnName("RefTeacherId").IsRequired();
+        builder.Property(sc => sc.Id).IsRequired();
+        builder.Property(sc => sc.Name);
+        builder.Property(sc => sc.ClassAge).IsRequired();
+        builder.Property(sc => sc.ClassBranch).IsRequired();
+        builder.Property(sc => sc.Decription);
+        builder.Property(sc => sc.SchoolId).IsRequired();
+        builder.Property(sc => sc.SemesterId).IsRequired();
+        builder.Property(sc => sc.RefTeacherId).IsRequired();
 
         builder.HasOne(sc => sc.School);
         builder.HasOne(sc => sc.Semester);
@@ -29,9 +29,9 @@ public class StudentClassConfiguration : IEntityTypeConfiguration<StudentClass>
         builder.HasMany(sc => sc.Analyses);
         builder.HasMany(sc => sc.Teachers);
 
-        builder.Property(sc => sc.CreatedDate).HasColumnName("CreatedDate").IsRequired();
-        builder.Property(sc => sc.UpdatedDate).HasColumnName("UpdatedDate");
-        builder.Property(sc => sc.DeletedDate).HasColumnName("DeletedDate");
+        builder.Property(sc => sc.CreatedDate).IsRequired();
+        builder.Property(sc => sc.UpdatedDate);
+        builder.Property(sc => sc.DeletedDate);
 
         builder.HasQueryFilter(sc => !sc.DeletedDate.HasValue);
     }

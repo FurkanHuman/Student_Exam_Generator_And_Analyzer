@@ -8,24 +8,25 @@ internal class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
 {
     public void Configure(EntityTypeBuilder<Teacher> builder)
     {
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).IsRequired();
-        builder.Property(e => e.Name).IsRequired();
-        builder.Property(e => e.SurName).IsRequired();
+        builder.HasKey(t => t.Id);
+        builder.Property(t => t.Id).IsRequired();
 
-        builder.Property(e => e.ExamId).IsRequired();
-        builder.Property(e => e.StudentId).IsRequired();
-        builder.Property(e => e.SchoolId).IsRequired();
+        builder.Property(t => t.PersonelId).IsRequired();
+        builder.Property(t => t.SchoolId).IsRequired();
+        builder.Property(t => t.SemesterId).IsRequired();
 
+        builder.HasOne(t => t.Personel);
         builder.HasOne(t => t.School);
+        builder.HasOne(t => t.Semester);
 
-        builder.HasMany(e => e.ReferenceBenefits);
-        builder.HasMany(e => e.Exams);
-        builder.HasMany(e => e.Students);
+        builder.HasMany(t => t.ReferenceBenefits);
+        builder.HasMany(t => t.Exams);
+        builder.HasMany(t => t.Students);
+        builder.HasMany(t => t.Lessons);
 
-        builder.Property(e => e.CreatedDate).IsRequired();
-        builder.Property(e => e.UpdatedDate);
-        builder.Property(e => e.DeletedDate);
+        builder.Property(t => t.CreatedDate).IsRequired();
+        builder.Property(t => t.UpdatedDate);
+        builder.Property(t => t.DeletedDate);
 
         builder.HasQueryFilter(e => !e.DeletedDate.HasValue);
     }

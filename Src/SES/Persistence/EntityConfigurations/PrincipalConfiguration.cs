@@ -8,16 +8,19 @@ internal class PrincipalConfiguration : IEntityTypeConfiguration<Principal>
 {
     public void Configure(EntityTypeBuilder<Principal> builder)
     {
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).IsRequired();
-        builder.Property(e => e.Name).IsRequired();
-        builder.Property(e => e.SurName).IsRequired();
+        builder.HasKey(p=>p.Id);
+        builder.Property(p=>p.Id).IsRequired();
+        builder.Property(p => p.SemesterId).IsRequired();
 
-        builder.Property(e => e.CreatedDate).IsRequired();
-        builder.Property(e => e.UpdatedDate);
-        builder.Property(e => e.DeletedDate);
+        builder.HasOne(p => p.Personel);
+        builder.HasOne(p => p.School);
+        builder.HasOne(p => p.Semester);
 
-        builder.HasQueryFilter(e => !e.DeletedDate.HasValue);
+        builder.Property(p=>p.CreatedDate).IsRequired();
+        builder.Property(p=>p.UpdatedDate);
+        builder.Property(p=>p.DeletedDate);
+
+        builder.HasQueryFilter(p => !p.DeletedDate.HasValue);
     }
 
 }

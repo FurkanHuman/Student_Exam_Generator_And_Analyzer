@@ -8,18 +8,17 @@ internal class SubLearningAreaConfiguration : IEntityTypeConfiguration<SubLearni
 {
     public void Configure(EntityTypeBuilder<SubLearningArea> builder)
     {
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).IsRequired();
-        builder.Property(e => e.Name).IsRequired();
-        builder.Property(e => e.BenefitId).IsRequired();
+        builder.HasKey(sla => sla.Id);
+        builder.Property(sla => sla.Id).IsRequired();
+        builder.Property(sla => sla.Name).IsRequired();
 
-        builder.HasMany(e => e.Benefits);
+        builder.HasMany(sla => sla.Benefits);
 
-        builder.Property(e => e.CreatedDate).IsRequired();
-        builder.Property(e => e.UpdatedDate);
-        builder.Property(e => e.DeletedDate);
+        builder.Property(sla => sla.CreatedDate).IsRequired();
+        builder.Property(sla => sla.UpdatedDate);
+        builder.Property(sla => sla.DeletedDate);
 
-        builder.HasQueryFilter(e => !e.DeletedDate.HasValue);
+        builder.HasQueryFilter(sla => !sla.DeletedDate.HasValue);
     }
 }
 

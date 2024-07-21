@@ -9,18 +9,22 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.ToTable("Users").HasKey(u => u.Id);
+        builder.HasKey(u => u.Id);
+        builder.Property(u => u.Id).IsRequired();        
+        builder.Property(u => u.Email).IsRequired();
+        builder.Property(u => u.PasswordSalt).IsRequired();
+        builder.Property(u => u.PasswordHash).IsRequired();
+        builder.Property(u => u.AuthenticatorType).IsRequired();
 
-        builder.Property(u => u.Id).HasColumnName("Id").IsRequired();
-        builder.Property(u => u.Email).HasColumnName("Email").IsRequired();
-        builder.Property(u => u.PasswordSalt).HasColumnName("PasswordSalt").IsRequired();
-        builder.Property(u => u.PasswordHash).HasColumnName("PasswordHash").IsRequired();
-        builder.Property(u => u.AuthenticatorType).HasColumnName("AuthenticatorType").IsRequired();
-        builder.Property(u => u.CreatedDate).HasColumnName("CreatedDate").IsRequired();
-        builder.Property(u => u.UpdatedDate).HasColumnName("UpdatedDate");
-        builder.Property(u => u.DeletedDate).HasColumnName("DeletedDate");
+        builder.Property(u => u.CreatedDate).IsRequired();
+        builder.Property(u => u.UpdatedDate);
+        builder.Property(u => u.DeletedDate);
 
         builder.HasQueryFilter(u => !u.DeletedDate.HasValue);
+
+
+        builder.HasOne(u => u.Personel).WithOne(p => p.User).HasForeignKey<User>(u => u.PersonelId);
+            ;
 
         builder.HasMany(u => u.UserOperationClaims);
         builder.HasMany(u => u.RefreshTokens);
@@ -42,15 +46,15 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                 passwordHash: out byte[] passwordHash,
                 passwordSalt: out byte[] passwordSalt
             );
-            User adminUser =
-                new()
-                {
-                    Id = AdminId,
-                    Email = "narch@kodlama.io",
-                    PasswordHash = passwordHash,
-                    PasswordSalt = passwordSalt
-                };
-            yield return adminUser;
+
+            yield return new()
+            {
+                Id = AdminId,
+                PersonelId=PersonelConfiguration.AdminPersonelId,
+                Email = "furkan@human.app",
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+            };
         }
     }
 }
