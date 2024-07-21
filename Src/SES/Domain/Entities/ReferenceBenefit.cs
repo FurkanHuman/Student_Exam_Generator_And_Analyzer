@@ -21,15 +21,14 @@ public class ReferenceBenefit : Entity<int>
      */
 
     public string ReferenceBenefitName { get; set; }
-    public int SemesterId { get; set; }
+    public int LessonId { get; set; }
     public int SchoolId { get; set; }
-    public int ExamId { get; set; }
-    public int LearningAreaId { get; set; }
+    public int SemesterId { get; set; }
 
-    public virtual IList<QuizQuestion> QuizQuestions { get; set; }
-    public virtual IList<LearningArea> LearningAreas { get; set; }
-    public IList<Exam> Exams { get; set; }
-    public virtual School School { get; set; }
+    public Lesson Lesson { get; set; }
+    public School School { get; set; }
     public Semester Semester { get; set; }
-
+    public IList<Exam> Exams { get; set; }
+    public IList<QuizQuestion> QuizQuestions { get; set; }
+    public IList<LearningArea> LearningAreas { get; set; }
 }
