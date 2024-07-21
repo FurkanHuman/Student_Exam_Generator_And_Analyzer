@@ -11,5 +11,5 @@ public class Benefit : Entity<int>
 
     public virtual SubLearningArea SubLearningArea { get; set; }
 
-    public virtual IList<QuizQuestion> QuizQuestions { get; set; }    
+    public virtual IList<QuizQuestion> QuizQuestions { get; set; }
 }

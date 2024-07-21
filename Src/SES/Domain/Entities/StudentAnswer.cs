@@ -13,7 +13,7 @@ public class StudentAnswer : Entity<Guid> // öğrencilerin sorulara verdiği ce
     public Guid? QuestionOptionId { get; set; }
     public virtual QuestionOption? QuestionOption { get; set; }
 
-    public int QuestionScoreId { get; set; } 
+    public int QuestionScoreId { get; set; }
     public QuestionScore QuestionScore { get; set; }
 
     public string? AnswerText { get; set; }

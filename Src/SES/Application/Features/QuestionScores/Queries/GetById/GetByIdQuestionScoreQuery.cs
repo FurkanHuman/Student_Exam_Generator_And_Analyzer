@@ -1,10 +1,9 @@
-using Application.Features.QuestionScores.Constants;
 using Application.Features.QuestionScores.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using MediatR;
+using NArchitecture.Core.Application.Pipelines.Authorization;
 using static Application.Features.QuestionScores.Constants.QuestionScoresOperationClaims;
 
 namespace Application.Features.QuestionScores.Queries.GetById;

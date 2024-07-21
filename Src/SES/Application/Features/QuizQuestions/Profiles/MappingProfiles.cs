@@ -4,8 +4,8 @@ using Application.Features.QuizQuestions.Commands.Update;
 using Application.Features.QuizQuestions.Queries.GetById;
 using Application.Features.QuizQuestions.Queries.GetList;
 using AutoMapper;
-using NArchitecture.Core.Application.Responses;
 using Domain.Entities;
+using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
 
 namespace Application.Features.QuizQuestions.Profiles;

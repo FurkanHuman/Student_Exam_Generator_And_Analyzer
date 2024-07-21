@@ -1,13 +1,12 @@
-using Application.Features.QuestionOptions.Constants;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using MediatR;
 using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Requests;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
-using MediatR;
 using static Application.Features.QuestionOptions.Constants.QuestionOptionsOperationClaims;
 
 namespace Application.Features.QuestionOptions.Queries.GetList;
@@ -38,7 +37,7 @@ public class GetListQuestionOptionQuery : IRequest<GetListResponse<GetListQuesti
         {
             IPaginate<QuestionOption> questionOptions = await _questionOptionRepository.GetListAsync(
                 index: request.PageRequest.PageIndex,
-                size: request.PageRequest.PageSize, 
+                size: request.PageRequest.PageSize,
                 cancellationToken: cancellationToken
             );
 

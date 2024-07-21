@@ -34,9 +34,9 @@ public class RegisterCommand : IRequest<RegisteredResponse>
 
         public RegisterCommandHandler(
             IUserRepository userRepository,
-            IAuthService authService,
+            IAuthService authService, 
             AuthBusinessRules authBusinessRules
-        )
+            )
         {
             _userRepository = userRepository;
             _authService = authService;

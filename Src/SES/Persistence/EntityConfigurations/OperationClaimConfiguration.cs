@@ -3,7 +3,9 @@ using Application.Features.Auth.Constants;
 using Application.Features.Benefits.Constants;
 using Application.Features.Exams.Constants;
 using Application.Features.LearningAreas.Constants;
+using Application.Features.Lessons.Constants;
 using Application.Features.OperationClaims.Constants;
+using Application.Features.Personels.Constants;
 using Application.Features.Principals.Constants;
 using Application.Features.QuestionOptions.Constants;
 using Application.Features.QuestionScores.Constants;
@@ -11,6 +13,7 @@ using Application.Features.ReferenceBenefits.Constants;
 using Application.Features.Schools.Constants;
 using Application.Features.Semesters.Constants;
 using Application.Features.StudentAnswers.Constants;
+using Application.Features.StudentClasses.Constants;
 using Application.Features.Students.Constants;
 using Application.Features.SubLearningAreas.Constants;
 using Application.Features.Teachers.Constants;
@@ -20,10 +23,6 @@ using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NArchitecture.Core.Security.Constants;
-using Application.Features.StudentClasses.Constants;
-using System.IO;
-using Application.Features.Personels.Constants;
-using Application.Features.Lessons.Constants;
 
 namespace Persistence.EntityConfigurations;
 
@@ -352,7 +351,7 @@ public class OperationClaimConfiguration : IEntityTypeConfiguration<OperationCla
         );
         #endregion
 
-        
+
         #region Personels CRUD
         featureOperationClaims.AddRange(
             [
@@ -365,8 +364,8 @@ public class OperationClaimConfiguration : IEntityTypeConfiguration<OperationCla
             ]
         );
         #endregion
-        
-        
+
+
         #region Lessons CRUD
         featureOperationClaims.AddRange(
             [
@@ -379,8 +378,8 @@ public class OperationClaimConfiguration : IEntityTypeConfiguration<OperationCla
             ]
         );
         #endregion
-        
-        
+
+
         #region Personels CRUD
         featureOperationClaims.AddRange(
             [
@@ -393,7 +392,7 @@ public class OperationClaimConfiguration : IEntityTypeConfiguration<OperationCla
             ]
         );
         #endregion
-        
+
         return featureOperationClaims;
     }
 #pragma warning restore S1854 // Unused assignments should be removed

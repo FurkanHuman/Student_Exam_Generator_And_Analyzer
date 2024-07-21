@@ -1,13 +1,12 @@
-using Application.Features.SubLearningAreas.Constants;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using MediatR;
 using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Requests;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
-using MediatR;
 using static Application.Features.SubLearningAreas.Constants.SubLearningAreasOperationClaims;
 
 namespace Application.Features.SubLearningAreas.Queries.GetList;
@@ -38,7 +37,7 @@ public class GetListSubLearningAreaQuery : IRequest<GetListResponse<GetListSubLe
         {
             IPaginate<SubLearningArea> subLearningAreas = await _subLearningAreaRepository.GetListAsync(
                 index: request.PageRequest.PageIndex,
-                size: request.PageRequest.PageSize, 
+                size: request.PageRequest.PageSize,
                 cancellationToken: cancellationToken
             );
 

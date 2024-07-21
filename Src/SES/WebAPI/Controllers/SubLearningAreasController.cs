@@ -3,9 +3,9 @@ using Application.Features.SubLearningAreas.Commands.Delete;
 using Application.Features.SubLearningAreas.Commands.Update;
 using Application.Features.SubLearningAreas.Queries.GetById;
 using Application.Features.SubLearningAreas.Queries.GetList;
+using Microsoft.AspNetCore.Mvc;
 using NArchitecture.Core.Application.Requests;
 using NArchitecture.Core.Application.Responses;
-using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
 

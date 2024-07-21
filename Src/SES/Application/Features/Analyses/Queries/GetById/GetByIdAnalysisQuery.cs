@@ -1,10 +1,9 @@
-using Application.Features.Analyses.Constants;
 using Application.Features.Analyses.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using MediatR;
+using NArchitecture.Core.Application.Pipelines.Authorization;
 using static Application.Features.Analyses.Constants.AnalysesOperationClaims;
 
 namespace Application.Features.Analyses.Queries.GetById;

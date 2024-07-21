@@ -1,13 +1,12 @@
-using Application.Features.Teachers.Constants;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using MediatR;
 using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Requests;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
-using MediatR;
 using static Application.Features.Teachers.Constants.TeachersOperationClaims;
 
 namespace Application.Features.Teachers.Queries.GetList;
@@ -38,7 +37,7 @@ public class GetListTeacherQuery : IRequest<GetListResponse<GetListTeacherListIt
         {
             IPaginate<Teacher> teachers = await _teacherRepository.GetListAsync(
                 index: request.PageRequest.PageIndex,
-                size: request.PageRequest.PageSize, 
+                size: request.PageRequest.PageSize,
                 cancellationToken: cancellationToken
             );
 

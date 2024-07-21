@@ -18,7 +18,7 @@ internal class StudentConfiguration : IEntityTypeConfiguration<Student>
 
         builder.Property(s => s.SchoolId);
         builder.Property(s => s.StudentClassId);
-       
+
 
         builder.HasOne(s => s.School);
         builder.HasOne(s => s.StudentClass);

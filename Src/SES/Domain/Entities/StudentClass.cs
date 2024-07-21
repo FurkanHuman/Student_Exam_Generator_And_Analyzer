@@ -1,7 +1,7 @@
 ﻿using NArchitecture.Core.Persistence.Repositories;
 
 namespace Domain.Entities;
-public class StudentClass:Entity<int>
+public class StudentClass : Entity<int>
 {
     public string? Name { get; set; }
     public int ClassAge { get; set; }

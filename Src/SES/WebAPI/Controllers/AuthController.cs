@@ -31,6 +31,7 @@ public class AuthController : BaseController
     public async Task<IActionResult> Login([FromBody] UserForLoginDto userForLoginDto)
     {
         LoginCommand loginCommand = new() { UserForLoginDto = userForLoginDto, IpAddress = getIpAddress() };
+        loginCommand.UserForLoginDto = new() { Email = "furkan@human.app", Password = "Passw0rd!" };
         LoggedResponse result = await Mediator.Send(loginCommand);
 
         if (result.RefreshToken is not null)

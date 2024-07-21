@@ -4,8 +4,8 @@ using Application.Features.StudentAnswers.Commands.Update;
 using Application.Features.StudentAnswers.Queries.GetById;
 using Application.Features.StudentAnswers.Queries.GetList;
 using AutoMapper;
-using NArchitecture.Core.Application.Responses;
 using Domain.Entities;
+using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
 
 namespace Application.Features.StudentAnswers.Profiles;

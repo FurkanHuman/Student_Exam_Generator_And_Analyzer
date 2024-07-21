@@ -10,7 +10,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.HasKey(u => u.Id);
-        builder.Property(u => u.Id).IsRequired();        
+        builder.Property(u => u.Id).IsRequired();
         builder.Property(u => u.Email).IsRequired();
         builder.Property(u => u.PasswordSalt).IsRequired();
         builder.Property(u => u.PasswordHash).IsRequired();
@@ -24,7 +24,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
 
         builder.HasOne(u => u.Personel).WithOne(p => p.User).HasForeignKey<User>(u => u.PersonelId);
-            ;
+        ;
 
         builder.HasMany(u => u.UserOperationClaims);
         builder.HasMany(u => u.RefreshTokens);
@@ -50,7 +50,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             yield return new()
             {
                 Id = AdminId,
-                PersonelId=PersonelConfiguration.AdminPersonelId,
+                PersonelId = PersonelConfiguration.AdminPersonelId,
                 Email = "furkan@human.app",
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,

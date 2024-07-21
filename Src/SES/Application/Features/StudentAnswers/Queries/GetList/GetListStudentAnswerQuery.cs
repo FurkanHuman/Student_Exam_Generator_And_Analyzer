@@ -1,13 +1,12 @@
-using Application.Features.StudentAnswers.Constants;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using MediatR;
 using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Requests;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
-using MediatR;
 using static Application.Features.StudentAnswers.Constants.StudentAnswersOperationClaims;
 
 namespace Application.Features.StudentAnswers.Queries.GetList;
@@ -38,7 +37,7 @@ public class GetListStudentAnswerQuery : IRequest<GetListResponse<GetListStudent
         {
             IPaginate<StudentAnswer> studentAnswers = await _studentAnswerRepository.GetListAsync(
                 index: request.PageRequest.PageIndex,
-                size: request.PageRequest.PageSize, 
+                size: request.PageRequest.PageSize,
                 cancellationToken: cancellationToken
             );
 

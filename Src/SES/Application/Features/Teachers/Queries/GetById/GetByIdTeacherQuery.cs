@@ -1,10 +1,9 @@
-using Application.Features.Teachers.Constants;
 using Application.Features.Teachers.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using MediatR;
+using NArchitecture.Core.Application.Pipelines.Authorization;
 using static Application.Features.Teachers.Constants.TeachersOperationClaims;
 
 namespace Application.Features.Teachers.Queries.GetById;

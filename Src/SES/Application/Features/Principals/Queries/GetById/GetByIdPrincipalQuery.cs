@@ -1,10 +1,9 @@
-using Application.Features.Principals.Constants;
 using Application.Features.Principals.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using MediatR;
+using NArchitecture.Core.Application.Pipelines.Authorization;
 using static Application.Features.Principals.Constants.PrincipalsOperationClaims;
 
 namespace Application.Features.Principals.Queries.GetById;

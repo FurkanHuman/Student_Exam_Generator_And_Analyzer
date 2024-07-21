@@ -1,5 +1,4 @@
 ﻿using Domain.Entities;
-using MailKit.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -10,5 +10,5 @@ public class GetByIdReferenceBenefitResponse : IResponse
     public int SchoolId { get; set; }
     public int ExamId { get; set; }
     public int LearningAreaId { get; set; }
-    
+
 }

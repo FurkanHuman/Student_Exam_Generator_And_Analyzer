@@ -8,5 +8,5 @@ public class UpdatedLessonResponse : IResponse
     public string LessonName { get; set; }
     public string Description { get; set; }
     public int SemesterId { get; set; }
-    
+
 }

@@ -4,8 +4,8 @@ using Application.Features.SubLearningAreas.Commands.Update;
 using Application.Features.SubLearningAreas.Queries.GetById;
 using Application.Features.SubLearningAreas.Queries.GetList;
 using AutoMapper;
-using NArchitecture.Core.Application.Responses;
 using Domain.Entities;
+using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
 
 namespace Application.Features.SubLearningAreas.Profiles;

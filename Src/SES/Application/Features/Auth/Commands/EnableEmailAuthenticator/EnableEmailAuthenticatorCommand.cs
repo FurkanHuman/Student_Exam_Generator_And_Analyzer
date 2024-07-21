@@ -1,5 +1,4 @@
-﻿using System.Web;
-using Application.Features.Auth.Rules;
+﻿using Application.Features.Auth.Rules;
 using Application.Services.AuthenticatorService;
 using Application.Services.Repositories;
 using Application.Services.UsersService;
@@ -9,6 +8,7 @@ using MimeKit;
 using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Mailing;
 using NArchitecture.Core.Security.Enums;
+using System.Web;
 
 namespace Application.Features.Auth.Commands.EnableEmailAuthenticator;
 
