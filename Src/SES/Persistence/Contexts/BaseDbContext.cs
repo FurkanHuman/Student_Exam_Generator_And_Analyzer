@@ -31,6 +31,8 @@ public class BaseDbContext : DbContext
     public DbSet<QuestionOption> QuestionOptions { get; set; }
     public DbSet<StudentAnswer> StudentAnswers { get; set; }
     public DbSet<Analysis> Analyses { get; set; }
+    public DbSet<Personel> Personels { get; set; }
+    public DbSet<Lesson> Lessons { get; set; }
 
     public BaseDbContext(DbContextOptions dbContextOptions, IConfiguration configuration) : base(dbContextOptions) => Configuration = configuration;
 
