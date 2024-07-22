@@ -2,6 +2,7 @@ using Application.Services.Analyses;
 using Application.Services.AuthenticatorService;
 using Application.Services.AuthService;
 using Application.Services.Benefits;
+using Application.Services.CookiesService;
 using Application.Services.Exams;
 using Application.Services.LearningAreas;
 using Application.Services.Lessons;
@@ -74,6 +75,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IAuthService, AuthManager>();
         services.AddScoped<IAuthenticatorService, AuthenticatorManager>();
         services.AddScoped<IUserService, UserManager>();
+        services.AddScoped<ICookieService,CookieManager>();
 
         services.AddYamlResourceLocalization();
 

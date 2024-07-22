@@ -1,17 +1,14 @@
-﻿using System.Collections.Immutable;
-using System.Security.Claims;
-using Application.Services.Repositories;
+﻿using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using NArchitecture.Core.Security.JWT;
+using System.Collections.Immutable;
 
 namespace Application.Services.AuthService;
 
 public class AuthManager : IAuthService
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly ITokenHelper<Guid, int, Guid> _tokenHelper;
     private readonly TokenOptions _tokenOptions;
@@ -23,8 +20,8 @@ public class AuthManager : IAuthService
         IRefreshTokenRepository refreshTokenRepository,
         ITokenHelper<Guid, int, Guid> tokenHelper,
         IConfiguration configuration,
-        IMapper mapper,
-        IHttpContextAccessor httpContextAccessor
+        IMapper mapper
+
     )
     {
         _userOperationClaimRepository = userOperationClaimRepository;
@@ -36,7 +33,6 @@ public class AuthManager : IAuthService
             configuration.GetSection(tokenOptionsConfigurationSection).Get<TokenOptions>()
             ?? throw new NullReferenceException($"\"{tokenOptionsConfigurationSection}\" section cannot found in configuration");
         _mapper = mapper;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<AccessToken> CreateAccessToken(User user)
@@ -115,48 +111,5 @@ public class AuthManager : IAuthService
         );
         RefreshToken refreshToken = _mapper.Map<RefreshToken>(coreRefreshToken);
         return Task.FromResult(refreshToken);
-    }
-
-    public Task SetAccessTokenToCookies(AccessToken accessToken)
-    {
-        CookieOptions cookieOptions = new() { HttpOnly = true, Secure = true, Expires = accessToken.ExpirationDate };
-
-        _httpContextAccessor.HttpContext.Response.Cookies.Append(nameof(accessToken), accessToken.Token);
-        return Task.CompletedTask;
-    }
-
-    public Task SetRefreshTokenToCookies(RefreshToken? refreshToken)
-    {
-        if (refreshToken == null)
-            return Task.CompletedTask;
-
-        CookieOptions cookieOptions = new() { HttpOnly = true, Secure = true, Expires = refreshToken.ExpirationDate, };
-        _httpContextAccessor.HttpContext.Response.Cookies.Append(nameof(refreshToken), refreshToken.Token);
-        return Task.CompletedTask;
-    }
-
-    public Task<string> GetTokenValueToCookie(string val)
-    {
-        return Task.FromResult<string>(_httpContextAccessor.HttpContext.Request.Cookies[val]);
-    }
-
-    public Task<string> GetIpV4AndIpV6Client()
-    {
-        System.Net.IPAddress? ips = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
-        return Task.FromResult<string>($"IPv4: {ips.MapToIPv4()}, IPv6: {ips.MapToIPv6()}");
-    }
-
-    public Task Logout()
-    {
-        _httpContextAccessor.HttpContext.Response.Cookies.Delete("refreshToken");
-        _httpContextAccessor.HttpContext.Response.Cookies.Delete("accessToken");
-
-        return Task.CompletedTask;
-    }
-
-    public Task AddUserToAuthPipeline(ClaimsPrincipal user)
-    {
-        _httpContextAccessor.HttpContext.User = user; // note: this code auth mediatr pipeline problem solver.
-        return Task.CompletedTask;
     }
 }
