@@ -1,5 +1,6 @@
 ﻿@page "/Register"
 @using Application.Features.Auth.Commands.Register
+@using Application.Services.CookiesService
 
 
 <AuthorizeView Roles="Admin" Context="RegisterContext">
@@ -37,7 +38,7 @@
     </NotAuthorized>
 </AuthorizeView>
 @inject IMediator _IMediator;
-@inject IHttpContextAccessor _HttpContextAccessor
+@inject ICookieService _cookieService
 
 @code {
     private string ClientIpAddress;
@@ -49,9 +50,8 @@
 
     protected override Task OnInitializedAsync()
     {
-        System.Net.IPAddress? ips = _HttpContextAccessor.HttpContext.Connection.RemoteIpAddress;
-        ClientIpAddress = $"IPv4: {ips.MapToIPv4().ToString()}, IPv6: {ips.MapToIPv6().ToString()}";
-        return base.OnInitializedAsync();
+        ClientIpAddress = await _cookieService.GetIpV4AndIpV6Client();
+        await base.OnInitializedAsync();
     }
 
 

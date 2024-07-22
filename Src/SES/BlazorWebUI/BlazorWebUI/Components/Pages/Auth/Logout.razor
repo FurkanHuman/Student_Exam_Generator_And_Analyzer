@@ -1,6 +1,7 @@
 ﻿@page "/Logout"
 @using Application.Features.Auth.Commands.RevokeToken
 @using Application.Services.AuthService
+@using Application.Services.CookiesService
 
 <AuthorizeView>
     <Authorized>
@@ -11,7 +12,7 @@
     </NotAuthorized>
 </AuthorizeView>
 
-@inject IAuthService _IAuthService
+@inject ICookieService _cookieService
 @inject AuthenticationStateProvider _State
 @inject NavigationManager nav
 @inject IMediator _IMediator;
@@ -22,8 +23,8 @@
         await (_State as CustomAuthenticationStateProvider).GetAuthenticationStateAsync();
         RevokeTokenCommand revokeTokenCommand = new()
             {
-                IpAddress = await _IAuthService.GetIpV4AndIpV6Client(),
-                Token = await _IAuthService.GetTokenValueToCookie("refreshToken")
+                IpAddress = await _cookieService.GetIpV4AndIpV6Client(),
+                Token = await _cookieService.GetTokenValueToCookie("refreshToken")
             };
 
         await _IMediator.Send(revokeTokenCommand);

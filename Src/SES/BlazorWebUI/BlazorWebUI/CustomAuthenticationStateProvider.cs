@@ -1,22 +1,22 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿using Application.Services.CookiesService;
+using Microsoft.AspNetCore.Components.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Application.Services.AuthService;
 
 namespace BlazorWebUI;
 
 public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 {
-    private readonly IAuthService _authService;
+    private readonly ICookieService _cookieService;
 
-    public CustomAuthenticationStateProvider(IAuthService authService)
+    public CustomAuthenticationStateProvider(ICookieService cookieService)
     {
-        _authService = authService;
+        _cookieService = cookieService;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        string? token = await _authService.GetTokenValueToCookie("accessToken");
+        string? token = await _cookieService.GetTokenValueToCookie("accessToken");
         if (string.IsNullOrEmpty(token))
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
@@ -26,7 +26,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 
         ClaimsPrincipal user = new ClaimsPrincipal(new ClaimsIdentity(claims, "Bearer"));
 
-        await _authService.AddUserToAuthPipeline(user);
+        await _cookieService.AddUserToAuthPipeline(user);
         return new AuthenticationState(user);
     }
 
@@ -34,7 +34,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 
     public void NotifyUserLogout()
     {
-        _authService.Logout();
+        _cookieService.CookieLogout();
         ClaimsIdentity identity = new ClaimsIdentity();
         ClaimsPrincipal user = new ClaimsPrincipal(identity);
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
