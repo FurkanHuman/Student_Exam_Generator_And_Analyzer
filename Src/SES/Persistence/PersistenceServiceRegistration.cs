@@ -14,7 +14,7 @@ public static class PersistenceServiceRegistration
     {
         services.AddDbContext<BaseDbContext>(options => options.UseInMemoryDatabase("BaseDb"));
         services.AddDbContext<PostgreSqlDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("PostgreSqlDbConnectionStrings")).UseSnakeCaseNamingConvention());
-        services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<BaseDbContext>());
+        // services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<BaseDbContext>());
         services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<PostgreSqlDbContext>());
 
         services.AddScoped<IEmailAuthenticatorRepository, EmailAuthenticatorRepository>();
