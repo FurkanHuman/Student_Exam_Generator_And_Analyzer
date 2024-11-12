@@ -88,11 +88,11 @@
     private async Task Submit()
     {
         CreateSemesterCommand semesterCommand = new()
-        {
+            {
                 Name = semesterForm.Name,
                 BeginSemesterDate = semesterForm.BeginSemesterDate,
                 EndSemesterDate = semesterForm.EndSemesterDate
-        };
+            };
 
         CreatedSemesterResponse result = await _IMediator.Send(semesterCommand);
     }
