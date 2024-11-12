@@ -19,7 +19,7 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 
     private bool StrongPassword(string value)
     {
-        Regex strongPasswordRegex = new("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", RegexOptions.Compiled);
+        Regex strongPasswordRegex = new("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", RegexOptions.Compiled,TimeSpan.FromMilliseconds(50));
 
         return strongPasswordRegex.IsMatch(value);
     }

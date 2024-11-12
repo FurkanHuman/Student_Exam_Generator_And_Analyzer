@@ -21,7 +21,7 @@ public class UpdateUserFromAuthCommandValidator : AbstractValidator<UpdateUserFr
 
     private bool StrongPassword(string arg)
     {
-        Regex regex = new("/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/");
+        Regex regex = new("/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/",RegexOptions.Compiled,TimeSpan.FromMilliseconds(50));
         return regex.IsMatch(arg);
     }
 }
