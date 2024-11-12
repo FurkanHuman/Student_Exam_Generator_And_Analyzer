@@ -23,8 +23,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasQueryFilter(u => !u.DeletedDate.HasValue);
 
 
-        builder.HasOne(u => u.Personel).WithOne(p => p.User).HasForeignKey<User>(u => u.PersonelId);
-        ;
+        builder.HasOne(u => u.Personel).WithOne(p => p.User);
 
         builder.HasMany(u => u.UserOperationClaims);
         builder.HasMany(u => u.RefreshTokens);
@@ -50,7 +49,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             yield return new()
             {
                 Id = AdminId,
-                PersonelId = PersonelConfiguration.AdminPersonelId,
                 Email = "furkan@human.app",
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,

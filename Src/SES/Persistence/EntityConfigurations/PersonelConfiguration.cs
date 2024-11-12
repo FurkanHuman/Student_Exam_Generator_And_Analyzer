@@ -16,7 +16,7 @@ public class PersonelConfiguration : IEntityTypeConfiguration<Personel>
         builder.Property(p => p.SurName).IsRequired();
         builder.Property(p => p.BirthDate).IsRequired();
 
-        builder.HasOne(p => p.User);
+        builder.HasOne(p => p.User).WithOne(u => u.Personel).HasForeignKey<Personel>(p => p.UserId);
 
         builder.Property(p => p.CreatedDate).IsRequired();
         builder.Property(p => p.UpdatedDate);
