@@ -99,6 +99,7 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(BlazorWebUI.Client._Imports).Assembly);
+    .DisableAntiforgery();
 
 const string webApiConfigurationSection = "BlazorConfiguration";
 BlazorConfiguration webApiConfiguration =
