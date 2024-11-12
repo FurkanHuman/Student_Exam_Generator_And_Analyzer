@@ -1,17 +1,18 @@
 using Application;
-using Persistence;
-using Infrastructure;
+using BlazorWebUI;
 using BlazorWebUI.Components;
-using NArchitecture.Core.CrossCuttingConcerns.Logging.Configurations;
-using NArchitecture.Core.ElasticSearch.Models;
-using NArchitecture.Core.Mailing;
+using Infrastructure;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using NArchitecture.Core.CrossCuttingConcerns.Logging.Configurations;
+using NArchitecture.Core.ElasticSearch.Models;
+using NArchitecture.Core.Localization.WebApi;
+using NArchitecture.Core.Mailing;
+using NArchitecture.Core.Persistence.WebApi;
 using NArchitecture.Core.Security.Encryption;
 using NArchitecture.Core.Security.JWT;
-using NArchitecture.Core.Persistence.WebApi;
-using NArchitecture.Core.Localization.WebApi;
-using BlazorWebUI;
+using Persistence;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -98,7 +99,7 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(BlazorWebUI.Client._Imports).Assembly);
+    .AddAdditionalAssemblies(typeof(BlazorWebUI.Client._Imports).Assembly)
     .DisableAntiforgery();
 
 const string webApiConfigurationSection = "BlazorConfiguration";
@@ -109,4 +110,5 @@ app.UseCors(opt => opt.WithOrigins(webApiConfiguration.AllowedOrigins).AllowAnyH
 
 app.UseResponseLocalization();
 
-app.Run();
+
+await app.RunAsync();
