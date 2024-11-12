@@ -14,11 +14,10 @@ namespace Application.Features.Principals.Commands.Create;
 
 public class CreatePrincipalCommand : IRequest<CreatedPrincipalResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
-    public required string Name { get; set; }
-    public required string SurName { get; set; }
     public required int SemesterId { get; set; }
-    public required School School { get; set; }
-    public required Semester Semester { get; set; }
+
+    public required Guid PersonelId { get; set; }
+
 
     public string[] Roles => [Admin, Write, PrincipalsOperationClaims.Create];
 

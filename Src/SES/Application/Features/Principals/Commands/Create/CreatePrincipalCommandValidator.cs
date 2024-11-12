@@ -6,10 +6,8 @@ public class CreatePrincipalCommandValidator : AbstractValidator<CreatePrincipal
 {
     public CreatePrincipalCommandValidator()
     {
-        RuleFor(c => c.Name).NotEmpty();
-        RuleFor(c => c.SurName).NotEmpty();
         RuleFor(c => c.SemesterId).NotEmpty();
-        RuleFor(c => c.School).NotEmpty();
-        RuleFor(c => c.Semester).NotEmpty();
+        RuleFor(c => c.PersonelId).NotEmpty();
+
     }
 }
