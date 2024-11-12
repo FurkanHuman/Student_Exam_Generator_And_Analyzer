@@ -8,7 +8,6 @@ using Application.Services.Repositories;
 using Application.Services.UsersService;
 using AutoMapper;
 using FluentValidation.TestHelper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using NArchitecture.Core.CrossCuttingConcerns.Exception.Types;
 using NArchitecture.Core.Localization.Abstraction;
@@ -27,12 +26,11 @@ using static Application.Features.Auth.Commands.Login.LoginCommand;
 namespace StudentExamGeneratorAndAnalyzer.Application.Tests.Features.Auth.Commands.Login;
 
 public class LoginTests
-{   
+{
     private readonly LoginCommand _loginCommand;
     private readonly LoginCommandHandler _loginCommandHandler;
     private readonly LoginCommandValidator _validator;
     private readonly IConfiguration _configuration;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     public LoginTests(
         OperationClaimFakeData operationClaimFakeData,
         RefreshTokenFakeData refreshTokenFakeData,
@@ -73,8 +71,7 @@ public class LoginTests
             _refreshTokenRepository,
             tokenHelper,
             _configuration,
-            mapper,
-            _httpContextAccessor
+            mapper
         );
         UserBusinessRules _userBusinessRules = new(_userRepository, localizationService);
         IUserService _userService = new UserManager(_userRepository, _userBusinessRules);
