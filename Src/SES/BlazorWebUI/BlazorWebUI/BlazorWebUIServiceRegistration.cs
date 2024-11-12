@@ -9,6 +9,8 @@ public static class BlazorWebUIServiceRegistration
 
         services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
         services.AddHttpContextAccessor();
+        services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
+
         return services;
     }
 }
