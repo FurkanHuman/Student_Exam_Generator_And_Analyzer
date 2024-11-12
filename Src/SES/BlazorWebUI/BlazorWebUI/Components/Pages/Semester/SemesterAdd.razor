@@ -9,6 +9,7 @@
 
     <DataAnnotationsValidator />
     <ValidationSummary />
+    <AntiforgeryToken />
 
     <div class="input-group mb-3" style="width:15rem;">
 
@@ -88,9 +89,9 @@
     {
         CreateSemesterCommand semesterCommand = new()
         {
-            Name=semesterForm.Name,
-            BeginSemesterDate=semesterForm.BeginSemesterDate,
-            EndSemesterDate= semesterForm.EndSemesterDate
+                Name = semesterForm.Name,
+                BeginSemesterDate = semesterForm.BeginSemesterDate,
+                EndSemesterDate = semesterForm.EndSemesterDate
         };
 
         CreatedSemesterResponse result = await _IMediator.Send(semesterCommand);
