@@ -1,0 +1,104 @@
+﻿@page "/SetPrincipal"
+@using Application.Features.Personels.Queries.GetList
+@using Application.Features.Principals.Commands.Create
+@using Application.Features.Semesters.Queries.GetList
+@using Application.Services.Personels
+@using Application.Services.Semesters
+@using NArchitecture.Core.Application.Responses
+@using NArchitecture.Core.Persistence.Paging
+@using Domain.Entities
+
+<AuthorizeView Roles="Admin" Context="RegisterContext">
+    <Authorized>
+        <PageTitle> Müdür ayarla </PageTitle>
+
+        <h3>Müdür Ayarla</h3>
+        <h1>Dikkat</h1>
+        <br />
+
+        <div class="mb-3" style="width:25rem;">
+
+            <EditForm method="post" OnValidSubmit="Submit" Model="_PrincipalSetDto" FormName="PrincipalSetForm">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <AntiforgeryToken />
+
+                <div class="input-group mb-3" style="width:15rem;">
+                    <label class="input-group-text">Dönem Seçiniz:</label>
+                    <InputSelect class="form-select" id="principalSG" @bind-Value="_PrincipalSetDto.SemesterId">
+                        <option selected>Seçiniz...</option>
+                        @foreach (GetListSemesterListItemDto? semester in semesterList.Items)
+                        {
+                            <option value="@semester.Id">@semester.BeginSemesterDate @semester.EndSemesterDate @semester.Name </option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="input-group mb-3" style="width:15rem;">
+                    <label class="input-group-text">Müdür Seçiniz:</label>
+                    <InputSelect class="form-select" id="principalSG" @bind-Value="_PrincipalSetDto.PersonelId">
+                        <option selected>Seçiniz...</option>
+                        @foreach (GetListPersonelListItemDto? personel in personelList.Items)
+                        {
+                            <option value="@personel.Id">@personel.Name @personel.SurName @personel.BirthDate</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="btn">
+                    <button type="submit" class="btn btn-primary text-lg-end">Ayarla</button>
+                </div>
+            </EditForm>
+
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <PageTitle>Yetkisiz erişim </PageTitle>
+        <h3>yetkili değilsiniz </h3>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@inject IMediator _IMediatr
+@inject IPersonelService _PersonelService
+@inject ISemesterService _SemesterService
+
+
+@code {
+    [SupplyParameterFromForm]
+    private PrincipalDto _PrincipalSetDto { get; set; } = new();
+    private GetListResponse<GetListSemesterListItemDto>? semesterList = new();
+    private GetListResponse<GetListPersonelListItemDto>? personelList = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetListSemesterQuery getListSemesterQuery = new();
+        getListSemesterQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
+        semesterList = await _IMediatr.Send(getListSemesterQuery);
+
+        GetListPersonelQuery getListPersonelQuery = new();
+        getListPersonelQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
+        personelList = await _IMediatr.Send(getListPersonelQuery);
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task Submit()
+    {
+        CreatePrincipalCommand createPrincipal = new()
+            {
+                SemesterId = _PrincipalSetDto.SemesterId,
+                PersonelId = _PrincipalSetDto.PersonelId
+            };
+
+        CreatedPrincipalResponse result = await _IMediatr.Send(createPrincipal);
+    }
+
+
+    private class PrincipalDto
+    {
+        public int SemesterId { get; set; }
+
+        public Guid PersonelId { get; set; }
+    }
+}
