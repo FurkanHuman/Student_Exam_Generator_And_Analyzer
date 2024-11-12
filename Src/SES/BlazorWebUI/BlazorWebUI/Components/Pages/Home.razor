@@ -1,7 +1,44 @@
 ﻿@page "/"
+@using Application.Services.CookiesService
+@using Application.Services.Personels
+@using Domain.Entities
+@inject IPersonelService _personel
+@inject ICookieService _cokkie
+
 <PageTitle>Hoş geldininz</PageTitle>
 
 <h1>Merhaba</h1>
-<AuthorizeView>Hoş Geldiniz...</AuthorizeView>
-S.E.S Yapılıyor... 
+<AuthorizeView>
+    <h5>@WelcomePersondto.Name  @WelcomePersondto.Surname</h5>
+    Hoş Geldiniz...
+</AuthorizeView>
+<br />
+S.E.S Yapılıyor...
 
+
+
+@code {
+    private WelcomePerson WelcomePersondto { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+
+        Guid userId = await _cokkie.GetUserIdFromCookie();
+
+        Personel? person = await _personel.GetAsync(p => p.UserId == userId);
+
+        if (person == null)
+            return;
+
+
+        WelcomePersondto.Name = person.Name;
+        WelcomePersondto.Surname = person.SurName;
+
+        await base.OnInitializedAsync();
+    }
+
+    private class WelcomePerson
+    {
+        public string Name { get; set; }
+        public string Surname { get; set; }
+    }
+}
