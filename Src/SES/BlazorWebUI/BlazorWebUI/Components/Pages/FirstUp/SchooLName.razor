@@ -19,6 +19,7 @@
     <EditForm method="post" OnValidSubmit="Submit" Model="schoolNameForm" FormName="SchoolNameForm">
         <DataAnnotationsValidator />
         <ValidationSummary />
+        <AntiforgeryToken />
         <div class="input-group mb-3" style="width:35rem;">
             <label class="input-group-text">Okul Adı:</label>
             <InputText type="Text" class="form-control conversion" id="name" style="text-transform:uppercase" @bind-Value="schoolNameForm.SchoolName" />

@@ -12,6 +12,7 @@
             <EditForm method="post" OnValidSubmit="RegisterSubmit" Model="_RegisterDto" FormName="RegisterForm">                
                 <DataAnnotationsValidator />
                 <ValidationSummary />
+                <AntiforgeryToken />
 
                 <div class="form-floating mb-3">
                     <InputText type="tex" class="form-control" id="floatingInput" placeholder="name@example.com" @bind-Value="_RegisterDto.Email" />
