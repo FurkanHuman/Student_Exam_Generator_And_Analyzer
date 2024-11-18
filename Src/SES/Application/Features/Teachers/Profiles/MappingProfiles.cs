@@ -25,7 +25,9 @@ public class MappingProfiles : Profile
 
         CreateMap<Teacher, GetByIdTeacherResponse>();
 
-        CreateMap<Teacher, GetListTeacherListItemDto>();
+        CreateMap<Teacher, GetListTeacherListItemDto>()
+            .ForMember(destinationMember: t => t.Name, memberOptions: opt => opt.MapFrom(p => p.Personel.Name))
+            .ForMember(destinationMember: t => t.SurName, memberOptions: opt => opt.MapFrom(p => p.Personel.SurName));
         CreateMap<IPaginate<Teacher>, GetListResponse<GetListTeacherListItemDto>>();
     }
 }
