@@ -9,6 +9,5 @@ public class CreateLessonCommandValidator : AbstractValidator<CreateLessonComman
         RuleFor(c => c.LessonName).NotEmpty();
         RuleFor(c => c.Description).NotEmpty();
         RuleFor(c => c.SemesterId).NotEmpty();
-        RuleFor(c => c.Semester).NotEmpty();
     }
 }

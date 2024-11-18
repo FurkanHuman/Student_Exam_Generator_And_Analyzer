@@ -1,0 +1,93 @@
+﻿@page "/LessonAdd"
+
+@using Application.Features.Lessons.Commands.Create
+@using Application.Features.Semesters.Queries.GetList
+@using NArchitecture.Core.Application.Responses
+
+<PageTitle>Ders Ekle</PageTitle>
+
+<h1>Ders Ekle</h1>
+
+<div>
+    <EditForm Model="lessonDto" FormName="LessonAddForm" OnValidSubmit="OnSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <AntiforgeryToken/>
+
+        <div class="input-group mb-3" style="width:35rem;">
+            <label class="input-group-text">Ders Adı: </label>
+            <InputText type="Text" class="form-control conversion" id="name" style="text-transform:uppercase"
+                       @bind-Value="lessonDto.Name"/>
+        </div>
+
+        <div class="input-group mb-3" style="width:35rem;">
+            <label class="input-group-text">Açıklama: </label>
+            <InputText type="Text" class="form-control conversion" id="description" style="text-transform:uppercase"
+                       @bind-Value="lessonDto.Description"/>
+        </div>
+
+        <div class="input-group mb-3" style="width:35rem;">
+            <label class="input-group-text">Dönem: </label>
+            <InputSelect class="form-select" id="name" style="text-transform:uppercase"
+                         @bind-Value="lessonDto.SemesterId">
+                <option selected>Seçiniz</option>
+
+                @foreach (GetListSemesterListItemDto semesterListItemDto in getListSemester.Items)
+                {
+                    <option value="@semesterListItemDto.Id">
+                        @semesterListItemDto.BeginSemesterDate.Year & @semesterListItemDto.EndSemesterDate.Year | @semesterListItemDto.Name
+                    </option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="input-group-append">
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+        </div>
+
+    </EditForm>
+</div>
+
+@inject IMediator _Mediator
+
+@code {
+
+    [SupplyParameterFromForm] private LessonDTO lessonDto { get; set; } = new() { Name = string.Empty, Description = string.Empty };
+
+    // private GetListResponse<GetListLessonListItemDto> getListLesson = new();
+    // private GetListSemesterListItemDto getLastSemesterListItemDto = new();
+
+    private GetListResponse<GetListSemesterListItemDto> getListSemester = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetListSemesterQuery getListSemesterQuery = new();
+        getListSemesterQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
+
+        getListSemester = await _Mediator.Send(getListSemesterQuery);
+        lessonDto.SemesterId = getListSemester.Items.Last().Id;
+
+        // GetListLessonQuery lessonQuery = new();
+        // lessonQuery.PageRequest= new() { PageIndex = 0, PageSize = int.MaxValue };
+        //
+        // getListLesson = await _Mediator.Send(lessonQuery);
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task OnSubmit()
+    {
+        CreateLessonCommand createLesson = new() { Description = lessonDto.Description, LessonName = lessonDto.Name, SemesterId = lessonDto.SemesterId };
+
+        await _Mediator.Send(createLesson);
+    }
+
+
+    private class LessonDTO
+    {
+        public required string Description { get; set; }
+        public required string Name { get; set; }
+        public int SemesterId { get; set; }
+    }
+
+}

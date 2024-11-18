@@ -17,7 +17,6 @@ public class CreateLessonCommand : IRequest<CreatedLessonResponse>, ISecuredRequ
     public required string LessonName { get; set; }
     public required string Description { get; set; }
     public required int SemesterId { get; set; }
-    public required Semester Semester { get; set; }
 
     public string[] Roles => [Admin, Write, LessonsOperationClaims.Create];
 
