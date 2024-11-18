@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
     <PackageReference Include="NArchitecture.Core.Application" Version="1.0.6" />
     <PackageReference Include="NArchitecture.Core.Mailing" Version="1.0.3" />
     <PackageReference Include="NArchitecture.Core.Mailing.Mailkit" Version="1.0.3" />
@@ -26,9 +27,5 @@
     <None Update="Features\**\Resources\Locales\*.*.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Features\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 </Project>
