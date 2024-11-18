@@ -14,17 +14,12 @@ namespace Application.Features.Teachers.Commands.Create;
 
 public class CreateTeacherCommand : IRequest<CreatedTeacherResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
-    public required string Name { get; set; }
-    public required string SurName { get; set; }
     public required int SemesterId { get; set; }
-    public required int ExamId { get; set; }
-    public required int StudentId { get; set; }
+    
+    public required Guid PersonelId { get; set; }
     public required int SchoolId { get; set; }
-    public required int UserId { get; set; }
-    public required User User { get; set; }
-    public required School School { get; set; }
-    public required Semester Semester { get; set; }
-
+    
+    
     public string[] Roles => [Admin, Write, TeachersOperationClaims.Create];
 
     public bool BypassCache { get; }
