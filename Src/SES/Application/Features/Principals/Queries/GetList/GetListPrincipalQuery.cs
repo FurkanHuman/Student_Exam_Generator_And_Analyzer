@@ -1,7 +1,9 @@
+using Application.Services.Personels;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Requests;
@@ -38,6 +40,7 @@ public class GetListPrincipalQuery : IRequest<GetListResponse<GetListPrincipalLi
             IPaginate<Principal> principals = await _principalRepository.GetListAsync(
                 index: request.PageRequest.PageIndex,
                 size: request.PageRequest.PageSize,
+                include: p => p.Include(p => p.Personel),
                 cancellationToken: cancellationToken
             );
 

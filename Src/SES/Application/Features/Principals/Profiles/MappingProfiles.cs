@@ -25,7 +25,10 @@ public class MappingProfiles : Profile
 
         CreateMap<Principal, GetByIdPrincipalResponse>();
 
-        CreateMap<Principal, GetListPrincipalListItemDto>();
+        CreateMap<Principal, GetListPrincipalListItemDto>()
+            .ForMember(destinationMember: p => p.Name, memberOptions: opt => opt.MapFrom(p => p.Personel.Name))
+            .ForMember(destinationMember: p => p.SurName, memberOptions: opt => opt.MapFrom(p => p.Personel.SurName));
+
         CreateMap<IPaginate<Principal>, GetListResponse<GetListPrincipalListItemDto>>();
     }
 }
