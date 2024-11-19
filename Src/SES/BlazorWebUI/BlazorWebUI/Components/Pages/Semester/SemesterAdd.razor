@@ -5,40 +5,42 @@
 <PageTitle>Dönem ekle</PageTitle>
 <h3>Dönem Ekle</h3>
 
-<EditForm method="post" OnValidSubmit="Submit" Model="semesterForm" FormName="SemesterAddForm">
+<div class="input-group mb-3">
+    
+    <EditForm method="post" OnValidSubmit="Submit" Model="semesterForm" FormName="SemesterAddForm">
 
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <AntiforgeryToken />
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <AntiforgeryToken />
 
-    <div class="input-group mb-3" style="width:15rem;">
+        <div class="input-group mb-3" style="width:15rem;">
 
-        <label class="input-group-text">
-            Dönem Başlangıc Tarihi :
-            <InputDate id="BDate" EnableMinMax="true" Min="1920-01-01" Placeholder="Tarih Giriniz:" @bind-Value="semesterForm.BeginSemesterDate" />
-        </label>
-    </div>
+            <label class="input-group-text">
+                Dönem Başlangıc Tarihi :
+                <InputDate id="BDate" EnableMinMax="true" Min="1920-01-01" Placeholder="Tarih Giriniz:" @bind-Value="semesterForm.BeginSemesterDate" />
+            </label>
+        </div>
 
-    <div class="input-group mb-3" style="width:15rem;">
-        <label class="input-group-text">
-            Dönem Bitiş Tarihi :
-            <InputDate id="EDate" EnableMinMax="true" Min="1920-01-01" Placeholder="Tarih Giriniz:" @bind-Value="semesterForm.EndSemesterDate" />
-        </label>
-    </div>
+        <div class="input-group mb-3" style="width:15rem;">
+            <label class="input-group-text">
+                Dönem Bitiş Tarihi :
+                <InputDate id="EDate" EnableMinMax="true" Min="1920-01-01" Placeholder="Tarih Giriniz:" @bind-Value="semesterForm.EndSemesterDate" />
+            </label>
+        </div>
 
-    <div class="mb-3" style="width:15rem;">
-        <label class="input-group-text">
-            Dönem Adı :
-            <InputText type="Text" class="form-control" id="SName" @bind-Value="semesterForm.Name" />
-        </label>
-    </div>
+        <div class="mb-3" style="width:15rem;">
+            <label class="input-group-text">
+                Dönem Adı :
+                <InputText type="Text" class="form-control" id="SName" @bind-Value="semesterForm.Name" />
+            </label>
+        </div>
 
+        <div class="mb-3" style="width:15rem;">
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+        </div>
 
-    <div class="mb-3" style="width:15rem;">
-        <button type="submit" class="btn btn-primary">Kaydet</button>
-    </div>
-
-</EditForm>
+    </EditForm>
+</div>
 
 <br />
 
