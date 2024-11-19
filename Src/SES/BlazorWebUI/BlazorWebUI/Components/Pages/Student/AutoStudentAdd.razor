@@ -1,6 +1,195 @@
-﻿@page "/Auto/MSAdd"
-<h3>AutoStudentAdd</h3>
+﻿@page "/Auto/MSAddV2"
+
+@using Application.Features.Schools.Queries.GetList
+@using Application.Features.Semesters.Queries.GetList
+@using Application.Features.StudentClasses.Queries.GetList
+@using Application.Features.Students.Commands.MultiCreate
+@using Application.Features.Teachers.Queries.GetList
+@using NArchitecture.Core.Application.Responses
+@using MediatR
+
+<h1>Otomatik öğrenci ekleme</h1>
+
+<br />
+<div class="input-group mb-3">
+
+    <EditForm OnValidSubmit="AddAutoStudent" Model="multiStudentDto" FormName="StudentMultiAdd">
+
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <AntiforgeryToken />
+
+        <div class="input-group mb-3" style="width:15rem;">
+            <label class="input-group-text">Okul :</label>
+            <InputSelect class="form-select" id="schoolDD" @bind-Value="multiStudentDto.SchoolId">
+                <option selected>Seçiniz...</option>
+                @foreach (GetListSchoolListItemDto school in SchoolResponse.Items)
+                {
+                    <option value="@school.Id">@school.Name</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="input-group mb-3" style="width:15rem;">
+            <label class="input-group-text">Dönem :</label>
+            <InputSelect class="form-select" id="schoolSemester" @bind-Value="multiStudentDto.SemesterId">
+                <option selected>Seçiniz...</option>
+                @foreach (GetListSemesterListItemDto semester in SemesterResponse.Items)
+                {
+                    <option value="@semester.Id">@semester.BeginSemesterDate @semester.EndSemesterDate @semester.Name</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="input-group mb-3" style="width:15rem;">
+            <label class="input-group-text">Öğretmen :</label>
+            <InputSelect class="form-select" id="teacher" @bind-Value="multiStudentDto.TeacherId">
+                <option selected>Seçiniz...</option>
+                @foreach (GetListTeacherListItemDto teacher in TeacherResponse.Items)
+                {
+                    <option value="@teacher.Id">@teacher.Name @teacher.SurName</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="input-group mb-3" style="width:20rem;">
+            <label class="input-group-text">Öğrenci Dosyası :</label>
+            <InputFile OnChange="OnInputFile" class="form-control" accept="application/pdf"  />
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary text-lg-end">Kaydet</button>
+        </div>
+
+    </EditForm>
+
+
+
+</div>
+
+<br />
+
+@if (createdMultiStudents.Count > 0)
+{
+    <div class="container mt-4">
+
+        <h2> Eklenen Öğrenci Bilgileri Tablosu</h2>
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>Öğrenci No</th>
+                    <th>Ad</th>
+                    <th>Soyad</th>
+                    <th>Sınıf</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (CreatedMultiStudentResponse st in createdMultiStudents)
+                {
+                    <tr>
+                        <td>@st.SchoolNumber</td>
+                        <td>@st.Name</td>
+                        <td>@st.SurName</td>
+                        <td>@st.ClassAge/@st.ClassBranch</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+@inject IMediator _mediator
 
 @code {
+    [SupplyParameterFromForm]
+    private MultiStudentDto multiStudentDto { get; set; } = new()
+        { TeacherId = 0, SchoolId = 0, SemesterId = 0 };
+
+    private byte[] _pdfFile { get; set; } = Array.Empty<byte>();
+
+    GetListResponse<GetListSchoolListItemDto> SchoolResponse = new();
+    GetListResponse<GetListSemesterListItemDto> SemesterResponse = new();
+    GetListResponse<GetListTeacherListItemDto> TeacherResponse = new();
+    GetListResponse<GetListStudentClassListItemDto> StudentClassResponse = new();
+    ICollection<CreatedMultiStudentResponse> createdMultiStudents = [];
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("OnInitializedAsync");
+        SchoolResponse = await _mediator.Send(new GetListSchoolQuery()
+            {
+                PageRequest = new()
+                {
+                    PageIndex = 0,
+                    PageSize = int.MaxValue
+                }
+            });
+
+        SemesterResponse = await _mediator.Send(new GetListSemesterQuery()
+            {
+                PageRequest = new()
+                {
+                    PageIndex = 0,
+                    PageSize = int.MaxValue
+                }
+            });
+
+        TeacherResponse = await _mediator.Send(new GetListTeacherQuery()
+            {
+                PageRequest = new()
+                {
+                    PageIndex = 0,
+                    PageSize = int.MaxValue
+                }
+            });
+
+        StudentClassResponse = await _mediator.Send(new GetListStudentClassQuery()
+            {
+                PageRequest = new()
+                {
+                    PageIndex = 0,
+                    PageSize = int.MaxValue
+                }
+            });
+        StateHasChanged();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task AddAutoStudent()
+    {
+        CreateMultiStudentCommand createMultiStudentCommand = new()
+            {
+                PdfFile = _pdfFile,
+                RefTeacherId = multiStudentDto.TeacherId,
+                SchoolId = multiStudentDto.SchoolId,
+                SemesterId = multiStudentDto.SemesterId,
+            };
+
+
+        createdMultiStudents = await _mediator.Send(createMultiStudentCommand);
+        StateHasChanged();
+    }
+
+    private async Task OnInputFile(InputFileChangeEventArgs e)
+    {
+        Console.WriteLine("OnInputFile tetiklendi");
+        IBrowserFile file = e.File;
+
+        if (file == null)
+            return;
+
+        byte[]? buffer = new byte[file.Size];
+        await using (Stream stream = file.OpenReadStream(maxAllowedSize: 50 * 1024 * 1024))
+            await stream.ReadAsync(buffer, 0, (int)file.Size);
+        _pdfFile = buffer;
+    }
+
+    private record MultiStudentDto
+    {
+        public required int SchoolId { get; set; }
+        public required int TeacherId { get; set; }
+        public required int SemesterId { get; set; }
+    }
 
 }
