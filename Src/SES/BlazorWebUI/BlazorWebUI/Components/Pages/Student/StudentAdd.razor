@@ -1,5 +1,4 @@
-﻿@page "/StudentAdd";
-@namespace BlazorWebUI.Components.Pages.Students
+﻿@page "/StudentAdd"
 @using Application.Features.Schools.Queries.GetList
 @using Application.Features.Semesters.Queries.GetList
 @using Application.Features.Students.Commands.Create
@@ -11,91 +10,93 @@
 <h3>Tekli öğrenci Ekleme</h3>
 
 <br />
+<div class="input-group mb-3">
 
-<EditForm method="post" OnValidSubmit="Submit" Model="studentDTO" FormName="StudentSingleAdd">
+    <EditForm method="post" OnValidSubmit="Submit" Model="studentDTO" FormName="StudentSingleAdd">
 
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <AntiforgeryToken />
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <AntiforgeryToken />
 
-    <div class="input-group mb-3" style="width:12rem;">
-        <label class="input-group-text">Okul :</label>
-        <InputSelect class="form-select" id="schoolDD" @bind-Value="studentDTO.SchoolId">
-            <option selected>Seçiniz...</option>
-            @foreach (GetListSchoolListItemDto school in SchoolResponse.Items)
-            {
-                <option value="@school.Id">@school.Name</option>
-            }
-        </InputSelect>
-    </div>
+        <div class="input-group mb-3" style="width:12rem;">
+            <label class="input-group-text">Okul :</label>
+            <InputSelect class="form-select" id="schoolDD" @bind-Value="studentDTO.SchoolId">
+                <option selected>Seçiniz...</option>
+                @foreach (GetListSchoolListItemDto school in SchoolResponse.Items)
+                {
+                    <option value="@school.Id">@school.Name</option>
+                }
+            </InputSelect>
+        </div>
 
-    <div class="input-group mb-3" style="width:12rem;">
-        <label class="input-group-text">Dönem :</label>
-        <InputSelect class="form-select" id="schoolSemester" @bind-Value="studentDTO.SemesterId">
-            <option selected>Seçiniz...</option>
-            @foreach (GetListSemesterListItemDto semester in SemesterResponse.Items)
-            {
-                <option value="@semester.Id">@semester.BeginSemesterDate @semester.EndSemesterDate @semester.Name</option>
-            }
-        </InputSelect>
-    </div>
+        <div class="input-group mb-3" style="width:12rem;">
+            <label class="input-group-text">Dönem :</label>
+            <InputSelect class="form-select" id="schoolSemester" @bind-Value="studentDTO.SemesterId">
+                <option selected>Seçiniz...</option>
+                @foreach (GetListSemesterListItemDto semester in SemesterResponse.Items)
+                {
+                    <option value="@semester.Id">@semester.BeginSemesterDate @semester.EndSemesterDate @semester.Name</option>
+                }
+            </InputSelect>
+        </div>
 
-    <div class="input-group mb-3" style="width:12rem;">
-        <label class="input-group-text">Sınıf :</label>
-        <InputSelect class="form-select" id="classAge" @bind-Value="studentDTO.ClassAge">
-            <option selected>Seçiniz...</option>
-            @for (int classAge = 1; classAge <= 12; classAge++)
-            {
-                <option value="@classAge">@classAge</option>
-            }
-        </InputSelect>
-    </div>
+        <div class="input-group mb-3" style="width:12rem;">
+            <label class="input-group-text">Sınıf :</label>
+            <InputSelect class="form-select" id="classAge" @bind-Value="studentDTO.ClassAge">
+                <option selected>Seçiniz...</option>
+                @for (int classAge = 0; classAge <= 12; classAge++)
+                {
+                    <option value="@classAge">@classAge</option>
+                }
+            </InputSelect>
+        </div>
 
-    <div class="input-group mb-3" style="width:12rem;">
+        <div class="input-group mb-3" style="width:12rem;">
 
-        <label class="input-group-text">Alt Sınıf :</label>
-        <InputSelect class="form-select" id="altClasss" @bind-Value="studentDTO.ClassBranch">
-            <option selected>Seçiniz...</option>
-            @for (char altClassAge = 'A'; altClassAge <= 'Z'; altClassAge++)
-            {
-                <option value="@altClassAge">@altClassAge</option>
-            }
-        </InputSelect>
-    </div>
+            <label class="input-group-text">Alt Sınıf :</label>
+            <InputSelect class="form-select" id="altClasss" @bind-Value="studentDTO.ClassBranch">
+                <option selected>Seçiniz...</option>
+                @for (char altClassAge = 'A'; altClassAge <= 'Z'; altClassAge++)
+                {
+                    <option value="@altClassAge">@altClassAge</option>
+                }
+            </InputSelect>
+        </div>
 
-    <div class="input-group mb-3" style="width:12rem;">
-        <label class="input-group-text">Cinsiyet :</label>
-        <InputSelect class="form-select" id="gender" @bind-Value="studentDTO.Gender">
-            <option selected>Seçiniz...</option>
-            <option value="K">Kız</option>
-            <option value="E">Erkek</option>
-        </InputSelect>
-    </div>
+        <div class="input-group mb-3" style="width:12rem;">
+            <label class="input-group-text">Cinsiyet :</label>
+            <InputSelect class="form-select" id="gender" @bind-Value="studentDTO.Gender">
+                <option selected>Seçiniz...</option>
+                <option value="K">Kız</option>
+                <option value="E">Erkek</option>
+            </InputSelect>
+        </div>
 
-    <div class="input-group mb-3" style="width:15rem;">
-        <label class="input-group-text">Okul Numarası :</label>
-        <InputText type="Text" class="form-control" id="schoolNumber" @bind-Value="studentDTO.SchoolNumber" />
-    </div>
+        <div class="input-group mb-3" style="width:15rem;">
+            <label class="input-group-text">Okul Numarası :</label>
+            <InputText type="Text" class="form-control" id="schoolNumber" @bind-Value="studentDTO.SchoolNumber" />
+        </div>
 
-    <div class="input-group mb-3" style="width:15rem;">
-        <label class="input-group-text">Adı :</label>
-        <InputText type="Text" class="form-control" id="name" @bind-Value="studentDTO.Name" />
-    </div>
+        <div class="input-group mb-3" style="width:15rem;">
+            <label class="input-group-text">Adı :</label>
+            <InputText type="Text" class="form-control" id="name" @bind-Value="studentDTO.Name" />
+        </div>
 
-    <div class="input-group mb-3" style="width:15rem;">
-        <label class="input-group-text">Soyadı : </label>
-        <InputText type="Text" class="form-control" id="surname" @bind-Value="studentDTO.SurName" />
-    </div>
-    <div class="input-group mb-3" style="width:15rem;">
-        <label class="input-group-text">Açıklama : </label>
-        <InputTextArea type="Text" class="form-control" id="surname" @bind-Value="studentDTO.Description" />
-    </div>
+        <div class="input-group mb-3" style="width:15rem;">
+            <label class="input-group-text">Soyadı : </label>
+            <InputText type="Text" class="form-control" id="surname" @bind-Value="studentDTO.SurName" />
+        </div>
+        <div class="input-group mb-3" style="width:15rem;">
+            <label class="input-group-text">Açıklama : </label>
+            <InputTextArea type="Text" class="form-control" id="surname" @bind-Value="studentDTO.Description" />
+        </div>
 
-    <div class="input-group mb-3" style="width:15rem;">
-        <button type="submit" class="btn btn-primary">Kaydet</button>
-    </div>
+        <div class="input-group mb-3" style="width:15rem;">
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+        </div>
 
-</EditForm>
+    </EditForm>
+</div>
 
 @inject IMediator _mediator
 
@@ -142,7 +143,6 @@
                 Description = studentDTO.Description,
                 SchoolId = studentDTO.SchoolId,
                 SemesterId = studentDTO.SemesterId
-
             };
 
         CreatedStudentResponse response = await _mediator.Send(createStudentCommand);
@@ -168,6 +168,5 @@
         public int SchoolId { get; set; }
 
         public int SemesterId { get; set; }
-
     }
 }
