@@ -1,7 +1,10 @@
 ﻿@page "/FirstUp/SchoolName"
 @namespace BlazorWebUI.Components.Pages.FirstUp
+@using Application.Features.Principals.Queries.GetList
+@using Application.Features.Personels.Queries.GetList
 @using Application.Features.Schools.Commands.Create
 @using Application.Features.Schools.Queries.GetList
+@using Domain.Entities
 @using NArchitecture.Core.Application.Requests
 @using NArchitecture.Core.Application.Responses
 
@@ -20,13 +23,28 @@
         <DataAnnotationsValidator />
         <ValidationSummary />
         <AntiforgeryToken />
+
         <div class="input-group mb-3" style="width:35rem;">
-            <label class="input-group-text">Okul Adı:</label>
+            <label class="input-group-text">Okul Adı: </label>
             <InputText type="Text" class="form-control conversion" id="name" style="text-transform:uppercase" @bind-Value="schoolNameForm.SchoolName" />
-            <div class="input-group-append">
-                <button type="submit" class="btn btn-primary">Kaydet</button>
-            </div>
         </div>
+
+        <div class="input-group mb-3" style="width:35rem;">
+            <label class="input-group-text">Müdür: </label>
+            <InputSelect class="form-select" @bind-Value=schoolNameForm.PrincipalId>
+                <option selected>Seçiniz...</option>
+                @foreach (GetListPrincipalListItemDto pricipal in principals.Items)
+                {
+                    <option value="@pricipal.Id">@pricipal.Name @pricipal.SurName</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="input-group-append">
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+        </div>
+
+
     </EditForm>
 </div>
 
@@ -36,7 +54,6 @@
     @foreach (GetListSchoolListItemDto getListSchoolListItemDto in previousSchoolNames.Items)
     {
         <li class="list-group-item list-group-item-action  @(previousSchoolNames.Items.Select(psn=>psn.Id).Max() == getListSchoolListItemDto.Id ? "active" : "")">@getListSchoolListItemDto.Name</li>
-
     }
 </ul>
 
@@ -48,7 +65,7 @@
     private SchoolNameForm schoolNameForm { get; set; } = new();
 
     private GetListResponse<GetListSchoolListItemDto> previousSchoolNames = new();
-
+    private GetListResponse<GetListPrincipalListItemDto> principals = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -59,6 +76,10 @@
         previousSchoolNames = previousSchoolNamesRequest;
         previousSchoolNames.Items = previousSchoolNames.Items.OrderByDescending(v => v.Id).ToList();
 
+
+        GetListPrincipalQuery getListPrincipalQuery = new();
+        getListPrincipalQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
+        principals = await _IMediator.Send(getListPrincipalQuery);
         await base.OnInitializedAsync();
     }
 
@@ -70,7 +91,7 @@
             return;
         // todo: Alert Ekle
 
-        CreateSchoolCommand command = new() { Name = schoolNameForm.SchoolName.ToUpper() };
+        CreateSchoolCommand command = new() { Name = schoolNameForm.SchoolName.ToUpper(), PrincipalId = schoolNameForm.PrincipalId };
         CreatedSchoolResponse response = await _IMediator.Send(command);
         previousSchoolNames.Items.Add(new() { Id = response.Id, Name = response.Name });
     }
@@ -78,6 +99,7 @@
     private class SchoolNameForm
     {
         public string SchoolName { get; set; } = string.Empty;
+        public int PrincipalId { get; set; }
     }
 
 }
