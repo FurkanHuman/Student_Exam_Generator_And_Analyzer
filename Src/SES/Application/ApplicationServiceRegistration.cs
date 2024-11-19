@@ -6,6 +6,7 @@ using Application.Services.CookiesService;
 using Application.Services.Exams;
 using Application.Services.LearningAreas;
 using Application.Services.Lessons;
+using Application.Services.PdfReaderService;
 using Application.Services.Personels;
 using Application.Services.Principals;
 using Application.Services.QuestionOptions;
@@ -101,6 +102,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IPersonelService, PersonelManager>();
         services.AddScoped<ILessonService, LessonManager>();
         services.AddScoped<IPersonelService, PersonelManager>();
+        services.AddScoped<IPdfReaderService,PdfReaderManager>();
         return services;
     }
 
