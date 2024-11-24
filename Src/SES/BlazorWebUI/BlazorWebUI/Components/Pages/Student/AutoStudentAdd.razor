@@ -1,5 +1,4 @@
-﻿@page "/Auto/MSAddV2"
-
+﻿@page "/Auto/MSAdd"
 @using Application.Features.Schools.Queries.GetList
 @using Application.Features.Semesters.Queries.GetList
 @using Application.Features.StudentClasses.Queries.GetList
@@ -13,7 +12,7 @@
 <br />
 <div class="input-group mb-3">
 
-    <EditForm OnValidSubmit="AddAutoStudent" Model="multiStudentDto" FormName="StudentMultiAdd">
+    <EditForm OnValidSubmit="AddAutoStudent" method="post" enctype="multipart/form-data" Model="multiStudentDto" FormName="StudentMultiAdd">
 
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -54,7 +53,12 @@
 
         <div class="input-group mb-3" style="width:20rem;">
             <label class="input-group-text">Öğrenci Dosyası :</label>
-            <InputFile OnChange="OnInputFile" class="form-control" accept="application/pdf"  />
+            <input type="file" name="FileFromPdf" class="form-control" accept=".pdf" />
+            @if (fileContent.Length == 0)
+            {
+                <div class="text-danger">Lütfen geçerli bir PDF dosyası yükleyin.</div>
+            }
+
         </div>
 
         <div class="mb-3">
@@ -62,8 +66,6 @@
         </div>
 
     </EditForm>
-
-
 
 </div>
 
@@ -105,7 +107,10 @@
     private MultiStudentDto multiStudentDto { get; set; } = new()
         { TeacherId = 0, SchoolId = 0, SemesterId = 0 };
 
-    private byte[] _pdfFile { get; set; } = Array.Empty<byte>();
+    [SupplyParameterFromForm]
+    private IFormFile? FileFromPdf { get; set; }
+
+    private byte[] fileContent = Array.Empty<byte>();
 
     GetListResponse<GetListSchoolListItemDto> SchoolResponse = new();
     GetListResponse<GetListSemesterListItemDto> SemesterResponse = new();
@@ -113,10 +118,8 @@
     GetListResponse<GetListStudentClassListItemDto> StudentClassResponse = new();
     ICollection<CreatedMultiStudentResponse> createdMultiStudents = [];
 
-
     protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("OnInitializedAsync");
         SchoolResponse = await _mediator.Send(new GetListSchoolQuery()
             {
                 PageRequest = new()
@@ -152,37 +155,33 @@
                     PageSize = int.MaxValue
                 }
             });
-        StateHasChanged();
+
+        await FileToMemoryAsync();
         await base.OnInitializedAsync();
+    }
+
+
+    private async Task FileToMemoryAsync()
+    {
+        if (FileFromPdf == null)
+            return;
+
+        using MemoryStream memoryStream = new();
+        await FileFromPdf.OpenReadStream().CopyToAsync(memoryStream);
+        fileContent = memoryStream.ToArray();
     }
 
     private async Task AddAutoStudent()
     {
         CreateMultiStudentCommand createMultiStudentCommand = new()
             {
-                PdfFile = _pdfFile,
+                PdfFile = fileContent,
                 RefTeacherId = multiStudentDto.TeacherId,
                 SchoolId = multiStudentDto.SchoolId,
                 SemesterId = multiStudentDto.SemesterId,
             };
 
-
         createdMultiStudents = await _mediator.Send(createMultiStudentCommand);
-        StateHasChanged();
-    }
-
-    private async Task OnInputFile(InputFileChangeEventArgs e)
-    {
-        Console.WriteLine("OnInputFile tetiklendi");
-        IBrowserFile file = e.File;
-
-        if (file == null)
-            return;
-
-        byte[]? buffer = new byte[file.Size];
-        await using (Stream stream = file.OpenReadStream(maxAllowedSize: 50 * 1024 * 1024))
-            await stream.ReadAsync(buffer, 0, (int)file.Size);
-        _pdfFile = buffer;
     }
 
     private record MultiStudentDto
@@ -191,5 +190,4 @@
         public required int TeacherId { get; set; }
         public required int SemesterId { get; set; }
     }
-
 }
