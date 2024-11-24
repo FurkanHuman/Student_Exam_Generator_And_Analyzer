@@ -19,9 +19,12 @@ public class MappingProfiles : Profile
         CreateMap<CreateStudentCommand, Student>();
         CreateMap<Student, CreatedStudentResponse>();
 
-        CreateMap<Student, CreatedMultiStudentResponse>().ReverseMap();
-        CreateMap<ICollection<Student>, ICollection<CreatedMultiStudentResponse>>().ReverseMap();
+        CreateMap<Student, CreatedMultiStudentResponse>()
+            .ForMember(destinationMember: s => s.ClassAge, memberOptions: opt => opt.MapFrom(s => s.StudentClass.ClassAge))
+            .ForMember(destinationMember: s => s.ClassBranch, memberOptions: opt => opt.MapFrom(s => s.StudentClass.ClassBranch));
 
+        CreateMap<ICollection<Student>, List<CreatedMultiStudentResponse>>()
+                   .ConvertUsing((src, dest, context) => src.Select(student => context.Mapper.Map<CreatedMultiStudentResponse>(student)).ToList());
         CreateMap<UpdateStudentCommand, Student>();
         CreateMap<Student, UpdatedStudentResponse>();
 
