@@ -11,6 +11,7 @@ internal class PdfReaderManager : IPdfReaderService
 {
     private readonly string _classRegex = @"(?:(Anasınıfı)|(\d+)\. Sınıf)\s*/\s*([A-Z])\s*Şubesi";
     private readonly string _studentRegex = @"^(?<ogrenciNo>\d+)\s+(?<adSoyad>[A-Za-zğüşöçİĞÜŞÖÇ]+\s[A-Za-zğüşöçİĞÜŞÖÇ]+(?:\s[A-Za-zğüşöçİĞÜŞÖÇ]+)*)\s+(?<cinsiyet>Kız|Erkek)$";
+    private readonly string _studentRegexNew = @"^(?<ogrenciNo>\d+)\s+(?<ad>[A-ZĞÜŞÖÇİ]+(?:\s[A-ZĞÜŞÖÇİ]+)*)\s+(?<cinsiyet>Kız|Erkek)\s+(?<soyad>[A-ZĞÜŞÖÇİ]+)$";
 
     public async Task<ICollection<ClassWithStudentsDto>> GetAllClassesAndStudents(byte[] pdfBytes)
     {
@@ -82,9 +83,9 @@ internal class PdfReaderManager : IPdfReaderService
 
     private ICollection<string[]> ExtractStudentInfo(string content)
     {
-        ICollection<string[]> ogrenciler = [];
+        ICollection<string[]> students = [];
 
-        Regex studentRegex = new Regex(_studentRegex, RegexOptions.Multiline);
+        Regex studentRegex = new Regex(_studentRegexNew, RegexOptions.Multiline);
 
         string[] lines = content.Split('\n');
 
@@ -100,21 +101,17 @@ internal class PdfReaderManager : IPdfReaderService
             Match match = studentRegex.Match(trimmedLine);
             if (!match.Success) continue;
 
-            string ogrenciNoStr = match.Groups["ogrenciNo"].Value;
-            if (string.IsNullOrEmpty(ogrenciNoStr) || !int.TryParse(ogrenciNoStr, out int ogrenciNo))
+            string studentNumberStr = match.Groups["ogrenciNo"].Value;
+            if (string.IsNullOrEmpty(studentNumberStr) || !int.TryParse(studentNumberStr, out int ogrenciNo))
                 continue;
 
-            string cinsiyet = match.Groups["cinsiyet"].Value;
-            string adSoyad = match.Groups["adSoyad"].Value.Trim();
+            string gender = match.Groups["cinsiyet"].Value;
+            string name = match.Groups["ad"].Value;
+            string surname = match.Groups["soyad"].Value;
 
-            // Ad ve soyad ayırma
-            string[] adSoyadParts = adSoyad.Split(' ');
-            string soyad = adSoyadParts[^1];
-            string ad = string.Join(" ", adSoyadParts[..^1]);
-
-            ogrenciler.Add([ogrenciNoStr, ad, soyad, cinsiyet]);
+            students.Add([ogrenciNo.ToString(), name, surname, gender]);
         }
 
-        return ogrenciler;
+        return students;
     }
 }
