@@ -32,6 +32,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWebUI", "Src\SES\Blaz
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWebUI.Client", "Src\SES\BlazorWebUI\BlazorWebUI.Client\BlazorWebUI.Client.csproj", "{8D7A34D4-CC8C-4B9B-87CD-13E02B92EF7E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMDREader", "CMDREader\CMDREader.csproj", "{1AB461D1-F03C-4DED-85C2-A3D3FFE9C411}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +72,10 @@ Global
 		{8D7A34D4-CC8C-4B9B-87CD-13E02B92EF7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D7A34D4-CC8C-4B9B-87CD-13E02B92EF7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D7A34D4-CC8C-4B9B-87CD-13E02B92EF7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AB461D1-F03C-4DED-85C2-A3D3FFE9C411}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AB461D1-F03C-4DED-85C2-A3D3FFE9C411}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AB461D1-F03C-4DED-85C2-A3D3FFE9C411}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AB461D1-F03C-4DED-85C2-A3D3FFE9C411}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
