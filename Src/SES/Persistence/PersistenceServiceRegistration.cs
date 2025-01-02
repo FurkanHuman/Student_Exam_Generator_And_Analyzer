@@ -12,17 +12,18 @@ public static class PersistenceServiceRegistration
 {
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<BaseDbContext>(options => options.UseInMemoryDatabase("BaseDb"));
-        services.AddDbContext<PostgreSqlDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("PostgreSqlDbConnectionStrings")).UseSnakeCaseNamingConvention());
-        // services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<BaseDbContext>());
-        services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<PostgreSqlDbContext>());
+        services.AddDbContext<BaseDbContext>(opt => opt.UseInMemoryDatabase("BaseDb"));
 
-        services.AddScoped<IEmailAuthenticatorRepository, EmailAuthenticatorRepository>();
-        services.AddScoped<IOperationClaimRepository, OperationClaimRepository>();
-        services.AddScoped<IOtpAuthenticatorRepository, OtpAuthenticatorRepository>();
-        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IUserOperationClaimRepository, UserOperationClaimRepository>();
+        services.AddDbContext<PostgreSqlDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("PostgreSqlDbConnectionStrings"),
+            m => m.MigrationsAssembly(typeof(PostgreSqlDbContext).Assembly.FullName)).UseSnakeCaseNamingConvention());
+
+        services.AddDbContext<PostgreSqlUserDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("PostgreSqlUserDbConnectionStrings"),
+            m => m.MigrationsAssembly(typeof(PostgreSqlUserDbContext).Assembly.FullName)).UseSnakeCaseNamingConvention());
+
+        services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<PostgreSqlDbContext>());
+        services.AddDbMigrationApplier(buildServices => buildServices.GetRequiredService<PostgreSqlUserDbContext>());
+
+
 
         services.AddScoped<IAnalysisRepository, AnalysisRepository>();
         services.AddScoped<IBenefitRepository, BenefitRepository>();
