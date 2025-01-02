@@ -12,13 +12,13 @@ using static Application.Features.Schools.Constants.SchoolsOperationClaims;
 
 namespace Application.Features.Schools.Commands.Update;
 
-public class UpdateSchoolCommand : IRequest<UpdatedSchoolResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class UpdateSchoolCommand : IRequest<UpdatedSchoolResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
     public required string Name { get; set; }
     public required Principal Principal { get; set; }
 
-    public string[] Roles => [Admin, Write, SchoolsOperationClaims.Update];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

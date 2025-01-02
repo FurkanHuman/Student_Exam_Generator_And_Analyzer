@@ -11,11 +11,11 @@ using static Application.Features.Lessons.Constants.LessonsOperationClaims;
 
 namespace Application.Features.Lessons.Queries.GetList;
 
-public class GetListLessonQuery : IRequest<GetListResponse<GetListLessonListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListLessonQuery : IRequest<GetListResponse<GetListLessonListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListLessons({PageRequest.PageIndex},{PageRequest.PageSize})";

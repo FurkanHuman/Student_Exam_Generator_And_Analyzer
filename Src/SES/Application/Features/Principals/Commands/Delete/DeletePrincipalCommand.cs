@@ -12,11 +12,11 @@ using static Application.Features.Principals.Constants.PrincipalsOperationClaims
 
 namespace Application.Features.Principals.Commands.Delete;
 
-public class DeletePrincipalCommand : IRequest<DeletedPrincipalResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class DeletePrincipalCommand : IRequest<DeletedPrincipalResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Write, PrincipalsOperationClaims.Delete];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

@@ -11,11 +11,11 @@ using static Application.Features.QuestionScores.Constants.QuestionScoresOperati
 
 namespace Application.Features.QuestionScores.Queries.GetList;
 
-public class GetListQuestionScoreQuery : IRequest<GetListResponse<GetListQuestionScoreListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListQuestionScoreQuery : IRequest<GetListResponse<GetListQuestionScoreListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListQuestionScores({PageRequest.PageIndex},{PageRequest.PageSize})";

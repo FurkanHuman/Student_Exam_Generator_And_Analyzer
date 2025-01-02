@@ -8,11 +8,11 @@ using static Application.Features.Principals.Constants.PrincipalsOperationClaims
 
 namespace Application.Features.Principals.Queries.GetById;
 
-public class GetByIdPrincipalQuery : IRequest<GetByIdPrincipalResponse>, ISecuredRequest
+public class GetByIdPrincipalQuery : IRequest<GetByIdPrincipalResponse>
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public class GetByIdPrincipalQueryHandler : IRequestHandler<GetByIdPrincipalQuery, GetByIdPrincipalResponse>
     {

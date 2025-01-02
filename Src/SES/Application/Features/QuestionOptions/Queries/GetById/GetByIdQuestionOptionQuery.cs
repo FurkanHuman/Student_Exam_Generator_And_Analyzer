@@ -8,11 +8,11 @@ using static Application.Features.QuestionOptions.Constants.QuestionOptionsOpera
 
 namespace Application.Features.QuestionOptions.Queries.GetById;
 
-public class GetByIdQuestionOptionQuery : IRequest<GetByIdQuestionOptionResponse>, ISecuredRequest
+public class GetByIdQuestionOptionQuery : IRequest<GetByIdQuestionOptionResponse>
 {
     public Guid Id { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public class GetByIdQuestionOptionQueryHandler : IRequestHandler<GetByIdQuestionOptionQuery, GetByIdQuestionOptionResponse>
     {

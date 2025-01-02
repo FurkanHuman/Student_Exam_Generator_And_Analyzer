@@ -12,7 +12,7 @@ using static Application.Features.ReferenceBenefits.Constants.ReferenceBenefitsO
 
 namespace Application.Features.ReferenceBenefits.Commands.Create;
 
-public class CreateReferenceBenefitCommand : IRequest<CreatedReferenceBenefitResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class CreateReferenceBenefitCommand : IRequest<CreatedReferenceBenefitResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required string ReferenceBenefitName { get; set; }
     public required int SemesterId { get; set; }
@@ -21,7 +21,7 @@ public class CreateReferenceBenefitCommand : IRequest<CreatedReferenceBenefitRes
     public required int LearningAreaId { get; set; }
     public required Semester Semester { get; set; }
 
-    public string[] Roles => [Admin, Write, ReferenceBenefitsOperationClaims.Create];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

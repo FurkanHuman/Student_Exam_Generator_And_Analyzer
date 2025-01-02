@@ -12,7 +12,7 @@ using static Application.Features.Analyses.Constants.AnalysesOperationClaims;
 
 namespace Application.Features.Analyses.Commands.Create;
 
-public class CreateAnalysisCommand : IRequest<CreatedAnalysisResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class CreateAnalysisCommand : IRequest<CreatedAnalysisResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required int ClassAge { get; set; }
     public required char AltClass { get; set; }
@@ -33,7 +33,7 @@ public class CreateAnalysisCommand : IRequest<CreatedAnalysisResponse>, ISecured
     public required Principal Principal { get; set; }
     public required School School { get; set; }
 
-    public string[] Roles => [Admin, Write, AnalysesOperationClaims.Create];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

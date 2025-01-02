@@ -12,11 +12,11 @@ using static Application.Features.Teachers.Constants.TeachersOperationClaims;
 
 namespace Application.Features.Teachers.Commands.Delete;
 
-public class DeleteTeacherCommand : IRequest<DeletedTeacherResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class DeleteTeacherCommand : IRequest<DeletedTeacherResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Write, TeachersOperationClaims.Delete];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

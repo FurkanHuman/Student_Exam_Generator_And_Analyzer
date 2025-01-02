@@ -12,7 +12,7 @@ using static Application.Features.Analyses.Constants.AnalysesOperationClaims;
 
 namespace Application.Features.Analyses.Commands.Update;
 
-public class UpdateAnalysisCommand : IRequest<UpdatedAnalysisResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class UpdateAnalysisCommand : IRequest<UpdatedAnalysisResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
     public required int ClassAge { get; set; }
@@ -34,7 +34,7 @@ public class UpdateAnalysisCommand : IRequest<UpdatedAnalysisResponse>, ISecured
     public required Principal Principal { get; set; }
     public required School School { get; set; }
 
-    public string[] Roles => [Admin, Write, AnalysesOperationClaims.Update];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

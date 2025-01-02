@@ -14,8 +14,5 @@ public class UpdateTeacherCommandValidator : AbstractValidator<UpdateTeacherComm
         RuleFor(c => c.StudentId).NotEmpty();
         RuleFor(c => c.SchoolId).NotEmpty();
         RuleFor(c => c.UserId).NotEmpty();
-        RuleFor(c => c.User).NotEmpty();
-        RuleFor(c => c.School).NotEmpty();
-        RuleFor(c => c.Semester).NotEmpty();
     }
 }

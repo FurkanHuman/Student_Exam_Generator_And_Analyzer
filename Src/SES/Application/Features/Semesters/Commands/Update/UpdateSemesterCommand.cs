@@ -12,14 +12,14 @@ using static Application.Features.Semesters.Constants.SemestersOperationClaims;
 
 namespace Application.Features.Semesters.Commands.Update;
 
-public class UpdateSemesterCommand : IRequest<UpdatedSemesterResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class UpdateSemesterCommand : IRequest<UpdatedSemesterResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
     public required string Name { get; set; }
     public required DateOnly BeginSemesterDate { get; set; }
     public required DateOnly EndSemesterDate { get; set; }
 
-    public string[] Roles => [Admin, Write, SemestersOperationClaims.Update];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

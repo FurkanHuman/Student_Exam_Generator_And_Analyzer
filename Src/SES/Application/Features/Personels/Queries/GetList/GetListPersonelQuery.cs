@@ -11,11 +11,11 @@ using static Application.Features.Personels.Constants.PersonelsOperationClaims;
 
 namespace Application.Features.Personels.Queries.GetList;
 
-public class GetListPersonelQuery : IRequest<GetListResponse<GetListPersonelListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListPersonelQuery : IRequest<GetListResponse<GetListPersonelListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListPersonels({PageRequest.PageIndex},{PageRequest.PageSize})";

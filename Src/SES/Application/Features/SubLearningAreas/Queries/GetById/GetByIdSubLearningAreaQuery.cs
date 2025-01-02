@@ -8,11 +8,11 @@ using static Application.Features.SubLearningAreas.Constants.SubLearningAreasOpe
 
 namespace Application.Features.SubLearningAreas.Queries.GetById;
 
-public class GetByIdSubLearningAreaQuery : IRequest<GetByIdSubLearningAreaResponse>, ISecuredRequest
+public class GetByIdSubLearningAreaQuery : IRequest<GetByIdSubLearningAreaResponse>
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public class GetByIdSubLearningAreaQueryHandler : IRequestHandler<GetByIdSubLearningAreaQuery, GetByIdSubLearningAreaResponse>
     {

@@ -4,7 +4,6 @@ using Application.Features.Students.Commands.MultiCreate;
 using Application.Features.Students.Commands.Update;
 using Application.Features.Students.Queries.GetById;
 using Application.Features.Students.Queries.GetList;
-using Application.Services.PdfReaderService.Dtos;
 using AutoMapper;
 using Domain.Entities;
 using NArchitecture.Core.Application.Responses;

@@ -8,11 +8,11 @@ using static Application.Features.StudentClasses.Constants.StudentClassesOperati
 
 namespace Application.Features.StudentClasses.Queries.GetById;
 
-public class GetByIdStudentClassQuery : IRequest<GetByIdStudentClassResponse>, ISecuredRequest
+public class GetByIdStudentClassQuery : IRequest<GetByIdStudentClassResponse>
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public class GetByIdStudentClassQueryHandler : IRequestHandler<GetByIdStudentClassQuery, GetByIdStudentClassResponse>
     {

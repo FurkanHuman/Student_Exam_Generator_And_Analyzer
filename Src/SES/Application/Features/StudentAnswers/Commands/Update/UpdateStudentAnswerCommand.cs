@@ -12,7 +12,7 @@ using static Application.Features.StudentAnswers.Constants.StudentAnswersOperati
 
 namespace Application.Features.StudentAnswers.Commands.Update;
 
-public class UpdateStudentAnswerCommand : IRequest<UpdatedStudentAnswerResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class UpdateStudentAnswerCommand : IRequest<UpdatedStudentAnswerResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public Guid Id { get; set; }
     public required int StudentId { get; set; }
@@ -22,7 +22,7 @@ public class UpdateStudentAnswerCommand : IRequest<UpdatedStudentAnswerResponse>
     public required int Score { get; set; }
     public required bool IsCorrect { get; set; }
 
-    public string[] Roles => [Admin, Write, StudentAnswersOperationClaims.Update];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

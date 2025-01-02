@@ -12,12 +12,12 @@ using static Application.Features.Schools.Constants.SchoolsOperationClaims;
 
 namespace Application.Features.Schools.Commands.Create;
 
-public class CreateSchoolCommand : IRequest<CreatedSchoolResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class CreateSchoolCommand : IRequest<CreatedSchoolResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required string Name { get; set; }
     public int PrincipalId { get; set; }
 
-    public string[] Roles => [Admin, Write, SchoolsOperationClaims.Create];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

@@ -12,13 +12,13 @@ using static Application.Features.QuestionOptions.Constants.QuestionOptionsOpera
 
 namespace Application.Features.QuestionOptions.Commands.Create;
 
-public class CreateQuestionOptionCommand : IRequest<CreatedQuestionOptionResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class CreateQuestionOptionCommand : IRequest<CreatedQuestionOptionResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required int QuizQuestionId { get; set; }
     public string? OptionText { get; set; }
     public required bool IsCorrect { get; set; }
 
-    public string[] Roles => [Admin, Write, QuestionOptionsOperationClaims.Create];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

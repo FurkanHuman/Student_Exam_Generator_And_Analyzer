@@ -13,7 +13,7 @@ using static Application.Features.QuizQuestions.Constants.QuizQuestionsOperation
 
 namespace Application.Features.QuizQuestions.Commands.Update;
 
-public class UpdateQuizQuestionCommand : IRequest<UpdatedQuizQuestionResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class UpdateQuizQuestionCommand : IRequest<UpdatedQuizQuestionResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
     public required int BenefitId { get; set; }
@@ -24,7 +24,7 @@ public class UpdateQuizQuestionCommand : IRequest<UpdatedQuizQuestionResponse>, 
     public required string QuestionImage { get; set; }
     public required QuestionType QuestionType { get; set; }
 
-    public string[] Roles => [Admin, Write, QuizQuestionsOperationClaims.Update];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }
