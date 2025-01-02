@@ -7,5 +7,5 @@ public class Personel : Entity<Guid>
     public string Name { get; set; }
     public string SurName { get; set; }
     public DateOnly BirthDate { get; set; }
-    public virtual User User { get; set; }
+    public virtual ApplicationUser? User { get; set; }
 }
