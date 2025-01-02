@@ -24,5 +24,3 @@ internal class PrincipalConfiguration : IEntityTypeConfiguration<Principal>
     }
 
 }
-
-
