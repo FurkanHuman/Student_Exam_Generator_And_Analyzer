@@ -1,8 +1,5 @@
 using Application.Services.Analyses;
-using Application.Services.AuthenticatorService;
-using Application.Services.AuthService;
 using Application.Services.Benefits;
-using Application.Services.CookiesService;
 using Application.Services.Exams;
 using Application.Services.LearningAreas;
 using Application.Services.Lessons;
@@ -20,7 +17,6 @@ using Application.Services.StudentClasses;
 using Application.Services.Students;
 using Application.Services.SubLearningAreas;
 using Application.Services.Teachers;
-using Application.Services.UsersService;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using NArchitecture.Core.Application.Pipelines.Authorization;
@@ -37,8 +33,6 @@ using NArchitecture.Core.ElasticSearch.Models;
 using NArchitecture.Core.Localization.Resource.Yaml.DependencyInjection;
 using NArchitecture.Core.Mailing;
 using NArchitecture.Core.Mailing.MailKit;
-using NArchitecture.Core.Security.DependencyInjection;
-using NArchitecture.Core.Security.JWT;
 using System.Reflection;
 
 namespace Application;
@@ -49,15 +43,14 @@ public static class ApplicationServiceRegistration
         this IServiceCollection services,
         MailSettings mailSettings,
         FileLogConfiguration fileLogConfiguration,
-        ElasticSearchConfig elasticSearchConfig,
-        TokenOptions tokenOptions
+        ElasticSearchConfig elasticSearchConfig
     )
+
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
         services.AddMediatR(configuration =>
         {
             configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-            configuration.AddOpenBehavior(typeof(AuthorizationBehavior<,>)); // Note: MediatR Blazor auth Problem ! 25.06.2024 solved this case
             configuration.AddOpenBehavior(typeof(CachingBehavior<,>));
             configuration.AddOpenBehavior(typeof(CacheRemovingBehavior<,>));
             configuration.AddOpenBehavior(typeof(LoggingBehavior<,>));
@@ -73,14 +66,7 @@ public static class ApplicationServiceRegistration
         services.AddSingleton<ILogger, SerilogFileLogger>(_ => new SerilogFileLogger(fileLogConfiguration));
         services.AddSingleton<IElasticSearch, ElasticSearchManager>(_ => new ElasticSearchManager(elasticSearchConfig));
 
-        services.AddScoped<IAuthService, AuthManager>();
-        services.AddScoped<IAuthenticatorService, AuthenticatorManager>();
-        services.AddScoped<IUserService, UserManager>();
-        services.AddScoped<ICookieService,CookieManager>();
-
         services.AddYamlResourceLocalization();
-
-        services.AddSecurityServices<Guid, int, Guid>(tokenOptions);
 
         services.AddScoped<IAnalysisService, AnalysisManager>();
         services.AddScoped<IBenefitService, BenefitManager>();
@@ -102,7 +88,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IPersonelService, PersonelManager>();
         services.AddScoped<ILessonService, LessonManager>();
         services.AddScoped<IPersonelService, PersonelManager>();
-        services.AddScoped<IPdfReaderService,PdfReaderManager>();
+        services.AddScoped<IPdfReaderService, PdfReaderManager>();
         return services;
     }
 
