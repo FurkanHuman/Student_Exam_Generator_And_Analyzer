@@ -1,8 +1,8 @@
 ﻿using Application.Services.PdfReaderService.Dtos;
 using iText.IO.Source;
 using iText.Kernel.Pdf;
-using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using iText.Kernel.Pdf.Canvas.Parser;
+using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
