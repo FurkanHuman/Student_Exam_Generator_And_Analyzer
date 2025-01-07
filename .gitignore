@@ -402,3 +402,4 @@ FodyWeavers.xsd
 *.sln.iml
 Src/SES/Persistence/Migrations/*
 /.sonarqube
+/CMDREader
