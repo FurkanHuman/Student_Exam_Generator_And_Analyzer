@@ -6,8 +6,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.11" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
       <PrivateAssets>all</PrivateAssets>
@@ -19,7 +23,11 @@
     <PackageReference Include="NArchitecture.Core.CrossCuttingConcerns.Exception.WebApi" Version="1.1.2" />
     <PackageReference Include="NArchitecture.Core.Localization.WebApi" Version="1.0.1" />
     <PackageReference Include="NArchitecture.Core.Persistence.WebApi" Version="1.0.2" />
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />    
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
+    <PackageReference Include="Net.Codecrete.QrCodeGenerator" Version="2.0.6" />
   </ItemGroup>
 
 
@@ -28,6 +36,11 @@
     <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\..\Persistence\Persistence.csproj" />
     <ProjectReference Include="..\BlazorWebUI.Client\BlazorWebUI.Client.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="Components\Pages\Auth\" />
   </ItemGroup>
 
 </Project>

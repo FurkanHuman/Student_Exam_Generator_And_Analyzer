@@ -12,7 +12,7 @@ using static Application.Features.Personels.Constants.PersonelsOperationClaims;
 
 namespace Application.Features.Personels.Commands.Update;
 
-public class UpdatePersonelCommand : IRequest<UpdatedPersonelResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class UpdatePersonelCommand : IRequest<UpdatedPersonelResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public Guid Id { get; set; }
     public required Guid UserId { get; set; }
@@ -20,7 +20,7 @@ public class UpdatePersonelCommand : IRequest<UpdatedPersonelResponse>, ISecured
     public required string SurName { get; set; }
     public required DateOnly BirthDate { get; set; }
 
-    public string[] Roles => [Admin, Write, PersonelsOperationClaims.Update];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

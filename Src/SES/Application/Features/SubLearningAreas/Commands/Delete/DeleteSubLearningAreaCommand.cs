@@ -12,11 +12,11 @@ using static Application.Features.SubLearningAreas.Constants.SubLearningAreasOpe
 
 namespace Application.Features.SubLearningAreas.Commands.Delete;
 
-public class DeleteSubLearningAreaCommand : IRequest<DeletedSubLearningAreaResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class DeleteSubLearningAreaCommand : IRequest<DeletedSubLearningAreaResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Write, SubLearningAreasOperationClaims.Delete];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

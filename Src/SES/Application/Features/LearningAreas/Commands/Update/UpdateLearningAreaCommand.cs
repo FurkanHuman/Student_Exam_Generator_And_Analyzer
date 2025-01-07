@@ -12,13 +12,13 @@ using static Application.Features.LearningAreas.Constants.LearningAreasOperation
 
 namespace Application.Features.LearningAreas.Commands.Update;
 
-public class UpdateLearningAreaCommand : IRequest<UpdatedLearningAreaResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class UpdateLearningAreaCommand : IRequest<UpdatedLearningAreaResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
     public required string Name { get; set; }
     public required int SubLearningAreaId { get; set; }
 
-    public string[] Roles => [Admin, Write, LearningAreasOperationClaims.Update];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

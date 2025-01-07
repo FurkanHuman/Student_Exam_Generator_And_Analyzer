@@ -12,13 +12,13 @@ using static Application.Features.Lessons.Constants.LessonsOperationClaims;
 
 namespace Application.Features.Lessons.Commands.Create;
 
-public class CreateLessonCommand : IRequest<CreatedLessonResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class CreateLessonCommand : IRequest<CreatedLessonResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required string LessonName { get; set; }
     public required string Description { get; set; }
     public required int SemesterId { get; set; }
 
-    public string[] Roles => [Admin, Write, LessonsOperationClaims.Create];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

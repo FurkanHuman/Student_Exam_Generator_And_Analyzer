@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿using BlazorWebUI.Components.Account;
+using Domain.Entities;
+using Identity.Components.Account;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace BlazorWebUI;
 
@@ -6,10 +10,10 @@ public static class BlazorWebUIServiceRegistration
 {
     public static IServiceCollection AddBlazorWebUIServiceRegistration(this IServiceCollection services)
     {
-
-        services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-        services.AddHttpContextAccessor();
-        services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
+        services.AddScoped<IdentityUserAccessor>();
+        services.AddScoped<IdentityRedirectManager>();
+        services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
+        services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
         return services;
     }

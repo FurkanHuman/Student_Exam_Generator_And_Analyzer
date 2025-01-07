@@ -12,11 +12,11 @@ using static Application.Features.QuestionOptions.Constants.QuestionOptionsOpera
 
 namespace Application.Features.QuestionOptions.Commands.Delete;
 
-public class DeleteQuestionOptionCommand : IRequest<DeletedQuestionOptionResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class DeleteQuestionOptionCommand : IRequest<DeletedQuestionOptionResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public Guid Id { get; set; }
 
-    public string[] Roles => [Admin, Write, QuestionOptionsOperationClaims.Delete];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

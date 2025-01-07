@@ -8,11 +8,11 @@ using static Application.Features.Analyses.Constants.AnalysesOperationClaims;
 
 namespace Application.Features.Analyses.Queries.GetById;
 
-public class GetByIdAnalysisQuery : IRequest<GetByIdAnalysisResponse>, ISecuredRequest
+public class GetByIdAnalysisQuery : IRequest<GetByIdAnalysisResponse>
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public class GetByIdAnalysisQueryHandler : IRequestHandler<GetByIdAnalysisQuery, GetByIdAnalysisResponse>
     {

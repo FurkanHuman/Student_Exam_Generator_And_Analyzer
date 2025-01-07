@@ -8,11 +8,11 @@ using static Application.Features.Exams.Constants.ExamsOperationClaims;
 
 namespace Application.Features.Exams.Queries.GetById;
 
-public class GetByIdExamQuery : IRequest<GetByIdExamResponse>, ISecuredRequest
+public class GetByIdExamQuery : IRequest<GetByIdExamResponse>
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public class GetByIdExamQueryHandler : IRequestHandler<GetByIdExamQuery, GetByIdExamResponse>
     {

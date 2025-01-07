@@ -12,14 +12,14 @@ using static Application.Features.Benefits.Constants.BenefitsOperationClaims;
 
 namespace Application.Features.Benefits.Commands.Update;
 
-public class UpdateBenefitCommand : IRequest<UpdatedBenefitResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class UpdateBenefitCommand : IRequest<UpdatedBenefitResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
     public required int SubLearningAreaId { get; set; }
     public required string ReferenceBenefitNumber { get; set; }
     public required string ReferenceBenefitComments { get; set; }
 
-    public string[] Roles => [Admin, Write, BenefitsOperationClaims.Update];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

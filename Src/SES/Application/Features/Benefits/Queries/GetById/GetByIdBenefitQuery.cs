@@ -8,11 +8,11 @@ using static Application.Features.Benefits.Constants.BenefitsOperationClaims;
 
 namespace Application.Features.Benefits.Queries.GetById;
 
-public class GetByIdBenefitQuery : IRequest<GetByIdBenefitResponse>, ISecuredRequest
+public class GetByIdBenefitQuery : IRequest<GetByIdBenefitResponse>
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public class GetByIdBenefitQueryHandler : IRequestHandler<GetByIdBenefitQuery, GetByIdBenefitResponse>
     {

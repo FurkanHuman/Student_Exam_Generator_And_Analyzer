@@ -12,14 +12,14 @@ using static Application.Features.Personels.Constants.PersonelsOperationClaims;
 
 namespace Application.Features.Personels.Commands.Create;
 
-public class CreatePersonelCommand : IRequest<CreatedPersonelResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class CreatePersonelCommand : IRequest<CreatedPersonelResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required Guid UserId { get; set; }
     public required string Name { get; set; }
     public required string SurName { get; set; }
     public required DateOnly BirthDate { get; set; }
 
-    public string[] Roles => [Admin, Write, PersonelsOperationClaims.Create];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

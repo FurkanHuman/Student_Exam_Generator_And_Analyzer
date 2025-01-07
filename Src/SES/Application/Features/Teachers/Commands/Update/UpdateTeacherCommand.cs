@@ -12,7 +12,7 @@ using static Application.Features.Teachers.Constants.TeachersOperationClaims;
 
 namespace Application.Features.Teachers.Commands.Update;
 
-public class UpdateTeacherCommand : IRequest<UpdatedTeacherResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class UpdateTeacherCommand : IRequest<UpdatedTeacherResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
     public required string Name { get; set; }
@@ -22,11 +22,7 @@ public class UpdateTeacherCommand : IRequest<UpdatedTeacherResponse>, ISecuredRe
     public required int StudentId { get; set; }
     public required int SchoolId { get; set; }
     public required int UserId { get; set; }
-    public required User User { get; set; }
-    public required School School { get; set; }
-    public required Semester Semester { get; set; }
 
-    public string[] Roles => [Admin, Write, TeachersOperationClaims.Update];
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

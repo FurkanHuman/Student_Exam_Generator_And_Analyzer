@@ -12,11 +12,11 @@ using static Application.Features.LearningAreas.Constants.LearningAreasOperation
 
 namespace Application.Features.LearningAreas.Commands.Delete;
 
-public class DeleteLearningAreaCommand : IRequest<DeletedLearningAreaResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class DeleteLearningAreaCommand : IRequest<DeletedLearningAreaResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Write, LearningAreasOperationClaims.Delete];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

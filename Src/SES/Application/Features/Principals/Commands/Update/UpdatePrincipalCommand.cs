@@ -12,7 +12,7 @@ using static Application.Features.Principals.Constants.PrincipalsOperationClaims
 
 namespace Application.Features.Principals.Commands.Update;
 
-public class UpdatePrincipalCommand : IRequest<UpdatedPrincipalResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class UpdatePrincipalCommand : IRequest<UpdatedPrincipalResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
     public required string Name { get; set; }
@@ -21,7 +21,7 @@ public class UpdatePrincipalCommand : IRequest<UpdatedPrincipalResponse>, ISecur
     public required School School { get; set; }
     public required Semester Semester { get; set; }
 
-    public string[] Roles => [Admin, Write, PrincipalsOperationClaims.Update];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

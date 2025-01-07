@@ -11,11 +11,11 @@ using static Application.Features.Benefits.Constants.BenefitsOperationClaims;
 
 namespace Application.Features.Benefits.Queries.GetList;
 
-public class GetListBenefitQuery : IRequest<GetListResponse<GetListBenefitListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListBenefitQuery : IRequest<GetListResponse<GetListBenefitListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListBenefits({PageRequest.PageIndex},{PageRequest.PageSize})";

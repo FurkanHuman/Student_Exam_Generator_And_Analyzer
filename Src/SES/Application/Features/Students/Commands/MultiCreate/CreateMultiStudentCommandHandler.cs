@@ -32,7 +32,7 @@ public class CreateMultiStudentCommandHandler : IRequestHandler<CreateMultiStude
 
         foreach (Services.PdfReaderService.Dtos.ClassWithStudentsDto classWithStudents in extractStudentAndClasess)
         {
-            
+
             StudentClass autocreatedStudentClass = await _studentClassService.AddAsync(new()
             {
                 Name = "Auto Added",

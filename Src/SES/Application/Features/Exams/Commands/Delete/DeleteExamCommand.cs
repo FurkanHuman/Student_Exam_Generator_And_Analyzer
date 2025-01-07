@@ -12,11 +12,11 @@ using static Application.Features.Exams.Constants.ExamsOperationClaims;
 
 namespace Application.Features.Exams.Commands.Delete;
 
-public class DeleteExamCommand : IRequest<DeletedExamResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class DeleteExamCommand : IRequest<DeletedExamResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Write, ExamsOperationClaims.Delete];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

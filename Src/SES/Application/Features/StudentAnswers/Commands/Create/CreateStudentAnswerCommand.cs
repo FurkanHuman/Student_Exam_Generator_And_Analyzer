@@ -12,7 +12,7 @@ using static Application.Features.StudentAnswers.Constants.StudentAnswersOperati
 
 namespace Application.Features.StudentAnswers.Commands.Create;
 
-public class CreateStudentAnswerCommand : IRequest<CreatedStudentAnswerResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class CreateStudentAnswerCommand : IRequest<CreatedStudentAnswerResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required int StudentId { get; set; }
     public required int QuizQuestionId { get; set; }
@@ -21,7 +21,7 @@ public class CreateStudentAnswerCommand : IRequest<CreatedStudentAnswerResponse>
     public required int Score { get; set; }
     public required bool IsCorrect { get; set; }
 
-    public string[] Roles => [Admin, Write, StudentAnswersOperationClaims.Create];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

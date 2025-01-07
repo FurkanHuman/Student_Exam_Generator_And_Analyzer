@@ -12,13 +12,13 @@ using static Application.Features.Semesters.Constants.SemestersOperationClaims;
 
 namespace Application.Features.Semesters.Commands.Create;
 
-public class CreateSemesterCommand : IRequest<CreatedSemesterResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class CreateSemesterCommand : IRequest<CreatedSemesterResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required string Name { get; set; }
     public required DateOnly BeginSemesterDate { get; set; }
     public required DateOnly EndSemesterDate { get; set; }
 
-    public string[] Roles => [Admin, Write, SemestersOperationClaims.Create];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

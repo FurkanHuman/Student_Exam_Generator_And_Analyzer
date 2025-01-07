@@ -8,11 +8,11 @@ using static Application.Features.Semesters.Constants.SemestersOperationClaims;
 
 namespace Application.Features.Semesters.Queries.GetById;
 
-public class GetByIdSemesterQuery : IRequest<GetByIdSemesterResponse>, ISecuredRequest
+public class GetByIdSemesterQuery : IRequest<GetByIdSemesterResponse>
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public class GetByIdSemesterQueryHandler : IRequestHandler<GetByIdSemesterQuery, GetByIdSemesterResponse>
     {

@@ -11,11 +11,11 @@ using static Application.Features.QuizQuestions.Constants.QuizQuestionsOperation
 
 namespace Application.Features.QuizQuestions.Queries.GetList;
 
-public class GetListQuizQuestionQuery : IRequest<GetListResponse<GetListQuizQuestionListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListQuizQuestionQuery : IRequest<GetListResponse<GetListQuizQuestionListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListQuizQuestions({PageRequest.PageIndex},{PageRequest.PageSize})";

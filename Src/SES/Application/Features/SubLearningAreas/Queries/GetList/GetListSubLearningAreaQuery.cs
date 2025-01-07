@@ -11,11 +11,11 @@ using static Application.Features.SubLearningAreas.Constants.SubLearningAreasOpe
 
 namespace Application.Features.SubLearningAreas.Queries.GetList;
 
-public class GetListSubLearningAreaQuery : IRequest<GetListResponse<GetListSubLearningAreaListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListSubLearningAreaQuery : IRequest<GetListResponse<GetListSubLearningAreaListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListSubLearningAreas({PageRequest.PageIndex},{PageRequest.PageSize})";

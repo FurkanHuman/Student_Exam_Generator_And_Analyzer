@@ -12,11 +12,11 @@ using static Application.Features.Benefits.Constants.BenefitsOperationClaims;
 
 namespace Application.Features.Benefits.Commands.Delete;
 
-public class DeleteBenefitCommand : IRequest<DeletedBenefitResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class DeleteBenefitCommand : IRequest<DeletedBenefitResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Write, BenefitsOperationClaims.Delete];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

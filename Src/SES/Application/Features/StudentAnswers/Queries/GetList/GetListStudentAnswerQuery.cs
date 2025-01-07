@@ -11,11 +11,11 @@ using static Application.Features.StudentAnswers.Constants.StudentAnswersOperati
 
 namespace Application.Features.StudentAnswers.Queries.GetList;
 
-public class GetListStudentAnswerQuery : IRequest<GetListResponse<GetListStudentAnswerListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListStudentAnswerQuery : IRequest<GetListResponse<GetListStudentAnswerListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListStudentAnswers({PageRequest.PageIndex},{PageRequest.PageSize})";
