@@ -12,13 +12,13 @@ using static Application.Features.QuestionScores.Constants.QuestionScoresOperati
 
 namespace Application.Features.QuestionScores.Commands.Update;
 
-public class UpdateQuestionScoreCommand : IRequest<UpdatedQuestionScoreResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class UpdateQuestionScoreCommand : IRequest<UpdatedQuestionScoreResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
     public required int Score { get; set; }
     public required int MaxScore { get; set; }
 
-    public string[] Roles => [Admin, Write, QuestionScoresOperationClaims.Update];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

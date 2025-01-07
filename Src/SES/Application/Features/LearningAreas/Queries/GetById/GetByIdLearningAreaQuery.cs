@@ -8,11 +8,11 @@ using static Application.Features.LearningAreas.Constants.LearningAreasOperation
 
 namespace Application.Features.LearningAreas.Queries.GetById;
 
-public class GetByIdLearningAreaQuery : IRequest<GetByIdLearningAreaResponse>, ISecuredRequest
+public class GetByIdLearningAreaQuery : IRequest<GetByIdLearningAreaResponse>
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public class GetByIdLearningAreaQueryHandler : IRequestHandler<GetByIdLearningAreaQuery, GetByIdLearningAreaResponse>
     {

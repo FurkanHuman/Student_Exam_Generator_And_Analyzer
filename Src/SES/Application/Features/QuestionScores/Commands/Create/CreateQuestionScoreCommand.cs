@@ -12,12 +12,12 @@ using static Application.Features.QuestionScores.Constants.QuestionScoresOperati
 
 namespace Application.Features.QuestionScores.Commands.Create;
 
-public class CreateQuestionScoreCommand : IRequest<CreatedQuestionScoreResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class CreateQuestionScoreCommand : IRequest<CreatedQuestionScoreResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required int Score { get; set; }
     public required int MaxScore { get; set; }
 
-    public string[] Roles => [Admin, Write, QuestionScoresOperationClaims.Create];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

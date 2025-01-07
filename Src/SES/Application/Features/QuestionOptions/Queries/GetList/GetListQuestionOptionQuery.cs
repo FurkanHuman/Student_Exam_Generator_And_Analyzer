@@ -11,11 +11,11 @@ using static Application.Features.QuestionOptions.Constants.QuestionOptionsOpera
 
 namespace Application.Features.QuestionOptions.Queries.GetList;
 
-public class GetListQuestionOptionQuery : IRequest<GetListResponse<GetListQuestionOptionListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListQuestionOptionQuery : IRequest<GetListResponse<GetListQuestionOptionListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListQuestionOptions({PageRequest.PageIndex},{PageRequest.PageSize})";

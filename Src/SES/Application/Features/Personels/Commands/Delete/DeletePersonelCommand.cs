@@ -12,11 +12,11 @@ using static Application.Features.Personels.Constants.PersonelsOperationClaims;
 
 namespace Application.Features.Personels.Commands.Delete;
 
-public class DeletePersonelCommand : IRequest<DeletedPersonelResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class DeletePersonelCommand : IRequest<DeletedPersonelResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public Guid Id { get; set; }
 
-    public string[] Roles => [Admin, Write, PersonelsOperationClaims.Delete];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

@@ -1,19 +1,13 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System.Reflection;
+using Persistence.EntityConfigurations;
 
 namespace Persistence.Contexts;
 
-public class BaseDbContext : DbContext
+public class BaseDbContext(DbContextOptions dbContextOptions, IConfiguration configuration) : DbContext(dbContextOptions)
 {
-    protected IConfiguration Configuration { get; set; }
-    public DbSet<EmailAuthenticator> EmailAuthenticators { get; set; }
-    public DbSet<OperationClaim> OperationClaims { get; set; }
-    public DbSet<OtpAuthenticator> OtpAuthenticators { get; set; }
-    public DbSet<RefreshToken> RefreshTokens { get; set; }
-    public DbSet<User> Users { get; set; }
-    public DbSet<UserOperationClaim> UserOperationClaims { get; set; }
+    protected IConfiguration Configuration { get; set; } = configuration;
     public DbSet<Analysis> AnalysisHeaders { get; set; }
     public DbSet<Benefit> Benefits { get; set; }
     public DbSet<Exam> Exams { get; set; }
@@ -34,9 +28,28 @@ public class BaseDbContext : DbContext
     public DbSet<Personel> Personels { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
 
-    public BaseDbContext(DbContextOptions dbContextOptions, IConfiguration configuration) : base(dbContextOptions) => Configuration = configuration;
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfiguration(new AnalysisConfiguration());
+        modelBuilder.ApplyConfiguration(new BenefitConfiguration());
+        modelBuilder.ApplyConfiguration(new ExamConfiguration());
+        modelBuilder.ApplyConfiguration(new LearningAreaConfiguration());
+        modelBuilder.ApplyConfiguration(new LessonConfiguration());
+        modelBuilder.ApplyConfiguration(new PersonelConfiguration());
+        modelBuilder.ApplyConfiguration(new PrincipalConfiguration());
+        modelBuilder.ApplyConfiguration(new QuestionOptionConfiguration());
+        modelBuilder.ApplyConfiguration(new QuestionScoreConfiguration());
+        modelBuilder.ApplyConfiguration(new QuizQuestionConfiguration());
+        modelBuilder.ApplyConfiguration(new ReferenceBenefitConfiguration());
+        modelBuilder.ApplyConfiguration(new SchoolConfiguration());
+        modelBuilder.ApplyConfiguration(new SemesterConfiguration());
+        modelBuilder.ApplyConfiguration(new StudentAnswerConfiguration());
+        modelBuilder.ApplyConfiguration(new StudentClassConfiguration());
+        modelBuilder.ApplyConfiguration(new StudentConfiguration());
+        modelBuilder.ApplyConfiguration(new SubLearningAreaConfiguration());
+        modelBuilder.ApplyConfiguration(new TeacherConfiguration());
 
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder) => modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
+        modelBuilder.HasDefaultSchema("SES_Base_Main");
+        base.OnModelCreating(modelBuilder);
+    }
 }

@@ -12,11 +12,9 @@ using static Application.Features.Teachers.Constants.TeachersOperationClaims;
 
 namespace Application.Features.Teachers.Queries.GetList;
 
-public class GetListTeacherQuery : IRequest<GetListResponse<GetListTeacherListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListTeacherQuery : IRequest<GetListResponse<GetListTeacherListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
-
-    public string[] Roles => [Admin, Read];
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListTeachers({PageRequest.PageIndex},{PageRequest.PageSize})";

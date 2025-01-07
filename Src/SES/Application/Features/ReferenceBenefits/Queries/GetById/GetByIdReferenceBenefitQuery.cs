@@ -8,11 +8,11 @@ using static Application.Features.ReferenceBenefits.Constants.ReferenceBenefitsO
 
 namespace Application.Features.ReferenceBenefits.Queries.GetById;
 
-public class GetByIdReferenceBenefitQuery : IRequest<GetByIdReferenceBenefitResponse>, ISecuredRequest
+public class GetByIdReferenceBenefitQuery : IRequest<GetByIdReferenceBenefitResponse>
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public class GetByIdReferenceBenefitQueryHandler : IRequestHandler<GetByIdReferenceBenefitQuery, GetByIdReferenceBenefitResponse>
     {

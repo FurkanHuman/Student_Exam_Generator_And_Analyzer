@@ -12,11 +12,11 @@ using static Application.Features.QuizQuestions.Constants.QuizQuestionsOperation
 
 namespace Application.Features.QuizQuestions.Commands.Delete;
 
-public class DeleteQuizQuestionCommand : IRequest<DeletedQuizQuestionResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class DeleteQuizQuestionCommand : IRequest<DeletedQuizQuestionResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Write, QuizQuestionsOperationClaims.Delete];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

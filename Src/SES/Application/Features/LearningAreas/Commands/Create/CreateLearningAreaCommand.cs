@@ -12,12 +12,12 @@ using static Application.Features.LearningAreas.Constants.LearningAreasOperation
 
 namespace Application.Features.LearningAreas.Commands.Create;
 
-public class CreateLearningAreaCommand : IRequest<CreatedLearningAreaResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class CreateLearningAreaCommand : IRequest<CreatedLearningAreaResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required string Name { get; set; }
     public required int SubLearningAreaId { get; set; }
 
-    public string[] Roles => [Admin, Write, LearningAreasOperationClaims.Create];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

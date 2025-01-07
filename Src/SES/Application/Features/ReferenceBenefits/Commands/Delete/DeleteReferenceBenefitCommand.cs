@@ -12,11 +12,11 @@ using static Application.Features.ReferenceBenefits.Constants.ReferenceBenefitsO
 
 namespace Application.Features.ReferenceBenefits.Commands.Delete;
 
-public class DeleteReferenceBenefitCommand : IRequest<DeletedReferenceBenefitResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class DeleteReferenceBenefitCommand : IRequest<DeletedReferenceBenefitResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Write, ReferenceBenefitsOperationClaims.Delete];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

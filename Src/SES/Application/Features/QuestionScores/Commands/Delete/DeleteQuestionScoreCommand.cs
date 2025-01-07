@@ -12,11 +12,11 @@ using static Application.Features.QuestionScores.Constants.QuestionScoresOperati
 
 namespace Application.Features.QuestionScores.Commands.Delete;
 
-public class DeleteQuestionScoreCommand : IRequest<DeletedQuestionScoreResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class DeleteQuestionScoreCommand : IRequest<DeletedQuestionScoreResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
 
-    public string[] Roles => [Admin, Write, QuestionScoresOperationClaims.Delete];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

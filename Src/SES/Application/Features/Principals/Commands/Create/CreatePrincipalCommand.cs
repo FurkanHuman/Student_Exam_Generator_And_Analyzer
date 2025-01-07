@@ -12,14 +12,14 @@ using static Application.Features.Principals.Constants.PrincipalsOperationClaims
 
 namespace Application.Features.Principals.Commands.Create;
 
-public class CreatePrincipalCommand : IRequest<CreatedPrincipalResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class CreatePrincipalCommand : IRequest<CreatedPrincipalResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required int SemesterId { get; set; }
 
     public required Guid PersonelId { get; set; }
 
 
-    public string[] Roles => [Admin, Write, PrincipalsOperationClaims.Create];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

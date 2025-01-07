@@ -11,11 +11,11 @@ using static Application.Features.ReferenceBenefits.Constants.ReferenceBenefitsO
 
 namespace Application.Features.ReferenceBenefits.Queries.GetList;
 
-public class GetListReferenceBenefitQuery : IRequest<GetListResponse<GetListReferenceBenefitListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListReferenceBenefitQuery : IRequest<GetListResponse<GetListReferenceBenefitListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListReferenceBenefits({PageRequest.PageIndex},{PageRequest.PageSize})";

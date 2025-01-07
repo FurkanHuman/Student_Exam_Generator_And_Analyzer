@@ -11,11 +11,11 @@ using static Application.Features.Exams.Constants.ExamsOperationClaims;
 
 namespace Application.Features.Exams.Queries.GetList;
 
-public class GetListExamQuery : IRequest<GetListResponse<GetListExamListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListExamQuery : IRequest<GetListResponse<GetListExamListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListExams({PageRequest.PageIndex},{PageRequest.PageSize})";

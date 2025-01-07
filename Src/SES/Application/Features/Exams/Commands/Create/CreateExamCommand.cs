@@ -12,7 +12,7 @@ using static Application.Features.Exams.Constants.ExamsOperationClaims;
 
 namespace Application.Features.Exams.Commands.Create;
 
-public class CreateExamCommand : IRequest<CreatedExamResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class CreateExamCommand : IRequest<CreatedExamResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required string LessonName { get; set; }
     public required string ExamCode { get; set; }
@@ -31,7 +31,7 @@ public class CreateExamCommand : IRequest<CreatedExamResponse>, ISecuredRequest,
     public required School School { get; set; }
     public required ReferenceBenefit ReferenceBenefit { get; set; }
 
-    public string[] Roles => [Admin, Write, ExamsOperationClaims.Create];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

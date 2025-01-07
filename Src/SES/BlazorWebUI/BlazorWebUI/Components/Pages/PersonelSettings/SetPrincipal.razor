@@ -7,8 +7,10 @@
 @using NArchitecture.Core.Application.Responses
 @using NArchitecture.Core.Persistence.Paging
 @using Domain.Entities
+@using Domain.Enums
 
-<AuthorizeView Roles="Admin" Context="RegisterContext">
+
+<AuthorizeView Roles=  "@($"{RoleType.Admin},{RoleType.Director}")" Context="RegisterContext">
     <Authorized>
         <PageTitle> Müdür ayarla </PageTitle>
 
@@ -45,7 +47,7 @@
                     </InputSelect>
                 </div>
 
-                <div class="btn">
+                <div class="mb-3">
                     <button type="submit" class="btn btn-primary text-lg-end">Ayarla</button>
                 </div>
             </EditForm>

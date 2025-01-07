@@ -12,14 +12,14 @@ using static Application.Features.QuestionOptions.Constants.QuestionOptionsOpera
 
 namespace Application.Features.QuestionOptions.Commands.Update;
 
-public class UpdateQuestionOptionCommand : IRequest<UpdatedQuestionOptionResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class UpdateQuestionOptionCommand : IRequest<UpdatedQuestionOptionResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public Guid Id { get; set; }
     public required int QuizQuestionId { get; set; }
     public string? OptionText { get; set; }
     public required bool IsCorrect { get; set; }
 
-    public string[] Roles => [Admin, Write, QuestionOptionsOperationClaims.Update];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

@@ -12,15 +12,15 @@ using static Application.Features.Teachers.Constants.TeachersOperationClaims;
 
 namespace Application.Features.Teachers.Commands.Create;
 
-public class CreateTeacherCommand : IRequest<CreatedTeacherResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class CreateTeacherCommand : IRequest<CreatedTeacherResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required int SemesterId { get; set; }
-    
+
     public required Guid PersonelId { get; set; }
     public required int SchoolId { get; set; }
+
+
     
-    
-    public string[] Roles => [Admin, Write, TeachersOperationClaims.Create];
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

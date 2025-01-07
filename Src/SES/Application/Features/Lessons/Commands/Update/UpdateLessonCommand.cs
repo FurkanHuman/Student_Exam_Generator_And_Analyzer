@@ -12,7 +12,7 @@ using static Application.Features.Lessons.Constants.LessonsOperationClaims;
 
 namespace Application.Features.Lessons.Commands.Update;
 
-public class UpdateLessonCommand : IRequest<UpdatedLessonResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class UpdateLessonCommand : IRequest<UpdatedLessonResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
     public required string LessonName { get; set; }
@@ -20,7 +20,7 @@ public class UpdateLessonCommand : IRequest<UpdatedLessonResponse>, ISecuredRequ
     public required int SemesterId { get; set; }
     public required Semester Semester { get; set; }
 
-    public string[] Roles => [Admin, Write, LessonsOperationClaims.Update];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

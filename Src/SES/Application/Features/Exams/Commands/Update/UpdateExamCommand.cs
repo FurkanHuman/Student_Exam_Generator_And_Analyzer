@@ -12,7 +12,7 @@ using static Application.Features.Exams.Constants.ExamsOperationClaims;
 
 namespace Application.Features.Exams.Commands.Update;
 
-public class UpdateExamCommand : IRequest<UpdatedExamResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class UpdateExamCommand : IRequest<UpdatedExamResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
     public required string LessonName { get; set; }
@@ -32,7 +32,7 @@ public class UpdateExamCommand : IRequest<UpdatedExamResponse>, ISecuredRequest,
     public required School School { get; set; }
     public required ReferenceBenefit ReferenceBenefit { get; set; }
 
-    public string[] Roles => [Admin, Write, ExamsOperationClaims.Update];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

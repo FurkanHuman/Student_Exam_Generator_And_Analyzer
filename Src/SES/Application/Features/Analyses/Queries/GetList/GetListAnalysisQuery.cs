@@ -11,11 +11,11 @@ using static Application.Features.Analyses.Constants.AnalysesOperationClaims;
 
 namespace Application.Features.Analyses.Queries.GetList;
 
-public class GetListAnalysisQuery : IRequest<GetListResponse<GetListAnalysisListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListAnalysisQuery : IRequest<GetListResponse<GetListAnalysisListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListAnalyses({PageRequest.PageIndex},{PageRequest.PageSize})";

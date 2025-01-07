@@ -12,7 +12,7 @@ using static Application.Features.StudentClasses.Constants.StudentClassesOperati
 
 namespace Application.Features.StudentClasses.Commands.Create;
 
-public class CreateStudentClassCommand : IRequest<CreatedStudentClassResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
+public class CreateStudentClassCommand : IRequest<CreatedStudentClassResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public string? Name { get; set; }
     public required int ClassAge { get; set; }
@@ -25,7 +25,7 @@ public class CreateStudentClassCommand : IRequest<CreatedStudentClassResponse>, 
     public required Semester Semester { get; set; }
     public required Teacher RefTeacher { get; set; }
 
-    public string[] Roles => [Admin, Write, StudentClassesOperationClaims.Create];
+    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

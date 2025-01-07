@@ -15,31 +15,30 @@ public class PersonelConfiguration : IEntityTypeConfiguration<Personel>
         builder.Property(p => p.Name).IsRequired();
         builder.Property(p => p.SurName).IsRequired();
         builder.Property(p => p.BirthDate).IsRequired();
-
-        builder.HasOne(p => p.User).WithOne(u => u.Personel).HasForeignKey<Personel>(p => p.UserId);
+        builder.Ignore(p => p.User);
 
         builder.Property(p => p.CreatedDate).IsRequired();
         builder.Property(p => p.UpdatedDate);
         builder.Property(p => p.DeletedDate);
 
         builder.HasQueryFilter(p => !p.DeletedDate.HasValue);
-        builder.HasData(_seeds);
+        builder.HasData(getSeedPersonel());
+
     }
 
-    public static Guid AdminPersonelId { get; set; } = Guid.NewGuid();
+    internal static Guid AdminPersonelId { get; set; } = Guid.NewGuid();
 
-    private IEnumerable<Personel> _seeds
+    private Personel getSeedPersonel()
     {
-        get
+        Personel personel = new()
         {
-            yield return new()
-            {
-                Id = AdminPersonelId,
-                UserId = UserConfiguration.AdminId,
-                Name = "Admin",
-                SurName = "Administrator",
-                BirthDate = DateOnly.FromDateTime(DateTime.Now),
-            };
-        }
+            Id = AdminPersonelId,
+            UserId = ApplicationUserConfiguration.AdminGuid,
+            Name = "Admin",
+            SurName = "Administrator",
+            BirthDate = DateOnly.FromDateTime(DateTime.Now),
+        };
+        return personel;
+
     }
 }

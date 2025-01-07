@@ -8,11 +8,11 @@ using static Application.Features.Personels.Constants.PersonelsOperationClaims;
 
 namespace Application.Features.Personels.Queries.GetById;
 
-public class GetByIdPersonelQuery : IRequest<GetByIdPersonelResponse>, ISecuredRequest
+public class GetByIdPersonelQuery : IRequest<GetByIdPersonelResponse>
 {
     public Guid Id { get; set; }
 
-    public string[] Roles => [Admin, Read];
+    
 
     public class GetByIdPersonelQueryHandler : IRequestHandler<GetByIdPersonelQuery, GetByIdPersonelResponse>
     {
