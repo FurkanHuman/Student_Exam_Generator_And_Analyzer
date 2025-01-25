@@ -1,6 +1,7 @@
 using Application;
 using BlazorWebUI;
 using BlazorWebUI.Components;
+using BlazorWebUI.Components.Account;
 using Domain.Entities;
 using Infrastructure;
 using Microsoft.AspNetCore.Identity;
