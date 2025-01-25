@@ -19,10 +19,10 @@ public class MappingProfiles : Profile
         CreateMap<SubLearningArea, CreatedSubLearningAreaResponse>();
 
         CreateMap<SubLearningArea, SubLearningDto>()
-            .ForMember(destinationMember: sl => sl.SLCode, memberOptions: opt => opt.MapFrom(sld => sld.SLACode))
-            .ForMember(destinationMember: sl => sl.Description, memberOptions: opt => opt.MapFrom(sld => sld.Description))
-            .ReverseMap();
-
+            .ForMember(destinationMember: sld => sld.SLCode, memberOptions: opt => opt.MapFrom(sl => sl.SLACode))
+            .ForMember(destinationMember: sld => sld.Description, memberOptions: opt => opt.MapFrom(sl => sl.Description))
+            .ReverseMap()
+            .ForMember(destinationMember: sl => sl.CreatedDate, memberOptions: opt => opt.MapFrom(_ => DateTime.UtcNow)); ;
 
         CreateMap<UpdateSubLearningAreaCommand, SubLearningArea>();
         CreateMap<SubLearningArea, UpdatedSubLearningAreaResponse>();

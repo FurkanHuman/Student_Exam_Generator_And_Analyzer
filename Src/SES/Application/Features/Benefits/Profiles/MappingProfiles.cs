@@ -20,9 +20,10 @@ public class MappingProfiles : Profile
         CreateMap<Benefit, CreatedBenefitResponse>();
 
         CreateMap<Benefit, BenefitDto>()
-            .ForMember(destinationMember: b => b.BCode, memberOptions: opt => opt.MapFrom(bd => bd.BenefitCode))
-            .ForMember(destinationMember: b => b.Description, memberOptions: opt => opt.MapFrom(bd => bd.Description))
-            .ReverseMap();
+            .ForMember(destinationMember: bd => bd.BCode, memberOptions: opt => opt.MapFrom(b => b.BenefitCode))
+            .ForMember(destinationMember: bd => bd.Description, memberOptions: opt => opt.MapFrom(b => b.Description))
+            .ReverseMap()
+            .ForMember(destinationMember: b => b.CreatedDate, memberOptions: opt => opt.MapFrom(_ => DateTime.UtcNow));
 
 
         CreateMap<UpdateBenefitCommand, Benefit>();

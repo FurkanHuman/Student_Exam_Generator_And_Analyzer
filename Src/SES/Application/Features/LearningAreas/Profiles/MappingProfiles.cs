@@ -19,9 +19,10 @@ public class MappingProfiles : Profile
         CreateMap<LearningArea, CreatedLearningAreaResponse>();
 
         CreateMap<LearningArea, LearningAreaDto>()
-            .ForMember(destinationMember: la => la.LACode, memberOptions: opt => opt.MapFrom(lad => lad.LACode))
-            .ForMember(destinationMember: la => la.Description, memberOptions: opt => opt.MapFrom(lad => lad.Description))
-            .ReverseMap();
+            .ForMember(destinationMember: lad => lad.LACode, memberOptions: opt => opt.MapFrom(la => la.LACode))
+            .ForMember(destinationMember: lad => lad.Description, memberOptions: opt => opt.MapFrom(la => la.Description))
+            .ReverseMap()
+            .ForMember(destinationMember: la => la.CreatedDate, memberOptions: opt => opt.MapFrom(_ => DateTime.UtcNow));
 
         CreateMap<UpdateLearningAreaCommand, LearningArea>();
         CreateMap<LearningArea, UpdatedLearningAreaResponse>();
