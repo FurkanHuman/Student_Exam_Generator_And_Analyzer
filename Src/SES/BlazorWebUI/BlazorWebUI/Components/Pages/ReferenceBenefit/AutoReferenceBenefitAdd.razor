@@ -64,7 +64,7 @@
     </div>
 
     <div class="mb-3">
-        <button type="submit" class="btn btn-primary text-lg-end">Kaydet</button>
+        <button type="submit" class="btn btn-primary text-lg-end" disabled="@(!(IsBenefitsOk && IsSubLearningOk && IsLearningOk))">Kaydet</button>
     </div>
 
 </EditForm>
@@ -89,15 +89,32 @@
             <EditContentList EditContents="EditContentLearning" />
             <hr />
 
+            <div class="input-group mb-3" style="width:30rem;">
+                <label class="form-check-label">Başlıkların Doğru Olduğunu Onaylıyorum</label>
+                <InputCheckbox class="form-check" @bind-Value="IsLearningOk" style="width:5rem;" />
+            </div>
+
             <h4>Alt Başlıklar</h4>
             <hr />
             <EditContentList EditContents="EditContentSubLearning" />
             <hr>
 
+            <div class="input-group mb-3" style="width:30rem;">
+                <label class="form-check-label">Alt Başlıkların Doğru Olduğunu Onaylıyorum</label>
+                <InputCheckbox class="form-check" @bind-Value="IsSubLearningOk" style="width:5rem;" />
+            </div>
+
+
             <h4>Kazanımlar</h4>
             <hr />
             <EditContentList EditContents="EditContentBenefits" />
             <hr>
+
+            <div class="input-group mb-3" style="width:30rem;">
+                <label class="form-check-label"> Kazanımların Doğru Olduğunu Onaylıyorum</label>
+                <InputCheckbox class="form-check" @bind-Value="IsBenefitsOk" style="width:5rem;" />
+            </div>
+
         }
         else
         {
@@ -142,6 +159,10 @@
     private byte[] fileContent = Array.Empty<byte>();
 
     private bool IsOpen = false;
+
+    private bool IsBenefitsOk = false;
+    private bool IsSubLearningOk = false;
+    private bool IsLearningOk = false;
 
     private bool IsChecked { get; set; } = false;
 
