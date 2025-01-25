@@ -1,0 +1,46 @@
+@page "/edit-content"
+<div class="row row-cols-lg-auto g-3 align-items-center m-1">
+
+    @foreach (EditContent editContent in EditContents)
+    {        
+        counter++;
+        <div class="col-12">
+            <div class="input-group">
+                <input type="text" class="form-control" value="@editContent.Current" @oninput="@(e => HandleInputChange(e, editContent))" style="width:50rem;" />
+            </div>
+        </div>
+        <div class="col-12">
+            <button class="btn btn-danger" @onclick="() => RemoveEditContent(editContent)">Sil</button>
+        </div>
+    }
+    <div class="col-12">
+        <button class="btn btn-primary" @onclick="AddEditContent" style="width:50rem;">Ekle</button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public IList<EditContent> EditContents { get; set; } = default!;
+    private uint counter = 0;
+    private void HandleInputChange(ChangeEventArgs e, EditContent content)
+    {
+        content.Current = e.Value?.ToString() ?? string.Empty;
+        content.IsUpdated = true;
+    }
+
+    private void AddEditContent()
+    {
+        EditContents.Add(new() { Current = string.Empty });
+    }
+
+    private void RemoveEditContent(EditContent content)
+    {
+        EditContents.Remove(content);
+    }
+
+    public class EditContent
+    {
+        public required string Current { get; set; }
+        public bool IsUpdated { get; set; } = false;
+    }
+}
