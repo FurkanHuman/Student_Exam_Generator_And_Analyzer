@@ -1,6 +1,5 @@
 using Application;
 using BlazorWebUI;
-using BlazorWebUI.Client;
 using BlazorWebUI.Components;
 using Domain.Entities;
 using Infrastructure;

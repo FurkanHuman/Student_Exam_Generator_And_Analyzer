@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Security.Claims;
 
-namespace Identity.Components.Account
+namespace BlazorWebUI.Components.Account
 {
     // This is a server-side AuthenticationStateProvider that revalidates the security stamp for the connected user
     // every 30 minutes an interactive circuit is connected. It also uses PersistentComponentState to flow the
@@ -54,13 +54,9 @@ namespace Identity.Components.Account
         {
             var user = await userManager.GetUserAsync(principal);
             if (user is null)
-            {
                 return false;
-            }
             else if (!userManager.SupportsUserSecurityStamp)
-            {
                 return true;
-            }
             else
             {
                 var principalStamp = principal.FindFirstValue(options.ClaimsIdentity.SecurityStampClaimType);
@@ -77,9 +73,7 @@ namespace Identity.Components.Account
         private async Task OnPersistingAsync()
         {
             if (authenticationStateTask is null)
-            {
                 throw new UnreachableException($"Authentication state not set in {nameof(OnPersistingAsync)}().");
-            }
 
             var authenticationState = await authenticationStateTask;
             var principal = authenticationState.User;
@@ -90,13 +84,11 @@ namespace Identity.Components.Account
                 var email = principal.FindFirst(options.ClaimsIdentity.EmailClaimType)?.Value;
 
                 if (userId != null && email != null)
-                {
                     state.PersistAsJson(nameof(UserInfo), new UserInfo
                     {
                         UserId = userId,
                         Email = email,
                     });
-                }
             }
         }
 

@@ -1,6 +1,5 @@
 ﻿using BlazorWebUI.Components.Account;
 using Domain.Entities;
-using Identity.Components.Account;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 
