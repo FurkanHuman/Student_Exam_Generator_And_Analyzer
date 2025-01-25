@@ -13,6 +13,14 @@
 
 <h3>Otomatik Kazanım Ekleyici</h3>
 
+@if (IsSuccess)
+{
+    <br />
+    <div class="alert alert-success" role="alert">
+        Başarıyla eklendi!
+    </div>
+}
+
 <EditForm OnValidSubmit="AddAotuBenefit" Model="autoBenefitDto">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -132,6 +140,7 @@
 
 @inject IPdfReaderService _pdfReaderService
 @inject IMediator _mediator
+@inject NavigationManager _navigationManager
 
 @code {
     [SupplyParameterFromForm]
@@ -157,6 +166,8 @@
     List<EditContent> EditContentLearning = new();
 
     private byte[] fileContent = Array.Empty<byte>();
+
+    private bool IsSuccess = false;
 
     private bool IsOpen = false;
 
@@ -218,6 +229,10 @@
             {
                 ReferenceBenefitDto = referenceBenefitDto
             });
+
+        IsSuccess = true;
+        await Task.Delay(3000);
+        _navigationManager.NavigateTo("/");
     }
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
