@@ -6,8 +6,8 @@ public class CreateBenefitCommandValidator : AbstractValidator<CreateBenefitComm
 {
     public CreateBenefitCommandValidator()
     {
-        RuleFor(c => c.SubLearningAreaId).NotEmpty();
-        RuleFor(c => c.ReferenceBenefitNumber).NotEmpty();
-        RuleFor(c => c.ReferenceBenefitComments).NotEmpty();
+        RuleFor(c => c.BenefitCode).NotEmpty();
+        RuleFor(c => c.Description).NotEmpty();
+        
     }
 }

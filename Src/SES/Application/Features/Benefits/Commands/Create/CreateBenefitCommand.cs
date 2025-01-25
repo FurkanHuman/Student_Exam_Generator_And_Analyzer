@@ -14,11 +14,9 @@ namespace Application.Features.Benefits.Commands.Create;
 
 public class CreateBenefitCommand : IRequest<CreatedBenefitResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
-    public required int SubLearningAreaId { get; set; }
-    public required string ReferenceBenefitNumber { get; set; }
-    public required string ReferenceBenefitComments { get; set; }
+    public required string BenefitCode { get; set; }
+    public required string Description { get; set; }
 
-    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }
