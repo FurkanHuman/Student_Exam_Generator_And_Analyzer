@@ -10,7 +10,8 @@ internal class SubLearningAreaConfiguration : IEntityTypeConfiguration<SubLearni
     {
         builder.HasKey(sla => sla.Id);
         builder.Property(sla => sla.Id).IsRequired();
-        builder.Property(sla => sla.Name).IsRequired();
+        builder.Property(sla => sla.SLACode).IsRequired(); 
+        builder.Property(sla => sla.Description).IsRequired();
 
         builder.HasMany(sla => sla.Benefits);
 

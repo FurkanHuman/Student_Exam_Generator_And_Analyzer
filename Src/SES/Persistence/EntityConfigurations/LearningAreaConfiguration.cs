@@ -10,8 +10,8 @@ internal class LearningAreaConfiguration : IEntityTypeConfiguration<LearningArea
     {
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Id).IsRequired();
-        builder.Property(e => e.Name).IsRequired();
-        builder.Property(e => e.SubLearningAreaId).IsRequired();
+        builder.Property(e => e.LACode).IsRequired();
+        builder.Property(e => e.Description).IsRequired();
 
         builder.HasMany(e => e.SubLearningAreas);
 

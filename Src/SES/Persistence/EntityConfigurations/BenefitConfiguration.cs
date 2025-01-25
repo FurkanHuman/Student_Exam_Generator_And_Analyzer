@@ -10,9 +10,8 @@ internal class BenefitConfiguration : IEntityTypeConfiguration<Benefit>
     {
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Id).IsRequired();
-        builder.Property(e => e.SubLearningAreaId).IsRequired();
-        builder.Property(e => e.ReferenceBenefitNumber).IsRequired();
-        builder.Property(e => e.ReferenceBenefitComments).IsRequired();
+        builder.Property(e => e.BenefitCode).IsRequired();
+        builder.Property(e => e.Description).IsRequired();
 
         builder.HasOne(e => e.SubLearningArea);
 
