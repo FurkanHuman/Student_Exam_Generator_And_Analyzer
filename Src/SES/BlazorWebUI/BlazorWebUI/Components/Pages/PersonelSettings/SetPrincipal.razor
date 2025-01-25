@@ -10,7 +10,7 @@
 @using Domain.Enums
 
 
-<AuthorizeView Roles=  "@($"{RoleType.Admin},{RoleType.Director}")" Context="RegisterContext">
+<AuthorizeView Context="RegisterContext">
     <Authorized>
         <PageTitle> Müdür ayarla </PageTitle>
 
@@ -54,10 +54,6 @@
 
         </div>
     </Authorized>
-    <NotAuthorized>
-        <PageTitle>Yetkisiz erişim </PageTitle>
-        <h3>yetkili değilsiniz </h3>
-    </NotAuthorized>
 </AuthorizeView>
 
 

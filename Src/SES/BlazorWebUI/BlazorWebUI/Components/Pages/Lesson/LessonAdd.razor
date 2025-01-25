@@ -9,7 +9,7 @@
 <h1>Ders Ekle</h1>
 
 <div>
-    <EditForm Model="lessonDto" FormName="LessonAddForm" OnValidSubmit="OnSubmit">
+    <EditForm Model="lessonDto" FormName="LessonAddForm" OnValidSubmit="OnSubmitAsync">
         <DataAnnotationsValidator/>
         <ValidationSummary/>
         <AntiforgeryToken/>
@@ -54,9 +54,6 @@
 
     [SupplyParameterFromForm] private LessonDTO lessonDto { get; set; } = new() { Name = string.Empty, Description = string.Empty };
 
-    // private GetListResponse<GetListLessonListItemDto> getListLesson = new();
-    // private GetListSemesterListItemDto getLastSemesterListItemDto = new();
-
     private GetListResponse<GetListSemesterListItemDto> getListSemester = new();
 
     protected override async Task OnInitializedAsync()
@@ -67,15 +64,10 @@
         getListSemester = await _Mediator.Send(getListSemesterQuery);
         lessonDto.SemesterId = getListSemester.Items.Last().Id;
 
-        // GetListLessonQuery lessonQuery = new();
-        // lessonQuery.PageRequest= new() { PageIndex = 0, PageSize = int.MaxValue };
-        //
-        // getListLesson = await _Mediator.Send(lessonQuery);
-
         await base.OnInitializedAsync();
     }
 
-    private async Task OnSubmit()
+    private async Task OnSubmitAsync()
     {
         CreateLessonCommand createLesson = new() { Description = lessonDto.Description, LessonName = lessonDto.Name, SemesterId = lessonDto.SemesterId };
 

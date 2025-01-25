@@ -2,10 +2,12 @@
 @using Application.Features.Schools.Queries.GetList
 @using Application.Features.Semesters.Queries.GetList
 @using Application.Features.StudentClasses.Queries.GetList
+@using Application.Features.Students.Commands.Delete
 @using Application.Features.Students.Commands.MultiCreate
 @using Application.Features.Teachers.Queries.GetList
 @using NArchitecture.Core.Application.Responses
 @using MediatR
+@rendermode InteractiveServer
 
 <h1>Otomatik öğrenci ekleme</h1>
 
@@ -21,7 +23,6 @@
         <div class="input-group mb-3" style="width:15rem;">
             <label class="input-group-text">Okul :</label>
             <InputSelect class="form-select" id="schoolDD" @bind-Value="multiStudentDto.SchoolId">
-                <option selected>Seçiniz...</option>
                 @foreach (GetListSchoolListItemDto school in SchoolResponse.Items)
                 {
                     <option value="@school.Id">@school.Name</option>
@@ -32,7 +33,6 @@
         <div class="input-group mb-3" style="width:15rem;">
             <label class="input-group-text">Dönem :</label>
             <InputSelect class="form-select" id="schoolSemester" @bind-Value="multiStudentDto.SemesterId">
-                <option selected>Seçiniz...</option>
                 @foreach (GetListSemesterListItemDto semester in SemesterResponse.Items)
                 {
                     <option value="@semester.Id">@semester.BeginSemesterDate @semester.EndSemesterDate @semester.Name</option>
@@ -43,7 +43,6 @@
         <div class="input-group mb-3" style="width:15rem;">
             <label class="input-group-text">Öğretmen :</label>
             <InputSelect class="form-select" id="teacher" @bind-Value="multiStudentDto.TeacherId">
-                <option selected>Seçiniz...</option>
                 @foreach (GetListTeacherListItemDto teacher in TeacherResponse.Items)
                 {
                     <option value="@teacher.Id">@teacher.Name @teacher.SurName</option>
@@ -53,11 +52,7 @@
 
         <div class="input-group mb-3" style="width:20rem;">
             <label class="input-group-text">Öğrenci Dosyası :</label>
-            <input type="file" name="FileFromPdf" class="form-control" accept=".pdf" />
-            @if (fileContent.Length == 0)
-            {
-                <div class="text-danger">Lütfen geçerli bir PDF dosyası yükleyin.</div>
-            }
+            <InputFile type="file" name="FileFromPdf" class="form-control" accept=".pdf" OnChange="FileToMemoryAsync" />
 
         </div>
 
@@ -83,7 +78,7 @@
                     <th>Ad</th>
                     <th>Soyad</th>
                     <th>Sınıf</th>
-
+                    <th>Işlem</th>
                 </tr>
             </thead>
             <tbody>
@@ -94,6 +89,9 @@
                         <td>@st.Name</td>
                         <td>@st.SurName</td>
                         <td>@st.ClassAge/@st.ClassBranch</td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => DeleteStudent(st.Id)">Sil</button>
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -107,9 +105,6 @@
     private MultiStudentDto multiStudentDto { get; set; } = new()
         { TeacherId = 0, SchoolId = 0, SemesterId = 0 };
 
-    [SupplyParameterFromForm]
-    private IFormFile? FileFromPdf { get; set; }
-
     private byte[] fileContent = Array.Empty<byte>();
 
     GetListResponse<GetListSchoolListItemDto> SchoolResponse = new();
@@ -118,6 +113,12 @@
     GetListResponse<GetListStudentClassListItemDto> StudentClassResponse = new();
     ICollection<CreatedMultiStudentResponse> createdMultiStudents = [];
 
+    private async Task DeleteStudent(int studentId)
+    {
+        await _mediator.Send(new DeleteStudentCommand { Id = studentId, PermanentDelete = true });
+
+        createdMultiStudents = createdMultiStudents.Where(st => st.Id != studentId).ToList();
+    }
     protected override async Task OnInitializedAsync()
     {
         SchoolResponse = await _mediator.Send(new GetListSchoolQuery()
@@ -156,18 +157,19 @@
                 }
             });
 
-        await FileToMemoryAsync();
         await base.OnInitializedAsync();
     }
 
 
-    private async Task FileToMemoryAsync()
+    private async Task FileToMemoryAsync(InputFileChangeEventArgs e)
     {
-        if (FileFromPdf == null)
+        IBrowserFile fileFromPdf = e.File;
+        Console.WriteLine(fileFromPdf.Size);
+        if (fileFromPdf == null)
             return;
 
         using MemoryStream memoryStream = new();
-        await FileFromPdf.OpenReadStream().CopyToAsync(memoryStream);
+        await fileFromPdf.OpenReadStream().CopyToAsync(memoryStream);
         fileContent = memoryStream.ToArray();
     }
 
