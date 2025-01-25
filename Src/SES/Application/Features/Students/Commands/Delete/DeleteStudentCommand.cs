@@ -15,35 +15,28 @@ namespace Application.Features.Students.Commands.Delete;
 public class DeleteStudentCommand : IRequest<DeletedStudentResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public int Id { get; set; }
+    public bool PermanentDelete { get; set; }
 
-    
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }
     public string[]? CacheGroupKey => ["GetStudents"];
 
-    public class DeleteStudentCommandHandler : IRequestHandler<DeleteStudentCommand, DeletedStudentResponse>
+    public class DeleteStudentCommandHandler(IMapper mapper, IStudentRepository studentRepository,
+                                     StudentBusinessRules studentBusinessRules) : IRequestHandler<DeleteStudentCommand, DeletedStudentResponse>
     {
-        private readonly IMapper _mapper;
-        private readonly IStudentRepository _studentRepository;
-        private readonly StudentBusinessRules _studentBusinessRules;
-
-        public DeleteStudentCommandHandler(IMapper mapper, IStudentRepository studentRepository,
-                                         StudentBusinessRules studentBusinessRules)
-        {
-            _mapper = mapper;
-            _studentRepository = studentRepository;
-            _studentBusinessRules = studentBusinessRules;
-        }
+        private readonly IMapper _mapper = mapper;
+        private readonly IStudentRepository _studentRepository = studentRepository;
+        private readonly StudentBusinessRules _studentBusinessRules = studentBusinessRules;
 
         public async Task<DeletedStudentResponse> Handle(DeleteStudentCommand request, CancellationToken cancellationToken)
         {
             Student? student = await _studentRepository.GetAsync(predicate: s => s.Id == request.Id, cancellationToken: cancellationToken);
             await _studentBusinessRules.StudentShouldExistWhenSelected(student);
 
-            await _studentRepository.DeleteAsync(student!);
+            Student? deleted = await _studentRepository.DeleteAsync(entity:student!, permanent:request.PermanentDelete, cancellationToken: cancellationToken);
 
-            DeletedStudentResponse response = _mapper.Map<DeletedStudentResponse>(student);
+            DeletedStudentResponse response = _mapper.Map<DeletedStudentResponse>(deleted);
             return response;
         }
     }
