@@ -4,10 +4,8 @@ namespace Domain.Entities;
 
 public class Benefit : Entity<int>
 {
-    public int SubLearningAreaId { get; set; }
-
-    public string ReferenceBenefitNumber { get; set; }
-    public string ReferenceBenefitComments { get; set; }
+    public required string BenefitCode { get; set; }
+    public required string Description { get; set; }
 
     public virtual SubLearningArea SubLearningArea { get; set; }
 
