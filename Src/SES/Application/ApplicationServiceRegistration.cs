@@ -19,7 +19,6 @@ using Application.Services.SubLearningAreas;
 using Application.Services.Teachers;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
@@ -89,6 +88,8 @@ public static class ApplicationServiceRegistration
         services.AddScoped<ILessonService, LessonManager>();
         services.AddScoped<IPersonelService, PersonelManager>();
         services.AddScoped<IPdfReaderService, PdfReaderManager>();
+
+        services.AddScoped<PdfReaderStudentManager>();
         return services;
     }
 
