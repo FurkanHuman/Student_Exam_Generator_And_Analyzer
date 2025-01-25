@@ -6,11 +6,9 @@ public class CreateReferenceBenefitCommandValidator : AbstractValidator<CreateRe
 {
     public CreateReferenceBenefitCommandValidator()
     {
-        RuleFor(c => c.ReferenceBenefitName).NotEmpty();
-        RuleFor(c => c.SemesterId).NotEmpty();
-        RuleFor(c => c.SchoolId).NotEmpty();
-        RuleFor(c => c.ExamId).NotEmpty();
-        RuleFor(c => c.LearningAreaId).NotEmpty();
-        RuleFor(c => c.Semester).NotEmpty();
+        RuleFor(c => c.ReferenceBenefitDto.RBName).NotNull().NotEmpty();
+        RuleFor(c => c.ReferenceBenefitDto.LessonId).NotEmpty();
+        RuleFor(c => c.ReferenceBenefitDto.SchoolId).NotEmpty();
+        RuleFor(c => c.ReferenceBenefitDto.SemesterId).NotEmpty();
     }
 }

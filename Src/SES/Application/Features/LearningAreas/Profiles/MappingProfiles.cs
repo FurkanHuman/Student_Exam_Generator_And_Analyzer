@@ -3,6 +3,7 @@ using Application.Features.LearningAreas.Commands.Delete;
 using Application.Features.LearningAreas.Commands.Update;
 using Application.Features.LearningAreas.Queries.GetById;
 using Application.Features.LearningAreas.Queries.GetList;
+using Application.Services.PdfReaderService.Dtos;
 using AutoMapper;
 using Domain.Entities;
 using NArchitecture.Core.Application.Responses;
@@ -16,6 +17,11 @@ public class MappingProfiles : Profile
     {
         CreateMap<CreateLearningAreaCommand, LearningArea>();
         CreateMap<LearningArea, CreatedLearningAreaResponse>();
+
+        CreateMap<LearningArea, LearningAreaDto>()
+            .ForMember(destinationMember: la => la.LACode, memberOptions: opt => opt.MapFrom(lad => lad.LACode))
+            .ForMember(destinationMember: la => la.Description, memberOptions: opt => opt.MapFrom(lad => lad.Description))
+            .ReverseMap();
 
         CreateMap<UpdateLearningAreaCommand, LearningArea>();
         CreateMap<LearningArea, UpdatedLearningAreaResponse>();

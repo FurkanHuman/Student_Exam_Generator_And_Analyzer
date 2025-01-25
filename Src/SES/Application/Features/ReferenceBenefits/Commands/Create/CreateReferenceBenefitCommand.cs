@@ -1,6 +1,10 @@
 using Application.Features.ReferenceBenefits.Constants;
 using Application.Features.ReferenceBenefits.Rules;
+using Application.Services.Benefits;
+using Application.Services.LearningAreas;
+using Application.Services.PdfReaderService.Dtos;
 using Application.Services.Repositories;
+using Application.Services.SubLearningAreas;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
@@ -14,14 +18,7 @@ namespace Application.Features.ReferenceBenefits.Commands.Create;
 
 public class CreateReferenceBenefitCommand : IRequest<CreatedReferenceBenefitResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
-    public required string ReferenceBenefitName { get; set; }
-    public required int SemesterId { get; set; }
-    public required int SchoolId { get; set; }
-    public required int ExamId { get; set; }
-    public required int LearningAreaId { get; set; }
-    public required Semester Semester { get; set; }
-
-    
+    public required ReferenceBenefitDto ReferenceBenefitDto { get; set; }
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }
@@ -33,8 +30,7 @@ public class CreateReferenceBenefitCommand : IRequest<CreatedReferenceBenefitRes
         private readonly IReferenceBenefitRepository _referenceBenefitRepository;
         private readonly ReferenceBenefitBusinessRules _referenceBenefitBusinessRules;
 
-        public CreateReferenceBenefitCommandHandler(IMapper mapper, IReferenceBenefitRepository referenceBenefitRepository,
-                                         ReferenceBenefitBusinessRules referenceBenefitBusinessRules)
+        public CreateReferenceBenefitCommandHandler(IMapper mapper, IReferenceBenefitRepository referenceBenefitRepository, ReferenceBenefitBusinessRules referenceBenefitBusinessRules)
         {
             _mapper = mapper;
             _referenceBenefitRepository = referenceBenefitRepository;
@@ -43,11 +39,11 @@ public class CreateReferenceBenefitCommand : IRequest<CreatedReferenceBenefitRes
 
         public async Task<CreatedReferenceBenefitResponse> Handle(CreateReferenceBenefitCommand request, CancellationToken cancellationToken)
         {
-            ReferenceBenefit referenceBenefit = _mapper.Map<ReferenceBenefit>(request);
+            ReferenceBenefit referenceBenefit = _mapper.Map<ReferenceBenefit>(request.ReferenceBenefitDto);
 
-            await _referenceBenefitRepository.AddAsync(referenceBenefit);
+            ReferenceBenefit createdReferenceBenefit = await _referenceBenefitRepository.AddAsync(referenceBenefit);
 
-            CreatedReferenceBenefitResponse response = _mapper.Map<CreatedReferenceBenefitResponse>(referenceBenefit);
+            CreatedReferenceBenefitResponse response = _mapper.Map<CreatedReferenceBenefitResponse>(createdReferenceBenefit);
             return response;
         }
     }

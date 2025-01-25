@@ -8,7 +8,5 @@ public class CreatedReferenceBenefitResponse : IResponse
     public string ReferenceBenefitName { get; set; }
     public int SemesterId { get; set; }
     public int SchoolId { get; set; }
-    public int ExamId { get; set; }
-    public int LearningAreaId { get; set; }
-
+    public int LessonId { get; set; }
 }

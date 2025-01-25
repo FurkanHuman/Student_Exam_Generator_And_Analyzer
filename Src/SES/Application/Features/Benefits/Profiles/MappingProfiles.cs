@@ -1,8 +1,10 @@
 using Application.Features.Benefits.Commands.Create;
 using Application.Features.Benefits.Commands.Delete;
+using Application.Features.Benefits.Commands.MultiCreate;
 using Application.Features.Benefits.Commands.Update;
 using Application.Features.Benefits.Queries.GetById;
 using Application.Features.Benefits.Queries.GetList;
+using Application.Services.PdfReaderService.Dtos;
 using AutoMapper;
 using Domain.Entities;
 using NArchitecture.Core.Application.Responses;
@@ -14,8 +16,14 @@ public class MappingProfiles : Profile
 {
     public MappingProfiles()
     {
-        CreateMap<CreateBenefitCommand, Benefit>();
+        CreateMap<MultiCreateBenefitCommand, Benefit>();
         CreateMap<Benefit, CreatedBenefitResponse>();
+
+        CreateMap<Benefit, BenefitDto>()
+            .ForMember(destinationMember: b => b.BCode, memberOptions: opt => opt.MapFrom(bd => bd.BenefitCode))
+            .ForMember(destinationMember: b => b.Description, memberOptions: opt => opt.MapFrom(bd => bd.Description))
+            .ReverseMap();
+
 
         CreateMap<UpdateBenefitCommand, Benefit>();
         CreateMap<Benefit, UpdatedBenefitResponse>();
