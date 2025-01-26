@@ -1,10 +1,12 @@
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.EntityConfigurations.Interfaces;
 
 namespace Persistence.EntityConfigurations;
 
-public class SemesterConfiguration : IEntityTypeConfiguration<Semester>
+public class SemesterConfiguration : IEntityTypeConfiguration<Semester>, IMainConfiguration
+
 {
     public void Configure(EntityTypeBuilder<Semester> builder)
     {

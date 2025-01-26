@@ -1,10 +1,11 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.EntityConfigurations.Interfaces;
 
 namespace Persistence.EntityConfigurations;
 
-internal class AnalysisConfiguration : IEntityTypeConfiguration<Analysis>
+internal class AnalysisConfiguration : IEntityTypeConfiguration<Analysis>, IMainConfiguration
 {
     public void Configure(EntityTypeBuilder<Analysis> builder)
     {

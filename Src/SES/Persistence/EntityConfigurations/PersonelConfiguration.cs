@@ -1,10 +1,11 @@
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.EntityConfigurations.Interfaces;
 
 namespace Persistence.EntityConfigurations;
 
-public class PersonelConfiguration : IEntityTypeConfiguration<Personel>
+public class PersonelConfiguration : IEntityTypeConfiguration<Personel>, IMainConfiguration
 {
     public void Configure(EntityTypeBuilder<Personel> builder)
     {

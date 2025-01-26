@@ -1,10 +1,11 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.EntityConfigurations.Interfaces;
 
 namespace Persistence.EntityConfigurations;
 
-internal class BenefitConfiguration : IEntityTypeConfiguration<Benefit>
+internal class BenefitConfiguration : IEntityTypeConfiguration<Benefit>, IMainConfiguration
 {
     public void Configure(EntityTypeBuilder<Benefit> builder)
     {

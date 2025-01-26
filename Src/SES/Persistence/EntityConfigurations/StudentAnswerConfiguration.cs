@@ -1,10 +1,11 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.EntityConfigurations.Interfaces;
 
 namespace Persistence.EntityConfigurations
 {
-    internal class StudentAnswerConfiguration : IEntityTypeConfiguration<StudentAnswer>
+    internal class StudentAnswerConfiguration : IEntityTypeConfiguration<StudentAnswer>, IMainConfiguration
     {
         public void Configure(EntityTypeBuilder<StudentAnswer> builder)
         {

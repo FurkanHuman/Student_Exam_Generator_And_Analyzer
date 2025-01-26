@@ -1,7 +1,7 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Persistence.EntityConfigurations;
+using Persistence.EntityConfigurations.Interfaces;
 
 namespace Persistence.Contexts;
 
@@ -30,24 +30,7 @@ public class BaseDbContext(DbContextOptions dbContextOptions, IConfiguration con
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new AnalysisConfiguration());
-        modelBuilder.ApplyConfiguration(new BenefitConfiguration());
-        modelBuilder.ApplyConfiguration(new ExamConfiguration());
-        modelBuilder.ApplyConfiguration(new LearningAreaConfiguration());
-        modelBuilder.ApplyConfiguration(new LessonConfiguration());
-        modelBuilder.ApplyConfiguration(new PersonelConfiguration());
-        modelBuilder.ApplyConfiguration(new PrincipalConfiguration());
-        modelBuilder.ApplyConfiguration(new QuestionOptionConfiguration());
-        modelBuilder.ApplyConfiguration(new QuestionScoreConfiguration());
-        modelBuilder.ApplyConfiguration(new QuizQuestionConfiguration());
-        modelBuilder.ApplyConfiguration(new ReferenceBenefitConfiguration());
-        modelBuilder.ApplyConfiguration(new SchoolConfiguration());
-        modelBuilder.ApplyConfiguration(new SemesterConfiguration());
-        modelBuilder.ApplyConfiguration(new StudentAnswerConfiguration());
-        modelBuilder.ApplyConfiguration(new StudentClassConfiguration());
-        modelBuilder.ApplyConfiguration(new StudentConfiguration());
-        modelBuilder.ApplyConfiguration(new SubLearningAreaConfiguration());
-        modelBuilder.ApplyConfiguration(new TeacherConfiguration());
+        modelBuilder.ApplyConfigurationsWithInterface<IMainConfiguration>();
 
         modelBuilder.HasDefaultSchema("SES_Base_Main");
         base.OnModelCreating(modelBuilder);

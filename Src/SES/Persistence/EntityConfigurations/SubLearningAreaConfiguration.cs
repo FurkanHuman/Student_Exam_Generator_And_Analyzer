@@ -1,16 +1,17 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.EntityConfigurations.Interfaces;
 
 namespace Persistence.EntityConfigurations;
 
-internal class SubLearningAreaConfiguration : IEntityTypeConfiguration<SubLearningArea>
+internal class SubLearningAreaConfiguration : IEntityTypeConfiguration<SubLearningArea>, IMainConfiguration
 {
     public void Configure(EntityTypeBuilder<SubLearningArea> builder)
     {
         builder.HasKey(sla => sla.Id);
         builder.Property(sla => sla.Id).IsRequired();
-        builder.Property(sla => sla.SLACode).IsRequired(); 
+        builder.Property(sla => sla.SLACode).IsRequired();
         builder.Property(sla => sla.Description).IsRequired();
 
         builder.HasMany(sla => sla.Benefits);

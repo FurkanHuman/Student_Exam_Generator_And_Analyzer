@@ -1,10 +1,11 @@
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.EntityConfigurations.Interfaces;
 
 namespace Persistence.EntityConfigurations;
 
-public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
+public class LessonConfiguration : IEntityTypeConfiguration<Lesson>, IMainConfiguration
 {
     public void Configure(EntityTypeBuilder<Lesson> builder)
     {

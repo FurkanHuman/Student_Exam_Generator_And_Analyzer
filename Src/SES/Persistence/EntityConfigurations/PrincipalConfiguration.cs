@@ -1,10 +1,11 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.EntityConfigurations.Interfaces;
 
 namespace Persistence.EntityConfigurations;
 
-internal class PrincipalConfiguration : IEntityTypeConfiguration<Principal>
+internal class PrincipalConfiguration : IEntityTypeConfiguration<Principal>, IMainConfiguration
 {
     public void Configure(EntityTypeBuilder<Principal> builder)
     {

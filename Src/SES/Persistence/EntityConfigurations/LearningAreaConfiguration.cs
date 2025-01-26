@@ -1,10 +1,11 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.EntityConfigurations.Interfaces;
 
 namespace Persistence.EntityConfigurations;
 
-internal class LearningAreaConfiguration : IEntityTypeConfiguration<LearningArea>
+internal class LearningAreaConfiguration : IEntityTypeConfiguration<LearningArea>, IMainConfiguration
 {
     public void Configure(EntityTypeBuilder<LearningArea> builder)
     {

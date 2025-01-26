@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Persistence.EntityConfigurations;
+using Persistence.EntityConfigurations.Interfaces;
 
 namespace Persistence.Contexts
 {
@@ -13,11 +13,7 @@ namespace Persistence.Contexts
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.ApplyConfiguration(new ApplicationUserConfiguration());
-            builder.ApplyConfiguration(new IdentityRoleConfiguration());
-            builder.ApplyConfiguration(new IdentityUserLoginConfiguration());
-            builder.ApplyConfiguration(new IdentityUserRoleConfiguration());
-            builder.ApplyConfiguration(new IdentityUserTokenConfiguration());
+            builder.ApplyConfigurationsWithInterface<IUserConfiguration>();
 
             builder.HasDefaultSchema("SES_Microsoft.AspNetCore.Identity.EntityFrameworkCore");
             base.OnModelCreating(builder);

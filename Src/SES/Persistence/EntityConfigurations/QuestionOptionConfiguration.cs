@@ -1,10 +1,11 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.EntityConfigurations.Interfaces;
 
 namespace Persistence.EntityConfigurations;
 
-internal class QuestionOptionConfiguration : IEntityTypeConfiguration<QuestionOption>
+internal class QuestionOptionConfiguration : IEntityTypeConfiguration<QuestionOption>, IMainConfiguration
 {
     public void Configure(EntityTypeBuilder<QuestionOption> builder)
     {
