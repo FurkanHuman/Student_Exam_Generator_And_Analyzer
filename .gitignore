@@ -403,3 +403,4 @@ FodyWeavers.xsd
 Src/SES/Persistence/Migrations/*
 /.sonarqube
 /CMDREader
+/Src/SES/BlazorWebUI/BlazorWebUI/appsettings.json
