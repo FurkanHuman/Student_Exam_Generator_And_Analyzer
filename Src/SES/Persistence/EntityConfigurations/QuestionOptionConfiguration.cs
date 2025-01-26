@@ -11,7 +11,6 @@ internal class QuestionOptionConfiguration : IEntityTypeConfiguration<QuestionOp
     {
         builder.HasKey(qo => qo.Id);
         builder.Property(qo => qo.Id).IsRequired();
-        builder.Property(qo => qo.QuizQuestionId).IsRequired();
         builder.Property(qo => qo.OptionText);
         builder.Property(qo => qo.IsCorrect).IsRequired();
 

@@ -4,10 +4,8 @@ using NArchitecture.Core.Persistence.Repositories;
 namespace Domain.Entities;
 public class QuizQuestion : Entity<int> // note: sorununn kendisi.
 {
-
-    public int QuestionScoreId { get; set; }
-    public string Question { get; set; }
-    public string QuestionBody { get; set; }
+    public string Question { get; set; } // soru girişi örnek: uzun hikaye yada sıralama sorusu girşi buraya yapılacak. ince fontlo sorular.
+    public string QuestionBody { get; set; } // ana soru.
     public string QuestionImageURL { get; set; }
     public QuestionType QuestionType { get; set; }
     public QuestionScore QuestionScore { get; set; }
