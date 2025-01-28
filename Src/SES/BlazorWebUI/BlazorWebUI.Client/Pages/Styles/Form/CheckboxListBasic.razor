@@ -1,0 +1,39 @@
+﻿@*Thanks chatgpt.CodeCopilot*@  
+@typeparam TKey
+@typeparam TValue
+
+@foreach (var item in Items)
+{
+
+    <div class="custom-checkbox d-flex align-items-center p-2 mb-2 rounded"
+         style="cursor: pointer; background-color: @(item.IsSelected ? "indigo" : "white"); color: @(item.IsSelected ? "white" : "black");"
+         @onclick="() => ToggleSelection(item)">
+        <span>@item.DisplayValue</span>
+    </div>
+}
+
+
+@code {
+    // Generic checkbox list item
+    public class CheckboxItem<TKey, TValue>
+    {
+        public TKey Key { get; set; }          // Unique Key
+        public TValue DisplayValue { get; set; } // Displayed Value
+        public bool IsSelected { get; set; }  // Checkbox Selection Status
+    }
+
+    private void ToggleSelection(CheckboxItem<TKey, TValue> item)
+    {
+        item.IsSelected = !item.IsSelected;
+    }
+
+    // Checkbox item list
+    [Parameter]
+    public List<CheckboxItem<TKey, TValue>> Items { get; set; } = new();
+
+    // Seçilen öğeleri döndür
+    public List<CheckboxItem<TKey, TValue>> GetSelectedItems()
+    {
+        return Items.Where(item => item.IsSelected).ToList();
+    }
+}
