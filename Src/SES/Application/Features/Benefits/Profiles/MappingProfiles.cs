@@ -4,6 +4,7 @@ using Application.Features.Benefits.Commands.MultiCreate;
 using Application.Features.Benefits.Commands.Update;
 using Application.Features.Benefits.Queries.GetById;
 using Application.Features.Benefits.Queries.GetList;
+using Application.Features.ReferenceBenefits.Queries.GetListByIdReferenceBenefitBenefit;
 using Application.Services.PdfReaderService.Dtos;
 using AutoMapper;
 using Domain.Entities;
@@ -25,6 +26,12 @@ public class MappingProfiles : Profile
             .ReverseMap()
             .ForMember(destinationMember: b => b.CreatedDate, memberOptions: opt => opt.MapFrom(_ => DateTime.UtcNow));
 
+        CreateMap<int, Benefit>()
+            .ForMember(destinationMember: dest => dest.Id, memberOptions: opt => opt.MapFrom(src => src));
+               
+
+
+
 
         CreateMap<UpdateBenefitCommand, Benefit>();
         CreateMap<Benefit, UpdatedBenefitResponse>();
@@ -36,5 +43,7 @@ public class MappingProfiles : Profile
 
         CreateMap<Benefit, GetListBenefitListItemDto>();
         CreateMap<IPaginate<Benefit>, GetListResponse<GetListBenefitListItemDto>>();
+
+        CreateMap<Benefit, GetListByIdReferenceBenefitBenefitDto>();
     }
 }

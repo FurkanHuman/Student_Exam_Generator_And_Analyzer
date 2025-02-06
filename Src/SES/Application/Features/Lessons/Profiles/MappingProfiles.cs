@@ -14,6 +14,9 @@ public class MappingProfiles : Profile
 {
     public MappingProfiles()
     {
+        CreateMap<int, ICollection<Lesson>>()
+            .ConvertUsing(s => new List<Lesson> { new() { Id = s, CreatedDate = DateTime.UtcNow }});
+
         CreateMap<CreateLessonCommand, Lesson>();
         CreateMap<Lesson, CreatedLessonResponse>();
 
