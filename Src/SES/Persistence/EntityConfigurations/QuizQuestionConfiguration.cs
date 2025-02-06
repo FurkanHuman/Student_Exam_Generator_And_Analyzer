@@ -12,10 +12,9 @@ internal class QuizQuestionConfiguration : IEntityTypeConfiguration<QuizQuestion
         builder.HasKey(qq => qq.Id);
         builder.Property(qq => qq.Id).IsRequired();
         builder.Property(qq => qq.Question).IsRequired();
-        builder.Property(qq => qq.QuestionBody).IsRequired();
-        builder.Property(qq => qq.QuestionImageURL).IsRequired();
+        builder.Property(qq => qq.QuestionBody).IsRequired(false);
+        builder.Property(qq => qq.QuestionImageURL).IsRequired(false);
         builder.Property(qq => qq.QuestionType).IsRequired();
-
 
         builder.HasOne(qq => qq.QuestionScore);
 
@@ -23,6 +22,7 @@ internal class QuizQuestionConfiguration : IEntityTypeConfiguration<QuizQuestion
         builder.HasMany(qq => qq.Benefits);
         builder.HasMany(qq => qq.Options);
         builder.HasMany(qq => qq.StudentAnswers);
+        builder.HasMany(qq => qq.Lessons);
 
         builder.Property(qq => qq.CreatedDate).IsRequired();
         builder.Property(qq => qq.UpdatedDate);

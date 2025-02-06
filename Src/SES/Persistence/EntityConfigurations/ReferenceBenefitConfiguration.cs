@@ -21,7 +21,6 @@ internal class ReferenceBenefitConfiguration : IEntityTypeConfiguration<Referenc
         builder.HasOne(rb => rb.Semester);
 
         builder.HasMany(rb => rb.Exams);
-        builder.HasMany(rb => rb.QuizQuestions);
         builder.HasMany(rb => rb.LearningAreas);
 
         builder.Property(rb => rb.CreatedDate).IsRequired();
