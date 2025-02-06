@@ -2,6 +2,7 @@ using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Requests;
@@ -14,8 +15,6 @@ namespace Application.Features.ReferenceBenefits.Queries.GetList;
 public class GetListReferenceBenefitQuery : IRequest<GetListResponse<GetListReferenceBenefitListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
-
-    
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListReferenceBenefits({PageRequest.PageIndex},{PageRequest.PageSize})";
@@ -38,6 +37,9 @@ public class GetListReferenceBenefitQuery : IRequest<GetListResponse<GetListRefe
             IPaginate<ReferenceBenefit> referenceBenefits = await _referenceBenefitRepository.GetListAsync(
                 index: request.PageRequest.PageIndex,
                 size: request.PageRequest.PageSize,
+                include: rb=> rb.Include(se => se.Semester)
+                                .Include(sc => sc.School)
+                                .Include(l => l.Lesson),
                 cancellationToken: cancellationToken
             );
 
