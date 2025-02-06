@@ -13,6 +13,5 @@ public class ReferenceBenefit : Entity<int>
     public School School { get; set; }
     public Semester Semester { get; set; }
     public IList<Exam> Exams { get; set; }
-    public IList<QuizQuestion> QuizQuestions { get; set; }
     public IList<LearningArea> LearningAreas { get; set; }
 }

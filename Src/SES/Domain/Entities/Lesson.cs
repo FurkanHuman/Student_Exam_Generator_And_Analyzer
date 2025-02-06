@@ -12,4 +12,6 @@ public class Lesson : Entity<int>
     public IList<StudentClass> StudentClasses { get; set; }
     public IList<ReferenceBenefit> ReferenceBenefits { get; set; }
     public IList<Teacher> Teachers { get; set; }
+    public IList<Exam> Exams { get; set; }
+    public IList<QuizQuestion> QuizQuestions { get; set; }
 }

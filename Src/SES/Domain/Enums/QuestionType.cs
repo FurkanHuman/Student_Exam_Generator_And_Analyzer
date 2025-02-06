@@ -3,10 +3,12 @@
 public enum QuestionType : byte
 
 {
-    None,
-    OpenendedQuestions,
-    ClosedendedQuestions,
-    MultipleChoiceQuestions,
-    TrueFalseQuestions,
-    FillInTheBlankQuestions
+    Undefined,
+    OpenEnded,
+    ClosedEnded,
+    MultipleChoice,
+    TrueFalse,
+    FillInTheBlank,
+    Matching,
+    Ordering
 }

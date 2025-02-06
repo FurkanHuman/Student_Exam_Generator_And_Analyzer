@@ -13,4 +13,5 @@ public class QuizQuestion : Entity<int> // note: sorununn kendisi.
     public IList<Benefit> Benefits { get; set; }
     public IList<QuestionOption> Options { get; set; }
     public IList<StudentAnswer> StudentAnswers { get; set; }
+    public IList<Lesson> Lessons { get; set; }
 }
