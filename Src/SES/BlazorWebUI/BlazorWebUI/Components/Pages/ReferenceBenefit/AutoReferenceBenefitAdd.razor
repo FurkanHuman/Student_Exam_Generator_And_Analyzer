@@ -13,6 +13,11 @@
 
 <h3>Otomatik Kazanım Ekleyici</h3>
 
+<ModalDialog @ref="ModalDialog" Title="Başarılı bir şekilde eklendi">
+
+    <button class="btn btn-primary" @onclick="() => ModalDialog.Close()">Tamam</button>
+</ModalDialog>
+
 @if (IsSuccess)
 {
     <br />
@@ -152,6 +157,8 @@
 
     private string EditContentPlainText { get; set; } = string.Empty;
 
+    ModalDialog ModalDialog { get; set; } = new();
+
     private List<EditContent> GetAllEditContents()
     {
         List<EditContent> allEditContents = [];
@@ -219,8 +226,6 @@
         ReferenceBenefitDto referenceBenefitDto = _pdfReaderService.ProcessReferenceBenefit(lines);
 
         referenceBenefitDto.RBName = autoBenefitDto.Name;
-
-
         referenceBenefitDto.LessonId = autoBenefitDto.LessonId;
         referenceBenefitDto.SemesterId = autoBenefitDto.SemesterId;
         referenceBenefitDto.SchoolId = autoBenefitDto.SchoolId;
@@ -230,9 +235,9 @@
                 ReferenceBenefitDto = referenceBenefitDto
             });
 
-        IsSuccess = true;
-        await Task.Delay(3000);
-        _navigationManager.NavigateTo("/");
+        DisplaySuccessMessage();
+        lines.Clear();
+        autoBenefitDto.Name = string.Empty;
     }
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
@@ -258,6 +263,14 @@
                 EditContentLearning.AddRange(rawBenefit.LearningAreas.Select(learning => new EditContent { Current = learning }));
         }
         IsOpen = true;
+    }
+
+    private void DisplaySuccessMessage()
+    {
+        ModalDialog.Open();
+        EditContentBenefits.Clear();
+        EditContentSubLearning.Clear();
+        EditContentLearning.Clear();
     }
 
     private void Toggle(MouseEventArgs e)
