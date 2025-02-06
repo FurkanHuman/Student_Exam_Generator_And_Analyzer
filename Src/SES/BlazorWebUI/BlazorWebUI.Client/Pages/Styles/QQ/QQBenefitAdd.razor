@@ -1,0 +1,39 @@
+﻿@rendermode InteractiveAuto
+@using BlazorWebUI.Client.Pages.Styles.Form
+@using BlazorWebUI.Client.Pages.Styles
+
+<button class="btn btn-outline-secondary" @onclick="() => ModalDialog.Open()"> Kazanım Ekle </button>
+
+<ModalDialog @ref="@ModalDialog" Title="Soruya Kazanım Ekle">
+    <div class="row">
+        <p>Eklemek istediğiniz kazanımı sadece seçiniz ve ekleme tuşuna basınız </p>
+
+        <div style="max-height: 30rem; overflow-y: auto;">
+            <CheckBoxList TKey="int" CheckboxItems="@CheckboxItems" />
+        </div>
+        <hr />
+        <button class="btn btn-primary" @onclick="() => ProcessSelectedBenefits()">Ekle</button>
+    </div>
+</ModalDialog>
+@code {
+    [Parameter]
+    public ICollection<CheckboxItem<int>> CheckboxItems { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<ICollection<CheckboxItem<int>>> OnSelectedBenefits { get; set; }
+
+
+    private ModalDialog ModalDialog { get; set; } = new();
+
+    private async Task ProcessSelectedBenefits()
+    {
+        IEnumerable<CheckboxItem<int>> selectedItems = CheckboxItems.Where(i => i.IsSelected);
+
+        await OnSelectedBenefits.InvokeAsync(selectedItems.ToList());
+
+        foreach (var item in CheckboxItems)
+            item.IsSelected = false;
+
+        ModalDialog.Close();
+    }
+}

@@ -1,0 +1,47 @@
+﻿@rendermode InteractiveAuto
+<div class="form-control">
+    <InputRadioGroup @bind-Value="selectedOption" Name="inlineRadioOptions">
+        @foreach (KeyValuePair<byte, string> radio in options)
+        {
+            <div class="form-check form-check-inline">
+                <InputRadio class="form-check-input" type="radio" Name="inlineRadioOptions" id="@($"inlineRadio{radio.Key}")" value="@radio.Key" />
+                <label class="form-check-label" for="@($"inlineRadio{radio.Key}")">@radio.Value</label>
+            </div>
+        }
+    </InputRadioGroup>
+
+    <QQOption @ref="QQOption" SelectedOption="selectedOption" OnSelectedOptions="OnSelectedOptionHandler"></QQOption>
+
+</div>
+
+@code {
+
+    [Parameter]
+    public EventCallback<ICollection<QuestionOptionDto>> OnSelectedOptions { get; set; }
+
+    [Parameter]
+    public EventCallback<byte> OnSelectedQType { get; set; }
+
+    public QQOption QQOption { get; set; } = new();
+
+
+    private byte selectedOption { get; set; }
+    private bool isChecked { get; set; }
+
+    private async Task OnSelectedOptionHandler(ICollection<QuestionOptionDto> questionOptions)
+    {
+        await OnSelectedOptions.InvokeAsync(questionOptions);
+        await OnSelectedQType.InvokeAsync(selectedOption);
+    }
+
+    private IDictionary<byte, string> options = new Dictionary<byte, string>
+    {
+        {1, "Açık Uçlu" },
+        // { 2, "Kapalı Uçlu" },
+        { 3, "Çoktan Seçmeli" },
+        { 4, "Doğru/Yanlış" },
+        { 5, "Boşluk Doldurma" },
+        // { 6, "Eşleştirme" },
+        // { 7, "Sıralama"  }
+    };
+}
