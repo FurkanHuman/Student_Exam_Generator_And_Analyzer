@@ -1,0 +1,191 @@
+@*Thanks ChatGPT.Code Copilot*@
+@using Application.Features.ReferenceBenefits.Queries.GetList
+@using Application.Features.ReferenceBenefits.Queries.GetListByIdReferenceBenefitBenefit
+@using NArchitecture.Core.Application.Requests
+@using NArchitecture.Core.Application.Responses
+@rendermode InteractiveServer
+@inject IMediator _mediator
+
+@if (IsVisible)
+{
+    <h3>Kazaným Yükleyici</h3>
+
+    <div class="form-control">
+
+        <div class="btn-group m-2">
+            <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                @(SelectedSchoolId.HasValue ? ReferenceBenefitSchools.FirstOrDefault(s => s.SchoolId == SelectedSchoolId)?.SchoolName : "Okul Seç")
+            </button>
+            <ul class="dropdown-menu">
+                @foreach (var school in ReferenceBenefitSchools)
+                {
+                    <li @onclick="() => SelectBenefitSchool(school.SchoolId)" class="dropdown-item">@school.SchoolName</li>
+                }
+            </ul>
+        </div>
+
+        @if (SelectedSchoolId.HasValue)
+        {
+            <div class="btn-group m-2">
+                <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    @(SelectedSemesterId.HasValue ? ReferenceBenefitSemesters.FirstOrDefault(s => s.SemesterId == SelectedSemesterId)?.SemesterName : "Dönem Seç")
+                </button>
+                <ul class="dropdown-menu">
+                    @foreach (var semester in ReferenceBenefitSemesters)
+                    {
+                        <li @onclick="() => SelectBenefitSemester(semester.SemesterId)" class="dropdown-item">
+                            @($"{semester.BeginSemesterDate} - {semester.EndSemesterDate} {semester.SemesterName}")
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+
+        @if (SelectedSemesterId.HasValue)
+        {
+            <div class="btn-group m-2">
+                <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    @(SelectedLessonId.HasValue ? ReferenceBenefitLessons.FirstOrDefault(l => l.LessonId == SelectedLessonId)?.LessonName : "Ders Seç")
+                </button>
+                <ul class="dropdown-menu">
+                    @foreach (var lesson in ReferenceBenefitLessons)
+                    {
+                        <li @onclick="() => SelectBenefitLesson(lesson.LessonId)" class="dropdown-item">@lesson.LessonName</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        @if (SelectedLessonId.HasValue)
+        {
+            <div class="btn-group m-2">
+                <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    @(SelectedBenefitId.HasValue ? GetListReferenceBenefits.Items.FirstOrDefault(b => b.Id == SelectedBenefitId)?.Name : "Yýllýk Plan Seç")
+                </button>
+                <ul class="dropdown-menu">
+                    @foreach (var benefit in GetListReferenceBenefits.Items)
+                    {
+                        <li @onclick="() => SelectBenefit(benefit.Id)" class="dropdown-item">@benefit.Name</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <button class="btn btn-group btn-primary btn-lg m-2" @onclick="LoadSelectedBenefits" disabled="@(!(SelectedBenefitId.HasValue))">Seç</button>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public EventCallback<int> OnSelectedBenefitId { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnLessonId { get; set; }
+
+    private ICollection<ReferenceBenefitSchool> ReferenceBenefitSchools { get; set; } = [];
+    private ICollection<ReferenceBenefitSemester> ReferenceBenefitSemesters { get; set; } = [];
+    private ICollection<ReferenceBenefitLesson> ReferenceBenefitLessons { get; set; } = [];
+
+    private List<GetListReferenceBenefitListItemDto> FullReferenceBenefits { get; set; } = new();
+    private GetListResponse<GetListReferenceBenefitListItemDto> GetListReferenceBenefits { get; set; } = new();
+
+    [Parameter]
+    public bool IsVisible { get; set; } = true;
+
+    private int? SelectedSchoolId { get; set; }
+    private int? SelectedSemesterId { get; set; }
+    private int? SelectedLessonId { get; set; }
+    private int? SelectedBenefitId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        PageRequest pg = new() { PageIndex = 0, PageSize = int.MaxValue };
+        GetListReferenceBenefits = await _mediator.Send(new GetListReferenceBenefitQuery() { PageRequest = pg });
+
+        FullReferenceBenefits = GetListReferenceBenefits.Items.ToList();
+
+        ReferenceBenefitSchools = FullReferenceBenefits
+            .Select(rb => new ReferenceBenefitSchool { SchoolId = rb.SchoolId, SchoolName = rb.SchoolName })
+            .DistinctBy(x => x.SchoolId)
+            .ToList();
+    }
+
+    private void SelectBenefitSchool(int schoolId)
+    {
+        SelectedSchoolId = schoolId;
+        SelectedSemesterId = null;
+        SelectedLessonId = null;
+        SelectedBenefitId = null;
+
+        ReferenceBenefitSemesters = FullReferenceBenefits
+            .Where(x => x.SchoolId == schoolId)
+            .Select(rb => new ReferenceBenefitSemester
+                {
+                    SemesterId = rb.SemesterId,
+                    SemesterName = rb.SemesterName,
+                    BeginSemesterDate = rb.BeginSemesterDate,
+                    EndSemesterDate = rb.EndSemesterDate
+                })
+            .DistinctBy(x => x.SemesterId)
+            .ToList();
+    }
+
+    private void SelectBenefitSemester(int semesterId)
+    {
+        SelectedSemesterId = semesterId;
+        SelectedLessonId = null;
+        SelectedBenefitId = null;
+
+        ReferenceBenefitLessons = FullReferenceBenefits
+            .Where(x => x.SchoolId == SelectedSchoolId && x.SemesterId == semesterId)
+            .Select(rb => new ReferenceBenefitLesson { LessonId = rb.LessonId, LessonName = rb.LessonName })
+            .DistinctBy(x => x.LessonId)
+            .ToList();
+    }
+
+    private void SelectBenefitLesson(int lessonId)
+    {
+        SelectedLessonId = lessonId;
+        SelectedBenefitId = null;
+
+        GetListReferenceBenefits.Items = FullReferenceBenefits
+            .Where(x => x.SchoolId == SelectedSchoolId && x.SemesterId == SelectedSemesterId && x.LessonId == lessonId)
+            .ToList();
+    }
+
+    private void SelectBenefit(int benefitId)
+    {
+        SelectedBenefitId = benefitId;
+    }
+
+    private async Task LoadSelectedBenefits()
+    {
+        if (SelectedBenefitId.HasValue)
+            await OnSelectedBenefitId.InvokeAsync(SelectedBenefitId.Value);
+        if (SelectedLessonId.HasValue)
+            await OnLessonId.InvokeAsync(SelectedLessonId.Value);
+        IsVisible = false;
+    }
+
+
+    private class ReferenceBenefitSchool
+    {
+        public string SchoolName { get; set; }
+        public int SchoolId { get; set; }
+    }
+
+    private class ReferenceBenefitSemester
+    {
+        public int SemesterId { get; set; }
+        public string SemesterName { get; set; }
+        public DateOnly BeginSemesterDate { get; set; }
+        public DateOnly EndSemesterDate { get; set; }
+    }
+
+    private class ReferenceBenefitLesson
+    {
+        public int LessonId { get; set; }
+        public string LessonName { get; set; }
+    }
+}

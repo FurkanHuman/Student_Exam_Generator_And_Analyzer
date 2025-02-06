@@ -1,0 +1,176 @@
+@rendermode InteractiveAuto
+
+<div class="form-control">
+    @switch (SelectedOption)
+    {
+
+        case 1: // OpenEnded
+            {
+                <span>Açýk Uçlu olduðu için seçenek eklenmez...</span>
+                break;
+            }
+
+        case 2: // ClosedEnded
+            {
+
+                break;
+            }
+
+        case 3: // MultipleChoice
+            {
+                foreach (QuestionOptionDto questionOption in QuestionOptions)
+                {
+                    <div class="input-group mb-3">
+                        <div class="input-group-text">
+                            <InputCheckbox class="form-check-input mt-0" @bind-Value="questionOption.IsCorrect" />
+                        </div>
+                        <InputText type="text" class="form-control" placeholder="Seçenek Metni" @bind-Value="questionOption.OptionText" />
+                        <button class="btn btn-danger" @onclick="() => RemoveOption(questionOption)">Sil</button>
+                    </div>
+                }
+
+                <button class="btn btn-primary" @onclick="AddOption">Seçenek Ekle</button>
+
+                break;
+            }
+
+        case 4: // True/False
+            {
+                foreach (QuestionOptionDto questionOption in QuestionOptions)
+                {
+                    <div class="input-group mb-3">
+                        <div class="input-group-text">
+                            <InputCheckbox class="form-check-input mt-0" @bind-Value="questionOption.IsCorrect" />
+                        </div>
+                        <InputText type="text" class="form-control" placeholder="Seçenek Metni" @bind-Value="questionOption.OptionText" />
+                    </div>
+                }
+
+                break;
+            }
+
+        case 5: // FillInTheBlank
+            {
+                foreach (QuestionOptionDto questionOption in QuestionOptions)
+                {
+                    <div class="input-group mb-3">
+                        <InputText type="text" class="form-control" placeholder="Boþ Býrakýlacak Kelime" @bind-Value="questionOption.OptionText" />
+                        <button class="btn btn-danger" @onclick="() => RemoveOption(questionOption)">Sil</button>
+                    </div>
+                }
+
+                <button class="btn btn-primary" @onclick="AddOption">Seçenek Ekle</button>
+                break;
+            }
+
+        case 6: // Matching
+            {
+                break;
+            }
+
+        case 7: // Ordering
+            {
+                break;
+            }
+
+        default: // Undefined
+            {
+                <span>Seçenek Seçiniz</span>
+                break;
+            }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int SelectedOption { get; set; } = 1;
+
+    [Parameter]
+    public ICollection<QuestionOptionDto> QuestionOptions { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<ICollection<QuestionOptionDto>> OnSelectedOptions { get; set; }
+
+    private int DefaultMultipleChoiceOptions = 4;
+    private int DefaultTrueFalseOptions = 2;
+    private int DefaultFillInTheBlankOptions = 1;
+
+    public async Task OnSelectedOptionHandler()
+    {
+        ICollection<QuestionOptionDto> questionOptionsAfter = QuestionOptions.ToList();
+        await OnSelectedOptions.InvokeAsync(questionOptionsAfter);
+        QuestionOptions.Clear();
+    }
+
+    public void AddOption()
+    {
+        QuestionOptions.Add(new QuestionOptionDto());
+    }
+
+    public void RemoveOption(QuestionOptionDto questionOption)
+    {
+        QuestionOptions.Remove(questionOption);
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        BeforeSetup();
+        return base.OnParametersSetAsync();
+    }
+
+
+    private Object? BeforeSetup()
+    {
+        QuestionOptions.Clear();
+
+        switch (SelectedOption)
+        {
+            case 1:
+                {
+                    break;
+                }
+
+            case 2: 
+                {
+                    break;
+                }
+
+            case 3:
+                {
+                    for (int i = 0; i < DefaultMultipleChoiceOptions; i++)
+                        QuestionOptions.Add(new());
+                    break;
+                }
+
+            case 4:
+                {
+                    for (int i = 0; i < DefaultTrueFalseOptions; i++)
+                        QuestionOptions.Add(new() { IsCorrect = (i % 2 == 0) });
+                    break;
+                }
+
+            case 5:
+                { 
+                    for (int i = 0; i < DefaultFillInTheBlankOptions; i++)
+                        QuestionOptions.Add(new(){IsCorrect=true});
+                    break;
+                }
+
+            case 6:
+                {
+                    break;
+                }
+
+            case 7:
+                {
+                    break;
+                }
+
+            default:
+                {
+                    break;
+                }
+        }
+        return null;
+    }
+}

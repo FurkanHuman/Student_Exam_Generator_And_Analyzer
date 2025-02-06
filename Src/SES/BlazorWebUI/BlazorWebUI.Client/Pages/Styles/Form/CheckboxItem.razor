@@ -1,0 +1,26 @@
+﻿@typeparam TKey
+<div class="form-check align-items-center p-2 mb-2"
+     style="cursor: pointer; background-color: @(IsSelected ? "purple" : "white"); color: @(IsSelected ? "white" : "black");"
+    @onclick="() => ToggleSelection()">
+    <span>@DisplayValue</span>
+</div>
+
+@code {
+    [Parameter]
+    public TKey? Key { get; set; }
+
+    [Parameter]
+    public string? DisplayValue { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnSelectedChanged { get; set; }
+
+    [Parameter]
+    public bool IsSelected { get; set; }
+
+    private async Task ToggleSelection()
+    {
+        IsSelected = !IsSelected;
+        await OnSelectedChanged.InvokeAsync(IsSelected);
+    }
+}
