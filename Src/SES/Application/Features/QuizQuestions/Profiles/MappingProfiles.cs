@@ -14,7 +14,14 @@ public class MappingProfiles : Profile
 {
     public MappingProfiles()
     {
-        CreateMap<CreateQuizQuestionCommand, QuizQuestion>();
+        CreateMap<CreateQuizQuestionCommand, QuizQuestion>()
+            .ForMember(destinationMember: qq => qq.Question, memberOptions: opt => opt.MapFrom(qqc => qqc.Question))
+            .ForMember(destinationMember: qq => qq.QuestionBody, memberOptions: opt => opt.MapFrom(qqc => qqc.QuestionBody));
+
+        CreateMap<CreateQuizQuestionCommand, QuestionScore>()
+            .ForMember(destinationMember: qs => qs.Score, memberOptions: opt => opt.MapFrom(cqqc => cqqc.Score))
+            .ForMember(destinationMember: qs => qs.MaxScore, memberOptions: opt => opt.MapFrom(cqqc => cqqc.MaxScore));
+
         CreateMap<QuizQuestion, CreatedQuizQuestionResponse>();
 
         CreateMap<UpdateQuizQuestionCommand, QuizQuestion>();

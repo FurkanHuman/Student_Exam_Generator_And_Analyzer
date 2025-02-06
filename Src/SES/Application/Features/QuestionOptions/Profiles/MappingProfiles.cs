@@ -3,6 +3,7 @@ using Application.Features.QuestionOptions.Commands.Delete;
 using Application.Features.QuestionOptions.Commands.Update;
 using Application.Features.QuestionOptions.Queries.GetById;
 using Application.Features.QuestionOptions.Queries.GetList;
+using Application.Features.QuizQuestions.Commands.Create;
 using AutoMapper;
 using Domain.Entities;
 using NArchitecture.Core.Application.Responses;
@@ -15,6 +16,8 @@ public class MappingProfiles : Profile
     public MappingProfiles()
     {
         CreateMap<CreateQuestionOptionCommand, QuestionOption>();
+        CreateMap<QuestionOptionAppDto,QuestionOption>();
+   
         CreateMap<QuestionOption, CreatedQuestionOptionResponse>();
 
         CreateMap<UpdateQuestionOptionCommand, QuestionOption>();
