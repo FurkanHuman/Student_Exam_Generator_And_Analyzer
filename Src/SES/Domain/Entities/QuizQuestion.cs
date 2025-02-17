@@ -8,6 +8,7 @@ public class QuizQuestion : Entity<int> // note: sorununn kendisi.
     public string QuestionBody { get; set; } // ana soru.
     public string QuestionImageURL { get; set; }
     public QuestionType QuestionType { get; set; }
+    public bool IsAIGenerated { get; set; } = false;
     public QuestionScore QuestionScore { get; set; }
     public IList<Exam> Exams { get; set; }
     public IList<Benefit> Benefits { get; set; }
