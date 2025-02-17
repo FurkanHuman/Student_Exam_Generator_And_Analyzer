@@ -65,7 +65,7 @@ public class CreateQuizQuestionCommand : IRequest<CreatedQuizQuestionResponse>, 
                 benefits.Add(await _benefitService.GetAsync(predicate: b => b.Id == id, cancellationToken: cancellationToken));
 
             foreach (QuestionOptionAppDto? option in request.QQOptions)
-                    questionOptions.Add(new() { IsCorrect = option.IsCorrect, OptionText = option.OptionText, CreatedDate = DateTime.Now });
+                    questionOptions.Add(new() { IsCorrect = option.IsCorrect, OptionText = option.OptionText, CreatedDate = DateTime.UtcNow});
 
             QuestionScore questionScore = _mapper.Map<QuestionScore>(request);
             questionScore.CreatedDate = DateTime.UtcNow;
