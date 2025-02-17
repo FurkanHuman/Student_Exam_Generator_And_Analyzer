@@ -23,8 +23,6 @@ public class PersonelConfiguration : IEntityTypeConfiguration<Personel>, IMainCo
         builder.Property(p => p.DeletedDate);
 
         builder.HasQueryFilter(p => !p.DeletedDate.HasValue);
-        builder.HasData(getSeedPersonel());
-
     }
 
     internal static Guid AdminPersonelId { get; set; } = Guid.NewGuid();
