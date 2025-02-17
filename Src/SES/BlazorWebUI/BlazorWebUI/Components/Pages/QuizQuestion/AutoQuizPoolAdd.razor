@@ -1,0 +1,113 @@
+﻿@page "/Auto/AiQuizPoolAdd"
+@rendermode InteractiveServer
+
+@using Application.Features.ReferenceBenefits.Queries.GetListByIdReferenceBenefitBenefit
+@using Application.Services.AIService
+@using Application.Services.AIService.Models
+@using Application.Services.Lessons
+@using BlazorWebUI.Client.Pages.Styles.QQ
+@using NArchitecture.Core.Application.Responses
+
+<h2>Yapay zeka destekli soru oluşturma</h2>
+
+
+<QQBenefitLoader IsVisible="IsQQBenefitLoaderVisible"  OnSelectedBenefitId="HandleBenefitId" OnLessonId="HandleLessonId" />
+
+<InputTextArea @bind-Value="UserPrompt" />
+
+<InputText class="form-control" type="number" min="0" max="100" placeholder="Kaç soru" @bind-Value="howMuchQuestion" />
+
+
+<div class="btn-group m-2">
+    <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
+        @(!string.IsNullOrEmpty(SelectedLanguage.Value) ? SelectedLanguage.Value : "Dil Seç")
+    </button>
+    <ul class="dropdown-menu">
+        @foreach (var language in LanguagePairs)
+        {
+            <li @onclick="() => SelectLanguage(language)" class="dropdown-item">@language.Value</li>
+        }
+    </ul>
+</div>
+
+<div class="form-check form-switch form-check-reverse">
+    <InputCheckbox class="form-check-input checkbox-large" type="checkbox" @bind-Value="IsQQBenefitLoaderVisible" id="flexCheckLoader" />
+    <label class="form-check-label" for="flexCheckLoader">Çapraz Kazanım (DENEYSEL)</label>
+</div>
+
+<QQBenefitAdd />
+
+
+
+<button @onclick="CallAIAsync" class="btn btn-group btn-primary btn-lg m-2">Test</button>
+
+
+@inject IServiceProvider _ServiceProvider
+@inject IMediator _mediator
+
+@code {
+    private IAIService? _aIServiceOpenAi;
+    private Dictionary<string, string> LanguagePairs { get; set; } = [];
+    private KeyValuePair<string, string> SelectedLanguage;
+
+    private string? UserPrompt { get; set; }
+    private string howMuchQuestion { get; set; } = string.Empty;
+    private bool _isSucces { get; set; } = false;
+    private bool IsQQBenefitLoaderVisible { get; set; } = true;
+
+
+
+    protected override Task OnInitializedAsync()
+    {
+        LoadLanguage();
+
+        _aIServiceOpenAi = _ServiceProvider.GetKeyedService<IAIService>("OpenAI");
+
+        return base.OnInitializedAsync();
+    }
+
+    private async Task HandleBenefitId(int benefiId)
+    {
+        GetListResponse<GetListByIdReferenceBenefitBenefitDto> response = await _mediator.Send(new GetListByIdReferenceBenefitBenefitQuery { Id = benefiId});
+
+    }
+
+    private Task HandleLessonId(int lessonId)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void SelectLanguage(KeyValuePair<string, string> langPair)
+    {
+        SelectedLanguage = langPair;
+    }
+
+    private async Task CallAIAsync()
+    {
+        using CancellationTokenSource cts = new();
+        QuestionAIOutgoingModel aIOutgoingModel = new()
+            {
+                TeacherPrompt = UserPrompt,
+                Language = SelectedLanguage.Key,
+                HowMuchQuestion = uint.Parse(howMuchQuestion),
+                HardLevel = 2,
+                LessonName = "Bilişim Teknolojileri",
+                QuestionType = Domain.Enums.QuestionType.TrueFalse,
+                Benefits = new Dictionary<string, string>()
+                {    {"BT.6.5.2.13.", "Bir algoritmayı uyarlamak için en uygun karar yapılarını seçer." },
+                     {"BT.6.5.2.14.", "Farklı programlama yapılarını kullanarak karmaşık problemlere çözüm üretir." },
+                     {"BT.6.5.2.15.", "Tüm programlama yapılarını içeren özgün bir proje oluşturur." }
+                }
+            };
+
+        await _aIServiceOpenAi.GenerateQuestionsFromAIAsync(outgoingModel: aIOutgoingModel, aiModel: "gpt-4o-mini", cancellationToken: cts.Token);
+        _isSucces = true;
+    }
+
+
+    private void LoadLanguage()
+    {
+        LanguagePairs.Add("TUR", "Türkçe");
+        LanguagePairs.Add("ENG", "Ingilizce");
+    }
+}
