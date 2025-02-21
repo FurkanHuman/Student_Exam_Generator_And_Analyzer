@@ -2,7 +2,7 @@
 
 namespace Domain.Entities;
 
-public class QuestionOption : Entity<Guid> // soruların seçenekleri
+public class QuestionOption : Entity<Guid>
 {
     public string? OptionText { get; set; }
     public bool IsCorrect { get; set; }

@@ -28,10 +28,6 @@ public class MappingProfiles : Profile
 
         CreateMap<int, Benefit>()
             .ForMember(destinationMember: dest => dest.Id, memberOptions: opt => opt.MapFrom(src => src));
-               
-
-
-
 
         CreateMap<UpdateBenefitCommand, Benefit>();
         CreateMap<Benefit, UpdatedBenefitResponse>();
