@@ -1,0 +1,30 @@
+﻿<div class="card p-4 mb-3 shadow-lg">
+    <p><strong>Soru Türü:</strong> @selectedQtype(QQBody.SelectedQType)</p>
+    <div class="d-flex justify-content-between align-items-center">
+        <h3 class="mb-0"><strong>Soru Detayları</strong></h3>
+        <span class="badge bg-primary fs-5">@QQBody.Score / @QQBody.MaxScore</span>
+    </div>
+
+    <hr />
+
+    @if (!string.IsNullOrEmpty(QQBody.QuestionBody))
+    {
+        <p class="text-muted" style="white-space: pre-line;"> @QQBody.QuestionBody</p>
+    }
+
+    <p class="fs-5" style="white-space: pre-line;"><strong>@QQBody.Question</strong></p>
+
+    <hr />
+
+    <h5>Seçenekler</h5>
+    <QQOption QuestionOptions="QQBody.QuestionOptions" SelectedOption="QQBody.SelectedQType" IsViewMode="true" />
+</div>
+
+@code
+{
+    [Parameter]
+    public QQBodyDto? QQBody { get; set; } = new();
+
+    private string selectedQtype(byte type)
+    => QQStatic.SelectTypeOptions.TryGetValue(key: type, value: out string? value) ? value : "Bilinmeyen Tür";
+}
