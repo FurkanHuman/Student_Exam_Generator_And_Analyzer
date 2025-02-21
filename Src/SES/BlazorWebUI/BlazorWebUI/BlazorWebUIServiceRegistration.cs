@@ -9,6 +9,7 @@ public static class BlazorWebUIServiceRegistration
 {
     public static IServiceCollection AddBlazorWebUIServiceRegistration(this IServiceCollection services)
     {
+        services.AddAutoMapper(typeof(MappingProfiles));
         services.AddScoped<IdentityUserAccessor>();
         services.AddScoped<IdentityRedirectManager>();
         services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
