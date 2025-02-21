@@ -1,0 +1,90 @@
+﻿@using Application.Features.Lessons.Queries.GetList
+@using Application.Features.QuizQuestions.Queries.GetByLessonId
+@using Application.Features.Semesters.Queries.GetList
+@using Application.Features.QuizQuestions.Queries.GetList
+@using NArchitecture.Core.Application.Requests
+@using NArchitecture.Core.Application.Responses
+
+@rendermode InteractiveServer
+@inject IMediator _mediatr
+
+@code
+{
+    [Parameter]
+    public EventCallback<IList<GetByLessonIdQuizQuestionListItemDto>> OnQQList { get; set; }
+
+
+    private int? SelectedSemesterId { get; set; }
+    private int? SelectedLessonId { get; set; }
+
+    private GetListResponse<GetListSemesterListItemDto> GetListSemesters { get; set; } = new();
+    private GetListResponse<GetListLessonListItemDto> GetListLessons { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        PageRequest pR = new() { PageIndex = 0, PageSize = int.MaxValue };
+        GetListSemesters = await _mediatr.Send(new GetListSemesterQuery() { PageRequest = pR });
+        GetListLessons = await _mediatr.Send(new GetListLessonQuery() { PageRequest = pR });
+
+        await base.OnInitializedAsync();
+    }
+
+    private void SelectSemester(int semesterId)
+    {
+        SelectedSemesterId = semesterId;
+        SelectedLessonId = null;
+        GetListLessons.Items = GetListLessons.Items.Where(l => l.SemesterId == semesterId).DistinctBy(l => l.Id).ToList();
+    }
+
+    private void SelectLesson(int lessonId)
+    {
+        SelectedLessonId = lessonId;
+    }
+
+    private async Task LoadSelectedQuestion()
+    {
+        List<GetByLessonIdQuizQuestionListItemDto> _qqList  = new();
+        if (SelectedLessonId != null)
+        {
+            GetListResponse<GetByLessonIdQuizQuestionListItemDto> GetListQuizQuestion = await _mediatr.Send(new GetByLessonIdQuizQuestionQuery()
+                { LessonId = SelectedLessonId.Value });
+
+            _qqList.AddRange(GetListQuizQuestion.Items);
+        }
+
+        _qqList = _qqList.Distinct().ToList();
+        await OnQQList.InvokeAsync(_qqList);
+    }
+}
+
+<div class="form-control">
+
+    <div class="btn-group m-2">
+        <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            @(SelectedSemesterId.HasValue ? GetListSemesters.Items.FirstOrDefault(s => s.Id == SelectedSemesterId)?.Name : "Dönem Seç")
+        </button>
+        <ul class="dropdown-menu">
+            @foreach (var semester in GetListSemesters.Items)
+            {
+                <li @onclick="() => SelectSemester(semester.Id)" class="dropdown-item">@($"{semester.BeginSemesterDate.Year} - {semester.EndSemesterDate.Year} {semester.Name}")</li>
+            }
+        </ul>
+    </div>
+
+    @if (SelectedSemesterId.HasValue)
+    {
+        <div class="btn-group m-2">
+            <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                @(SelectedLessonId.HasValue ? GetListLessons.Items.FirstOrDefault(l => l.Id == SelectedLessonId)?.LessonName : "Ders Seç")
+            </button>
+            <ul class="dropdown-menu">
+                @foreach (var lesson in GetListLessons.Items)
+                {
+                    <li @onclick="() => SelectLesson(lesson.Id)" class="dropdown-item">@lesson.LessonName</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <button class="btn btn-group btn-primary btn-lg m-2" @onclick="LoadSelectedQuestion" disabled="@(!(SelectedLessonId.HasValue))">Seç</button>
+</div>
