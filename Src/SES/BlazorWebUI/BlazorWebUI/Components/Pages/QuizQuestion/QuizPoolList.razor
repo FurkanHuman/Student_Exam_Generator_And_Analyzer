@@ -1,0 +1,24 @@
+﻿@using Application.Features.QuizQuestions.Queries.GetByLessonId
+@using AutoMapper
+@using BlazorWebUI.Client.Pages.Styles.QQ
+
+@rendermode InteractiveServer
+@inject IMapper _mapper 
+@page "/PoolList"
+@code {
+    private IList<QQBodyDto> _listOfQQBodyDto { get; set; } = [];
+
+    private void LoadAPool(IList<GetByLessonIdQuizQuestionListItemDto> getByQuizzes)
+    {
+        _listOfQQBodyDto = _mapper.Map<IList<QQBodyDto>>(getByQuizzes);
+    }
+}
+
+<QuizPoolLoader OnQQList="LoadAPool"></QuizPoolLoader>
+
+<div class="form-control">
+        @foreach (QQBodyDto quest in _listOfQQBodyDto)
+        {
+            <QQView QQBody="quest" />
+        }
+</div>
