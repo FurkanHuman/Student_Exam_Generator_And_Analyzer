@@ -3,6 +3,7 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Text
 @using System.Text.Encodings.Web
+@using Application.Services.Personels
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 @using Domain.Entities
@@ -14,6 +15,7 @@
 @inject ILogger<Register> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject IPersonelService PersonelService
 
 <PageTitle>Register</PageTitle>
 
@@ -27,24 +29,48 @@
             <h2>Create a new account.</h2>
             <hr />
             <ValidationSummary class="text-danger" role="alert" />
+
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Name" class="form-control" autocomplete="name" aria-required="true" placeholder="Name" />
+                <label for="name">Name</label>
+                <ValidationMessage For="() => Input.Name" class="text-danger" />
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Surname" class="form-control" autocomplete="family-name" aria-required="true" placeholder="Surname" />
+                <label for="surname">Surname</label>
+                <ValidationMessage For="() => Input.Surname" class="text-danger" />
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputDate @bind-Value="Input.DateOfBirth" TValue="DateOnly" Type="InputDateType.Date" class="form-control" aria-required="true" Min="@MinDate" Max="@MaxDate" />
+                <label for="date-of-birth">Date of Birth</label>
+                <ValidationMessage For="() => Input.DateOfBirth" class="text-danger" />
+            </div>
+
             <div class="form-floating mb-3">
                 <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                 <label for="email">Email</label>
                 <ValidationMessage For="() => Input.Email" class="text-danger" />
             </div>
+
             <div class="form-floating mb-3">
                 <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
                 <label for="password">Password</label>
                 <ValidationMessage For="() => Input.Password" class="text-danger" />
             </div>
+
             <div class="form-floating mb-3">
                 <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
                 <label for="confirm-password">Confirm Password</label>
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
             </div>
+
             <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+
         </EditForm>
     </div>
+
     <div class="col-md-6 col-md-offset-2">
         <section>
             <h3>Use another service to register.</h3>
@@ -52,6 +78,7 @@
             <ExternalLoginPicker />
         </section>
     </div>
+
 </div>
 
 @code {
@@ -65,9 +92,16 @@
 
     private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
 
+    private DateOnly MinDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-22));
+    private DateOnly MaxDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-128));
+    private Guid UserGuid = Guid.NewGuid();
+    private Guid UserPersonelGuid = Guid.NewGuid();
+
     public async Task RegisterUser(EditContext editContext)
     {
         var user = CreateUser();
+        user.Id = UserGuid;
+        user.PersonelId = UserPersonelGuid;
 
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
@@ -80,7 +114,11 @@
             return;
         }
 
-        Logger.LogInformation("User created a new account with password.");
+        await UserManager.AddToRoleAsync(user, "unauthorized");
+
+        await AddPersonelAsync();
+
+        Logger.LogInformation("User created a new account with password. Personel is created");
 
         var userId = await UserManager.GetUserIdAsync(user);
         var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
@@ -100,6 +138,23 @@
 
         await SignInManager.SignInAsync(user, isPersistent: false);
         RedirectManager.RedirectTo(ReturnUrl);
+    }
+
+    /// <summary>
+    /// Add personel to database and return the personel
+    /// </summary>
+    /// <returns>Personel</returns>
+    private async Task<Personel> AddPersonelAsync()
+    {
+        var personel = new Personel
+            {
+                UserId = UserGuid,
+                Id = UserPersonelGuid,
+                Name = Input.Name,
+                SurName = Input.Surname,
+                BirthDate = Input.DateOfBirth
+            };
+        return await PersonelService.AddAsync(personel);
     }
 
     private ApplicationUser CreateUser()
@@ -128,11 +183,12 @@
     {
         [Required]
         [EmailAddress]
+        [DataType(DataType.EmailAddress)]
         [Display(Name = "Email")]
         public string Email { get; set; } = "";
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 10)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; } = "";
@@ -141,5 +197,27 @@
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; } = "";
+
+        // personel name
+        [Required]
+        [StringLength(32, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
+        [DataType(DataType.Text)]
+        [Display(Name = "Name")]
+        public string Name { get; set; } = "";
+
+        // personel surname
+        [Required]
+        [StringLength(32, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
+        [DataType(DataType.Text)]
+        [Display(Name = "Surname")]
+        public string Surname { get; set; } = "";
+
+        // personel birth date
+        [Required]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
+        [Range(typeof(DateOnly), nameof(MinDate), nameof(MaxDate), ErrorMessage = "Date of Birth must be between {1} and {2}.")]
+        [DataType(DataType.Date)]
+        [Display(Name = "Date Of Birth")]
+        public DateOnly DateOfBirth { get; set; } = DateOnly.FromDateTime(DateTime.Now.AddYears(-22));
     }
 }
