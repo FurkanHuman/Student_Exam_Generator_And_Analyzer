@@ -4,6 +4,7 @@
 @using Application.Features.Semesters.Queries.GetList
 @using Application.Services.Personels
 @using Application.Services.Semesters
+@using Microsoft.AspNetCore.Identity
 @using NArchitecture.Core.Application.Responses
 @using NArchitecture.Core.Persistence.Paging
 @using Domain.Entities
@@ -59,14 +60,14 @@
 
 @inject IMediator _IMediatr
 @inject IPersonelService _PersonelService
-@inject ISemesterService _SemesterService
-
+@inject UserManager<ApplicationUser> _userManager
 
 @code {
     [SupplyParameterFromForm]
     private PrincipalDto _PrincipalSetDto { get; set; } = new();
-    private GetListResponse<GetListSemesterListItemDto>? semesterList = new();
-    private GetListResponse<GetListPersonelListItemDto>? personelList = new();
+    
+    private GetListResponse<GetListSemesterListItemDto> semesterList = new();
+    private GetListResponse<GetListPersonelListItemDto> personelList = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,9 +90,18 @@
                 PersonelId = _PrincipalSetDto.PersonelId
             };
 
+        Personel? personel = await _PersonelService.GetByIdAsync(_PrincipalSetDto.PersonelId);
+
+        if (personel == null || personel.User == null)
+            return;
+
+        ApplicationUser user = personel.User;
+
+        await _userManager.AddToRolesAsync(user, ["director", "authorized"]);
+        await _userManager.RemoveFromRoleAsync(user, "unauthorized");
+
         CreatedPrincipalResponse result = await _IMediatr.Send(createPrincipal);
     }
-
 
     private class PrincipalDto
     {
