@@ -1,17 +1,49 @@
 ﻿@page "/"
 @using Application.Services.Personels
+@using BlazorWebUI.Components.Account
 @using Domain.Entities
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
 
 <PageTitle>Hoş geldiniz</PageTitle>
 
 <h1>Merhaba</h1>
 <AuthorizeView>
     Hoş Geldiniz...
+    <br />
+    @(GetMessage())
 </AuthorizeView>
 <br />
 S.E.S Yapılıyor...
 
-@code {
+@inject IPersonelService _personelService
+@inject UserManager<ApplicationUser> _userManager
 
+@code {
+    private ApplicationUser? user = default!;
+    private Personel? personel { get; set; } = default!;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await _userManager.GetUserAsync(HttpContext.User);
+        personel = await _personelService.GetByIdAsync(user!.PersonelId);
+    }
+
+    private string GetMessage()
+    {
+        switch (personel)
+        {
+            case null:
+                return "Lütfen Giriş Yapınız";
+
+            case Personel p when p.BirthDate == DateOnly.FromDateTime(DateTime.Now):
+                return $"Mutlu Yıllar Merhaba {p.Name} {p.SurName}";
+
+            default:
+                return $"Merhaba {personel.Name} {personel.SurName}";
+        }
+    }
 }
