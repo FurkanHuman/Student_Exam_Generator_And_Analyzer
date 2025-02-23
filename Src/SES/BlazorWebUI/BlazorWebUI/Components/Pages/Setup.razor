@@ -28,7 +28,7 @@
             <button class="btn btn-primary" @onclick="NextStep">İki adımlı doğrulamayı aç</button>
         }
 
-        else if (ModalPage==2)
+        else if (ModalPage == 2)
         {
             <p><strong>Lütfen 2 Adımlı doğrulamayı açın</strong></p>
             <button class="btn btn-success" @onclick="CompleteSetup">Bitir</button>
@@ -111,12 +111,13 @@
 
     private async Task<Personel> AddPersonel(Guid userId)
     {
-        var personel = new Personel
+        Personel personel = new Personel
             {
                 UserId = userId,
                 Id = AdminPersonelGuid,
                 Name = "Admin",
                 SurName = "Administrator",
+                BirthDate = DateOnly.FromDateTime(DateTime.UtcNow),
                 CreatedDate = DateTime.UtcNow
             };
 
@@ -221,7 +222,7 @@
         string? username = isAuthenticated ? user.Identity?.Name : "Anonymous";
         string? userId = isAuthenticated ? user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value : "Unknown";
         string? roles = string.Join(", ", user.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value));
-        string? authType = isAuthenticated ? user.Identity?.AuthenticationType : "Unknown";
+        string? authType = isAuthenticated ? string.Join(",", user.Claims.Where(c => c.Type == "amr").Select(c => c.Value)) : "Unknown";
 
         bool isHttps = context.Request.IsHttps;
         int localPort = context.Connection.LocalPort;
