@@ -1,6 +1,7 @@
 using Application.Features.Personels.Rules;
 using Application.Services.Repositories;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using NArchitecture.Core.Persistence.Paging;
 using System.Linq.Expressions;
@@ -27,6 +28,20 @@ public class PersonelManager : IPersonelService
     )
     {
         Personel? personel = await _personelRepository.GetAsync(predicate, include, withDeleted, enableTracking, cancellationToken);
+        return personel;
+    }
+
+    public async Task<Personel?> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        Personel? personel = await _personelRepository.GetAsync(
+            predicate: p => p.Id == id,
+            include: null,
+            withDeleted: false,
+            enableTracking: true,
+            cancellationToken: cancellationToken);
+
         return personel;
     }
 
@@ -74,4 +89,5 @@ public class PersonelManager : IPersonelService
 
         return deletedPersonel;
     }
+
 }

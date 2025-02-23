@@ -1,3 +1,4 @@
+using Application.Services.Generic;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore.Query;
 using NArchitecture.Core.Persistence.Paging;
@@ -5,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace Application.Services.Personels;
 
-public interface IPersonelService
+public interface IPersonelService : IIdentifiable<Personel, Guid>
 {
     Task<Personel?> GetAsync(
         Expression<Func<Personel, bool>> predicate,
