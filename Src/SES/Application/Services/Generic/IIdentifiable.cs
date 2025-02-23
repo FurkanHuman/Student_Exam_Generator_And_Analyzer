@@ -1,6 +1,4 @@
-﻿using Domain.Entities;
-using Microsoft.EntityFrameworkCore.Query;
-using NArchitecture.Core.Persistence.Repositories;
+﻿using NArchitecture.Core.Persistence.Repositories;
 
 namespace Application.Services.Generic;
 public interface IIdentifiable<TEntity, TId>
