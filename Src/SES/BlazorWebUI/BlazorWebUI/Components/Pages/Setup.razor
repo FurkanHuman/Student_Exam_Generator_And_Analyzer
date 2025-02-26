@@ -11,6 +11,7 @@
 @using System.Net
 
 @inject UserManager<ApplicationUser> _userManager
+@inject RoleManager<IdentityRole<Guid>> _roleManager
 @inject NavigationManager _navigationManager
 @inject IUserStore<ApplicationUser> _userStore
 @inject IPersonelService _personelService
@@ -44,6 +45,8 @@
 
 @code {
     private ModalDialog ModalDialog { get; set; } = new();
+
+    private readonly IEnumerable<string> roles = ["admin", "authorized", "unauthorized", "director", "assistant_director", "teacher", "head_teacher", "officer"];
 
     private string generatedPassword = "";
     private readonly string adminEmail = "admin@root";
@@ -101,7 +104,6 @@
         await emailStore.SetEmailConfirmedAsync(adminUser, true, CancellationToken.None);
 
         IdentityResult? identityResult = await _userManager.CreateAsync(adminUser, generatedPassword);
-
         if (identityResult.Succeeded)
         {
             await _userManager.AddToRoleAsync(adminUser, "admin");
@@ -123,8 +125,20 @@
         return await _personelService.AddAsync(personel);
     }
 
+    private async Task CreateRolesAsync()
+    {
+        foreach (string role in roles)
+        {
+            if (!await _roleManager.RoleExistsAsync(role))
+            {
+                await _roleManager.CreateAsync(new IdentityRole<Guid>(role));
+            }
+        }
+    }
+
     private async Task NextStep()
     {
+        await CreateRolesAsync();
         await CreateAdminUser();
         ModalPage = 2;
     }
