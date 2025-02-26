@@ -9,4 +9,7 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.12" />
     <PackageReference Include="NArchitecture.Core.Persistence" Version="1.1.4" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Constants\" />
+  </ItemGroup>
 </Project>
