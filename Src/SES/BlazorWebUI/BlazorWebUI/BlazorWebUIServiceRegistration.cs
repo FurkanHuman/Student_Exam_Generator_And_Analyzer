@@ -14,6 +14,7 @@ public static class BlazorWebUIServiceRegistration
         services.AddScoped<IdentityRedirectManager>();
         services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
         services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+        services.AddScoped<RoleManager<IdentityRole<Guid>>>();
 
         return services;
     }
