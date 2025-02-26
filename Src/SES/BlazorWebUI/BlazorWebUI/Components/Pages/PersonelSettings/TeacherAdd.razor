@@ -17,18 +17,19 @@
         <DataAnnotationsValidator />
         <ValidationSummary />
         <AntiforgeryToken />
-
-        <div class="input-group mb-3" style="width:35rem;">
-            <label class="input-group-text">Öğretmen: </label>
-            <InputSelect class="form-select" id="schoolDD" @bind-Value="teacherDto.PersonelId">
-                <option selected>Seçiniz</option>
-                @foreach (GetListPersonelListItemDto personelItemDto in GetListPersonel.Items)
-                {
-                    <option value="@personelItemDto.Id">@personelItemDto.Name @personelItemDto.SurName @personelItemDto.BirthDate </option>
-                }
-            </InputSelect>
-        </div>
-
+        @if (PersonelId == null)
+        {
+            <div class="input-group mb-3" style="width:35rem;">
+                <label class="input-group-text">Öğretmen: </label>
+                <InputSelect class="form-select" id="schoolDD" @bind-Value="teacherDto.PersonelId">
+                    <option selected>Seçiniz</option>
+                    @foreach (GetListPersonelListItemDto personelItemDto in GetListPersonel.Items)
+                    {
+                        <option value="@personelItemDto.Id">@personelItemDto.Name @personelItemDto.SurName @personelItemDto.BirthDate </option>
+                    }
+                </InputSelect>
+            </div>
+        }
         <div class="input-group mb-3" style="width:35rem;">
             <label class="input-group-text">Dönem: </label>
             <InputSelect class="form-select" id="schoolDD" @bind-Value="teacherDto.SemesterId">
@@ -60,21 +61,28 @@
 
 @inject IMediator _Mediator
 
-
 @code {
     [SupplyParameterFromForm]
     private TeacherAddDto teacherDto { get; set; } = new();
+
+    [Parameter]
+    public Guid? PersonelId { get; set; }
+
+    [Parameter]
+    public EventCallback TriggerEvent { get; set; }
 
     private GetListResponse<GetListPersonelListItemDto> GetListPersonel = new();
     private GetListResponse<GetListSchoolListItemDto> GetListSchool = new();
     private GetListResponse<GetListSemesterListItemDto> GetListSemester = new();
 
-
     protected override async Task OnInitializedAsync()
     {
-        GetListPersonelQuery listPersonelQuery = new();
-        listPersonelQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
-        GetListPersonel = await _Mediator.Send(listPersonelQuery);
+        if (PersonelId == null)
+        {
+            GetListPersonelQuery listPersonelQuery = new();
+            listPersonelQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
+            GetListPersonel = await _Mediator.Send(listPersonelQuery);
+        }
 
         GetListSchoolQuery listSchoolQuery = new();
         listSchoolQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
@@ -92,8 +100,12 @@
         if (teacherDto.SchoolId == 0)
             teacherDto.SchoolId = GetListSchool.Items.Last().Id;
 
+        if (PersonelId != null)
+            teacherDto.PersonelId = PersonelId.Value;
+
         CreateTeacherCommand teacherCommand = new() { PersonelId = teacherDto.PersonelId, SchoolId = teacherDto.SchoolId, SemesterId = teacherDto.SemesterId };
         CreatedTeacherResponse teacherResponse = await _Mediator.Send(teacherCommand);
+        await TriggerEvent.InvokeAsync();
     }
 
     private class TeacherAddDto
