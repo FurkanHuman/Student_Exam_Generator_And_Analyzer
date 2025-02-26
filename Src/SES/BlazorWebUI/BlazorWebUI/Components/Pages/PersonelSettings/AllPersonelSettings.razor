@@ -1,0 +1,213 @@
+﻿@using Application.Services.Personels
+@using BlazorWebUI.Client.Pages.Styles
+@using Domain.Entities
+@using Microsoft.AspNetCore.Identity
+
+@page "/test"
+@rendermode InteractiveServer
+@inject UserManager<ApplicationUser> userManager
+@inject RoleManager<IdentityRole<Guid>> roleManager
+@inject IPersonelService personelService
+
+@code
+{
+    private IEnumerable<ApplicationUser> users = [];
+    private IEnumerable<Personel> personels = [];
+    private IEnumerable<Personel> discardPersonels = [];
+
+    private IEnumerable<IdentityRole<Guid>> availableRoles = [];
+    private readonly Dictionary<Guid, IList<string>> userRoles = [];
+
+    private ApplicationUser selectedUser { get; set; } = new();
+    private Personel? selectedPersonel { get; set; } = new();
+
+    private ModalDialog ModalDialogRoleAssign { get; set; } = new();
+    private ModalDialog ModalDialogDeleteUser { get; set; } = new();
+    private ModalDialog ModalDialogTeacherAdd { get; set; } = new();
+    private ModalDialog ModalDialogPersonelChange { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = userManager.Users.ToList();
+        availableRoles = roleManager.Roles.ToList();
+        availableRoles = RemoveAdmin(availableRoles);
+
+        var _personels = await personelService.GetListAsync();
+        personels = _personels!.Items;
+
+        discardPersonels = personels.Where(p => p.UserId == Guid.Empty).ToList();
+
+        foreach (ApplicationUser user in users)
+            userRoles.Add(user.Id, await userManager.GetRolesAsync(user));
+    }
+
+    private IEnumerable<IdentityRole<Guid>> RemoveAdmin(IEnumerable<IdentityRole<Guid>> roles)
+    {
+        return roles.Where(r => r.Name != "admin");
+    }
+
+    private async Task AddRoleAsync(ApplicationUser user, IdentityRole<Guid> role)
+    {
+        if (!await roleManager.RoleExistsAsync(role.Name!))
+            await roleManager.CreateAsync(new IdentityRole<Guid>(role.Name!));
+
+        await userManager.AddToRoleAsync(user, role.Name!);
+
+        userRoles[user.Id] = await userManager.GetRolesAsync(user);
+        StateHasChanged();
+    }
+
+    private async Task RemoveRoleAsync(ApplicationUser user, IdentityRole<Guid> role)
+    {
+        await userManager.RemoveFromRoleAsync(user, role.Name!);
+
+        userRoles[user.Id] = await userManager.GetRolesAsync(user);
+        StateHasChanged();
+    }
+
+    private async Task ChangeUserAndPersonelAsync(ApplicationUser user, Personel personel)
+    {
+        personel.UserId = user.Id;
+        personel.User = user;
+        user.Personel = personel;
+        user.PersonelId = personel.Id;
+
+        await personelService.UpdateAsync(personel);
+
+        await userManager.UpdateAsync(user);
+        users = userManager.Users.ToList();
+
+        ModalDialogPersonelChange.Close();
+        StateHasChanged();
+    }
+
+    private async Task DeleteUserAsync(ApplicationUser user, Personel personel)
+    {
+        personel.UserId = Guid.Empty;
+        personel.User = null;
+        if (userRoles[user.Id].Contains("admin"))
+        {
+            ModalDialogDeleteUser.Close();
+            StateHasChanged();
+            return;
+        }
+        await personelService.DeleteAsync(personel);
+        await userManager.DeleteAsync(user);
+
+        users = userManager.Users.ToList();
+        var _personels = await personelService.GetListAsync();
+        personels = _personels!.Items;
+
+        ModalDialogDeleteUser.Close();
+        StateHasChanged();
+    }
+
+    private async Task AddTeacherAsync()
+    {
+        await Task.CompletedTask;
+    }
+
+    private bool IsUserInRole(ApplicationUser user, string roleName)
+    {
+        return userRoles.GetValueOrDefault(user.Id, new List<string>()).Contains(roleName);
+    }
+}
+
+<h3>DİKKAT</h3>
+
+<p>Burada yapacağınız ayarlara dikkat ediniz</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Personel Ad Soyad</th>
+            <th>Email</th>
+            <th>Roller</th>
+            <th>Aksiyonlar</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (ApplicationUser user in users)
+        {
+            Personel? personel = personels.FirstOrDefault(p => p.UserId == user.Id);
+            <tr>
+                <td>@personel?.Name @personel?.SurName</td>
+                <td>@user?.Email</td>
+                <td>
+                    @foreach (string role in userRoles.GetValueOrDefault(user!.Id, new List<string>()))
+                    {
+                        <span style="font-size:1rem;" class="badge rounded-pill text-bg-warning">@role</span>
+                    }
+                </td>
+                <td>
+                    <button class="btn btn-primary" @onclick="() => {selectedUser = user; ModalDialogRoleAssign.Open();}">Rolleri Düzenle</button>
+                    <button class="btn btn-primary" @onclick="() => {selectedPersonel=personel; ModalDialogTeacherAdd.Open();}">Öğretmen olarak ekle</button>
+                    <button class="btn btn-danger" disabled="@true">Şifreyi sıfırla</button>
+                    <button class="btn btn-danger" disabled="@true">2 Faktorlü Doğrulamayı sil</button>
+                    <button class="btn btn-danger" @onclick="() => {selectedUser = user; selectedPersonel=personel!; ModalDialogDeleteUser.Open();}">Kullanıcıyı sil</button>
+                    <button class="btn btn-primary" @onclick="() => {selectedUser = user; ModalDialogPersonelChange.Open();}">Personel Ata</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<ModalDialog @ref="ModalDialogDeleteUser" Title="Kullanıcı Sil">
+
+    <p>DİKKAT Kullanıcıyı silmek istediğinize emin misiniz?</p>
+    <p>silinen kullanıcıya ait personel bilgileri saklanacaktır. Silinemez</p>
+    <p>seçilen kullanıcı: <strong>@selectedUser.Email</strong></p>
+
+    <button class="btn btn-danger" @onclick="() => DeleteUserAsync(selectedUser, selectedPersonel!)">Sil</button>
+
+    <button class="btn btn-primary" @onclick="() => ModalDialogDeleteUser.Close()">Kapat</button>
+</ModalDialog>
+
+<ModalDialog @ref="ModalDialogTeacherAdd">
+    <TeacherAdd PersonelId="@selectedPersonel?.Id" TriggerEvent="ModalDialogTeacherAdd.Close" />
+</ModalDialog>
+
+<ModalDialog @ref="ModalDialogRoleAssign" Title="Atanan Roller">
+    <p>DİKKAT Rol planlamasını dikkatli yapınız!!!</p>
+    <p>seçilen kullanıcı: <strong>@selectedUser.Email</strong></p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Role</th>
+                <th>Aksiyonlar</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (IdentityRole<Guid> role in availableRoles)
+            {
+                <tr>
+                    <td>@role.Name</td>
+                    <td>
+                        <button class="btn btn-success" @onclick="() => AddRoleAsync(selectedUser, role)" disabled="@(IsUserInRole(selectedUser, role.Name!))">Ekle</button>
+                        <button class="btn btn-danger" @onclick="() =>  RemoveRoleAsync(selectedUser, role)" disabled="@(!IsUserInRole(selectedUser, role.Name!))">Sil</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button class="btn btn-primary" @onclick="() => ModalDialogRoleAssign.Close()">Kapat</button>
+</ModalDialog>
+
+<ModalDialog @ref="ModalDialogPersonelChange" Title="Personel değiştir">
+    <div style="width:35rem;">
+        <p>DİKKAT Personel değiştirmek istediğinize emin misiniz?</p>
+        <p>seçilen kullanıcı: <strong>@selectedUser.Email</strong></p>
+
+        <label class="input-group-text">!Personeller: </label>
+        <InputSelect class="form-select" @bind-Value="selectedPersonel">
+            <option selected>Seçiniz</option>
+            @foreach (Personel? personel in discardPersonels)
+            {
+                <option value="@personel.Id">@personel.Name @personel.SurName @personel.BirthDate </option>
+            }
+        </InputSelect>
+    </div>
+
+    <button class="btn btn-danger" @onclick="() => ChangeUserAndPersonelAsync(selectedUser, selectedPersonel!)">Değiştir</button>
+    <button class="btn btn-primary" @onclick="() => ModalDialogPersonelChange.Close()">Kapat</button>
+</ModalDialog>
