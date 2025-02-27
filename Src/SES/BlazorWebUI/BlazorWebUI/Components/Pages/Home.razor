@@ -29,6 +29,8 @@ S.E.S Yapılıyor...
     protected override async Task OnInitializedAsync()
     {
         user = await _userManager.GetUserAsync(HttpContext.User);
+        if (user == null)
+            return;
         personel = await _personelService.GetByIdAsync(user!.PersonelId);
     }
 
