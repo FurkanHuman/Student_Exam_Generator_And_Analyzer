@@ -43,7 +43,7 @@
             </div>
 
             <div class="form-floating mb-3">
-                <InputDate @bind-Value="Input.DateOfBirth" TValue="DateOnly" Type="InputDateType.Date" class="form-control" aria-required="true" Min="@MinDate" Max="@MaxDate" />
+                <InputDate @bind-Value="Input.DateOfBirth" TValue="DateOnly" Type="InputDateType.Date" class="form-control" aria-required="true" Min="@MinDate.ToString("yyyy-MM-dd")" Max="@MaxDate.ToString("yyyy-MM-dd")" />
                 <label for="date-of-birth">Date of Birth</label>
                 <ValidationMessage For="() => Input.DateOfBirth" class="text-danger" />
             </div>
@@ -92,8 +92,8 @@
 
     private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
 
-    private DateOnly MinDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-22));
-    private DateOnly MaxDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-128));
+    private DateOnly MinDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-128));
+    private DateOnly MaxDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-22));
     private Guid UserGuid = Guid.NewGuid();
     private Guid UserPersonelGuid = Guid.NewGuid();
 
@@ -215,7 +215,7 @@
         // personel birth date
         [Required]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
-        [Range(typeof(DateOnly), nameof(MinDate), nameof(MaxDate), ErrorMessage = "Date of Birth must be between {1} and {2}.")]
+        [Range(typeof(DateOnly), "1900-01-01", "2024-12-31", ErrorMessage = "Date of Birth must be between {1} and {2}.")]
         [DataType(DataType.Date)]
         [Display(Name = "Date Of Birth")]
         public DateOnly DateOfBirth { get; set; } = DateOnly.FromDateTime(DateTime.Now.AddYears(-22));
