@@ -21,6 +21,8 @@
     private ApplicationUser selectedUser { get; set; } = new();
     private Personel? selectedPersonel { get; set; } = new();
 
+    private Guid selectedPersonelGuid { get; set; } = Guid.Empty;
+
     private ModalDialog ModalDialogRoleAssign { get; set; } = new();
     private ModalDialog ModalDialogDeleteUser { get; set; } = new();
     private ModalDialog ModalDialogTeacherAdd { get; set; } = new();
@@ -32,7 +34,7 @@
         availableRoles = roleManager.Roles.ToList();
         availableRoles = RemoveAdmin(availableRoles);
 
-        var _personels = await personelService.GetListAsync();
+        var _personels = await personelService.GetListAsync(withDeleted: true);
         personels = _personels!.Items;
 
         discardPersonels = personels.Where(p => p.UserId == Guid.Empty).ToList();
@@ -65,16 +67,27 @@
         StateHasChanged();
     }
 
-    private async Task ChangeUserAndPersonelAsync(ApplicationUser user, Personel personel)
+    private async Task ChangeUserAndPersonelAsync(ApplicationUser user, Guid pId, Personel personel)
     {
-        personel.UserId = user.Id;
-        personel.User = user;
-        user.Personel = personel;
-        user.PersonelId = personel.Id;
+        var inactivePersonel = discardPersonels.FirstOrDefault(p => p.Id == pId);
+        if (inactivePersonel == null)
+        {
+            ModalDialogPersonelChange.Close();
+            StateHasChanged();
+            return;
+        }
 
-        await personelService.UpdateAsync(personel);
+        inactivePersonel.DeletedDate = null;
+        inactivePersonel.UserId = user.Id;
 
+        personel.UserId = Guid.Empty;
+
+        user.PersonelId = inactivePersonel.Id;
+
+        await personelService.UpdateAsync(inactivePersonel);
+        await personelService.DeleteAsync(personel);
         await userManager.UpdateAsync(user);
+        await userManager.AddToRoleAsync(user, "unauthorized");
         users = userManager.Users.ToList();
 
         ModalDialogPersonelChange.Close();
@@ -95,7 +108,7 @@
         await userManager.DeleteAsync(user);
 
         users = userManager.Users.ToList();
-        var _personels = await personelService.GetListAsync();
+        var _personels = await personelService.GetListAsync(withDeleted: true);
         personels = _personels!.Items;
 
         ModalDialogDeleteUser.Close();
@@ -145,7 +158,7 @@
                     <button class="btn btn-danger" disabled="@true">Şifreyi sıfırla</button>
                     <button class="btn btn-danger" disabled="@true">2 Faktorlü Doğrulamayı sil</button>
                     <button class="btn btn-danger" @onclick="() => {selectedUser = user; selectedPersonel=personel!; ModalDialogDeleteUser.Open();}">Kullanıcıyı sil</button>
-                    <button class="btn btn-primary" @onclick="() => {selectedUser = user; ModalDialogPersonelChange.Open();}">Personel Ata</button>
+                    <button class="btn btn-primary" @onclick="() => {selectedUser = user; selectedPersonel = personel!; ModalDialogPersonelChange.Open();}">Personel Ata</button>
                 </td>
             </tr>
         }
@@ -199,7 +212,7 @@
         <p>seçilen kullanıcı: <strong>@selectedUser.Email</strong></p>
 
         <label class="input-group-text">!Personeller: </label>
-        <InputSelect class="form-select" @bind-Value="selectedPersonel">
+        <InputSelect class="form-select" @bind-Value="selectedPersonelGuid">
             <option selected>Seçiniz</option>
             @foreach (Personel? personel in discardPersonels)
             {
@@ -208,6 +221,6 @@
         </InputSelect>
     </div>
 
-    <button class="btn btn-danger" @onclick="() => ChangeUserAndPersonelAsync(selectedUser, selectedPersonel!)">Değiştir</button>
+    <button class="btn btn-danger" @onclick="() => ChangeUserAndPersonelAsync(selectedUser,selectedPersonelGuid, selectedPersonel!)">Değiştir</button>
     <button class="btn btn-primary" @onclick="() => ModalDialogPersonelChange.Close()">Kapat</button>
 </ModalDialog>
