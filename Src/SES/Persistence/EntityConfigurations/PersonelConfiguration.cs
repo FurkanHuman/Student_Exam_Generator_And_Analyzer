@@ -24,20 +24,4 @@ public class PersonelConfiguration : IEntityTypeConfiguration<Personel>, IMainCo
 
         builder.HasQueryFilter(p => !p.DeletedDate.HasValue);
     }
-
-    internal static Guid AdminPersonelId { get; set; } = Guid.NewGuid();
-
-    private Personel getSeedPersonel()
-    {
-        Personel personel = new()
-        {
-            Id = AdminPersonelId,
-            UserId = ApplicationUserConfiguration.AdminGuid,
-            Name = "Admin",
-            SurName = "Administrator",
-            BirthDate = DateOnly.FromDateTime(DateTime.Now),
-        };
-        return personel;
-
-    }
 }
