@@ -1,9 +1,10 @@
 ﻿@using Application.Services.Personels
 @using BlazorWebUI.Client.Pages.Styles
 @using Domain.Entities
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
-
-@page "/test"
+@attribute [Authorize(Roles = "admin,director")]
+@page "/admin/Panel"
 @rendermode InteractiveServer
 @inject UserManager<ApplicationUser> userManager
 @inject RoleManager<IdentityRole<Guid>> roleManager
