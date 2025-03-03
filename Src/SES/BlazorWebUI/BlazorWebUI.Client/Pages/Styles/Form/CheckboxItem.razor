@@ -7,10 +7,10 @@
 
 @code {
     [Parameter]
-    public TKey? Key { get; set; }
+    public TKey Key { get; set; } = default!;
 
     [Parameter]
-    public string? DisplayValue { get; set; }
+    public required string DisplayValue { get; set; }
 
     [Parameter]
     public EventCallback<bool> OnSelectedChanged { get; set; }
