@@ -16,9 +16,13 @@
 
 <QuizPoolLoader OnQQList="LoadAPool"></QuizPoolLoader>
 
-<div class="form-control">
+
+@if (_listOfQQBodyDto.Count != 0)
+{
+    <div class="form-control">
         @foreach (QQBodyDto quest in _listOfQQBodyDto)
         {
             <QQView QQBody="quest" />
         }
-</div>
+    </div>
+}

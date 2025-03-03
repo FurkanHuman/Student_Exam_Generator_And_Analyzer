@@ -11,12 +11,11 @@ public class MappingProfiles : Profile
     {
         CreateMap<GetByLessonIdQuizQuestionListItemDto, QQBodyDto>()
             .ForMember(dest => dest.SelectedQType, opt => opt.MapFrom(src => src.QuestionType))
-            .ForMember(dest => dest.SelectedBenefitIds, opt => opt.MapFrom(src => src.Benefits.Select(b => b.Id)))
+            .ForMember(dest => dest.SelectedBenefits, opt => opt.MapFrom(dest => dest.Benefits.ToDictionary(d => d.Id, d => $"{d.BenefitCode} {d.Description}")))
             .ForMember(dest => dest.QuestionOptions, opt => opt.MapFrom(src => src.Options));
 
         CreateMap<QuestionOption, QuestionOptionDto>()
             .ForMember(dest => dest.OptionText, opt => opt.MapFrom(src => src.OptionText))
             .ForMember(dest => dest.IsCorrect, opt => opt.MapFrom(src => src.IsCorrect));
-
     }
 }

@@ -26,7 +26,7 @@
 
     <br />
 
-    @if (QQBodyData.SelectedBenefitIds.Count > 0)
+    @if (QQBodyData.SelectedBenefits.Count > 0)
     {
         <QQOptionBody @ref="QQOptionBody" OnSelectedOptions="OnSelectedOptionHandler" OnSelectedQType="OnSelectedQTypeHandler" />
     }
@@ -88,8 +88,6 @@
     private string? Question { get; set; }
     private string Score { get; set; }
     private string MaxScore { get; set; }
-    private ICollection<int> BenefitIds = [];
-
     private bool IsBody;
     private bool IsImage;
     private bool IsQQBenefitLoader;
@@ -97,7 +95,7 @@
 
     private async Task ExecuteQQHandle()
     {
-        if ((string.IsNullOrEmpty(Score) && string.IsNullOrEmpty(MaxScore)) || string.IsNullOrWhiteSpace(QuestionBody) || BenefitIds.Count == 0 )
+        if ((string.IsNullOrEmpty(Score) && string.IsNullOrEmpty(MaxScore)) || string.IsNullOrWhiteSpace(QuestionBody) || QQBodyData.SelectedBenefits.Count == 0 )
         {
             showSuccessMessage = false;
             return;
@@ -118,7 +116,6 @@
         Question = string.Empty;
         Score = string.Empty;
         MaxScore = string.Empty;
-        BenefitIds.Clear();
         StateHasChanged();
     }
 
@@ -131,10 +128,7 @@
 
     private void HandleBenefits(ICollection<CheckboxItem<int>> SelectedCheckboxItems)
     {
-        foreach (CheckboxItem<int> SelectedCheckboxItem in SelectedCheckboxItems)
-            BenefitIds.Add(SelectedCheckboxItem.Key);
-
-        QQBodyData.SelectedBenefitIds = BenefitIds;
+        QQBodyData.SelectedBenefits = SelectedCheckboxItems.ToDictionary(item => item.Key, item => item.DisplayValue);
     }
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
