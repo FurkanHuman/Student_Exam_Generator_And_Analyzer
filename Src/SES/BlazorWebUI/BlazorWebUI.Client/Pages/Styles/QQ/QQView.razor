@@ -2,6 +2,7 @@
     <p><strong>Soru Türü:</strong> @selectedQtype(QQBody.SelectedQType)</p>
     <div class="d-flex justify-content-between align-items-center">
         <h3 class="mb-0"><strong>Soru Detayları</strong></h3>
+        <button class="btn btn-primary fs-5" @onclick="() => ModalDialog.Open()">Kazanımları görüntüle</button>
         <span class="badge bg-primary fs-5">@QQBody.Score / @QQBody.MaxScore</span>
     </div>
 
@@ -20,10 +21,25 @@
     <QQOption QuestionOptions="QQBody.QuestionOptions" SelectedOption="QQBody.SelectedQType" IsViewMode="true" />
 </div>
 
+<ModalDialog @ref="@ModalDialog" Title="Soru Kazanımları">
+    <div class="row">
+        <div style="max-height: 30rem; overflow-y: auto;">
+            @foreach (KeyValuePair<int, string> benefitPair in QQBody.SelectedBenefits)
+            {
+                <div class="form-check align-items-center p-2 mb-2">
+                    @benefitPair.Value
+                </div>
+            }
+        </div>
+    </div>
+</ModalDialog>
+
 @code
 {
     [Parameter]
     public QQBodyDto? QQBody { get; set; } = new();
+
+    private ModalDialog ModalDialog { get; set; } = new();
 
     private string selectedQtype(byte type)
     => QQStatic.SelectTypeOptions.TryGetValue(key: type, value: out string? value) ? value : "Bilinmeyen Tür";
