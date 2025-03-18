@@ -65,7 +65,7 @@
 @code {
     [SupplyParameterFromForm]
     private PrincipalDto _PrincipalSetDto { get; set; } = new();
-    
+
     private GetListResponse<GetListSemesterListItemDto> semesterList = new();
     private GetListResponse<GetListPersonelListItemDto> personelList = new();
 
@@ -92,10 +92,12 @@
 
         Personel? personel = await _PersonelService.GetByIdAsync(_PrincipalSetDto.PersonelId);
 
-        if (personel == null || personel.User == null)
+        if (personel == null || personel.UserId == Guid.Empty)
             return;
 
-        ApplicationUser user = personel.User;
+        ApplicationUser? user = await _userManager.FindByIdAsync(personel.UserId.ToString());
+        if (user == null)
+            return;
 
         await _userManager.AddToRolesAsync(user, ["director", "authorized"]);
         await _userManager.RemoveFromRoleAsync(user, "unauthorized");
