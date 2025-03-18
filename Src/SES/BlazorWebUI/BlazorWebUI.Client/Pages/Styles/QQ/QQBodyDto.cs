@@ -2,6 +2,7 @@
 
 public class QQBodyDto
 {
+    public int Id { get; set; }
     public string QuestionBody { get; set; } = string.Empty;
     public string? Question { get; set; }
     public byte SelectedQType { get; set; }
