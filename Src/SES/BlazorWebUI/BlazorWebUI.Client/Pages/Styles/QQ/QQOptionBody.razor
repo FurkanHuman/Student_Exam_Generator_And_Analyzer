@@ -1,10 +1,10 @@
 ﻿@rendermode InteractiveAuto
 <div class="form-control">
-    <InputRadioGroup @bind-Value="selectedOption" Name="inlineRadioOptions">
+    <InputRadioGroup @bind-Value="selectedOption" TValue="byte" Name="inlineRadioOptions">
         @foreach (KeyValuePair<byte, string> radio in QQStatic.SelectTypeOptions)
         {
             <div class="form-check form-check-inline">
-                <InputRadio class="form-check-input" type="radio" Name="inlineRadioOptions" id="@($"inlineRadio{radio.Key}")" value="@radio.Key" />
+                <InputRadio class="form-check-input" TValue="byte" type="radio" Name="inlineRadioOptions" id="@($"inlineRadio{radio.Key}")" value="@radio.Key" />
                 <label class="form-check-label" for="@($"inlineRadio{radio.Key}")">@radio.Value</label>
             </div>
         }
