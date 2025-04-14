@@ -59,6 +59,27 @@ builder.Services.AddBlazorWebUIServiceRegistration();
 
 builder.Services.AddDistributedMemoryCache();
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ConfigureHttpsDefaults(httpsOptions =>
+    {
+        string? certPath = builder.Configuration["ASPNETCORE_Kestrel__Certificates__Default__Path"];
+        string? certPassword = builder.Configuration["ASPNETCORE_Kestrel__Certificates__Default__Password"];
+
+        if (!string.IsNullOrEmpty(certPath) && !string.IsNullOrEmpty(certPassword))
+        {
+            httpsOptions.ServerCertificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(certPath, certPassword);
+        }
+    });
+});
+
+builder.Services.Configure<ForwardedHeadersOptions>(opt =>
+{
+    opt.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    opt.KnownNetworks.Clear();
+    opt.KnownProxies.Clear();
+});
+
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
