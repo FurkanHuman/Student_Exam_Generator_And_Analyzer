@@ -14,9 +14,9 @@
             @Body
 
             <div class="version-banner">
-                <span style="color: red; font-weight: bold;">Alfa V0.1</span> — Geliştirme aşamasında.
+                <span style="color: red; font-weight: bold;">V0.0.1-alpha</span> — Geliştirme aşamasında.
                 <br />
-                Hızlı ilerlemek için kahve desteği gerekli!
+                @versionMsg[rndMsg]
             </div>
 
         </article>
@@ -31,8 +31,11 @@
 
 <style>
     .version-banner {
+        align-content: center;
+        align-items: center;
+        text-align: center;
         position: fixed;
-        bottom: 11rem;
+        bottom: 10rem;
         right: -1rem;
         transform: rotate(-45deg);
         background-color: rgba(0, 0, 0, 0.75);
@@ -48,5 +51,27 @@
 </style>
 
 @code {
+    private static string[] versionMsg { get; set; } =
+            {"Hızlı ilerlemek için kahve desteği gerekli! ☕☕☕",
+            "Kahve molasını azaltmam gerek! ☕" ,
+            "☕☕☕☕☕ ☕☕☕☕☕ ☕☕☕☕☕",
+            "kod yazarken ölümsüzlüğü bulduk!?! ♾️♾️♾️",
+            "Pantheon, S.E. Lain, Evangelion, Code Lyoko 👁️👁️👁️",
+            "En iyi kod çalışan koddur.",
+            "Hayatım olmuş kod, sen olmasanda olur!!!",
+            "😅 Kod daha tam yürümeyi öğrenmedi...",
+            "kod kendi kendini yazmıyor hâlâ",
+            "Kod yazmazsan sabaha kadar bitmeyecek 🤡"
+    };
 
+    int rndMsg = 0;
+
+    protected override Task OnInitializedAsync()
+    {
+        Random rnd = new();
+
+        rndMsg = rnd.Next(0, versionMsg.Length);
+
+        return base.OnInitializedAsync();
+    }
 }
