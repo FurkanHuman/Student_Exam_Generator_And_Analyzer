@@ -1,4 +1,4 @@
-@*Thanks ChatGPT.Code Copilot*@
+ï»¿@*Thanks ChatGPT.Code Copilot*@
 @using Application.Features.ReferenceBenefits.Queries.GetList
 @using Application.Features.ReferenceBenefits.Queries.GetListByIdReferenceBenefitBenefit
 @using NArchitecture.Core.Application.Requests
@@ -6,17 +6,15 @@
 @rendermode InteractiveServer
 @inject IMediator _mediator
 
-<meta charset="utf-8" />
-
 @if (IsVisible)
 {
-    <h3>Kazaným Yükleyici</h3>
+    <h3>KazanÄ±m YÃ¼kleyici</h3>
 
     <div class="form-control">
 
         <div class="btn-group m-2">
             <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                @(SelectedSchoolId.HasValue ? ReferenceBenefitSchools.FirstOrDefault(s => s.SchoolId == SelectedSchoolId)?.SchoolName : "Okul Seç")
+                @(SelectedSchoolId.HasValue ? ReferenceBenefitSchools.FirstOrDefault(s => s.SchoolId == SelectedSchoolId)?.SchoolName : "Okul SeÃ§")
             </button>
             <ul class="dropdown-menu">
                 @foreach (var school in ReferenceBenefitSchools)
@@ -30,7 +28,7 @@
         {
             <div class="btn-group m-2">
                 <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    @(SelectedSemesterId.HasValue ? ReferenceBenefitSemesters.FirstOrDefault(s => s.SemesterId == SelectedSemesterId)?.SemesterName : "Dönem Seç")
+                    @(SelectedSemesterId.HasValue ? ReferenceBenefitSemesters.FirstOrDefault(s => s.SemesterId == SelectedSemesterId)?.SemesterName : "DÃ¶nem SeÃ§")
                 </button>
                 <ul class="dropdown-menu">
                     @foreach (var semester in ReferenceBenefitSemesters)
@@ -47,7 +45,7 @@
         {
             <div class="btn-group m-2">
                 <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    @(SelectedLessonId.HasValue ? ReferenceBenefitLessons.FirstOrDefault(l => l.LessonId == SelectedLessonId)?.LessonName : "Ders Seç")
+                    @(SelectedLessonId.HasValue ? ReferenceBenefitLessons.FirstOrDefault(l => l.LessonId == SelectedLessonId)?.LessonName : "Ders SeÃ§")
                 </button>
                 <ul class="dropdown-menu">
                     @foreach (var lesson in ReferenceBenefitLessons)
@@ -62,7 +60,7 @@
         {
             <div class="btn-group m-2">
                 <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    @(SelectedBenefitId.HasValue ? GetListReferenceBenefits.Items.FirstOrDefault(b => b.Id == SelectedBenefitId)?.Name : "Yýllýk Plan Seç")
+                    @(SelectedBenefitId.HasValue ? GetListReferenceBenefits.Items.FirstOrDefault(b => b.Id == SelectedBenefitId)?.Name : "YÄ±llÄ±k Plan SeÃ§")
                 </button>
                 <ul class="dropdown-menu">
                     @foreach (var benefit in GetListReferenceBenefits.Items)
@@ -73,7 +71,7 @@
             </div>
         }
 
-        <button class="btn btn-group btn-primary btn-lg m-2" @onclick="LoadSelectedBenefits" disabled="@(!(SelectedBenefitId.HasValue))">Seç</button>
+        <button class="btn btn-group btn-primary btn-lg m-2" @onclick="LoadSelectedBenefits" disabled="@(!(SelectedBenefitId.HasValue))">SeÃ§</button>
     </div>
 }
 
