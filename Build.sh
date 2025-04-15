@@ -25,7 +25,7 @@ RUNNING_CONTAINER=$(docker ps -q --filter "name=$APP_NAME")
 if [ ! -z "$RUNNING_CONTAINER" ]; then
     echo "Running container found for $APP_NAME. Stopping it..."
     docker stop "$RUNNING_CONTAINER"
-#    docker rm "$RUNNING_CONTAINER" # Uncomment if you want to remove the container
+    docker rm "$RUNNING_CONTAINER"
 else
     echo "No running container found for $APP_NAME."
 fi
