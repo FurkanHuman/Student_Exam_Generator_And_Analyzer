@@ -13,6 +13,7 @@ public static class QQStatic
         // { 7, "Sıralama"  }
     };
 
+    public static readonly int DefaultOpenEndedOptions = 1;
     public static readonly int DefaultMultipleChoiceOptions = 4;
     public static readonly int DefaultTrueFalseOptions = 2;
     public static readonly int DefaultFillInTheBlankOptions = 1;

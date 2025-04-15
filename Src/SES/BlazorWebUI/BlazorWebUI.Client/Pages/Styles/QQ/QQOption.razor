@@ -1,4 +1,4 @@
-@rendermode InteractiveAuto
+ï»¿@rendermode InteractiveAuto
 
 <div class="form-control">
     @switch (SelectedOption)
@@ -6,7 +6,15 @@
 
         case 1: // OpenEnded
             {
-                <span>Açýk Uçlu olduðu için seçenek eklenmez...</span>
+                foreach (QuestionOptionDto questionOption in QuestionOptions)
+                {
+                    <div class="input-group mb-3">
+                        <div class="input-group-text">
+                            <InputCheckbox class="form-check-input mt-0" @bind-Value="questionOption.IsCorrect" disabled="true" />
+                        </div>
+                        <InputText type="text" class="form-control" placeholder="Anahtar Kelimeleri ekleyin ve VirgÃ¼l ile ayÄ±rÄ±n" @bind-Value="questionOption.OptionText" disabled="@IsViewMode" />
+                    </div>
+                }
                 break;
             }
 
@@ -24,12 +32,12 @@
                         <div class="input-group-text">
                             <InputCheckbox class="form-check-input mt-0" @bind-Value="questionOption.IsCorrect" disabled="@IsViewMode" />
                         </div>
-                        <InputText type="text" class="form-control" placeholder="Seçenek Metni" @bind-Value="questionOption.OptionText" disabled="@IsViewMode" />
+                        <InputText type="text" class="form-control" placeholder="SeÃ§enek Metni" @bind-Value="questionOption.OptionText" disabled="@IsViewMode" />
                         <button class="btn btn-danger" @onclick="() => RemoveOption(questionOption)" hidden="@IsViewMode" disabled="@IsViewMode">Sil</button>
                     </div>
                 }
 
-                <button class="btn btn-primary" @onclick="AddOption" hidden="@IsViewMode" disabled="@IsViewMode">Seçenek Ekle</button>
+                <button class="btn btn-primary" @onclick="AddOption" hidden="@IsViewMode" disabled="@IsViewMode">SeÃ§enek Ekle</button>
 
                 break;
             }
@@ -42,7 +50,7 @@
                         <div class="input-group-text">
                             <InputCheckbox class="form-check-input mt-0" @bind-Value="questionOption.IsCorrect" disabled="@IsViewMode" />
                         </div>
-                        <InputText type="text" class="form-control" placeholder="Seçenek Metni" @bind-Value="questionOption.OptionText" disabled="@IsViewMode" />
+                        <InputText type="text" class="form-control" placeholder="SeÃ§enek Metni" @bind-Value="questionOption.OptionText" disabled="@IsViewMode" />
                     </div>
                 }
 
@@ -54,12 +62,12 @@
                 foreach (QuestionOptionDto questionOption in QuestionOptions)
                 {
                     <div class="input-group mb-3">
-                        <InputText type="text" class="form-control" placeholder="Boþ Býrakýlacak Kelime" @bind-Value="questionOption.OptionText" disabled="@IsViewMode" />
+                        <InputText type="text" class="form-control" placeholder="BoÅŸ BÄ±rakÄ±lacak Kelimeleri yazÄ±n ve VirgÃ¼l ile ayÄ±rÄ±n" @bind-Value="questionOption.OptionText" disabled="@IsViewMode" />
                         <button class="btn btn-danger" @onclick="() => RemoveOption(questionOption)" disabled="@IsViewMode" hidden="@IsViewMode">Sil</button>
                     </div>
                 }
 
-                <button class="btn btn-primary" @onclick="AddOption" hidden="@IsViewMode" disabled="@IsViewMode">Seçenek Ekle</button>
+                <button class="btn btn-primary" @onclick="AddOption" hidden="@IsViewMode" disabled="@IsViewMode">SeÃ§enek Ekle</button>
                 break;
             }
 
@@ -75,7 +83,7 @@
 
         default: // Undefined
             {
-                <span>Seçenek Seçiniz</span>
+                <span>SeÃ§enek SeÃ§iniz</span>
                 break;
             }
     }
@@ -128,6 +136,10 @@
         {
             case 1:
                 {
+                    for (int i = 0; i < QQStatic.DefaultOpenEndedOptions; i++)
+                    {
+                        QuestionOptions.Add(new() { IsCorrect = true });
+                    }
                     break;
                 }
 
