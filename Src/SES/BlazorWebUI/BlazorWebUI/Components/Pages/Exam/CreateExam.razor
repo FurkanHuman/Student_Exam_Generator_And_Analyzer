@@ -260,7 +260,7 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
         @foreach (QQBodyDto quest in _loadedQQ)
         {
             <div class="container p-3 my-5 d-flex align-items-start bg-light shadow-sm rounded">
-                <InputCheckbox class="form-check-input fs-3 me-3 mt-1" type="checkbox" id="flexCheckDefault" ValueChanged="(e) => ToggleQuestInList(e,quest)" ValueExpression="() => isChecked"  Value="false"/>
+                <InputCheckbox class="form-check-input fs-3 me-3 mt-1" type="checkbox" id="flexCheckDefault" ValueChanged="(e) => ToggleQuestInList(e,quest)" ValueExpression="() => isChecked"  Value="isChecked"/>
                 <div class="flex-grow-1 p-3 bg-white rounded border shadow-sm">
                     <QQView QQBody="quest" />
                 </div>
