@@ -12,14 +12,14 @@ public static class PersistenceServiceRegistration
 {
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<BaseDbContext>(opt => opt.UseInMemoryDatabase("BaseDb"));
+        services.AddDbContext<BaseDbContext>(opt => opt.UseInMemoryDatabase("BaseDb"), ServiceLifetime.Transient);
 
         services.AddDbContext<PostgreSqlDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("PostgreSqlDbConnectionStrings"),
-            m => m.MigrationsAssembly(typeof(PostgreSqlDbContext).Assembly.FullName)).UseSnakeCaseNamingConvention());
+            m => m.MigrationsAssembly(typeof(PostgreSqlDbContext).Assembly.FullName)).UseSnakeCaseNamingConvention(), ServiceLifetime.Transient);
         services.BuildServiceProvider().GetRequiredService<PostgreSqlDbContext>().Database.Migrate();
 
         services.AddDbContext<PostgreSqlUserDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("PostgreSqlUserDbConnectionStrings"),
-                m => m.MigrationsAssembly(typeof(PostgreSqlUserDbContext).Assembly.FullName)).UseSnakeCaseNamingConvention());
+                m => m.MigrationsAssembly(typeof(PostgreSqlUserDbContext).Assembly.FullName)).UseSnakeCaseNamingConvention(), ServiceLifetime.Transient);
         services.BuildServiceProvider().GetRequiredService<PostgreSqlUserDbContext>().Database.Migrate();
 
         services.AddScoped<IAnalysisRepository, AnalysisRepository>();
