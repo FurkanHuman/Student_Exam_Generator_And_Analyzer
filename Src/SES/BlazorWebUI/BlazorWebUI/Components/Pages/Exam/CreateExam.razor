@@ -50,7 +50,7 @@
 
         GetListResponse<GetListStudentClassListItemDto> getClasses = await _mediator.Send(new GetListStudentClassQuery() { PageRequest = pageRequest });
 
-        semesterList = await _mediator.Send(new GetListSemesterQuery(){PageRequest=pageRequest});
+        semesterList = await _mediator.Send(new GetListSemesterQuery() { PageRequest = pageRequest });
         getClassesForAges = getClasses.Items.Select(sc => sc.ClassAge).Distinct().ToList();
 
         await base.OnInitializedAsync();
@@ -168,7 +168,7 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
 
 @if (isFirstStage)
 {
-    //sınıf secçimi ekle  o döneme ait
+    //sınıf secçimi ekle o döneme ait
 
     <div class="form-control container p-3 bg-light shadow-sm rounded">
 
@@ -214,7 +214,7 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
                 }
             </InputSelect>
         </div>
-
+@* 
         <div class="form-check form-check-inline">
             <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox1" @bind-value="isRandomizeQuestions" />
             <label class="form-check-label" for="inlineCheckbox1">Soruları karıştır.</label>
@@ -224,7 +224,7 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
             <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox2" @bind-value="isRandomizeOptions" />
             <label class="form-check-label" for="inlineCheckbox2">Seçenekleri karıştır.</label>
         </div>
-        
+
         <div class="form-check form-check-inline">
             <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox3" @bind-value="isRandomizeOptions" />
             <label class="form-check-label" for="inlineCheckbox3">Optik kodlama ekle.</label>
@@ -243,8 +243,8 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
         <div class="form-check form-check-inline">
             <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox6" @bind-value="isRandomizeOptions" />
             <label class="form-check-label" for="inlineCheckbox6">.</label>
-        </div> 
-
+        </div>
+ *@
         <button class="btn btn-primary" @onclick="FirstStageHandle">İleri</button>
 
     </div>
@@ -260,7 +260,7 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
         @foreach (QQBodyDto quest in _loadedQQ)
         {
             <div class="container p-3 my-5 d-flex align-items-start bg-light shadow-sm rounded">
-                <InputCheckbox class="form-check-input fs-3 me-3 mt-1" type="checkbox" id="flexCheckDefault" ValueChanged="(e) => ToggleQuestInList(e,quest)" ValueExpression="() => isChecked"  Value="isChecked"/>
+                <InputCheckbox class="form-check-input fs-3 me-3 mt-1" type="checkbox" id="flexCheckDefault" ValueChanged="(e) => ToggleQuestInList(e, quest)" ValueExpression="() => isChecked" />
                 <div class="flex-grow-1 p-3 bg-white rounded border shadow-sm">
                     <QQView QQBody="quest" />
                 </div>
