@@ -21,28 +21,17 @@
     private bool isSecondStage { get; set; } = false;
     private bool isThirdStage { get; set; } = false;
 
-    private bool isRandomizeQuestions { get; set; } = false;
-    private bool isRandomizeOptions { get; set; } = false;
-
-    private int SelectedClass { get; set; }
-    private int SelectedExamNumber { get; set; }
-    private int SemesterId { get; set; }
-
-    private int ExamScore { get; set; } = 100;
-    private string FooterNote { get; set; } = string.Empty;
-
-
-    private IEnumerable<int> getClassesForAges { get; set; } = [];
     private GetListResponse<GetListSemesterListItemDto> semesterList = new();
 
-
+    private IEnumerable<int> getClassesForAges { get; set; } = [];
+    private ICollection<CheckboxItem<int>> CheckboxItemsForClasses { get; set; } = [];
     private IList<QQBodyDto> _loadedQQ { get; set; } = [];
     private IList<QQBodyDto> _selectedQQ { get; set; } = [];
-
     private IList<Ordering> _orderedQQ { get; set; } = [];
 
     private ExamInfo ExamRequaredInfo { get; set; } = new();
-    private ICollection<CheckboxItem<int>> CheckboxItemsForClasses { get; set; } = [];
+    private AdditionalExamInfo AdditionalInfo { get; set; } = new();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -94,25 +83,41 @@
 
     private string getSecondStageButtonText()
     {
-        if (!isRandomizeQuestions)
+        if (!AdditionalInfo.isRandomizeQuestions)
             return "Soru Sırasını Düzenle";
         return "Sınav Oluştur";
     }
 
-    private class Ordering
+    private sealed class Ordering
     {
         public int QQId { get; set; }
         public int Order { get; set; }
     }
 
-    private class ExamInfo
+    private sealed class AdditionalExamInfo
+    {
+        public int SelectedClass { get; set; } = 0;
+
+        public int CurrentExamNumber { get; set; } = 0;
+
+        public bool isRandomizeQuestions { get; set; } = false;
+
+        public bool isRandomizeOptions { get; set; } = false;
+
+        public bool isOpticCode { get; set; } = false; // back page optic code form
+
+        public bool isStandardOptions { get; set; } = true; // common options for all questions or not optic vs standard options
+    }
+
+    private sealed class ExamInfo
     {
         public string ExamName { get; set; } = string.Empty;
 
         public string? FooterNote { get; set; }
 
-
         public string? ExamScoreStr { get; set; }
+
+        public int ExamScore { get; set; } = 100;
 
         public int SemesterId { get; set; }
 
@@ -174,17 +179,17 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
 
         <div class="input-group mb-3" style="width:12rem;">
             <label class="input-group-text">Sınav Puanı: </label>
-            <InputNumber type="Text" class="form-control conversion" id="name" @bind-Value="ExamScore" disabled="true" />
+            <InputNumber type="Text" class="form-control conversion" id="name" @bind-Value="ExamRequaredInfo.ExamScore" disabled="true" />
         </div>
 
         <div class="input-group mb-3" style="width:15rem;">
             <label class="input-group-text">Alt Not: </label>
-            <InputText type="Text" class="form-control conversion" id="name" @bind-Value="FooterNote" />
+            <InputText type="Text" class="form-control conversion" id="name" @bind-Value="ExamRequaredInfo.FooterNote" />
         </div>
 
         <div class="input-group mb-3" style="width:15rem;">
             <label class="input-group-text">Dönem Seçiniz:</label>
-            <InputSelect class="form-select" id="principalSG" @bind-Value="SemesterId">
+            <InputSelect class="form-select" id="principalSG" @bind-Value="ExamRequaredInfo.SemesterId">
                 <option selected>Seçiniz...</option>
                 @foreach (GetListSemesterListItemDto? semester in semesterList.Items)
                 {
@@ -195,7 +200,7 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
 
         <div class="input-group mb-3" style="width:15rem;">
             <label class="input-group-text">sınav sınıfları</label>
-            <InputSelect class="form-select" @bind-Value="SelectedClass">
+            <InputSelect class="form-select" @bind-Value="AdditionalInfo.SelectedClass">
                 <option selected>Seçiniz...</option>
                 @foreach (int age in getClassesForAges)
                 {
@@ -206,7 +211,7 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
 
         <div class="input-group mb-3" style="width:15rem;">
             <label class="input-group-text">sınav sınıfları</label>
-            <InputSelect class="form-select" @bind-Value="SelectedExamNumber">
+            <InputSelect class="form-select" @bind-Value="AdditionalInfo.CurrentExamNumber">
                 <option selected>Seçiniz...</option>
                 @for (int examNumber = 1; examNumber != 10; examNumber++)
                 {
@@ -214,37 +219,26 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
                 }
             </InputSelect>
         </div>
-@* 
         <div class="form-check form-check-inline">
-            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox1" @bind-value="isRandomizeQuestions" />
+            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox1" @bind-Value="AdditionalInfo.isRandomizeQuestions" />
             <label class="form-check-label" for="inlineCheckbox1">Soruları karıştır.</label>
         </div>
 
         <div class="form-check form-check-inline">
-            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox2" @bind-value="isRandomizeOptions" />
+            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox2" @bind-Value="AdditionalInfo.isRandomizeOptions" />
             <label class="form-check-label" for="inlineCheckbox2">Seçenekleri karıştır.</label>
         </div>
 
         <div class="form-check form-check-inline">
-            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox3" @bind-value="isRandomizeOptions" />
+            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox3" @bind-Value="AdditionalInfo.isOpticCode" />
             <label class="form-check-label" for="inlineCheckbox3">Optik kodlama ekle.</label>
         </div>
 
         <div class="form-check form-check-inline">
-            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox4" @bind-value="isRandomizeOptions" />
+            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox4" @bind-Value="AdditionalInfo.isStandardOptions" />
             <label class="form-check-label" for="inlineCheckbox4">Standart Seçenekler.</label>
         </div>
 
-        <div class="form-check form-check-inline">
-            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox5" @bind-value="isRandomizeOptions" />
-            <label class="form-check-label" for="inlineCheckbox5">.</label>
-        </div>
-
-        <div class="form-check form-check-inline">
-            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox6" @bind-value="isRandomizeOptions" />
-            <label class="form-check-label" for="inlineCheckbox6">.</label>
-        </div>
- *@
         <button class="btn btn-primary" @onclick="FirstStageHandle">İleri</button>
 
     </div>
@@ -288,50 +282,3 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
         }
     </div>
 }
-
-@* 
-<EditForm Model="@ExamRequaredInfo">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div class="form-control">
-
-        <div class="form-group">
-            <label for="examName">Sınav Adı</label>
-            <InputText type="text" class="form-control" id="examName" placeholder="Sınav Adı"
-                       @bind-Value=ExamRequaredInfo.ExamName />
-        </div>
-
-        <div class="form-group">
-            <label for="footerNote">Alt Not</label>
-            <InputText type="text" class="form-control" id="footerNote" placeholder="Alt Not (Opsiyonel):"
-                       @bind-Value=ExamRequaredInfo.FooterNote />
-        </div>
-
-        <div class="form-group">
-            <label class="input-group-text" for="examPoint">Sınav Puanı</label>
-            <InputText type="number" class="form-control" id="examPoint" placeholder="Sınav Puanı"
-                       @bind-Value="ExamRequaredInfo.ExamScore" />
-        </div>
-
-        <div class="form-group">
-            <label for="examPointText">Sınav Puanı Metinsel</label>
-            <InputText type="text" class="form-control" id="examPointText" placeholder="Sınav Puanı Metinsel"
-                       @bind-Value="ExamRequaredInfo.ExamScoreStr" />
-        </div>
-
-        note: buradan devam wsınıf dropdowwn olacak verileri çekmeywe hazırlan
-
-        <div class="form-group" >
-            <label>Ders Seç </label>
-
-        </div>
-
-        <div class="form-group">
-            <label>sınav sınııfları</label>
-
-        </div>
-
-    </div>
-</EditForm>
- *@
