@@ -70,8 +70,6 @@
                 </ul>
             </div>
         }
-
-        <button class="btn btn-group btn-primary btn-lg m-2" @onclick="LoadSelectedBenefits" disabled="@(!(SelectedBenefitId.HasValue))">Seç</button>
     </div>
 }
 
@@ -154,9 +152,10 @@
             .ToList();
     }
 
-    private void SelectBenefit(int benefitId)
+    private async Task SelectBenefit(int benefitId)
     {
         SelectedBenefitId = benefitId;
+        await LoadSelectedBenefits();
     }
 
     private async Task LoadSelectedBenefits()
