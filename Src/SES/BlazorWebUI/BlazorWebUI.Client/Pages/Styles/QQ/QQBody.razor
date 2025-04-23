@@ -1,20 +1,40 @@
 ﻿@using BlazorWebUI.Client.Pages.Styles.Form
 <div class="input-form">
+
+    @if (checkboxItems.Count > 0)
+    {
+
+        <div class="d-flex flex-column align-items-center">
+            <QQBenefitAdd OnSelectedBenefits="HandleBenefits" CheckboxItems="checkboxItems" />
+            <div class="mt-3">
+                <ul>
+                    @foreach (KeyValuePair<int, string> benefit in QQBodyData.SelectedBenefits)
+                    {
+                        <li>@benefit.Value</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+
     <div class="input-group">
         @if (IsBody)
         {
             <InputTextArea class="form-control" @bind-Value="Question" placeholder="Bilgi / Ana Metin" />
         }
     </div>
-
+    <br />
     <div class="input-group">
         <InputTextArea class="form-control" placeholder="Soru Kökü" @bind-Value="QuestionBody" />
-        <div style="max-width: 5.5rem;">
-            <InputText class="form-control" type="number" min="0" placeholder="Puan" @bind-Value="Score" />
-            <InputText class="form-control" type="number" min="0" placeholder="Max Puan" @bind-Value="MaxScore" />
-        </div>
-        <QQBenefitAdd OnSelectedBenefits="HandleBenefits" CheckboxItems="checkboxItems" />
     </div>
+    <br />
+    <div style="max-width: 15rem;" class="input-group align-items-center">
+        <InputText class="form-control" type="number" min="0" placeholder="Puan" @bind-Value="Score" />
+        <InputText class="form-control" type="number" min="0" placeholder="Max Puan" @bind-Value="MaxScore" />
+    </div>
+    <br />
+    <QQOptionBody @ref="QQOptionBody" OnSelectedOptions="OnSelectedOptionHandler" OnSelectedQType="OnSelectedQTypeHandler" />
+    <br />
 
     @if (IsImage)
     {
@@ -23,15 +43,6 @@
             <InputFile type="file" class="form-control" id="inputGroupFile02" OnChange="HandleFileSelected" accept="image/*" />
         </div>
     }
-
-    <br />
-
-    @if (QQBodyData.SelectedBenefits.Count > 0)
-    {
-        <QQOptionBody @ref="QQOptionBody" OnSelectedOptions="OnSelectedOptionHandler" OnSelectedQType="OnSelectedQTypeHandler" />
-    }
-
-    <br />
 
     <div class="form-check form-switch form-check-reverse">
         <InputCheckbox class="form-check-input checkbox-large" type="checkbox" @bind-Value="IsBody" id="flexCheckBody" />
@@ -50,23 +61,23 @@
 
     <button class="btn btn-primary form-check-reverse" type="button" @onclick="ExecuteQQHandle">Soruyu Ekle</button>
 
-    @if (showSuccessMessage)
+    @if (showSuccessMessage.HasValue)
     {
-        <div class="alert alert-success mt-3" role="alert">
-            Başarıyla eklendi!
-        </div>
-    }
-    @if (!showSuccessMessage)
-    {
-        <div class="alert alert-danger mt-3" role="alert">
-            Lütfen Tüm Alanları Kontrol Ediniz!
-        </div>
+        @if (showSuccessMessage.Value)
+        {
+            <div class="alert alert-success mt-3" role="alert">
+                Başarıyla eklendi!
+            </div>
+        }
+
+        else
+        {
+            <div class="alert alert-danger mt-3" role="alert">
+                Lütfen Tüm Alanları Kontrol Ediniz!
+            </div>
+        }
     }
 </div>
-
-
-
-
 
 @code {
     // todo: devam... qo yu yap yeni komponent 6 farklı seçenek var. resim foto var ve db kayıt var
@@ -86,16 +97,23 @@
 
     private string QuestionBody { get; set; } = string.Empty;
     private string? Question { get; set; }
-    private string Score { get; set; }
-    private string MaxScore { get; set; }
+    private string? Score { get; set; }
+    private string? MaxScore { get; set; }
     private bool IsBody;
     private bool IsImage;
     private bool IsQQBenefitLoader;
-    private bool showSuccessMessage;
+    private bool? showSuccessMessage;
+
+    protected override void OnInitialized()
+    {
+        QQOptionBody = new();
+        QQBodyData=new();
+        base.OnInitialized();
+    }
 
     private async Task ExecuteQQHandle()
     {
-        if ((string.IsNullOrEmpty(Score) && string.IsNullOrEmpty(MaxScore)) || string.IsNullOrWhiteSpace(QuestionBody) || QQBodyData.SelectedBenefits.Count == 0 )
+        if ((string.IsNullOrEmpty(Score) && string.IsNullOrEmpty(MaxScore)) || string.IsNullOrWhiteSpace(QuestionBody) || QQBodyData.SelectedBenefits.Count == 0)
         {
             showSuccessMessage = false;
             return;
@@ -105,8 +123,8 @@
 
         QQBodyData.QuestionBody = QuestionBody;
         QQBodyData.Question = Question;
-        QQBodyData.Score = int.Parse(Score);
-        QQBodyData.MaxScore = int.Parse(MaxScore);
+        QQBodyData.Score = int.Parse(Score!);
+        QQBodyData.MaxScore = int.Parse(MaxScore!);
 
         await OnQQBodyData.InvokeAsync(QQBodyData);
         QQBodyData = new();
@@ -126,10 +144,7 @@
 
     private void OnSelectedQTypeHandler(byte qType) => QQBodyData.SelectedQType = qType;
 
-    private void HandleBenefits(ICollection<CheckboxItem<int>> SelectedCheckboxItems)
-    {
-        QQBodyData.SelectedBenefits = SelectedCheckboxItems.ToDictionary(item => item.Key, item => item.DisplayValue);
-    }
+    private void HandleBenefits(ICollection<CheckboxItem<int>> SelectedCheckboxItems) => QQBodyData.SelectedBenefits = SelectedCheckboxItems.ToDictionary(item => item.Key, item => item.DisplayValue);
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
