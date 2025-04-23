@@ -3,6 +3,7 @@ using Application.Features.Lessons.Commands.Delete;
 using Application.Features.Lessons.Commands.Update;
 using Application.Features.Lessons.Queries.GetById;
 using Application.Features.Lessons.Queries.GetList;
+using Application.Features.Lessons.Queries.GetListLessonQueryBySemesterId;
 using AutoMapper;
 using Domain.Entities;
 using NArchitecture.Core.Application.Responses;
@@ -30,5 +31,8 @@ public class MappingProfiles : Profile
 
         CreateMap<Lesson, GetListLessonListItemDto>();
         CreateMap<IPaginate<Lesson>, GetListResponse<GetListLessonListItemDto>>();
+
+        CreateMap<Lesson, GetListLessonQueryBySemesterIdDto>();
+        CreateMap<IPaginate<Lesson>, GetListResponse<GetListLessonQueryBySemesterIdDto>>();
     }
 }
