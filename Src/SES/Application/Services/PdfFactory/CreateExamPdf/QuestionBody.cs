@@ -5,52 +5,38 @@ using QuestPDF.Infrastructure;
 namespace Application.Services.PdfFactory.CreateExamPdf;
 internal static class QuestionBody
 {
-
     private static readonly char[] Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+
     internal static IContainer QuestionOption(this IContainer container, string[] optionsText, bool isStandardOptionMode)
     {
-        switch (isStandardOptionMode)
+        container.Column(col =>
         {
-            case true:
-                {
-                    container.Column(col =>
-                    {
-                        for (int i = 0; i < optionsText.Length; i++)
-                        {
-                            col.Item().Padding(2.5f, Unit.Point).Text(txt =>
-                            {
-                                txt.Element().PaddingBottom(-5.75f, Unit.Point).Height(15, Unit.Point).OptChar(Chars[i], false);
-                                txt.Span("  ");
-                                txt.Justify();
-                                txt.Span(optionsText[i]).FontSize(11);
-                            });
-                        }
-                    });
-                    break;
-                }
+            for (int i = 0; i < optionsText.Length; i++)
+            {
+                float height = isStandardOptionMode ? 15 : 20;
+                float paddingBottom = isStandardOptionMode ? -5.5f : -5.75f;
+                float textPaddingTop = isStandardOptionMode ? 1.5f : 2.5f;
 
-            case false:
+                col.Item().PaddingBottom(5, Unit.Point).Row(row =>
                 {
-                    container.Column(col =>
+                    row.ConstantItem(20, Unit.Point).Element(e =>
                     {
-                        for (int i = 0; i < optionsText.Length; i++)
-                        {
-                            col.Item().Padding(2.5f, Unit.Point).Text(txt =>
-                            {
-                                txt.Element().PaddingBottom(-5.75f, Unit.Point).Height(20, Unit.Point).OptChar(Chars[i], true);
-                                txt.Span("   ");
-                                txt.Justify();
-                                txt.Span(optionsText[i]).FontSize(11);
-                            });
-                        }
+                        e.PaddingBottom(paddingBottom, Unit.Point)
+                         .Height(height, Unit.Point)
+                         .OptChar(Chars[i], !isStandardOptionMode);
                     });
-                    break;
-                }
 
-        }
+                    row.ConstantItem(145).Element(inner =>
+                    {
+                        inner.PaddingTop(textPaddingTop, Unit.Point)
+                             .Text(optionsText[i])
+                             .FontSize(12);
+                    });
+                });
+            }
+        });
 
         return container;
-
     }
 
     internal static IContainer OptChar(this IContainer container, char letter, bool isStandardOptionMode)
