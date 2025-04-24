@@ -7,7 +7,7 @@ internal static class QuestionBody
 {
     private static readonly char[] Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
 
-    internal static IContainer QuestionOption(this IContainer container, string[] optionsText, bool isStandardOptionMode)
+    internal static IContainer RenderQuestionOptions(this IContainer container, string[] optionsText, bool isStandardOptionMode)
     {
         container.Column(col =>
         {
