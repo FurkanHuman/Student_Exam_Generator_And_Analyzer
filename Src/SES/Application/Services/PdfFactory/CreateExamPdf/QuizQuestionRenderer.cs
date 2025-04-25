@@ -40,6 +40,7 @@ internal static class QuizQuestionRenderer
                         case QuestionType.FillInTheBlank:
                             break;
                         case QuestionType.Matching:
+                            col.Item().Row(rw => rw.AutoItem().PaddingLeft(10).PaddingTop(10).RenderMatchingPairs(question.Options));
                             break;
                         case QuestionType.Ordering:
                             break;
@@ -53,7 +54,35 @@ internal static class QuizQuestionRenderer
         return container;
     }
 
-    internal static IContainer RenderQuestionOptions(this IContainer container, IList<QuestionOption> questionOptions, bool isStandardOptionMode)
+    private static IContainer RenderMatchingPairs(this IContainer container, IList<QuestionOption> questionOptions)
+    {
+        string[] firstParts = new string[questionOptions.Count];
+        string[] secondParts = new string[questionOptions.Count];
+
+        for (int i = 0; i < questionOptions.Count; i++)
+        {
+            string[] splitedString = questionOptions[i].OptionText!.Split(',');
+            firstParts[i] = splitedString[0];
+            secondParts[i] = splitedString[1];
+        }
+
+        Shuffle(ref firstParts, 0101);
+        Shuffle(ref secondParts, 1001);
+
+        container.Column(col =>
+        {
+            for (int i = 0; i < questionOptions.Count; i++)
+                col.Item().PaddingBottom(5, Unit.Point).Row(row =>
+                {
+                    row.ConstantItem(90).Element(e => e.PaddingTop(5).Text($"{Chars[i]}) {firstParts[i]}").FontSize(12).AlignLeft());
+                    row.ConstantItem(90).Element(e => e.PaddingTop(5).Text($"{i + 1}) .... {secondParts[i]}").FontSize(12).AlignLeft());
+                });
+        });
+
+        return container;
+    }
+
+    private static IContainer RenderQuestionOptions(this IContainer container, IList<QuestionOption> questionOptions, bool isStandardOptionMode)
     {
         container.Column(col =>
         {
@@ -86,26 +115,26 @@ internal static class QuizQuestionRenderer
     }
 
 
-    internal static IContainer RenderOpenEndedSolidBox(this IContainer container)
+    private static IContainer RenderOpenEndedSolidBox(this IContainer container)
     {
         container.Border(1.5f).Width(185).Height(75);
         return container;
     }
 
-    internal static IContainer RenderOpenEndedDashedBoxDrawing(this IContainer container)
+    private static IContainer RenderOpenEndedDashedBoxDrawing(this IContainer container)
     {
         string svg = "<svg xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\" stroke-dasharray=\"2\"/></svg>";
         container.Svg(svg);
         return container;
     }
-    internal static IContainer RenderTrueFalseDrawing(this IContainer container)
+    private static IContainer RenderTrueFalseDrawing(this IContainer container)
     {
         string svg = $"<svg width=\"50\" height=\"35\" xmlns=\"http://www.w3.org/2000/svg\"><g fill=\"none\" stroke=\"#000\"><path stroke-width=\"2\" d=\"m4 10 5 6L21 4\"/><circle cx=\"11\" cy=\"28\" r=\"6\"/></g><g transform=\"translate(30)\" stroke=\"#000\"><path stroke-width=\"2\" d=\"m4 4 14 14m0-14L4 18\"/><circle cx=\"11\" cy=\"28\" r=\"6\" fill=\"none\"/></g></svg>";
         container.Svg(svg);
         return container;
     }
 
-    internal static IContainer RenderOptionMarkerDrawing(this IContainer container, char letter, bool isStandardOptionMode)
+    private static IContainer RenderOptionMarkerDrawing(this IContainer container, char letter, bool isStandardOptionMode)
     {
         string svg = isStandardOptionMode
                 ? $@"
@@ -120,5 +149,15 @@ internal static class QuizQuestionRenderer
 
         container.Svg(svg);
         return container;
+    }
+
+    private static void Shuffle(ref string[] array, int seed)
+    {
+        Random rng = new(seed);
+        for (int i = array.Length - 1; i > 0; i--)
+        {
+            int j = rng.Next(i + 1);
+            (array[i], array[j]) = (array[j], array[i]);
+        }
     }
 }
