@@ -5,7 +5,7 @@ using QuestPDF.Infrastructure;
 
 namespace Application.Services.PdfFactory.CreateExamPdf;
 
-internal static class QuestionBody
+internal static class QuizQuestionRenderer
 {
     private static readonly char[] Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
 
@@ -69,7 +69,7 @@ internal static class QuestionBody
                     {
                         e.PaddingBottom(paddingBottom, Unit.Point)
                          .Height(height, Unit.Point)
-                         .RenderOptChar(Chars[i], !isStandardOptionMode);
+                         .RenderOptionMarkerDrawing(Chars[i], !isStandardOptionMode);
                     });
 
                     row.ConstantItem(145).Element(inner =>
@@ -85,12 +85,6 @@ internal static class QuestionBody
         return container;
     }
 
-    internal static IContainer RenderOpenEndedDashedBox(this IContainer container)
-    {
-        string svg = "<svg xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\" stroke-dasharray=\"2\"/></svg>";
-        container.Svg(svg);
-        return container;
-    }
 
     internal static IContainer RenderOpenEndedSolidBox(this IContainer container)
     {
@@ -98,6 +92,12 @@ internal static class QuestionBody
         return container;
     }
 
+    internal static IContainer RenderOpenEndedDashedBoxDrawing(this IContainer container)
+    {
+        string svg = "<svg xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\" stroke-dasharray=\"2\"/></svg>";
+        container.Svg(svg);
+        return container;
+    }
     internal static IContainer RenderTrueFalseDrawing(this IContainer container)
     {
         string svg = $"<svg width=\"50\" height=\"35\" xmlns=\"http://www.w3.org/2000/svg\"><g fill=\"none\" stroke=\"#000\"><path stroke-width=\"2\" d=\"m4 10 5 6L21 4\"/><circle cx=\"11\" cy=\"28\" r=\"6\"/></g><g transform=\"translate(30)\" stroke=\"#000\"><path stroke-width=\"2\" d=\"m4 4 14 14m0-14L4 18\"/><circle cx=\"11\" cy=\"28\" r=\"6\" fill=\"none\"/></g></svg>";
@@ -105,27 +105,19 @@ internal static class QuestionBody
         return container;
     }
 
-    internal static IContainer RenderOptChar(this IContainer container, char letter, bool isStandardOptionMode)
+    internal static IContainer RenderOptionMarkerDrawing(this IContainer container, char letter, bool isStandardOptionMode)
     {
-        string svg = string.Empty;
-        switch (isStandardOptionMode)
-        {
-            case true:
-                svg = $@"
-                                <svg width=""12"" height=""12"" viewBox=""0 0 12 12"" xmlns=""http://www.w3.org/2000/svg"">
-                                  <circle cx=""6"" cy=""6"" r=""4.5"" stroke=""black"" stroke-width=""0.7"" fill=""white"" />
-                                  <text x=""50%"" y=""67%"" text-anchor=""middle"" dominant-baseline=""middle"" font-size=""6"" font-family=""Segoe UI, Arial, sans-serif"" fill=""black"">{letter}</text>
-                                </svg>";
+        string svg = isStandardOptionMode
+                ? $@"
+                    <svg width=""12"" height=""12"" viewBox=""0 0 12 12"" xmlns=""http://www.w3.org/2000/svg"">
+                      <circle cx=""6"" cy=""6"" r=""4.5"" stroke=""black"" stroke-width=""0.7"" fill=""white"" />
+                      <text x=""50%"" y=""67%"" text-anchor=""middle"" dominant-baseline=""middle"" font-size=""6"" font-family=""Segoe UI, Arial, sans-serif"" fill=""black"">{letter}</text>
+                    </svg>"
+                : $@"
+                    <svg width=""12"" height=""12"" viewBox=""0 0 12 12"" xmlns=""http://www.w3.org/2000/svg"">
+                      <text x=""50%"" y=""90%"" text-anchor=""middle"" dominant-baseline=""middle"" font-size=""12"" font-family=""Segoe UI, Arial, sans-serif"" fill=""black"">{letter})</text>
+                    </svg>";
 
-                break;
-
-            case false:
-                svg = $@"
-                                <svg width=""12"" height=""12"" viewBox=""0 0 12 12"" xmlns=""http://www.w3.org/2000/svg"">
-                                  <text x=""50%"" y=""90%"" text-anchor=""middle"" dominant-baseline=""middle"" font-size=""12"" font-family=""Segoe UI, Arial, sans-serif"" fill=""black"">{letter})</text>
-                                </svg>";
-                break;
-        }
         container.Svg(svg);
         return container;
     }
