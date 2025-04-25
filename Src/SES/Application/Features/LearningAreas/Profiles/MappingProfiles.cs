@@ -3,7 +3,7 @@ using Application.Features.LearningAreas.Commands.Delete;
 using Application.Features.LearningAreas.Commands.Update;
 using Application.Features.LearningAreas.Queries.GetById;
 using Application.Features.LearningAreas.Queries.GetList;
-using Application.Services.PdfReaderService.Dtos;
+using Application.Services.PdfFactory.PdfReaderService.Dtos;
 using AutoMapper;
 using Domain.Entities;
 using NArchitecture.Core.Application.Responses;

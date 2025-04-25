@@ -1,4 +1,4 @@
-﻿namespace Application.Services.PdfReaderService.Dtos;
+﻿namespace Application.Services.PdfFactory.PdfReaderService.Dtos;
 
 public record LearningAreaDto
 {

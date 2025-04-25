@@ -5,7 +5,7 @@ using Application.Features.Benefits.Commands.Update;
 using Application.Features.Benefits.Queries.GetById;
 using Application.Features.Benefits.Queries.GetList;
 using Application.Features.ReferenceBenefits.Queries.GetListByIdReferenceBenefitBenefit;
-using Application.Services.PdfReaderService.Dtos;
+using Application.Services.PdfFactory.PdfReaderService.Dtos;
 using AutoMapper;
 using Domain.Entities;
 using NArchitecture.Core.Application.Responses;

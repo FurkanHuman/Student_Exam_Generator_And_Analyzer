@@ -1,14 +1,14 @@
 ﻿// note: perfect clean and readable code. 
 // note: the code is well-structured and easy to understand.
 
-using Application.Services.PdfReaderService.Dtos;
+using Application.Services.PdfFactory.PdfReaderService.Dtos;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
-namespace Application.Services.PdfReaderService;
+namespace Application.Services.PdfFactory.PdfReaderService;
 
 internal static class PdfReaderReferenceBenefitManager
 {
