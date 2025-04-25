@@ -3,7 +3,7 @@ using Application.Services.Benefits;
 using Application.Services.Exams;
 using Application.Services.LearningAreas;
 using Application.Services.Lessons;
-using Application.Services.PdfReaderService;
+using Application.Services.PdfFactory.PdfReaderService;
 using Application.Services.Personels;
 using Application.Services.Principals;
 using Application.Services.QuestionOptions;
