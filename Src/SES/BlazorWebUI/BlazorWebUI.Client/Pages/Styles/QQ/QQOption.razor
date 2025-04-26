@@ -63,16 +63,27 @@
                 {
                     <div class="input-group mb-3">
                         <InputText type="text" class="form-control" placeholder="Boş Bırakılacak Kelimeleri yazın ve Virgül ile ayırın" @bind-Value="questionOption.OptionText" disabled="@IsViewMode" />
-                        <button class="btn btn-danger" @onclick="() => RemoveOption(questionOption)" disabled="@IsViewMode" hidden="@IsViewMode">Sil</button>
                     </div>
                 }
 
-                <button class="btn btn-primary" @onclick="AddOption" hidden="@IsViewMode" disabled="@IsViewMode">Seçenek Ekle</button>
                 break;
             }
 
         case 6: // Matching
             {
+                foreach (QuestionOptionDto questionOption in QuestionOptions)
+                {
+                    <div class="input-group mb-3">
+                        <div class="input-group-text">
+                            <InputCheckbox class="form-check-input mt-0" @bind-Value="questionOption.IsCorrect" disabled="@IsViewMode" />
+                        </div>
+                        <InputText type="text" class="form-control" placeholder="eşletirmeleri VİRGÜL ile ayırın" @bind-Value="questionOption.OptionText" disabled="@IsViewMode" />
+                        <button class="btn btn-danger" @onclick="() => RemoveOption(questionOption)" hidden="@IsViewMode" disabled="@IsViewMode">Sil</button>
+                    </div>
+                }
+
+                <button class="btn btn-primary" @onclick="AddOption" hidden="@IsViewMode" disabled="@IsViewMode">Seçenek Ekle</button>
+
                 break;
             }
 
@@ -137,9 +148,7 @@
             case 1:
                 {
                     for (int i = 0; i < QQStatic.DefaultOpenEndedOptions; i++)
-                    {
                         QuestionOptions.Add(new() { IsCorrect = true });
-                    }
                     break;
                 }
 
@@ -171,6 +180,8 @@
 
             case 6:
                 {
+                    for (int i = 0; i < QQStatic.DefaultMachingOptions; i++)
+                        QuestionOptions.Add(new() { IsCorrect = true });                    
                     break;
                 }
 

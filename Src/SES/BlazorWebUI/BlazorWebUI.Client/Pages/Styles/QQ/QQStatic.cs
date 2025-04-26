@@ -9,7 +9,7 @@ public static class QQStatic
         { 3, "Çoktan Seçmeli" },
         { 4, "Doğru/Yanlış" },
         { 5, "Boşluk Doldurma" },
-        // { 6, "Eşleştirme" },
+        { 6, "Eşleştirme" },
         // { 7, "Sıralama"  }
     };
 
@@ -17,6 +17,7 @@ public static class QQStatic
     public static readonly int DefaultMultipleChoiceOptions = 4;
     public static readonly int DefaultTrueFalseOptions = 2;
     public static readonly int DefaultFillInTheBlankOptions = 1;
+    public static readonly int DefaultMachingOptions = 2;
 
 
 }
