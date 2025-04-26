@@ -5,12 +5,15 @@ using QuestPDF.Infrastructure;
 
 namespace Application.Services.PdfFactory.CreateExamPdf;
 
-internal static class QuizQuestionRenderer
+internal static class QuizQuestionCapsuleRenderer
 {
     private static readonly char[] Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
 
     internal static IContainer QuizQuestion(this IContainer container, QuizQuestion question)
     {
+        if (question.QuestionType == QuestionType.FillInTheBlank)
+            RenderFillInTheBlankMask(ref question);
+
         container.Column(col =>
         {
             col.Item().Row(row =>
@@ -36,8 +39,6 @@ internal static class QuizQuestionRenderer
                             break;
                         case QuestionType.TrueFalse:
                             col.Item().Row(rw => rw.AutoItem().PaddingLeft(10).MaxHeight(30).RenderTrueFalseDrawing());
-                            break;
-                        case QuestionType.FillInTheBlank:
                             break;
                         case QuestionType.Matching:
                             col.Item().Row(rw => rw.AutoItem().PaddingLeft(10).PaddingTop(10).RenderMatchingPairs(question.Options));
@@ -149,6 +150,17 @@ internal static class QuizQuestionRenderer
 
         container.Svg(svg);
         return container;
+    }
+
+    private static void RenderFillInTheBlankMask(ref QuizQuestion question)
+    {
+        List<string> shadowStrings = [];
+
+        foreach (QuestionOption option in question.Options)
+            shadowStrings.AddRange(option.OptionText!.Split(','));
+
+        foreach (string str in shadowStrings)
+            question.Question = question.Question.Replace(str, new string('.', str.Length + 3));
     }
 
     private static void Shuffle(ref string[] array, int seed)
