@@ -3,9 +3,9 @@ using Domain.Enums;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
-namespace Application.Services.PdfFactory.CreateExamPdf;
+namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF;
 
-internal static class QuizQuestionCapsuleRenderer
+internal static class QuizQuestionCapsule
 {
     private static readonly char[] Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
 
@@ -18,7 +18,7 @@ internal static class QuizQuestionCapsuleRenderer
         {
             col.Item().Row(row =>
             {
-                row.ConstantItem(200).PaddingTop(25).Column(col =>
+                row.ConstantItem(200).Column(col =>
                 {
                     col.Spacing(5);
                     if (!string.IsNullOrEmpty(question.QuestionImageURL))
@@ -115,10 +115,9 @@ internal static class QuizQuestionCapsuleRenderer
         return container;
     }
 
-
     private static IContainer RenderOpenEndedSolidBox(this IContainer container)
     {
-        container.Border(1.5f).Width(185).Height(75);
+        container.Border(1.5f).Width(185).Height(100);
         return container;
     }
 
@@ -128,6 +127,7 @@ internal static class QuizQuestionCapsuleRenderer
         container.Svg(svg);
         return container;
     }
+
     private static IContainer RenderTrueFalseDrawing(this IContainer container)
     {
         string svg = $"<svg width=\"50\" height=\"35\" xmlns=\"http://www.w3.org/2000/svg\"><g fill=\"none\" stroke=\"#000\"><path stroke-width=\"2\" d=\"m4 10 5 6L21 4\"/><circle cx=\"11\" cy=\"28\" r=\"6\"/></g><g transform=\"translate(30)\" stroke=\"#000\"><path stroke-width=\"2\" d=\"m4 4 14 14m0-14L4 18\"/><circle cx=\"11\" cy=\"28\" r=\"6\" fill=\"none\"/></g></svg>";
