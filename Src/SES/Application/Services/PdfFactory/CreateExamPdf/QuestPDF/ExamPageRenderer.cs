@@ -4,9 +4,17 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
 namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF;
-public class ExamPageRenderer : IExamPageGenerator
+public class ExamPageRenderer : IExamPageGenerator, IQuestPDFTestPageGenerator
 {
     private static readonly byte questionsPerPage = 6;
+
+    // this code is for testing purposes only the main code is in the QuestPDF folder and IQuestPDFTestPageGenerator 
+    IDocument IQuestPDFTestPageGenerator.PageGenerate(Exam exam)
+    {
+        if (exam.QuizQuestions.Count <= questionsPerPage)
+            return FrontPageGenerate(exam);
+        return Document.Merge(FrontPageGenerate(exam), BackPageGenerate(exam));
+    }
 
     public byte[] PageGenerate(Exam exam)
     {
