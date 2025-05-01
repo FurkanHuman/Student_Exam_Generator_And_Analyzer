@@ -1,11 +1,11 @@
-﻿using Application.Services.PdfReaderService.Dtos;
+﻿using Application.Services.PdfFactory.PdfReaderService.Dtos;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
-namespace Application.Services.PdfReaderService;
+namespace Application.Services.PdfFactory.PdfReaderService;
 
 internal class PdfReaderStudentManager
 {
@@ -19,7 +19,7 @@ internal class PdfReaderStudentManager
 
     private ClassWithStudentsDto? ExtractClassAndStudentsFromPage(string content)
     {
-        Regex classRegex = new Regex(_classRegex);
+        var classRegex = new Regex(_classRegex);
         Match classMatch = classRegex.Match(content);
 
         if (!classMatch.Success)
@@ -40,7 +40,7 @@ internal class PdfReaderStudentManager
     {
         ICollection<string[]> students = [];
 
-        Regex studentRegex = new Regex(_studentNewRegex, RegexOptions.Multiline);
+        var studentRegex = new Regex(_studentNewRegex, RegexOptions.Multiline);
 
         string[] lines = content.Split('\n');
 
@@ -83,9 +83,7 @@ internal class PdfReaderStudentManager
         ClassWithStudentsDto? classWithStudents = ExtractClassAndStudentsFromPage(pageContent);
 
         if (classWithStudents != null)
-        {
             result.Add(classWithStudents);
-        }
 
         await Task.Yield();
     }

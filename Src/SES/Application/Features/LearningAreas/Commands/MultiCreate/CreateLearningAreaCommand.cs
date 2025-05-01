@@ -1,6 +1,6 @@
 using Application.Features.LearningAreas.Constants;
 using Application.Features.LearningAreas.Rules;
-using Application.Services.PdfReaderService.Dtos;
+using Application.Services.PdfFactory.PdfReaderService.Dtos;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;

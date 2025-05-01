@@ -1,5 +1,6 @@
 ﻿using Application.Features.Students.Rules;
-using Application.Services.PdfReaderService;
+using Application.Services.PdfFactory.PdfReaderService;
+using Application.Services.PdfFactory.PdfReaderService.Dtos;
 using Application.Services.Repositories;
 using Application.Services.StudentClasses;
 using AutoMapper;
@@ -27,10 +28,10 @@ public class CreateMultiStudentCommandHandler : IRequestHandler<CreateMultiStude
 
     public async Task<ICollection<CreatedMultiStudentResponse>> Handle(CreateMultiStudentCommand request, CancellationToken cancellationToken)
     {
-        ICollection<Services.PdfReaderService.Dtos.ClassWithStudentsDto> extractStudentAndClasess = await _pdfReaderService.GetAllClassesAndStudents(request.PdfFile);
+        ICollection<ClassWithStudentsDto> extractStudentAndClasess = await _pdfReaderService.GetAllClassesAndStudents(request.PdfFile);
         ICollection<Student> createStudents = [];
 
-        foreach (Services.PdfReaderService.Dtos.ClassWithStudentsDto classWithStudents in extractStudentAndClasess)
+        foreach (ClassWithStudentsDto classWithStudents in extractStudentAndClasess)
         {
 
             StudentClass autocreatedStudentClass = await _studentClassService.AddAsync(new()
