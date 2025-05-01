@@ -2,7 +2,7 @@
 using Domain.Entities;
 using SimpleBase;
 
-namespace Application.Services.PdfFactory.CreateExamPdf;
+namespace Application.Services.PdfFactory.CreateExamPdf.Helpers;
 
 internal static class QuizQuestionHelpers
 {
@@ -20,7 +20,7 @@ internal static class QuizQuestionHelpers
                                    .ToList();
 
         // Extract the IDs of the ordered questions
-        HashSet<int> orderedIds = orderedPairs
+        var orderedIds = orderedPairs
             .Select(x => x.Value)
             .ToHashSet();
 

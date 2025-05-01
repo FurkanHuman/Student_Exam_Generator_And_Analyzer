@@ -4,7 +4,7 @@ using Application.Services.Exams;
 using Application.Services.LearningAreas;
 using Application.Services.Lessons;
 using Application.Services.PdfFactory.CreateExamPdf;
-using Application.Services.PdfFactory.CreateExamPdf.QuestPDF;
+using Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
 using Application.Services.PdfFactory.PdfReaderService;
 using Application.Services.Personels;
 using Application.Services.Principals;
