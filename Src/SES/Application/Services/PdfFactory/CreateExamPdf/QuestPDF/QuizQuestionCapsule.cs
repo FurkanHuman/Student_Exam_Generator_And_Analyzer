@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.Services.PdfFactory.CreateExamPdf.DTOs;
+using Domain.Entities;
 using Domain.Enums;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
@@ -9,8 +10,13 @@ internal static class QuizQuestionCapsule
 {
     private static readonly char[] Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
 
-    internal static IContainer QuizQuestion(this IContainer container, QuizQuestion question)
+    internal static IContainer QuizQuestion(this IContainer container, QuizQuestion question, ExamInfo examInfo, int seed)
     {
+        // Create a local variable to hold the options and pass it by reference
+        IList<QuestionOption> options = question.Options;
+        QuizQuestionHelpers.ShuffleQuestionOptions(ref options, ref examInfo, seed);
+        question.Options = options;
+
         if (question.QuestionType == QuestionType.FillInTheBlank)
             RenderFillInTheBlankMask(ref question);
 
@@ -35,13 +41,13 @@ internal static class QuizQuestionCapsule
                             col.Item().Row(rw => rw.AutoItem().PaddingLeft(10).PaddingTop(10).RenderOpenEndedSolidBox());
                             break;
                         case QuestionType.MultipleChoice:
-                            col.Item().Row(rw => rw.AutoItem().PaddingLeft(10).PaddingTop(10).RenderQuestionOptions(question.Options, true));
+                            col.Item().Row(rw => rw.AutoItem().PaddingLeft(10).PaddingTop(10).RenderQuestionOptions(question.Options, examInfo.IsStandardOptionMode));
                             break;
                         case QuestionType.TrueFalse:
-                            col.Item().Row(rw => rw.AutoItem().PaddingLeft(10).MaxHeight(30).RenderTrueFalseDrawing());
+                            col.Item().Row(rw => rw.AutoItem().PaddingLeft(10).PaddingTop(10).RenderTrueFalseOptions(question.Options));
                             break;
                         case QuestionType.Matching:
-                            col.Item().Row(rw => rw.AutoItem().PaddingLeft(10).PaddingTop(10).RenderMatchingPairs(question.Options));
+                            col.Item().Row(rw => rw.AutoItem().PaddingLeft(10).PaddingTop(10).RenderMatchingPairs(question.Options, seed));
                             break;
                         case QuestionType.Ordering:
                             break;
@@ -55,10 +61,14 @@ internal static class QuizQuestionCapsule
         return container;
     }
 
-    private static IContainer RenderMatchingPairs(this IContainer container, IList<QuestionOption> questionOptions)
+    private static IContainer RenderMatchingPairs(this IContainer container, IList<QuestionOption> questionOptions, int seed)
     {
+        Random rnd = new(seed);
+
         string[] firstParts = new string[questionOptions.Count];
         string[] secondParts = new string[questionOptions.Count];
+
+        questionOptions = [.. questionOptions.OrderBy(x => Guid.NewGuid())];
 
         for (int i = 0; i < questionOptions.Count; i++)
         {
@@ -67,8 +77,8 @@ internal static class QuizQuestionCapsule
             secondParts[i] = splitedString[1];
         }
 
-        Shuffle(ref firstParts, 0101);
-        Shuffle(ref secondParts, 1001);
+        QuizQuestionHelpers.ShuffleStringArray(ref firstParts, rnd.Next());
+        QuizQuestionHelpers.ShuffleStringArray(ref secondParts, rnd.Next());
 
         container.Column(col =>
         {
@@ -83,8 +93,21 @@ internal static class QuizQuestionCapsule
         return container;
     }
 
+    private static void RenderFillInTheBlankMask(ref QuizQuestion question)
+    {
+        List<string> shadowStrings = [];
+
+        foreach (QuestionOption option in question.Options)
+            shadowStrings.AddRange(option.OptionText!.Split(','));
+
+        foreach (string str in shadowStrings)
+            question.Question = question.Question.Replace(str, new string('.', str.Length + 3));
+    }
+
     private static IContainer RenderQuestionOptions(this IContainer container, IList<QuestionOption> questionOptions, bool isStandardOptionMode)
     {
+        questionOptions = [.. questionOptions.OrderBy(x => x.Id)];
+
         container.Column(col =>
         {
             for (int i = 0; i < questionOptions.Count; i++)
@@ -121,17 +144,29 @@ internal static class QuizQuestionCapsule
         return container;
     }
 
-    private static IContainer RenderOpenEndedDashedBoxDrawing(this IContainer container)
+    private static IContainer RenderTrueFalseOptions(this IContainer container, IList<QuestionOption> questionOptions)
     {
-        string svg = "<svg xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\" stroke-dasharray=\"2\"/></svg>";
-        container.Svg(svg);
-        return container;
-    }
+        questionOptions = [.. questionOptions.OrderBy(x => x.Id)];
 
-    private static IContainer RenderTrueFalseDrawing(this IContainer container)
-    {
-        string svg = $"<svg width=\"50\" height=\"35\" xmlns=\"http://www.w3.org/2000/svg\"><g fill=\"none\" stroke=\"#000\"><path stroke-width=\"2\" d=\"m4 10 5 6L21 4\"/><circle cx=\"11\" cy=\"28\" r=\"6\"/></g><g transform=\"translate(30)\" stroke=\"#000\"><path stroke-width=\"2\" d=\"m4 4 14 14m0-14L4 18\"/><circle cx=\"11\" cy=\"28\" r=\"6\" fill=\"none\"/></g></svg>";
-        container.Svg(svg);
+        container.Column(col =>
+        {
+            foreach (QuestionOption questionOption in questionOptions)
+            {
+                col.Item().PaddingBottom(5, Unit.Point).Row(row =>
+                {
+                    row.ConstantItem(20, Unit.Point).Element(e => e.PaddingBottom(-5.5f, Unit.Point).Text("(...)"));
+                    row.Spacing(5);
+                    row.ConstantItem(145).Element(inner =>
+                    {
+                        inner.PaddingTop(1.5f, Unit.Point)
+                             .Text(questionOption.OptionText)
+                             .FontSize(12);
+                    });
+                });
+            }
+        });
+
+
         return container;
     }
 
@@ -152,24 +187,17 @@ internal static class QuizQuestionCapsule
         return container;
     }
 
-    private static void RenderFillInTheBlankMask(ref QuizQuestion question)
+    private static IContainer RenderTrueFalseDrawing(this IContainer container)
     {
-        List<string> shadowStrings = [];
-
-        foreach (QuestionOption option in question.Options)
-            shadowStrings.AddRange(option.OptionText!.Split(','));
-
-        foreach (string str in shadowStrings)
-            question.Question = question.Question.Replace(str, new string('.', str.Length + 3));
+        string svg = $"<svg width=\"50\" height=\"35\" xmlns=\"http://www.w3.org/2000/svg\"><g fill=\"none\" stroke=\"#000\"><path stroke-width=\"2\" d=\"m4 10 5 6L21 4\"/><circle cx=\"11\" cy=\"28\" r=\"6\"/></g><g transform=\"translate(30)\" stroke=\"#000\"><path stroke-width=\"2\" d=\"m4 4 14 14m0-14L4 18\"/><circle cx=\"11\" cy=\"28\" r=\"6\" fill=\"none\"/></g></svg>";
+        container.Svg(svg);
+        return container;
     }
 
-    private static void Shuffle(ref string[] array, int seed)
+    private static IContainer RenderOpenEndedDashedBoxDrawing(this IContainer container)
     {
-        Random rng = new(seed);
-        for (int i = array.Length - 1; i > 0; i--)
-        {
-            int j = rng.Next(i + 1);
-            (array[i], array[j]) = (array[j], array[i]);
-        }
+        string svg = "<svg xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\" stroke-dasharray=\"2\"/></svg>";
+        container.Svg(svg);
+        return container;
     }
 }

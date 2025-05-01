@@ -1,46 +1,46 @@
-﻿using Domain.Entities;
+﻿using Application.Services.PdfFactory.CreateExamPdf.DTOs;
+using Domain.Entities;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
 namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF;
+
 public class ExamPageRenderer : IExamPageGenerator, IQuestPDFTestPageGenerator
 {
-    private static readonly byte questionsPerPage = 6;
+    private static readonly byte QuestionsPerPage = 6;
 
-    // this code is for testing purposes only the main code is in the QuestPDF folder and IQuestPDFTestPageGenerator 
-    IDocument IQuestPDFTestPageGenerator.PageGenerate(Exam exam)
+    IDocument IQuestPDFTestPageGenerator.PageGenerate(Exam exam, ref ExamInfo examInfo)
     {
-        if (exam.QuizQuestions.Count <= questionsPerPage)
-            return FrontPageGenerate(exam);
-        return Document.Merge(FrontPageGenerate(exam), BackPageGenerate(exam));
+        if (exam.QuizQuestions.Count <= QuestionsPerPage)
+            return FrontPageGenerate(exam, examInfo);
+        return Document.Merge(FrontPageGenerate(exam, examInfo), BackPageGenerate(exam, examInfo));
     }
 
-    public byte[] PageGenerate(Exam exam)
+    public byte[] PageGenerate(Exam exam, ref ExamInfo examInfo)
     {
-        if (exam.QuizQuestions.Count <= questionsPerPage)
-            return FrontPageGenerate(exam).GeneratePdf();
-        return Document.Merge(FrontPageGenerate(exam), BackPageGenerate(exam)).GeneratePdf();
+        if (exam.QuizQuestions.Count <= QuestionsPerPage)
+            return FrontPageGenerate(exam, examInfo).GeneratePdf();
+        return Document.Merge(FrontPageGenerate(exam, examInfo), BackPageGenerate(exam, examInfo)).GeneratePdf();
     }
 
-    private static IDocument FrontPageGenerate(Exam exam)
+    private static IDocument FrontPageGenerate(Exam exam, ExamInfo examInfo) => Document.Create(document =>
     {
-        return Document.Create(document =>
+        document.Page(page =>
         {
-            document.Page(page =>
-            {
-                page.DefaultTextStyle(ts => ts.FontFamily(Fonts.Arial));
-                page.Margin(0.5f, Unit.Centimetre);
-                page.Size(pageSize: PageSizes.A4);
-                // custom page design
-                page.ExamHeader(exam);
-                page.ExamQuestionContent(exam, 0, Math.Min(questionsPerPage, exam.QuizQuestions.Count));
-                page.ExamFooter(exam);
-            });
+            page.DefaultTextStyle(ts => ts.FontFamily(Fonts.Arial));
+            page.Margin(0.5f, Unit.Centimetre);
+            page.Size(pageSize: PageSizes.A4);
+            // custom page design  
+            page.Background().Svg(WatermarkSVG("v0.0.1-alpha-04 S.E.S"));
+            page.ExamHeader(exam, examInfo);
+            page.ExamQuestionContent(exam, 0, Math.Min(QuestionsPerPage, exam.QuizQuestions.Count), examInfo);
+            page.ExamFooter(exam, examInfo);
         });
-    }
+    });
 
-    private static IDocument BackPageGenerate(Exam exam) => Document.Create(document =>
+
+    private static IDocument BackPageGenerate(Exam exam, ExamInfo examInfo) => Document.Create(document =>
     {
         document.Page(page =>
         {
@@ -48,9 +48,14 @@ public class ExamPageRenderer : IExamPageGenerator, IQuestPDFTestPageGenerator
             page.Margin(0.5f, Unit.Centimetre);
             page.Size(pageSize: PageSizes.A4);
             // custom page design
-            page.ExamQuestionContent(exam, questionsPerPage, Math.Min((questionsPerPage * 2), exam.QuizQuestions.Count));
-            page.ExamFooter(exam);
+            page.Background().Svg(WatermarkSVG("v0.0.1-alpha-04 S.E.S"));
+            page.ExamQuestionContent(exam, QuestionsPerPage, Math.Min(QuestionsPerPage * 2, exam.QuizQuestions.Count), examInfo);
+            page.ExamFooter(exam, examInfo);
         });
     });
 
+    private static string WatermarkSVG(string text)
+    {
+        return @$"<svg viewBox=""0 0 200 200"" xmlns=""http://www.w3.org/2000/svg""><text x=""100"" y=""100"" text-anchor=""middle"" dominant-baseline=""middle"" fill=""gray"" opacity="".3"" font-family=""Arial"" font-size=""16"" transform=""rotate(-45 100 100)"">{text}</text></svg>";
+    }
 }
