@@ -1,4 +1,4 @@
-﻿using Application.Services.PdfReaderService.Dtos;
+﻿using Application.Services.PdfFactory.PdfReaderService.Dtos;
 using iText.IO.Source;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
@@ -7,7 +7,7 @@ using Nest;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
-namespace Application.Services.PdfReaderService;
+namespace Application.Services.PdfFactory.PdfReaderService;
 internal class PdfReaderManager(PdfReaderStudentManager pdfReadeRStudent) : IPdfReaderService
 {
     private readonly PdfReaderStudentManager _pdfReadeRStudent = pdfReadeRStudent;

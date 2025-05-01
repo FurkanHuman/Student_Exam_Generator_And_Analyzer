@@ -3,7 +3,9 @@ using Application.Services.Benefits;
 using Application.Services.Exams;
 using Application.Services.LearningAreas;
 using Application.Services.Lessons;
-using Application.Services.PdfReaderService;
+using Application.Services.PdfFactory.CreateExamPdf;
+using Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
+using Application.Services.PdfFactory.PdfReaderService;
 using Application.Services.Personels;
 using Application.Services.Principals;
 using Application.Services.QuestionOptions;
@@ -44,6 +46,7 @@ public static class ApplicationServiceRegistration
         FileLogConfiguration fileLogConfiguration,
         ElasticSearchConfig elasticSearchConfig
     )
+
 
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
@@ -90,6 +93,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IPdfReaderService, PdfReaderManager>();
 
         services.AddScoped<PdfReaderStudentManager>();
+        services.AddScoped<IExamPageGenerator, ExamPageRenderer>();
         return services;
     }
 

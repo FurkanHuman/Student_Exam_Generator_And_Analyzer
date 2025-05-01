@@ -2,7 +2,7 @@ using Application.Features.ReferenceBenefits.Constants;
 using Application.Features.ReferenceBenefits.Rules;
 using Application.Services.Benefits;
 using Application.Services.LearningAreas;
-using Application.Services.PdfReaderService.Dtos;
+using Application.Services.PdfFactory.PdfReaderService.Dtos;
 using Application.Services.Repositories;
 using Application.Services.SubLearningAreas;
 using AutoMapper;
