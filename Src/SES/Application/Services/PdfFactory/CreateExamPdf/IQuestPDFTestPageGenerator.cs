@@ -1,9 +1,10 @@
-﻿using Domain.Entities;
+﻿using Application.Services.PdfFactory.CreateExamPdf.DTOs;
+using Domain.Entities;
 using QuestPDF.Infrastructure;
 
 namespace Application.Services.PdfFactory.CreateExamPdf;
 
 public interface IQuestPDFTestPageGenerator
 {
-    IDocument PageGenerate(Exam exam);
+    IDocument PageGenerate(Exam exam, ref ExamInfo examInfo);
 }

@@ -1,0 +1,19 @@
+﻿namespace Application.Services.PdfFactory.CreateExamPdf.DTOs;
+
+public class ExamInfo
+{
+    public IDictionary<int, int> QQOrder { get; set; } // key is question Id, value is exam question order
+    public string ExamName { get; set; }
+    public string Language { get; set; } = "TUR"; // exam language
+    public string FooterNote { get; set; } = "Footer note is here"; // footer note for the exam
+    public string? ExamScoreStr { get; set; } = "Yüz"; // score in string format
+    public int ExamScore { get; set; } = 100;
+    public int SelectedClass { get; set; } = 0;
+    public byte ExamTerm { get; set; } // period of exam
+    public byte CurrentExamNumber { get; set; } // in period number of exam 
+    public bool IsStandardOptionMode { get; set; } = false;
+    public bool IsRandomizeQuestions { get; set; } = false;
+    public bool IsRandomizeOptions { get; set; } = false;
+    public bool IsOpticCodeForm { get; set; } = false; // back page optic code form
+
+}
