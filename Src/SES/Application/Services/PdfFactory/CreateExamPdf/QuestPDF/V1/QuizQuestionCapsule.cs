@@ -1,10 +1,11 @@
 ﻿using Application.Services.PdfFactory.CreateExamPdf.DTOs;
+using Application.Services.PdfFactory.CreateExamPdf.Helpers;
 using Domain.Entities;
 using Domain.Enums;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
-namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF;
+namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
 
 internal static class QuizQuestionCapsule
 {
@@ -151,7 +152,6 @@ internal static class QuizQuestionCapsule
         container.Column(col =>
         {
             foreach (QuestionOption questionOption in questionOptions)
-            {
                 col.Item().PaddingBottom(5, Unit.Point).Row(row =>
                 {
                     row.ConstantItem(20, Unit.Point).Element(e => e.PaddingBottom(-5.5f, Unit.Point).Text("(...)"));
@@ -163,7 +163,6 @@ internal static class QuizQuestionCapsule
                              .FontSize(12);
                     });
                 });
-            }
         });
 
 

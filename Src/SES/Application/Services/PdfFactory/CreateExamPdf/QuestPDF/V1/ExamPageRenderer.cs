@@ -4,9 +4,9 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
-namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF;
+namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
 
-public class ExamPageRenderer : IExamPageGenerator, IQuestPDFTestPageGenerator
+public class ExamPageRenderer : IExamPageGenerator
 {
     private static readonly byte QuestionsPerPage = 6;
 

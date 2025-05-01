@@ -1,9 +1,10 @@
 ﻿using Application.Services.PdfFactory.CreateExamPdf.DTOs;
+using Application.Services.PdfFactory.CreateExamPdf.Helpers;
 using Domain.Entities;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
-namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF;
+namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
 
 internal static class ExamPageContent
 {
@@ -30,23 +31,22 @@ internal static class ExamPageContent
                     column.Item()
                           .ShowEntire()
                           .PaddingBottom(20)
-                          .QuestionBody(exam, i, examInfo);
+                          .QuestionBody(exam, i, examInfo, (int)seed);
             });
         });
 
         return page;
     }
 
-    private static IContainer QuestionBody(this IContainer container, Exam exam, int index, ExamInfo examInfo)
+    private static IContainer QuestionBody(this IContainer container, Exam exam, int index, ExamInfo examInfo, int seed)
     {
         container.Row(row =>
         {
             row.Spacing(10);
             row.AutoItem().AlignMiddle().AlignTop().Text($"{index + 1})");
-            row.RelativeItem(1).AlignMiddle().QuizQuestion(exam.QuizQuestions[index], examInfo, 0);
+            row.RelativeItem(1).AlignMiddle().QuizQuestion(exam.QuizQuestions[index], examInfo, seed);
         });
 
         return container;
     }
-
 }

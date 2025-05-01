@@ -1,9 +1,10 @@
 ﻿using Application.Services.PdfFactory.CreateExamPdf.DTOs;
+using Application.Services.PdfFactory.CreateExamPdf.Helpers;
 using Domain.Entities;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
-namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF;
+namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
 
 internal static class ExamPageFooter
 {
