@@ -63,12 +63,34 @@ internal static class QuizQuestionHelpers
     // Shuffles the options of a question if randomization is enabled in ExamInfo
     internal static void ShuffleQuestionOptions(ref IList<QuestionOption> options, ref ExamInfo examInfo, int seed)
     {
-        // Sort options by ID before shuffling
+        // Sort options by ID before shuffling to ensure a consistent base order
         options = [.. options.OrderBy(o => o.Id)];
 
-        // Shuffle options if randomization is enabled
+        // Shuffle options if randomization is enabled in the exam settings
         if (examInfo.IsRandomizeOptions)
-            options = [.. options.OrderBy(o => new Random(seed).Next())];
+        {
+            Random rnd = new(seed);
+            options = [.. options.OrderBy(_ => rnd.Next())];
+        }
+    }
+
+    // Shuffles the options of all questions in the quiz if randomization is enabled in ExamInfo
+    internal static void ShuffleAllQuestionOptions(ref IList<QuizQuestion> quizQuestions, ExamInfo examInfo, int globalSeed)
+    {
+        // Check if randomization of options is enabled in the exam settings
+        if (!examInfo.IsRandomizeOptions)
+            return;
+
+        // Iterate through each question and shuffle its options
+        for (int i = 0; i < quizQuestions.Count; i++)
+        {
+            QuizQuestion question = quizQuestions[i];
+            int localSeed = globalSeed * i; // Generate a unique seed for each question
+            Random rng = new(localSeed);
+
+            // Shuffle the options of the current question
+            question.Options = [.. question.Options.OrderBy(_ => rng.Next())];
+        }
     }
 
     // Shuffles a string array using the Fisher-Yates algorithm

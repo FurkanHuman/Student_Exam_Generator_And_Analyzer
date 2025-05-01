@@ -13,7 +13,9 @@ internal static class ExamPageContent
         IList<QuizQuestion> quizQuestions = exam.QuizQuestions;
 
         uint seed = QuizQuestionHelpers.DecodeBase32String(exam.ExamCode);
+       
         QuizQuestionHelpers.ShuffleQuizQuestions(ref quizQuestions, ref examInfo, (int)seed);
+        QuizQuestionHelpers.ShuffleAllQuestionOptions(ref quizQuestions, examInfo, (int)seed);
         QuizQuestionHelpers.OrderQuizQuestions(quizQuestions, ref examInfo, (int)seed);
 
         exam.QuizQuestions = quizQuestions;

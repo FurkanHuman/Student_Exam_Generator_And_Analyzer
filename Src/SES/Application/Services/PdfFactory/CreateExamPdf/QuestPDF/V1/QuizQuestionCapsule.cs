@@ -13,11 +13,6 @@ internal static class QuizQuestionCapsule
 
     internal static IContainer QuizQuestion(this IContainer container, QuizQuestion question, ExamInfo examInfo, int seed)
     {
-        // Create a local variable to hold the options and pass it by reference
-        IList<QuestionOption> options = question.Options;
-        QuizQuestionHelpers.ShuffleQuestionOptions(ref options, ref examInfo, seed);
-        question.Options = options;
-
         if (question.QuestionType == QuestionType.FillInTheBlank)
             RenderFillInTheBlankMask(ref question);
 
@@ -107,8 +102,6 @@ internal static class QuizQuestionCapsule
 
     private static IContainer RenderQuestionOptions(this IContainer container, IList<QuestionOption> questionOptions, bool isStandardOptionMode)
     {
-        questionOptions = [.. questionOptions.OrderBy(x => x.Id)];
-
         container.Column(col =>
         {
             for (int i = 0; i < questionOptions.Count; i++)
