@@ -2,6 +2,7 @@
 @using Application.Features.QuizQuestions.Queries.GetByLessonId
 @using Application.Features.Semesters.Queries.GetList
 @using Application.Features.StudentClasses.Queries.GetList
+@using Application.Services.PdfFactory.CreateExamPdf.DTOs
 @using AutoMapper
 @using BlazorWebUI.Client.Pages.Styles
 @using BlazorWebUI.Client.Pages.Styles.QQ
@@ -14,24 +15,28 @@
 
 @code
 {
-    private bool isChecked { get; set; } = false;
+    private bool _isChecked { get; set; } = false;
 
-    private bool isZeroStage { get; set; } = true;
-    private bool isFirstStage { get; set; } = false;
-    private bool isSecondStage { get; set; } = false;
-    private bool isThirdStage { get; set; } = false;
+    private bool _isZeroStage { get; set; } = true;
+    private bool _isFirstStage { get; set; } = false;
+    private bool _isSecondStage { get; set; } = false;
+    private bool _isThirdStage { get; set; } = false;
 
-    private GetListResponse<GetListSemesterListItemDto> semesterList = new();
+    private int _semesterId { get; set; }
+    private int _lessonId { get; set; }
+    private int _schoolId { get; set; }
+    private int _refrenceBenefitId { get; set; }
 
-    private IEnumerable<int> getClassesForAges { get; set; } = [];
-    private ICollection<CheckboxItem<int>> CheckboxItemsForClasses { get; set; } = [];
+    private GetListResponse<GetListSemesterListItemDto> _semesterList = new();
+
+    private IEnumerable<int> _getClassesForAges { get; set; } = [];
+    private ICollection<CheckboxItem<int>> _checkboxItemsForClasses { get; set; } = [];
     private IList<QQBodyDto> _loadedQQ { get; set; } = [];
     private IList<QQBodyDto> _selectedQQ { get; set; } = [];
-    private IList<Ordering> _orderedQQ { get; set; } = [];
 
-    private ExamInfo ExamRequaredInfo { get; set; } = new();
-    private AdditionalExamInfo AdditionalInfo { get; set; } = new();
+    private Dictionary<int, int> _orderedQQ { get; set; } = new();
 
+    private ExamInfo _examInfo { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -39,8 +44,8 @@
 
         GetListResponse<GetListStudentClassListItemDto> getClasses = await _mediator.Send(new GetListStudentClassQuery() { PageRequest = pageRequest });
 
-        semesterList = await _mediator.Send(new GetListSemesterQuery() { PageRequest = pageRequest });
-        getClassesForAges = getClasses.Items.Select(sc => sc.ClassAge).Distinct().ToList();
+        _semesterList = await _mediator.Send(new GetListSemesterQuery() { PageRequest = pageRequest });
+        _getClassesForAges = getClasses.Items.Select(sc => sc.ClassAge).Distinct().ToList();
 
         await base.OnInitializedAsync();
     }
@@ -56,76 +61,34 @@
     private void LoadAPool(IList<GetByLessonIdQuizQuestionListItemDto> getByQuizzes)
     {
         _loadedQQ = _mapper.Map<IList<QQBodyDto>>(getByQuizzes);
-        isZeroStage = false;
-        isFirstStage = true;
+        _isZeroStage = false;
+        _isFirstStage = true;
     }
 
     private void FirstStageHandle(MouseEventArgs args)
     {
-        isFirstStage = false;
-        isSecondStage = true;
+        _isFirstStage = false;
+        _isSecondStage = true;
     }
 
     private void SecondStageHandle(MouseEventArgs args)
     {
-        _orderedQQ = _selectedQQ.Select((x, i) => new Ordering() { QQId = x.Id, Order = i }).ToList();
+        _orderedQQ = _selectedQQ.Select((x, i) => new KeyValuePair<int, int>(x.Id, i + 1)).ToDictionary(pair => pair.Key, pair => pair.Value);
 
-        isSecondStage = false;
-        isThirdStage = true;
+        _isSecondStage = false;
+        _isThirdStage = true;
     }
 
     private void ThirdStageHandle(MouseEventArgs args)
     {
-        isThirdStage = false;
-
-        // note: anlık dönem al otomatik
+        _isThirdStage = false;
     }
 
     private string getSecondStageButtonText()
     {
-        if (!AdditionalInfo.isRandomizeQuestions)
+        if (!_examInfo.IsRandomizeQuestions)
             return "Soru Sırasını Düzenle";
         return "Sınav Oluştur";
-    }
-
-    private sealed class Ordering
-    {
-        public int QQId { get; set; }
-        public int Order { get; set; }
-    }
-
-    private sealed class AdditionalExamInfo
-    {
-        public int SelectedClass { get; set; } = 0;
-
-        public int CurrentExamNumber { get; set; } = 0;
-
-        public bool isRandomizeQuestions { get; set; } = false;
-
-        public bool isRandomizeOptions { get; set; } = false;
-
-        public bool isOpticCode { get; set; } = false; // back page optic code form
-
-        public bool isStandardOptions { get; set; } = true; // common options for all questions or not optic vs standard options
-    }
-
-    private sealed class ExamInfo
-    {
-        public string ExamName { get; set; } = string.Empty;
-
-        public string? FooterNote { get; set; }
-
-        public string? ExamScoreStr { get; set; }
-
-        public int ExamScore { get; set; } = 100;
-
-        public int SemesterId { get; set; }
-
-        public int LessonId { get; set; }
-
-        public int SchoolId { get; set; }
-
-        public int RefrenceBenefitId { get; set; }
     }
 }
 
@@ -166,12 +129,12 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
 <h3>Sınav Oluştur</h3>
 <p>Soru havuzunu seçtikten sonra önce soruları belirleyin, ardından soruların sırasını düzenleyin. Eğer bir sıra belirtmezseniz, fazladan seçtiğiniz sorular rastgele yerleştirilecektir.</p>
 
-@if (isZeroStage)
+@if (_isZeroStage)
 {
     <QuizPoolLoader OnQQList="LoadAPool" />
 }
 
-@if (isFirstStage)
+@if (_isFirstStage)
 {
     //sınıf secçimi ekle o döneme ait
 
@@ -179,19 +142,19 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
 
         <div class="input-group mb-3" style="width:12rem;">
             <label class="input-group-text">Sınav Puanı: </label>
-            <InputNumber type="Text" class="form-control conversion" id="name" @bind-Value="ExamRequaredInfo.ExamScore" disabled="true" />
+            <InputNumber type="Text" class="form-control conversion" id="name" @bind-Value="_examInfo.ExamScore" disabled="true" />
         </div>
 
         <div class="input-group mb-3" style="width:15rem;">
             <label class="input-group-text">Alt Not: </label>
-            <InputText type="Text" class="form-control conversion" id="name" @bind-Value="ExamRequaredInfo.FooterNote" />
+            <InputText type="Text" class="form-control conversion" id="name" @bind-Value="_examInfo.FooterNote" />
         </div>
 
         <div class="input-group mb-3" style="width:15rem;">
             <label class="input-group-text">Dönem Seçiniz:</label>
-            <InputSelect class="form-select" id="principalSG" @bind-Value="ExamRequaredInfo.SemesterId">
+            <InputSelect class="form-select" id="principalSG" @bind-Value="_semesterId">
                 <option selected>Seçiniz...</option>
-                @foreach (GetListSemesterListItemDto? semester in semesterList.Items)
+                @foreach (GetListSemesterListItemDto? semester in _semesterList.Items)
                 {
                     <option value="@semester.Id">@semester.BeginSemesterDate @semester.EndSemesterDate @semester.Name </option>
                 }
@@ -200,9 +163,9 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
 
         <div class="input-group mb-3" style="width:15rem;">
             <label class="input-group-text">sınav sınıfları</label>
-            <InputSelect class="form-select" @bind-Value="AdditionalInfo.SelectedClass">
+            <InputSelect class="form-select" @bind-Value="_examInfo.SelectedClass">
                 <option selected>Seçiniz...</option>
-                @foreach (int age in getClassesForAges)
+                @foreach (int age in _getClassesForAges)
                 {
                     <option value="@age">@($"{age}. Sınıflar")</option>
                 }
@@ -211,7 +174,7 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
 
         <div class="input-group mb-3" style="width:15rem;">
             <label class="input-group-text">sınav sınıfları</label>
-            <InputSelect class="form-select" @bind-Value="AdditionalInfo.CurrentExamNumber">
+            <InputSelect class="form-select" @bind-Value="_examInfo.CurrentExamNumber">
                 <option selected>Seçiniz...</option>
                 @for (int examNumber = 1; examNumber != 10; examNumber++)
                 {
@@ -220,22 +183,22 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
             </InputSelect>
         </div>
         <div class="form-check form-check-inline">
-            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox1" @bind-Value="AdditionalInfo.isRandomizeQuestions" />
+            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox1" @bind-Value="_examInfo.IsRandomizeQuestions" />
             <label class="form-check-label" for="inlineCheckbox1">Soruları karıştır.</label>
         </div>
 
         <div class="form-check form-check-inline">
-            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox2" @bind-Value="AdditionalInfo.isRandomizeOptions" />
+            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox2" @bind-Value="_examInfo.IsRandomizeOptions" />
             <label class="form-check-label" for="inlineCheckbox2">Seçenekleri karıştır.</label>
         </div>
 
         <div class="form-check form-check-inline">
-            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox3" @bind-Value="AdditionalInfo.isOpticCode" />
+            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox3" @bind-Value="_examInfo.IsOpticCodeForm" />
             <label class="form-check-label" for="inlineCheckbox3">Optik kodlama ekle.</label>
         </div>
 
         <div class="form-check form-check-inline">
-            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox4" @bind-Value="AdditionalInfo.isStandardOptions" />
+            <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox4" @bind-Value="_examInfo.IsStandardOptionMode" />
             <label class="form-check-label" for="inlineCheckbox4">Standart Seçenekler.</label>
         </div>
 
@@ -244,7 +207,7 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
     </div>
 }
 
-@if (isSecondStage)
+@if (_isSecondStage)
 {
     <div class="form-control">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -254,7 +217,7 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
         @foreach (QQBodyDto quest in _loadedQQ)
         {
             <div class="container p-3 my-5 d-flex align-items-start bg-light shadow-sm rounded">
-                <InputCheckbox class="form-check-input fs-3 me-3 mt-1" type="checkbox" id="flexCheckDefault" ValueChanged="(e) => ToggleQuestInList(e, quest)" ValueExpression="() => isChecked" />
+                <InputCheckbox class="form-check-input fs-3 me-3 mt-1" type="checkbox" id="flexCheckDefault" ValueChanged="(e) => ToggleQuestInList(e, quest)" ValueExpression="() => _isChecked" />
                 <div class="flex-grow-1 p-3 bg-white rounded border shadow-sm">
                     <QQView QQBody="quest" />
                 </div>
@@ -263,7 +226,7 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
     </div>
 }
 
-@if (isThirdStage)
+@if (_isThirdStage)
 {
     <div class="form-control">
 
@@ -271,12 +234,12 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
             <button class="btn btn-primary" @onclick="ThirdStageHandle">Sınav Oluştur</button>
         </div>
 
-        @foreach (Ordering q in _orderedQQ.OrderBy(q => q.Order == 0 ? int.MaxValue : q.Order))
+        @foreach (int qId in _orderedQQ.Keys.OrderBy(id => _orderedQQ[id] == 0 ? int.MaxValue : _orderedQQ[id]))
         {
             <div class="container p-3 my-5 d-flex align-items-start bg-light shadow-sm rounded">
-                <InputNumber class="form-control me-3 text-center" min="0" @bind-Value="q.Order" style="width:5rem" />
+                <InputNumber class="form-control me-3 text-center" min="0" @bind-Value="_orderedQQ[qId]" style="width:5rem" />
                 <div class="flex-grow-1 p-3 bg-white rounded border shadow-sm">
-                    <QQView QQBody="_selectedQQ.First(qq => qq.Id == q.QQId)" />
+                    <QQView QQBody="_selectedQQ.First(qq => qq.Id == qId)" />
                 </div>
             </div>
         }
