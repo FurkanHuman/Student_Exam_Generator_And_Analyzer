@@ -405,3 +405,4 @@ Src/SES/Persistence/Migrations/*
 /CMDREader
 /Src/SES/BlazorWebUI/BlazorWebUI/appsettings.json
 /QuestPdfTest
+/PDFTEST
