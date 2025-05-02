@@ -14,6 +14,14 @@
     [Parameter]
     public EventCallback<IList<GetByLessonIdQuizQuestionListItemDto>> OnQQList { get; set; }
 
+    [Parameter]
+    public EventCallback<int> OnSemesterId { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnLessonId { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnStudentClasssAge { get; set; }
 
     private int? SelectedSemesterId { get; set; }
     private int? SelectedLessonId { get; set; }
@@ -46,14 +54,18 @@
         List<GetByLessonIdQuizQuestionListItemDto> _qqList = new();
         if (SelectedLessonId != null)
         {
-            GetListResponse<GetByLessonIdQuizQuestionListItemDto> GetListQuizQuestion = await _mediatr.Send(new GetByLessonIdQuizQuestionQuery()
-                { LessonId = SelectedLessonId.Value });
+            GetListResponse<GetByLessonIdQuizQuestionListItemDto> GetListQuizQuestion = await _mediatr.Send(new GetByLessonIdQuizQuestionQuery() { LessonId = SelectedLessonId.Value });
 
             _qqList.AddRange(GetListQuizQuestion.Items);
         }
 
         _qqList = _qqList.Distinct().ToList();
+
+        int classAge = GetListLessons.Items.FirstOrDefault(l => l.Id == SelectedLessonId)?.StudentClassAge ?? 0;
         await OnQQList.InvokeAsync(_qqList);
+        await OnLessonId.InvokeAsync(SelectedLessonId!.Value);
+        await OnSemesterId.InvokeAsync(SelectedSemesterId!.Value);
+        await OnStudentClasssAge.InvokeAsync(classAge);
     }
 }
 
@@ -80,10 +92,9 @@
             <ul class="dropdown-menu">
                 @foreach (var lesson in GetListLessons.Items)
                 {
-                    <li @onclick="() => SelectLesson(lesson.Id)" class="dropdown-item">@lesson.LessonName</li>
+                    <li @onclick="() => SelectLesson(lesson.Id)" class="dropdown-item">@lesson.StudentClassAge. Sınıf @lesson.LessonName</li>
                 }
             </ul>
         </div>
     }
-
 </div>
