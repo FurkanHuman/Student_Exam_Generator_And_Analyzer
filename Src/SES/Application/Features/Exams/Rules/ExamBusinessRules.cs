@@ -4,6 +4,7 @@ using Domain.Entities;
 using NArchitecture.Core.Application.Rules;
 using NArchitecture.Core.CrossCuttingConcerns.Exception.Types;
 using NArchitecture.Core.Localization.Abstraction;
+using NArchitecture.Core.Persistence.Paging;
 
 namespace Application.Features.Exams.Rules;
 
@@ -22,6 +23,12 @@ public class ExamBusinessRules : BaseBusinessRules
     {
         string message = await _localizationService.GetLocalizedAsync(messageKey, ExamsBusinessMessages.SectionName);
         throw new BusinessException(message);
+    }
+
+    public void CheckStudentAvailability(IPaginate<Student>? students)
+    {
+        if (students == null || students.Items.Count == 0)
+            throw new BusinessException("No students found for the given class age.");
     }
 
     public async Task ExamShouldExistWhenSelected(Exam? exam)
