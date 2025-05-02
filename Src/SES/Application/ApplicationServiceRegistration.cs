@@ -94,6 +94,8 @@ public static class ApplicationServiceRegistration
 
         services.AddScoped<PdfReaderStudentManager>();
         services.AddScoped<IExamPageGenerator, ExamPageRenderer>();
+
+        QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
         return services;
     }
 
