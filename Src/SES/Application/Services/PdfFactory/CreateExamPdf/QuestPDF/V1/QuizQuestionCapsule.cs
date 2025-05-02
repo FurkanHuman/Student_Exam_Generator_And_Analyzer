@@ -27,9 +27,9 @@ internal static class QuizQuestionCapsule
                         col.Item().Image(question.QuestionImageURL).FitArea();
 
                     if (!string.IsNullOrEmpty(question.QuestionBody))
-                        col.Item().Text(question.Question).FontSize(12).Italic().Justify();
+                        col.Item().Text(question.QuestionBody).FontSize(12).Italic().Justify();
 
-                    col.Item().Text(question.QuestionBody).FontSize(12).Bold().Justify();
+                    col.Item().Text(question.Question).FontSize(12).Bold().Justify();
 
                     switch (question.QuestionType)
                     {
