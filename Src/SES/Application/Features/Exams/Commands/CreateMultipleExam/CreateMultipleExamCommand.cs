@@ -65,6 +65,9 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
             IList<Exam> exams = [];
             IList<byte[]> pdfBytes = [];
 
+            if (string.IsNullOrEmpty(request.ExamInfo.ExamName))
+                request.ExamInfo.ExamName = "Currently empty";
+
             string examCode = QuizQuestionHelpers.GenerateBase32String();
 
             Lesson? lesson = await _lessonService.GetAsync(
