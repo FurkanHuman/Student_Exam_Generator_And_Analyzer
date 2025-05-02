@@ -1,4 +1,5 @@
 ﻿@page "/CreateExam"
+@using Application.Features.Exams.Commands.CreateMultipleExam
 @using Application.Features.QuizQuestions.Queries.GetByLessonId
 @using Application.Features.Semesters.Queries.GetList
 @using Application.Features.StudentClasses.Queries.GetList
@@ -12,6 +13,7 @@
 @rendermode InteractiveServer
 @inject IMediator _mediator
 @inject IMapper _mapper
+@inject IJSRuntime _jsRuntime
 
 @code
 {
@@ -24,13 +26,13 @@
 
     private int _semesterId { get; set; }
     private int _lessonId { get; set; }
-    private int _schoolId { get; set; }
-    private int _refrenceBenefitId { get; set; }
+    // private int _schoolId { get; set; }
+    // private int _refrenceBenefitId { get; set; }
 
-    private GetListResponse<GetListSemesterListItemDto> _semesterList = new();
+    // private GetListResponse<GetListSemesterListItemDto> _semesterList = new();
 
-    private IEnumerable<int> _getClassesForAges { get; set; } = [];
-    private ICollection<CheckboxItem<int>> _checkboxItemsForClasses { get; set; } = [];
+    // private IEnumerable<int> _getClassesForAges { get; set; } = [];
+    // private ICollection<CheckboxItem<int>> _checkboxItemsForClasses { get; set; } = [];
     private IList<QQBodyDto> _loadedQQ { get; set; } = [];
     private IList<QQBodyDto> _selectedQQ { get; set; } = [];
 
@@ -40,12 +42,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        PageRequest pageRequest = new PageRequest() { PageIndex = 0, PageSize = int.MaxValue };
+        // PageRequest pageRequest = new PageRequest() { PageIndex = 0, PageSize = int.MaxValue };
 
-        GetListResponse<GetListStudentClassListItemDto> getClasses = await _mediator.Send(new GetListStudentClassQuery() { PageRequest = pageRequest });
+        // GetListResponse<GetListStudentClassListItemDto> getClasses = await _mediator.Send(new GetListStudentClassQuery() { PageRequest = pageRequest });
 
-        _semesterList = await _mediator.Send(new GetListSemesterQuery() { PageRequest = pageRequest });
-        _getClassesForAges = getClasses.Items.Select(sc => sc.ClassAge).Distinct().ToList();
+        // _semesterList = await _mediator.Send(new GetListSemesterQuery() { PageRequest = pageRequest });
+        // _getClassesForAges = getClasses.Items.Select(sc => sc.ClassAge).Distinct().ToList();
 
         await base.OnInitializedAsync();
     }
@@ -79,9 +81,24 @@
         _isThirdStage = true;
     }
 
-    private void ThirdStageHandle(MouseEventArgs args)
+    private async Task ThirdStageHandle(MouseEventArgs args)
     {
-        _isThirdStage = false;
+        // _isThirdStage = false;
+        _examInfo.QQOrder = _orderedQQ;
+
+        CreateMultipleExamResponse createExamResponse = await _mediator.Send(new CreateMultipleExamCommand()
+            {
+                ExamInfo = _examInfo,
+                ClassAge = _examInfo.SelectedClass,
+                LessonId = _lessonId,
+                SemesterId = _semesterId,
+            // SchoolId = _schoolId,
+            // RefrenceBenefitId = _refrenceBenefitId
+            });
+
+        string? base64 = Convert.ToBase64String(createExamResponse.ZipFileMemStream.ToArray());
+
+        await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", createExamResponse.FileName, base64, "application/zip");
     }
 
     private string getSecondStageButtonText()
@@ -131,18 +148,17 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
 
 @if (_isZeroStage)
 {
-    <QuizPoolLoader OnQQList="LoadAPool" />
+    <QuizPoolLoader OnLessonId="(lId) => _lessonId = lId"
+                    OnSemesterId="(sId) => _semesterId = sId" OnQQList="LoadAPool" />
 }
 
 @if (_isFirstStage)
 {
-    //sınıf secçimi ekle o döneme ait
-
     <div class="form-control container p-3 bg-light shadow-sm rounded">
 
-        <div class="input-group mb-3" style="width:12rem;">
-            <label class="input-group-text">Sınav Puanı: </label>
-            <InputNumber type="Text" class="form-control conversion" id="name" @bind-Value="_examInfo.ExamScore" disabled="true" />
+        <div class="input-group mb-3" style="width:20rem;">
+            <label class="input-group-text">Sınav Adı (Opsiyonel): </label>
+            <InputText type="Text" class="form-control conversion" id="name" @bind-Value="_examInfo.ExamName" />
         </div>
 
         <div class="input-group mb-3" style="width:15rem;">
@@ -150,30 +166,13 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
             <InputText type="Text" class="form-control conversion" id="name" @bind-Value="_examInfo.FooterNote" />
         </div>
 
-        <div class="input-group mb-3" style="width:15rem;">
-            <label class="input-group-text">Dönem Seçiniz:</label>
-            <InputSelect class="form-select" id="principalSG" @bind-Value="_semesterId">
-                <option selected>Seçiniz...</option>
-                @foreach (GetListSemesterListItemDto? semester in _semesterList.Items)
-                {
-                    <option value="@semester.Id">@semester.BeginSemesterDate @semester.EndSemesterDate @semester.Name </option>
-                }
-            </InputSelect>
+        <div class="input-group mb-3" style="width:12rem;">
+            <label class="input-group-text">Sınav Puanı: </label>
+            <InputNumber type="Text" class="form-control conversion" id="name" @bind-Value="_examInfo.ExamScore" disabled="true" />
         </div>
 
         <div class="input-group mb-3" style="width:15rem;">
-            <label class="input-group-text">sınav sınıfları</label>
-            <InputSelect class="form-select" @bind-Value="_examInfo.SelectedClass">
-                <option selected>Seçiniz...</option>
-                @foreach (int age in _getClassesForAges)
-                {
-                    <option value="@age">@($"{age}. Sınıflar")</option>
-                }
-            </InputSelect>
-        </div>
-
-        <div class="input-group mb-3" style="width:15rem;">
-            <label class="input-group-text">sınav sınıfları</label>
+            <label class="input-group-text">Kaçıncı Yazılı?: </label>
             <InputSelect class="form-select" @bind-Value="_examInfo.CurrentExamNumber">
                 <option selected>Seçiniz...</option>
                 @for (int examNumber = 1; examNumber != 10; examNumber++)
@@ -182,6 +181,18 @@ sınavı oluştur butonuna basıldığında aksiyon zamanı.
                 }
             </InputSelect>
         </div>
+        
+        <div class="input-group mb-3" style="width:15rem;">
+            <label class="input-group-text">Kaçıncı Sınıf?: </label>
+            <InputSelect class="form-select" @bind-Value="_examInfo.SelectedClass">
+                <option selected>Seçiniz...</option>
+                @for (int currentClassLevel = 1; currentClassLevel != 10; currentClassLevel++)
+                {
+                    <option value="@currentClassLevel">@($"{currentClassLevel}. Sınıf")</option>
+                }
+            </InputSelect>
+        </div>
+
         <div class="form-check form-check-inline">
             <InputCheckbox class="form-check-input" type="checkbox" id="inlineCheckbox1" @bind-Value="_examInfo.IsRandomizeQuestions" />
             <label class="form-check-label" for="inlineCheckbox1">Soruları karıştır.</label>
