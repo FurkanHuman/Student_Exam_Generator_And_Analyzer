@@ -20,9 +20,6 @@
     [Parameter]
     public EventCallback<int> OnLessonId { get; set; }
 
-    [Parameter]
-    public EventCallback<int> OnStudentClasssAge { get; set; }
-
     private int? SelectedSemesterId { get; set; }
     private int? SelectedLessonId { get; set; }
 
@@ -61,11 +58,9 @@
 
         _qqList = _qqList.Distinct().ToList();
 
-        int classAge = GetListLessons.Items.FirstOrDefault(l => l.Id == SelectedLessonId)?.StudentClassAge ?? 0;
         await OnQQList.InvokeAsync(_qqList);
         await OnLessonId.InvokeAsync(SelectedLessonId!.Value);
         await OnSemesterId.InvokeAsync(SelectedSemesterId!.Value);
-        await OnStudentClasssAge.InvokeAsync(classAge);
     }
 }
 
