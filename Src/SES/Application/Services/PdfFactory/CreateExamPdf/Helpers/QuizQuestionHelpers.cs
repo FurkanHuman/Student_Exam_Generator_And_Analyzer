@@ -57,7 +57,8 @@ internal static class QuizQuestionHelpers
         quizQuestions = [.. quizQuestions.OrderBy(q => q.Id)];
 
         // Shuffle questions using a random seed
-        quizQuestions = [.. quizQuestions.OrderBy(q => new Random(seed).Next())];
+        Random rnd = new(seed * quizQuestions.Count);
+        quizQuestions = [.. quizQuestions.OrderBy(q => rnd.Next(int.MinValue, int.MaxValue))];
     }
 
     // Shuffles the options of a question if randomization is enabled in ExamInfo
