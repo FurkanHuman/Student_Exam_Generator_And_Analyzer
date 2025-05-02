@@ -23,6 +23,7 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>, IMainConfig
         builder.HasMany(l => l.Teachers);
         builder.HasMany(l => l.Exams);
         builder.HasMany(l => l.QuizQuestions);
+        builder.HasMany(l => l.StudentClasses);
 
         builder.Property(l => l.CreatedDate).IsRequired();
         builder.Property(l => l.UpdatedDate);

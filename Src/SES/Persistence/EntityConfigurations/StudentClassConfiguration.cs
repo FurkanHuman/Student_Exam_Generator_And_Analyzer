@@ -29,6 +29,7 @@ public class StudentClassConfiguration : IEntityTypeConfiguration<StudentClass>,
         builder.HasMany(sc => sc.Exams);
         builder.HasMany(sc => sc.Analyses);
         builder.HasMany(sc => sc.Teachers);
+        builder.HasMany(sc => sc.Lessons);
 
         builder.Property(sc => sc.CreatedDate).IsRequired();
         builder.Property(sc => sc.UpdatedDate);

@@ -16,6 +16,7 @@ public class StudentClass : Entity<int>
     public Semester Semester { get; set; }
     public Teacher RefTeacher { get; set; }
 
+    public IList<Lesson> Lessons { get; set; }
     public IList<Student> Students { get; set; }
     public IList<Exam> Exams { get; set; }
     public IList<Analysis> Analyses { get; set; }

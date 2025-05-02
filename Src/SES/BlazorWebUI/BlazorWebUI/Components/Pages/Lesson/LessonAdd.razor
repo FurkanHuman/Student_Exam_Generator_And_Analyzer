@@ -10,20 +10,20 @@
 
 <div>
     <EditForm Model="lessonDto" FormName="LessonAddForm" OnValidSubmit="OnSubmitAsync">
-        <DataAnnotationsValidator/>
-        <ValidationSummary/>
-        <AntiforgeryToken/>
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <AntiforgeryToken />
 
         <div class="input-group mb-3" style="width:35rem;">
             <label class="input-group-text">Ders Adı: </label>
             <InputText type="Text" class="form-control conversion" id="name" style="text-transform:uppercase"
-                       @bind-Value="lessonDto.Name"/>
+                       @bind-Value="lessonDto.Name" />
         </div>
 
         <div class="input-group mb-3" style="width:35rem;">
             <label class="input-group-text">Açıklama: </label>
             <InputText type="Text" class="form-control conversion" id="description" style="text-transform:uppercase"
-                       @bind-Value="lessonDto.Description"/>
+                       @bind-Value="lessonDto.Description" />
         </div>
 
         <div class="input-group mb-3" style="width:35rem;">
@@ -41,6 +41,18 @@
             </InputSelect>
         </div>
 
+        <div class="input-group mb-3" style="width:35rem;">
+            <label class="input-group-text">Dönem: </label>
+            <InputSelect class="form-select" id="name" style="text-transform:uppercase" @bind-Value="lessonDto.ClassAge">
+                <option selected>Seçiniz</option>
+
+                @for (byte i = 0; i <= 12; i++)
+                {
+                    <option value="@i">@i. Sınııflar</option>
+                }
+            </InputSelect>
+        </div>
+
         <div class="input-group-append">
             <button type="submit" class="btn btn-primary">Kaydet</button>
         </div>
@@ -52,7 +64,8 @@
 
 @code {
 
-    [SupplyParameterFromForm] private LessonDTO lessonDto { get; set; } = new() { Name = string.Empty, Description = string.Empty };
+    [SupplyParameterFromForm]
+    private LessonDTO lessonDto { get; set; } = new() { Name = string.Empty, Description = string.Empty };
 
     private GetListResponse<GetListSemesterListItemDto> getListSemester = new();
 
@@ -69,16 +82,23 @@
 
     private async Task OnSubmitAsync()
     {
-        CreateLessonCommand createLesson = new() { Description = lessonDto.Description, LessonName = lessonDto.Name, SemesterId = lessonDto.SemesterId };
+        CreateLessonCommand createLesson = new()
+            {
+                LessonName = lessonDto.Name,
+                Description = lessonDto.Description,
+                SemesterId = lessonDto.SemesterId,
+                ClassAge = lessonDto.ClassAge
+            };
 
         await _Mediator.Send(createLesson);
     }
 
-
     private class LessonDTO
     {
-        public required string Description { get; set; }
+
         public required string Name { get; set; }
+        public required string Description { get; set; }
+        public int ClassAge { get; set; }
         public int SemesterId { get; set; }
     }
 
