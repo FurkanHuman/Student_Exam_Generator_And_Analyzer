@@ -10,14 +10,9 @@ using NArchitecture.Core.Persistence.Paging;
 
 namespace Application.Features.QuizQuestions.Queries.GetByLessonId;
 
-public class GetByLessonIdQuizQuestionQuery : IRequest<GetListResponse<GetByLessonIdQuizQuestionListItemDto>>, ICachableRequest
+public class GetByLessonIdQuizQuestionQuery : IRequest<GetListResponse<GetByLessonIdQuizQuestionListItemDto>>
 {
     public int LessonId { get; set; }
-
-    public bool BypassCache { get; }
-    public string? CacheKey => $"GetByLessonId";
-    public string? CacheGroupKey => "GetQuizQuestions";
-    public TimeSpan? SlidingExpiration { get; }
 
     public class GetByLessonIdQuizQuestionQueryHandler : IRequestHandler<GetByLessonIdQuizQuestionQuery, GetListResponse<GetByLessonIdQuizQuestionListItemDto>>
     {
