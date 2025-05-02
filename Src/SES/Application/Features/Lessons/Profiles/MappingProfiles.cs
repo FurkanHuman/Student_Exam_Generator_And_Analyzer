@@ -32,7 +32,8 @@ public class MappingProfiles : Profile
         CreateMap<Lesson, GetListLessonListItemDto>();
         CreateMap<IPaginate<Lesson>, GetListResponse<GetListLessonListItemDto>>();
 
-        CreateMap<Lesson, GetListLessonQueryBySemesterIdDto>();
+        CreateMap<Lesson, GetListLessonQueryBySemesterIdDto>()
+            .ForMember(destinationMember: x=>x.StudentClassAge, memberOptions: opt=>opt.MapFrom(l=>l.StudentClasses.Select(sc=>sc.ClassAge).FirstOrDefault()));
         CreateMap<IPaginate<Lesson>, GetListResponse<GetListLessonQueryBySemesterIdDto>>();
     }
 }

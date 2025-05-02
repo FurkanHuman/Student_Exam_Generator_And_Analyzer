@@ -7,6 +7,7 @@ using NArchitecture.Core.Application.Responses;
 using Application.Services.Repositories;
 using NArchitecture.Core.Persistence.Paging;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Lessons.Queries.GetListLessonQueryBySemesterId;
 
@@ -34,9 +35,11 @@ public class GetListLessonQueryBySemesterIdQuery : IRequest<GetListResponse<GetL
 
         public async Task<GetListResponse<GetListLessonQueryBySemesterIdDto>> Handle(GetListLessonQueryBySemesterIdQuery request, CancellationToken cancellationToken)
         {
-            IPaginate<Lesson> lessons =await _lessonRepository.GetListAsync(
+            IPaginate<Lesson> lessons = await _lessonRepository.GetListAsync(
                 predicate: l => l.SemesterId == request.SemesterId,
-                cancellationToken: cancellationToken    );
+                include: l => l.Include(l => l.Semester)
+                    .Include(l => l.StudentClasses),
+                cancellationToken: cancellationToken);
 
             GetListResponse<GetListLessonQueryBySemesterIdDto> response  = _mapper.Map<GetListResponse<GetListLessonQueryBySemesterIdDto>>(lessons);
             return response;
