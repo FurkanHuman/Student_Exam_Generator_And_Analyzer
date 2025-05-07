@@ -4,7 +4,6 @@ using AutoMapper;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
 
@@ -34,6 +33,7 @@ public class GetByLessonIdQuizQuestionQuery : IRequest<GetListResponse<GetByLess
                                                                                                                .Include(qq => qq.Options)
                                                                                                                .Include(qq => qq.QuestionScore)
                                                                                                                .Include(qq => qq.Benefits),
+                                                                                              size: int.MaxValue,
                                                                                               cancellationToken: cancellationToken);
 
             GetListResponse<GetByLessonIdQuizQuestionListItemDto> response = _mapper.Map<GetListResponse<GetByLessonIdQuizQuestionListItemDto>>(quizQuestion);
