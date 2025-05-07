@@ -20,6 +20,9 @@
     [Parameter]
     public EventCallback<int> OnLessonId { get; set; }
 
+
+    private bool IncludePreviousSemesters { get; set; } = false;
+
     private int? SelectedSemesterId { get; set; }
     private int? SelectedLessonId { get; set; }
 
@@ -30,6 +33,12 @@
     {
         PageRequest pR = new() { PageIndex = 0, PageSize = int.MaxValue };
         GetListSemesters = await _mediatr.Send(new GetListSemesterQuery() { PageRequest = pR });
+
+        if (!IncludePreviousSemesters)
+        {
+            SelectedSemesterId = GetListSemesters.Items.Last()?.Id;
+            GetListLessons = await _mediatr.Send(new GetListLessonQueryBySemesterIdQuery() { SemesterId = SelectedSemesterId!.Value });
+        }
         await base.OnInitializedAsync();
     }
 
@@ -63,20 +72,22 @@
         await OnSemesterId.InvokeAsync(SelectedSemesterId!.Value);
     }
 }
-
 <div class="form-control">
 
-    <div class="btn-group m-2">
-        <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-            @(SelectedSemesterId.HasValue ? GetListSemesters.Items.FirstOrDefault(s => s.Id == SelectedSemesterId)?.Name : "Dönem Seç")
-        </button>
-        <ul class="dropdown-menu">
-            @foreach (var semester in GetListSemesters.Items)
-            {
-                <li @onclick="() => SelectSemester(semester.Id)" class="dropdown-item">@($"{semester.BeginSemesterDate.Year} - {semester.EndSemesterDate.Year} {semester.Name}")</li>
-            }
-        </ul>
-    </div>
+    @if (IncludePreviousSemesters)
+    {
+        <div class="btn-group m-2">
+            <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                @(SelectedSemesterId.HasValue ? GetListSemesters.Items.FirstOrDefault(s => s.Id == SelectedSemesterId)?.Name : "Dönem Seç")
+            </button>
+            <ul class="dropdown-menu">
+                @foreach (var semester in GetListSemesters.Items)
+                {
+                    <li @onclick="() => SelectSemester(semester.Id)" class="dropdown-item">@($"{semester.BeginSemesterDate.Year} - {semester.EndSemesterDate.Year} {semester.Name}")</li>
+                }
+            </ul>
+        </div>
+    }
 
     @if (SelectedSemesterId.HasValue)
     {
@@ -92,4 +103,9 @@
             </ul>
         </div>
     }
+
+    <div class="form-check form-switch m-2">
+        <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" @bind="IncludePreviousSemesters">
+        <label class="form-check-label" for="flexSwitchCheckDefault">Önceki Dönemleri Dahil Et</label>
+    </div>
 </div>

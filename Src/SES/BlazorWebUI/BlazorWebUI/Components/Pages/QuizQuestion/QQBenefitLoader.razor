@@ -12,33 +12,37 @@
 
     <div class="form-control">
 
-        <div class="btn-group m-2">
-            <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                @(SelectedSchoolId.HasValue ? ReferenceBenefitSchools.FirstOrDefault(s => s.SchoolId == SelectedSchoolId)?.SchoolName : "Okul Seç")
-            </button>
-            <ul class="dropdown-menu">
-                @foreach (var school in ReferenceBenefitSchools)
-                {
-                    <li @onclick="() => SelectBenefitSchool(school.SchoolId)" class="dropdown-item">@school.SchoolName</li>
-                }
-            </ul>
-        </div>
-
-        @if (SelectedSchoolId.HasValue)
+        @if (IsExtraSettings)
         {
+
             <div class="btn-group m-2">
                 <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    @(SelectedSemesterId.HasValue ? ReferenceBenefitSemesters.FirstOrDefault(s => s.SemesterId == SelectedSemesterId)?.SemesterName : "Dönem Seç")
+                    @(SelectedSchoolId.HasValue ? ReferenceBenefitSchools.FirstOrDefault(s => s.SchoolId == SelectedSchoolId)?.SchoolName : "Okul Seç")
                 </button>
                 <ul class="dropdown-menu">
-                    @foreach (var semester in ReferenceBenefitSemesters)
+                    @foreach (var school in ReferenceBenefitSchools)
                     {
-                        <li @onclick="() => SelectBenefitSemester(semester.SemesterId)" class="dropdown-item">
-                            @($"{semester.BeginSemesterDate} - {semester.EndSemesterDate} {semester.SemesterName}")
-                        </li>
+                        <li @onclick="() => SelectBenefitSchool(school.SchoolId)" class="dropdown-item">@school.SchoolName</li>
                     }
                 </ul>
             </div>
+
+            @if (SelectedSchoolId.HasValue)
+            {
+                <div class="btn-group m-2">
+                    <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        @(SelectedSemesterId.HasValue ? ReferenceBenefitSemesters.FirstOrDefault(s => s.SemesterId == SelectedSemesterId)?.SemesterName : "Dönem Seç")
+                    </button>
+                    <ul class="dropdown-menu">
+                        @foreach (var semester in ReferenceBenefitSemesters)
+                        {
+                            <li @onclick="() => SelectBenefitSemester(semester.SemesterId)" class="dropdown-item">
+                                @($"{semester.BeginSemesterDate} - {semester.EndSemesterDate} {semester.SemesterName}")
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
         }
 
         @if (SelectedSemesterId.HasValue)
@@ -70,6 +74,12 @@
                 </ul>
             </div>
         }
+
+
+        <div class="form-check form-switch m-2">
+            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" @bind="IsExtraSettings">
+            <label class="form-check-label" for="flexSwitchCheckDefault">Farklı Ayarlar</label>
+        </div>
     </div>
 }
 
@@ -96,17 +106,32 @@
     private int? SelectedLessonId { get; set; }
     private int? SelectedBenefitId { get; set; }
 
+    private bool IsExtraSettings { get; set; } = false;
+
     protected override async Task OnInitializedAsync()
     {
         PageRequest pg = new() { PageIndex = 0, PageSize = int.MaxValue };
         GetListReferenceBenefits = await _mediator.Send(new GetListReferenceBenefitQuery() { PageRequest = pg });
 
         FullReferenceBenefits = GetListReferenceBenefits.Items.ToList();
-
         ReferenceBenefitSchools = FullReferenceBenefits
             .Select(rb => new ReferenceBenefitSchool { SchoolId = rb.SchoolId, SchoolName = rb.SchoolName })
             .DistinctBy(x => x.SchoolId)
             .ToList();
+
+        if (!IsExtraSettings)
+        {
+            SelectedSchoolId = FullReferenceBenefits.Last()?.SchoolId;
+            SelectedSemesterId = FullReferenceBenefits.Last()?.SemesterId;
+
+            ReferenceBenefitLessons = FullReferenceBenefits
+            .Where(x => x.SchoolId == SelectedSchoolId && x.SemesterId == SelectedSemesterId)
+            .Select(rb => new ReferenceBenefitLesson { LessonId = rb.LessonId, LessonName = rb.LessonName })
+            .DistinctBy(x => x.LessonId)
+            .ToList();
+        }
+
+        await base.OnInitializedAsync();
     }
 
     private void SelectBenefitSchool(int schoolId)
