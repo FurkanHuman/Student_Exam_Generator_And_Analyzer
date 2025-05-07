@@ -1,75 +1,86 @@
 # Student Exam System & Analyzer (S.E.S.)
 
 > **Short Name:** S.E.S.
-> **Status:** Currently under active development—new features coming soon!
-
-## 🔧 Infrastructure Reference
-
-* **Semantic Commit Messages:** Follow [Semantic Commit Messages](https://github.com/FurkanHuman/Student_Exam_Generator_And_Analyzer/blob/Main/Docs/Semantic%20Commit%20Messages.md) for commit history consistency.
-
-## Support the Project
-
-If you find this project helpful or want to support its development, consider buying the author a coffee! Your support ensures the continued development and improvement of the project.
-
-[Support the Project on Buy Me a Coffee](https://buymeacoffee.com/furkanhuman)
+> **Status:** 🚧 Actively being developed — New features on the way!
 
 ---
 
-## 📋 Overview
+## 📌 What is S.E.S.?
 
-Student Exam System & Analyzer (S.E.S.) is an innovative open-source platform designed to revolutionize the way educators manage exams. By leveraging modern technologies, S.E.S. simplifies the creation, administration, and analysis of exams, saving valuable time for teachers and providing actionable insights into student performance. The platform ensures data privacy and security by offering deployment options tailored to institutional needs, including on-premises and private cloud setups.
+S.E.S. (Student Exam System & Analyzer) is a powerful, open-source platform built to streamline the exam process for educators. It makes exam preparation, grading, and result analysis faster and easier — with built-in tools that help reduce cheating and improve learning outcomes.
 
-With S.E.S., educators can generate diverse question types, automate grading, and access detailed analytics to identify learning gaps and improve teaching strategies. The system also promotes academic integrity by creating unique exam versions for each student, reducing the likelihood of cheating.
+Whether you’re an individual teacher, a school, or an institution, S.E.S. can adapt to your needs — and can even be deployed on-premises or in private clouds.
 
 ---
 
-## 🔍 Key Features
+## 🌟 Key Features
 
-* **Automated Question Generation:** Input syllabus topics or reference materials; S.E.S. generates multiple-choice, true/false, and short-answer questions.
-* **Automated Grading & Analytics:** Auto-grade submissions and visualize results (score distribution, averages, topic performance).
-* **Exam Management:** Central question bank, exam scheduling, and unique exam permutations per student to discourage academic dishonesty.
-* **Customizable Deployment:** Supports on-premises servers, private clouds, or Dockerized setups.
+* **Auto Question Generation** — Enter topics, get multiple-choice, true/false, and short-answer questions.
+* **Smart Grading & Analytics** — Automatically grade and visualize student performance.
+* **Unique Exams Per Student** — Reduces cheating by generating different versions of each test.
+* **Exam Management Dashboard** — Centralized control for question banks and scheduling.
+* **Flexible Deployment** — Works on local servers, private clouds, or via Docker.
 
-## 🛠️ Tech Stack
+---
+
+## 🧰 Tech Stack
 
 * **Backend:** C# / .NET 8 (ASP.NET Core MVC)
-* **ORM:** Entity Framework Core
 * **Database:** PostgreSQL
-* **Containers:** Docker (optional)
+* **ORM:** Entity Framework Core
+* **Containerization:** Docker (optional)
 
-## 🚀 Quick Start
+---
 
-1. **Clone Repository**
+## 🚀 How to Get Started
+
+1. **Clone the Repository**
 
    ```bash
    git clone https://github.com/FurkanHuman/Student_Exam_Generator_And_Analyzer.git
    cd Student_Exam_Generator_And_Analyzer
    ```
 
-2. **Configure**
-   Edit `appsettings.json` to set your database connection.
+2. **Configure the Database**
 
-3. **Build & Run**
+   Update `appsettings.json` with your database connection info.
+
+3. **Build and Run the App**
 
    ```bash
    dotnet build
    dotnet run --urls "http://localhost:5000"
    ```
 
-4. **Access**
-   Open `http://localhost:5000` in your web browser. Use default teacher credentials as documented in the Docs folder.
+4. **Open in Browser**
+
+   Go to `http://localhost:5000` and log in using the default teacher credentials (see Docs folder).
 
 ---
 
-## 🎯 Benefits for Educators
+## 🎓 Why Educators Love It
 
-* **Time Efficiency:** Automates exam creation and grading workflows.
-* **Insightful Data:** Comprehensive analytics identify learning gaps.
-* **Enhanced Integrity:** Unique exam versions per student reduce cheating.
-* **Organized Workflow:** Centralized question bank and exam scheduling.
+* Save time with automatic generation and grading
+* Identify learning gaps with data-driven insights
+* Reduce cheating with unique exams for each student
+* Manage everything from one dashboard
+
+---
+
+## 🔄 Contribution Guidelines
+
+* 💬 Use [Semantic Commit Messages](https://github.com/FurkanHuman/Student_Exam_Generator_And_Analyzer/blob/Main/Docs/Semantic%20Commit%20Messages.md) to keep the git history clean and meaningful.
+
+---
+
+## 💖 Support the Project
+
+Like what you see? Help keep the project growing by buying the author a coffee:
+
+[👉 Buy Me a Coffee](https://buymeacoffee.com/furkanhuman)
 
 ---
 
 ## 📚 References
 
-* Infrastructure reference: [Kodlama.io nArchitecture](https://github.com/kodlamaio-projects/nArchitecture.git)
+* Infrastructure inspired by: [Kodlama.io nArchitecture](https://github.com/kodlamaio-projects/nArchitecture.git)
