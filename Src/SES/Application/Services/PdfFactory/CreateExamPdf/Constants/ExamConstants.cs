@@ -5,10 +5,15 @@ internal static class ExamConstants
     {
         { "TUR", new Dictionary<string, string>
             {
+                { "name", "İsim" },
+                { "surname", "Soyisim" },
+                { "class_age", "Sınıf" },
+                { "class_branch", "Şube" },
+                { "number", "No" },
                 { "score", "Puan" },
                 { "exams", "Sınavlar" },
                 { "period", "Dönem" },
-                { "written_exam", "Yazılı Sınav" },
+                { "written_exam", "Yazılı Sınavı" },
                 { "clasess", "Sınıflar" },
                 { "lesson", "Dersi" }
             }
@@ -16,6 +21,11 @@ internal static class ExamConstants
 
         { "ENG", new Dictionary<string, string>
             {
+                { "name", "Name" },
+                { "surname","Surname" },
+                { "class_age","Class" },
+                { "class_branch", "Branch" },
+                { "number", "Num" },
                 { "score", "Score" },
                 { "exams", "Exams" },
                 { "period","Period" },
