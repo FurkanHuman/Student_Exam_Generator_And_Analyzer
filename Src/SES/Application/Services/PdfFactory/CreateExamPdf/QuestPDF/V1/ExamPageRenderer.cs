@@ -29,7 +29,11 @@ public class ExamPageRenderer : IExamPageGenerator
         document.Page(page =>
         {
             page.DefaultTextStyle(ts => ts.FontFamily(Fonts.Arial));
-            page.Margin(0.5f, Unit.Centimetre);
+            //page.Margin(0.5f, Unit.Centimetre);
+            page.MarginTop(2, Unit.Centimetre);
+            page.MarginBottom(2, Unit.Centimetre);
+            page.MarginRight(2, Unit.Centimetre);
+            page.MarginLeft(2.5f, Unit.Centimetre);
             page.Size(pageSize: PageSizes.A4);
             // custom page design  
             page.Background().Svg(WatermarkSVG("v0.0.1-alpha-04 S.E.S"));

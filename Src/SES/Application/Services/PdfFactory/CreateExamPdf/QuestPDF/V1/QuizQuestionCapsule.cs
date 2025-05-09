@@ -1,4 +1,5 @@
-﻿using Application.Services.PdfFactory.CreateExamPdf.DTOs;
+﻿using Application.Services.PdfFactory.CreateExamPdf.Constants;
+using Application.Services.PdfFactory.CreateExamPdf.DTOs;
 using Application.Services.PdfFactory.CreateExamPdf.Helpers;
 using Domain.Entities;
 using Domain.Enums;
@@ -29,7 +30,8 @@ internal static class QuizQuestionCapsule
                     if (!string.IsNullOrEmpty(question.QuestionBody))
                         col.Item().Text(question.QuestionBody).FontSize(12).Italic().Justify();
 
-                    col.Item().Text(question.Question).FontSize(12).Bold().Justify();
+                    string examScore = $"\n({question.QuestionScore.Score} {ExamConstants.Get("score")})";
+                    col.Item().Text($"{question.Question}{examScore}").FontSize(12).Bold().Justify();
 
                     switch (question.QuestionType)
                     {

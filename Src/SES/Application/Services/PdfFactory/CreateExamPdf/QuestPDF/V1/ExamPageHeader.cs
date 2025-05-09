@@ -13,36 +13,54 @@ internal static class ExamPageHeader
     {
         ExamConstants.CurrentLanguage = examInfo.Language;
 
-        page.Header().Height(3, Unit.Centimetre).Row(headerRow =>
+        page.Header().PaddingBottom(0.5F,Unit.Centimetre).Row(headerRow =>
         {
-            headerRow.RelativeItem(2).Padding(0.2f, Unit.Centimetre).Column(nametag =>
+            headerRow.Spacing(1.15f,Unit.Point);
+            headerRow.RelativeItem(1).AlignLeft().AlignCenter().AlignTop().Column(nameBox =>
             {
-                nametag.Item().DefaultTextStyle(ts => ts.FontSize(9));
+                if (!examInfo.IsAnonymousExamMode)
+                {
+                    nameBox.Item().AlignMiddle().Border(0, Unit.Point).Height(55).Column(col =>
+                    {
+                        col.Item().AlignLeft().Text(exam.Student.Name).Bold();
+                        col.Item().AlignLeft().Text(exam.Student.SurName).Bold();
+                        col.Item().AlignLeft().Text($"{exam.Student.StudentClass.ClassAge}/{exam.Student.StudentClass.ClassBranch}       {exam.Student.SchoolNumber}").Bold();
+                    });
+                }
 
-                nametag.Item().AlignCenter().Text(exam.Student.Name);
-                nametag.Item().AlignCenter().Text(exam.Student.SurName);
-                nametag.Item().AlignCenter().Text($"{exam.Student.StudentClass.ClassAge}/{exam.Student.StudentClass.ClassBranch} | {exam.Student.SchoolNumber}");
+                else
+                {
+                    nameBox.Item().AlignMiddle().Border(0, Unit.Point).Height(55).Column(col =>
+                    {
+                        col.Item().AlignLeft().Text($"{ExamConstants.Get("name")}:").Bold();
+                        col.Item().AlignLeft().Text($"{ExamConstants.Get("surname")}:").Bold();
+                        col.Item().AlignLeft().Row(iRow =>
+                        {
+                            iRow.RelativeItem().AlignLeft().Text($"{ExamConstants.Get("class_branch")}:").Bold();
+                            iRow.RelativeItem().AlignLeft().Text($"{ExamConstants.Get("number")}:").Bold();
+
+                        });
+                    });
+                }
             });
 
-            headerRow.RelativeItem(5).Padding(0.2f, Unit.Centimetre).Column(generalInfo =>
+            headerRow.RelativeItem(2).AlignCenter().AlignTop().Column(generalInfo =>
             {
-                generalInfo.Item().DefaultTextStyle(ts => ts.FontSize(15));
-
-                generalInfo.Item().AlignCenter().Text($"{exam.Semester.BeginSemesterDate.Year}/{exam.Semester.EndSemesterDate.Year}").FontSize(12).Bold();
+                generalInfo.Item().AlignCenter().Text($"{exam.Semester.BeginSemesterDate.Year} - {exam.Semester.EndSemesterDate.Year}").Bold();
                 generalInfo.Item().AlignCenter().Text(exam.School.Name).Bold();
                 generalInfo.Item().AlignCenter().Text($"{exam.Lesson.LessonName} {ExamConstants.Get("lesson")}").Bold();
-                generalInfo.Item().AlignCenter().Text($"{exam.Student.StudentClass.ClassAge}. {ExamConstants.Get("clasess")} {examInfo.ExamTerm}. {ExamConstants.Get("period")} {examInfo.CurrentExamNumber}. {ExamConstants.Get("written_exam")}").Bold();
+                generalInfo.Item().AlignCenter().Text($"{examInfo.SelectedClass}. {ExamConstants.Get("clasess")} {examInfo.ExamTerm}. {ExamConstants.Get("period")} {examInfo.CurrentExamNumber}. {ExamConstants.Get("written_exam")}").Bold();
             });
 
-            headerRow.RelativeItem(1.5f).Padding(0.2f, Unit.Centimetre).Column(examSummary =>
+            headerRow.RelativeItem(1).AlignRight().AlignTop().Column(examSummary =>
             {
-                examSummary.Item().AlignCenter().Text(QuizQuestionHelpers.InsertDashInString(exam.ExamCode)).FontSize(9);
-                examSummary.Item().AlignCenter().Text(ExamConstants.Get("score")).FontSize(14);
-                examSummary.Item().AlignCenter().Border(1).Width(75).Height(25).Column(col =>
+                examSummary.Item().AlignCenter().Text(QuizQuestionHelpers.InsertDashInString(exam.ExamCode)).Bold();
+                examSummary.Item().AlignCenter().Text(exam.ExamDate.ToShortDateString()).Bold();
+                examSummary.Item().AlignCenter().Text(ExamConstants.Get("score")).Bold();
+                examSummary.Item().AlignCenter().Width(2,Unit.Centimetre).Column(col =>
                 {
-                    col.Item().PaddingRight(5).PaddingTop(3.5F).AlignMiddle().AlignRight().Text($"/ {examInfo.ExamScore}").FontSize(15).Bold();
+                    col.Item().AlignMiddle().AlignRight().Text($"/ {examInfo.ExamScore}").Bold();
                 });
-
             });
         });
         return page;
