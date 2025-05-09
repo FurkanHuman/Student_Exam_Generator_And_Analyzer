@@ -23,7 +23,7 @@ internal static class ExamPageContent
         page.Content().MultiColumn(multi =>
         {
             multi.Columns(2);
-            multi.Spacing(15);
+            multi.Spacing(10);
 
             multi.Content().Column(column =>
             {
