@@ -60,6 +60,7 @@ internal static class ExamPageHeader
                 examSummary.Item().AlignCenter().Width(2,Unit.Centimetre).Column(col =>
                 {
                     col.Item().AlignMiddle().AlignRight().Text($"/ {examInfo.ExamScore}").Bold();
+                    col.Item().AlignMiddle().AlignRight().Text($"/ {examInfo.ExamScoreStr}").Bold();
                 });
             });
         });
