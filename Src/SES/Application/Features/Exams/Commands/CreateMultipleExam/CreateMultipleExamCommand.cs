@@ -19,19 +19,22 @@ using Application.Services.ReferenceBenefits;
 using System.IO.Compression;
 using Application.Services.QuizQuestions;
 using Application.Features.Exams.Commands.Create;
+using Application.Services.Teachers;
 
 namespace Application.Features.Exams.Commands.CreateMultipleExam;
 
 public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public ExamInfo ExamInfo { get; set; }
+    public Guid ExamAuthorIdByPersonelId { get; set; }
     public int SemesterId { get; set; }
     public int LessonId { get; set; }
-    public int ClassAge { get; set; }
+    public int[] ClassIds { get; set; }
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }
     public string[]? CacheGroupKey => ["GetExams"];
+
 
     public class CreateMultipleExamCommandHandler : IRequestHandler<CreateMultipleExamCommand, CreateMultipleExamResponse>
     {
@@ -42,11 +45,12 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
         private readonly ISemesterService _semesterService;
         private readonly ISchoolService _schoolService;
         private readonly IReferenceBenefitService _referenceBenefitService;
+        private readonly ITeacherService _teacherService;
         private readonly IQuizQuestionService _quizQuestionService;
         private readonly IExamPageGenerator _examPageGenerator;
         private readonly ExamBusinessRules _examBusinessRules;
 
-        public CreateMultipleExamCommandHandler(IMapper mapper, IExamRepository examRepository, IStudentService studentService, ILessonService lessonService, ISemesterService semesterService, ISchoolService schoolService, IReferenceBenefitService referenceBenefitService, IQuizQuestionService quizQuestionService, IExamPageGenerator examPageGenerator, ExamBusinessRules examBusinessRules)
+        public CreateMultipleExamCommandHandler(IMapper mapper, IExamRepository examRepository, IStudentService studentService, ILessonService lessonService, ISemesterService semesterService, ISchoolService schoolService, IReferenceBenefitService referenceBenefitService, ITeacherService teacherService, IQuizQuestionService quizQuestionService, IExamPageGenerator examPageGenerator, ExamBusinessRules examBusinessRules)
         {
             _mapper = mapper;
             _examRepository = examRepository;
@@ -55,6 +59,7 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
             _semesterService = semesterService;
             _schoolService = schoolService;
             _referenceBenefitService = referenceBenefitService;
+            _teacherService = teacherService;
             _quizQuestionService = quizQuestionService;
             _examPageGenerator = examPageGenerator;
             _examBusinessRules = examBusinessRules;
@@ -64,9 +69,6 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
         {
             IList<Exam> exams = [];
             IList<byte[]> pdfBytes = [];
-
-            if (string.IsNullOrEmpty(request.ExamInfo.ExamName))
-                request.ExamInfo.ExamName = "Currently empty";
 
             string examCode = QuizQuestionHelpers.GenerateBase32String();
 
@@ -78,6 +80,11 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
                 predicate: s => s.Id == request.SemesterId,
                 cancellationToken: cancellationToken);
 
+            Teacher? examAuthor = await _teacherService.GetAsync(
+                predicate: t => t.PersonelId == request.ExamAuthorIdByPersonelId,
+                include: t => t.Include(x => x.Personel),
+                cancellationToken: cancellationToken);
+
             IPaginate<School>? schools = await _schoolService.GetListAsync(cancellationToken: cancellationToken);
             School school = schools!.Items.Last();
 
@@ -85,7 +92,7 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
             ReferenceBenefit referenceBenefit = referenceBenefitList!.Items.First(rb => rb.Lesson == lesson && rb.School == school && rb.Semester == semester);
 
             IPaginate<Student>? students = await _studentService.GetListAsync(
-                predicate: s => s.StudentClass.ClassAge == request.ClassAge,
+                predicate: s => request.ClassIds.Contains(s.StudentClassId),
                 size: int.MaxValue,
                 index: 0,
                 include: s => s.Include(x => x.StudentClass),
@@ -108,6 +115,7 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
 
                 Exam exam = new()
                 {
+                    ExamDate = request.ExamInfo.ExamScheduledDate,
                     ExamLessonName = request.ExamInfo.ExamName,
                     ExamCode = examCode,
                     FooterNote = request.ExamInfo.FooterNote,
@@ -119,12 +127,14 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
                     LessonId = request.LessonId,
                     SchoolId = school.Id,
                     ReferenceBenefitId = referenceBenefit.Id,
+                    ExamAuthorId = examAuthor!.Id,
 
                     Lesson = lesson!,
                     Semester = semester!,
                     Student = student!,
                     School = school!,
                     ReferenceBenefit = referenceBenefit!,
+                    ExamAuthor = examAuthor!,
 
                     QuizQuestions = quizQuestions!.Items
                 };
