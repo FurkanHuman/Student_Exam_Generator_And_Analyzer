@@ -15,7 +15,7 @@ if [ -z "$APP_NAME" ] || [ -z "$ARCHITECTURE" ] || [ -z "$CERT_PATH" ] || [ -z "
 fi
 
 # Build Docker image
-echo "Docker Build started" 
+echo "Docker Build started"
 docker buildx build --platform linux/$ARCHITECTURE -t $APP_NAME:$ARCHITECTURE --load .
 echo "Docker Build finished"
 
@@ -25,7 +25,7 @@ RUNNING_CONTAINER=$(docker ps -q --filter "name=$APP_NAME")
 if [ ! -z "$RUNNING_CONTAINER" ]; then
     echo "Running container found for $APP_NAME. Stopping it..."
     docker stop "$RUNNING_CONTAINER"
-    docker rm "$RUNNING_CONTAINER"
+    docker rm "$RUNNING_CONTAINER" # Uncomment if you want to remove the container
 else
     echo "No running container found for $APP_NAME."
 fi
