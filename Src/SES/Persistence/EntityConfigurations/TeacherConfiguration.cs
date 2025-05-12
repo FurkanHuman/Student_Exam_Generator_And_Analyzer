@@ -22,6 +22,7 @@ internal class TeacherConfiguration : IEntityTypeConfiguration<Teacher>, IMainCo
 
         builder.HasMany(t => t.ReferenceBenefits);
         builder.HasMany(t => t.Exams);
+        builder.HasMany(t => t.ExamAuthors).WithOne(e => e.ExamAuthor);
         builder.HasMany(t => t.Students);
         builder.HasMany(t => t.Lessons);
 
