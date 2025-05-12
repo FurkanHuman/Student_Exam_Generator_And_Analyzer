@@ -2,6 +2,8 @@ using Application.Features.StudentClasses.Commands.Create;
 using Application.Features.StudentClasses.Commands.Delete;
 using Application.Features.StudentClasses.Commands.Update;
 using Application.Features.StudentClasses.Queries.GetById;
+using Application.Features.StudentClasses.Queries.GetClassesByClassAge;
+using Application.Features.StudentClasses.Queries.GetClassesBySemesterId;
 using Application.Features.StudentClasses.Queries.GetList;
 using AutoMapper;
 using Domain.Entities;
@@ -27,5 +29,11 @@ public class MappingProfiles : Profile
 
         CreateMap<StudentClass, GetListStudentClassListItemDto>();
         CreateMap<IPaginate<StudentClass>, GetListResponse<GetListStudentClassListItemDto>>();
+
+        CreateMap<StudentClass,GetClassesByClassAgeResponse>();
+        CreateMap<IPaginate<StudentClass>, GetListResponse<GetClassesByClassAgeResponse>>();
+
+        CreateMap<StudentClass, GetClassesBySemesterIdResponse>();
+        CreateMap<IPaginate<StudentClass>, GetListResponse<GetClassesBySemesterIdResponse>>();
     }
 }

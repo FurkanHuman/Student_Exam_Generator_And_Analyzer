@@ -12,4 +12,6 @@ public static class StudentClassesOperationClaims
     public const string Create = $"{_section}.Create";
     public const string Update = $"{_section}.Update";
     public const string Delete = $"{_section}.Delete";
+
+    public const string GetClassesByClassAge = $"{_section}.GetClassesByClassAge";
 }
