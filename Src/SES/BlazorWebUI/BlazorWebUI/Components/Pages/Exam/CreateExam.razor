@@ -9,6 +9,7 @@
 @using AutoMapper
 @using BlazorWebUI.Client.Pages.Styles
 @using BlazorWebUI.Client.Pages.Styles.QQ
+@using BlazorWebUI.Components.Account
 @using BlazorWebUI.Components.Pages.QuizQuestion
 @using Domain.Entities
 @using Microsoft.AspNetCore.Identity
@@ -22,10 +23,12 @@
 
 @inject IPersonelService _personelService
 @inject UserManager<ApplicationUser> _userManager
-
+@inject AuthenticationStateProvider _authStateProvider
 
 @code
 {
+    private Guid _personelGuid;
+
     private bool _isChecked { get; set; } = false;
 
     private byte _progressStage { get; set; } = 0;
@@ -44,6 +47,23 @@
     private Dictionary<int, int> _orderedQQ { get; set; } = new();
     private ExamInfo _examInfo { get; set; } = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await _authStateProvider.GetAuthenticationStateAsync();
+        var userPrincipal = authState.User;
+
+        if (userPrincipal.Identity?.IsAuthenticated == true)
+        {
+            var user = await _userManager.GetUserAsync(userPrincipal);
+            if (user is not null)
+            {
+                Personel? personel = await _personelService.GetByIdAsync(user.PersonelId);
+                if (personel is not null)
+                    _personelGuid = personel.Id;
+            }
+        }
+    }
+
     private void ToggleQuestInList(bool isSelected, QQBodyDto qQBody)
     {
         if (isSelected)
@@ -52,7 +72,7 @@
             _selectedQQ.Remove(qQBody);
     }
 
-    private async Task LoadAPool(IList<GetByLessonIdQuizQuestionListItemDto> getByQuizzes)
+    private void LoadAPool(IList<GetByLessonIdQuizQuestionListItemDto> getByQuizzes)
     {
         _loadedQQ = _mapper.Map<IList<QQBodyDto>>(getByQuizzes);
         _progressStage++;
@@ -79,7 +99,7 @@
                 LessonId = _lessonId,
                 SemesterId = _semesterId,
                 ClassIds = _selectedClassBranchIds.ToArray(),
-                ExamAuthorIdByPersonelId = Guid.Parse("edaa4330-94b5-4f41-9ac2-948245572d44")
+                ExamAuthorIdByPersonelId = _personelGuid
             });
 
         string? base64 = Convert.ToBase64String(createExamResponse.ZipFileMemStream.ToArray());
