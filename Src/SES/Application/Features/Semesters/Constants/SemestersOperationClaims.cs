@@ -12,4 +12,6 @@ public static class SemestersOperationClaims
     public const string Create = $"{_section}.Create";
     public const string Update = $"{_section}.Update";
     public const string Delete = $"{_section}.Delete";
+    
+    public const string GetClassesBySemesterId = $"{_section}.GetClassesBySemesterId";
 }
