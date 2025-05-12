@@ -4,6 +4,7 @@ namespace Domain.Entities;
 
 public class Exam : Entity<int>
 {
+    public DateOnly ExamDate { get; set; }
     public string ExamLessonName { get; set; }
     public string ExamCode { get; set; }
     public string FooterNote { get; set; }
@@ -15,12 +16,14 @@ public class Exam : Entity<int>
     public int StudentId { get; set; }
     public int SchoolId { get; set; }
     public int ReferenceBenefitId { get; set; }
+    public int ExamAuthorId { get; set; }
 
     public Lesson Lesson { get; set; }
     public Semester Semester { get; set; }
     public Student Student { get; set; }
     public School School { get; set; }
     public ReferenceBenefit ReferenceBenefit { get; set; }
+    public Teacher ExamAuthor { get; set; }
 
     public IList<Analysis> Analyses { get; set; }
     public IList<Teacher> Teachers { get; set; }
