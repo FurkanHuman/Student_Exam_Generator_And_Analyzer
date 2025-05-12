@@ -3,6 +3,7 @@
 public class ExamInfo
 {
     public IDictionary<int, int> QQOrder { get; set; } // key is question Id, value is exam question order
+    public DateOnly ExamScheduledDate { get; set; } = DateOnly.FromDateTime(DateTime.Now.Date);
     public string ExamName { get; set; }
     public string Language { get; set; } = "TUR"; // exam language
     public string FooterNote { get; set; } // footer note for the exam
@@ -15,5 +16,6 @@ public class ExamInfo
     public bool IsRandomizeQuestions { get; set; } = false;
     public bool IsRandomizeOptions { get; set; } = false;
     public bool IsOpticCodeForm { get; set; } = false; // back page optic code form
-
+    public bool IsAnonymousExamMode { get; set; } = true;
+    public bool IsCommonExam { get; set; } = true;
 }
