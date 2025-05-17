@@ -1,11 +1,11 @@
 ﻿@using BlazorWebUI.Client.Pages.Styles.Form
 <div class="input-form">
 
-    @if (checkboxItems.Count > 0)
+    @if (CheckboxItems.Count > 0)
     {
 
         <div class="d-flex flex-column align-items-center">
-            <QQBenefitAdd OnSelectedBenefits="HandleBenefits" CheckboxItems="checkboxItems" />
+            <QQBenefitAdd OnSelectedBenefits="HandleBenefits" CheckboxItems="CheckboxItems" />
             <div class="mt-3">
                 <ul>
                     @foreach (KeyValuePair<int, string> benefit in QQBodyData.SelectedBenefits)
@@ -83,7 +83,7 @@
     // todo: devam... qo yu yap yeni komponent 6 farklı seçenek var. resim foto var ve db kayıt var
 
     [Parameter]
-    public ICollection<CheckboxItem<int>> checkboxItems { get; set; } = [];
+    public ICollection<CheckboxItem<int>> CheckboxItems { get; set; } = [];
 
     [Parameter]
     public EventCallback<bool> OnQQBenefitLoader { get; set; }

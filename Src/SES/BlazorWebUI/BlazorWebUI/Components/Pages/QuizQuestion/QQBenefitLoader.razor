@@ -17,26 +17,26 @@
 
             <div class="btn-group m-2">
                 <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    @(SelectedSchoolId.HasValue ? ReferenceBenefitSchools.FirstOrDefault(s => s.SchoolId == SelectedSchoolId)?.SchoolName : "Okul Seç")
+                    @(_selectedSchoolId.HasValue ? _referenceBenefitSchools.FirstOrDefault(s => s.SchoolId == _selectedSchoolId)?.SchoolName : "Okul Seç")
                 </button>
                 <ul class="dropdown-menu">
-                    @foreach (var school in ReferenceBenefitSchools)
+                    @foreach (var school in _referenceBenefitSchools)
                     {
-                        <li @onclick="() => SelectBenefitSchool(school.SchoolId)" class="dropdown-item">@school.SchoolName</li>
+                        <li @onclick="() => _selectBenefitSchool(school.SchoolId)" class="dropdown-item">@school.SchoolName</li>
                     }
                 </ul>
             </div>
 
-            @if (SelectedSchoolId.HasValue)
+            @if (_selectedSchoolId.HasValue)
             {
                 <div class="btn-group m-2">
                     <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        @(SelectedSemesterId.HasValue ? ReferenceBenefitSemesters.FirstOrDefault(s => s.SemesterId == SelectedSemesterId)?.SemesterName : "Dönem Seç")
+                        @(_selectedSemesterId.HasValue ? _referenceBenefitSemesters.FirstOrDefault(s => s.SemesterId == _selectedSemesterId)?.SemesterName : "Dönem Seç")
                     </button>
                     <ul class="dropdown-menu">
-                        @foreach (var semester in ReferenceBenefitSemesters)
+                        @foreach (var semester in _referenceBenefitSemesters)
                         {
-                            <li @onclick="() => SelectBenefitSemester(semester.SemesterId)" class="dropdown-item">
+                            <li @onclick="() => _selectBenefitSemester(semester.SemesterId)" class="dropdown-item">
                                 @($"{semester.BeginSemesterDate} - {semester.EndSemesterDate} {semester.SemesterName}")
                             </li>
                         }
@@ -45,31 +45,31 @@
             }
         }
 
-        @if (SelectedSemesterId.HasValue)
+        @if (_selectedSemesterId.HasValue)
         {
             <div class="btn-group m-2">
                 <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    @(SelectedLessonId.HasValue ? ReferenceBenefitLessons.FirstOrDefault(l => l.LessonId == SelectedLessonId)?.LessonName : "Ders Seç")
+                    @(_selectedLessonId.HasValue ? _referenceBenefitLessons.FirstOrDefault(l => l.LessonId == _selectedLessonId)?.LessonName : "Ders Seç")
                 </button>
                 <ul class="dropdown-menu">
-                    @foreach (var lesson in ReferenceBenefitLessons)
+                    @foreach (var lesson in _referenceBenefitLessons)
                     {
-                        <li @onclick="() => SelectBenefitLesson(lesson.LessonId)" class="dropdown-item">@lesson.LessonName</li>
+                        <li @onclick="() => _selectBenefitLesson(lesson.LessonId)" class="dropdown-item">@lesson.LessonName</li>
                     }
                 </ul>
             </div>
         }
 
-        @if (SelectedLessonId.HasValue)
+        @if (_selectedLessonId.HasValue)
         {
             <div class="btn-group m-2">
                 <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    @(SelectedBenefitId.HasValue ? GetListReferenceBenefits.Items.FirstOrDefault(b => b.Id == SelectedBenefitId)?.Name : "Yıllık Plan Seç")
+                    @(_selectedBenefitId.HasValue ? _getListReferenceBenefits.Items.FirstOrDefault(b => b.Id == _selectedBenefitId)?.Name : "Yıllık Plan Seç")
                 </button>
                 <ul class="dropdown-menu">
-                    @foreach (var benefit in GetListReferenceBenefits.Items)
+                    @foreach (var benefit in _getListReferenceBenefits.Items)
                     {
-                        <li @onclick="() => SelectBenefit(benefit.Id)" class="dropdown-item">@benefit.Name</li>
+                        <li @onclick="() => _selectBenefit(benefit.Id)" class="dropdown-item">@benefit.Name</li>
                     }
                 </ul>
             </div>
@@ -91,41 +91,41 @@
     [Parameter]
     public EventCallback<int> OnLessonId { get; set; }
 
-    private ICollection<ReferenceBenefitSchool> ReferenceBenefitSchools { get; set; } = [];
-    private ICollection<ReferenceBenefitSemester> ReferenceBenefitSemesters { get; set; } = [];
-    private ICollection<ReferenceBenefitLesson> ReferenceBenefitLessons { get; set; } = [];
-
-    private List<GetListReferenceBenefitListItemDto> FullReferenceBenefits { get; set; } = new();
-    private GetListResponse<GetListReferenceBenefitListItemDto> GetListReferenceBenefits { get; set; } = new();
-
     [Parameter]
     public bool IsVisible { get; set; } = true;
 
-    private int? SelectedSchoolId { get; set; }
-    private int? SelectedSemesterId { get; set; }
-    private int? SelectedLessonId { get; set; }
-    private int? SelectedBenefitId { get; set; }
+    private ICollection<ReferenceBenefitSchool> _referenceBenefitSchools { get; set; } = [];
+    private ICollection<ReferenceBenefitSemester> _referenceBenefitSemesters { get; set; } = [];
+    private ICollection<ReferenceBenefitLesson> _referenceBenefitLessons { get; set; } = [];
+
+    private List<GetListReferenceBenefitListItemDto> _fullReferenceBenefits { get; set; } = new();
+    private GetListResponse<GetListReferenceBenefitListItemDto> _getListReferenceBenefits { get; set; } = new();
+
+    private int? _selectedSchoolId { get; set; }
+    private int? _selectedSemesterId { get; set; }
+    private int? _selectedLessonId { get; set; }
+    private int? _selectedBenefitId { get; set; }
 
     private bool IsExtraSettings { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
         PageRequest pg = new() { PageIndex = 0, PageSize = int.MaxValue };
-        GetListReferenceBenefits = await _mediator.Send(new GetListReferenceBenefitQuery() { PageRequest = pg });
+        _getListReferenceBenefits = await _mediator.Send(new GetListReferenceBenefitQuery() { PageRequest = pg });
 
-        FullReferenceBenefits = GetListReferenceBenefits.Items.ToList();
-        ReferenceBenefitSchools = FullReferenceBenefits
+        _fullReferenceBenefits = _getListReferenceBenefits.Items.ToList();
+        _referenceBenefitSchools = _fullReferenceBenefits
             .Select(rb => new ReferenceBenefitSchool { SchoolId = rb.SchoolId, SchoolName = rb.SchoolName })
             .DistinctBy(x => x.SchoolId)
             .ToList();
 
         if (!IsExtraSettings)
         {
-            SelectedSchoolId = FullReferenceBenefits.Last()?.SchoolId;
-            SelectedSemesterId = FullReferenceBenefits.Last()?.SemesterId;
+            _selectedSchoolId = _fullReferenceBenefits.Last()?.SchoolId;
+            _selectedSemesterId = _fullReferenceBenefits.Last()?.SemesterId;
 
-            ReferenceBenefitLessons = FullReferenceBenefits
-            .Where(x => x.SchoolId == SelectedSchoolId && x.SemesterId == SelectedSemesterId)
+            _referenceBenefitLessons = _fullReferenceBenefits
+            .Where(x => x.SchoolId == _selectedSchoolId && x.SemesterId == _selectedSemesterId)
             .Select(rb => new ReferenceBenefitLesson { LessonId = rb.LessonId, LessonName = rb.LessonName })
             .DistinctBy(x => x.LessonId)
             .ToList();
@@ -134,14 +134,14 @@
         await base.OnInitializedAsync();
     }
 
-    private void SelectBenefitSchool(int schoolId)
+    private void _selectBenefitSchool(int schoolId)
     {
-        SelectedSchoolId = schoolId;
-        SelectedSemesterId = null;
-        SelectedLessonId = null;
-        SelectedBenefitId = null;
+        _selectedSchoolId = schoolId;
+        _selectedSemesterId = null;
+        _selectedLessonId = null;
+        _selectedBenefitId = null;
 
-        ReferenceBenefitSemesters = FullReferenceBenefits
+        _referenceBenefitSemesters = _fullReferenceBenefits
             .Where(x => x.SchoolId == schoolId)
             .Select(rb => new ReferenceBenefitSemester
                 {
@@ -154,41 +154,41 @@
             .ToList();
     }
 
-    private void SelectBenefitSemester(int semesterId)
+    private void _selectBenefitSemester(int semesterId)
     {
-        SelectedSemesterId = semesterId;
-        SelectedLessonId = null;
-        SelectedBenefitId = null;
+        _selectedSemesterId = semesterId;
+        _selectedLessonId = null;
+        _selectedBenefitId = null;
 
-        ReferenceBenefitLessons = FullReferenceBenefits
-            .Where(x => x.SchoolId == SelectedSchoolId && x.SemesterId == semesterId)
+        _referenceBenefitLessons = _fullReferenceBenefits
+            .Where(x => x.SchoolId == _selectedSchoolId && x.SemesterId == semesterId)
             .Select(rb => new ReferenceBenefitLesson { LessonId = rb.LessonId, LessonName = rb.LessonName })
             .DistinctBy(x => x.LessonId)
             .ToList();
     }
 
-    private void SelectBenefitLesson(int lessonId)
+    private void _selectBenefitLesson(int lessonId)
     {
-        SelectedLessonId = lessonId;
-        SelectedBenefitId = null;
+        _selectedLessonId = lessonId;
+        _selectedBenefitId = null;
 
-        GetListReferenceBenefits.Items = FullReferenceBenefits
-            .Where(x => x.SchoolId == SelectedSchoolId && x.SemesterId == SelectedSemesterId && x.LessonId == lessonId)
+        _getListReferenceBenefits.Items = _fullReferenceBenefits
+            .Where(x => x.SchoolId == _selectedSchoolId && x.SemesterId == _selectedSemesterId && x.LessonId == lessonId)
             .ToList();
     }
 
-    private async Task SelectBenefit(int benefitId)
+    private async Task _selectBenefit(int benefitId)
     {
-        SelectedBenefitId = benefitId;
-        await LoadSelectedBenefits();
+        _selectedBenefitId = benefitId;
+        await Load_selectedBenefits();
     }
 
-    private async Task LoadSelectedBenefits()
+    private async Task Load_selectedBenefits()
     {
-        if (SelectedBenefitId.HasValue)
-            await OnSelectedBenefitId.InvokeAsync(SelectedBenefitId.Value);
-        if (SelectedLessonId.HasValue)
-            await OnLessonId.InvokeAsync(SelectedLessonId.Value);
+        if (_selectedBenefitId.HasValue)
+            await OnSelectedBenefitId.InvokeAsync(_selectedBenefitId.Value);
+        if (_selectedLessonId.HasValue)
+            await OnLessonId.InvokeAsync(_selectedLessonId.Value);
         IsVisible = false;
     }
 

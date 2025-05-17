@@ -1,4 +1,8 @@
-﻿@page "/Auto/AiQuizPoolAdd"
+﻿@*
+    todo: return here. style, logic, and component all code is review and rework
+*@
+
+@page "/Auto/AiQuizPoolAdd"
 @rendermode InteractiveServer
 
 @using Application.Features.ReferenceBenefits.Queries.GetListByIdReferenceBenefitBenefit
@@ -8,22 +12,23 @@
 @using BlazorWebUI.Client.Pages.Styles.QQ
 @using NArchitecture.Core.Application.Responses
 
+<PageTitle>Yapay Zeka Destekli Soru Oluşturma</PageTitle>
+
 <h2>Yapay zeka destekli soru oluşturma</h2>
 
 
-<QQBenefitLoader IsVisible="IsQQBenefitLoaderVisible"  OnSelectedBenefitId="HandleBenefitId" OnLessonId="HandleLessonId" />
+<QQBenefitLoader IsVisible="_isQQBenefitLoaderVisible"  OnSelectedBenefitId="HandleBenefitId" OnLessonId="HandleLessonId"/>
 
-<InputTextArea @bind-Value="UserPrompt" />
+<InputTextArea @bind-Value="_userPrompt" />
 
-<InputText class="form-control" type="number" min="0" max="100" placeholder="Kaç soru" @bind-Value="howMuchQuestion" />
-
+<InputText class="form-control" type="number" min="0" max="100" placeholder="Kaç soru" @bind-Value="_howMuchQuestion" />
 
 <div class="btn-group m-2">
     <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-        @(!string.IsNullOrEmpty(SelectedLanguage.Value) ? SelectedLanguage.Value : "Dil Seç")
+        @(!string.IsNullOrEmpty(_selectedLanguage.Value) ? _selectedLanguage.Value : "Dil Seç")
     </button>
     <ul class="dropdown-menu">
-        @foreach (var language in LanguagePairs)
+        @foreach (var language in _languagePairs)
         {
             <li @onclick="() => SelectLanguage(language)" class="dropdown-item">@language.Value</li>
         }
@@ -31,29 +36,26 @@
 </div>
 
 <div class="form-check form-switch form-check-reverse">
-    <InputCheckbox class="form-check-input checkbox-large" type="checkbox" @bind-Value="IsQQBenefitLoaderVisible" id="flexCheckLoader" />
+    <InputCheckbox class="form-check-input checkbox-large" type="checkbox" @bind-Value="_isQQBenefitLoaderVisible" id="flexCheckLoader" />
     <label class="form-check-label" for="flexCheckLoader">Çapraz Kazanım (DENEYSEL)</label>
 </div>
 
 <QQBenefitAdd />
 
-
-
 <button @onclick="CallAIAsync" class="btn btn-group btn-primary btn-lg m-2">Test</button>
-
 
 @inject IServiceProvider _ServiceProvider
 @inject IMediator _mediator
 
 @code {
     private IAIService? _aIServiceOpenAi;
-    private Dictionary<string, string> LanguagePairs { get; set; } = [];
-    private KeyValuePair<string, string> SelectedLanguage;
+    private Dictionary<string, string> _languagePairs { get; set; } = [];
+    private KeyValuePair<string, string> _selectedLanguage;
 
-    private string? UserPrompt { get; set; }
-    private string howMuchQuestion { get; set; } = string.Empty;
+    private string? _userPrompt { get; set; }
+    private string _howMuchQuestion { get; set; } = string.Empty;
     private bool _isSucces { get; set; } = false;
-    private bool IsQQBenefitLoaderVisible { get; set; } = true;
+    private bool _isQQBenefitLoaderVisible { get; set; } = true;
 
 
 
@@ -79,7 +81,7 @@
 
     private void SelectLanguage(KeyValuePair<string, string> langPair)
     {
-        SelectedLanguage = langPair;
+        _selectedLanguage = langPair;
     }
 
     private async Task CallAIAsync()
@@ -87,9 +89,9 @@
         using CancellationTokenSource cts = new();
         QuestionAIOutgoingModel aIOutgoingModel = new()
             {
-                TeacherPrompt = UserPrompt,
-                Language = SelectedLanguage.Key,
-                HowMuchQuestion = uint.Parse(howMuchQuestion),
+                TeacherPrompt = _userPrompt,
+                Language = _selectedLanguage.Key,
+                HowMuchQuestion = uint.Parse(_howMuchQuestion),
                 HardLevel = 2,
                 LessonName = "Bilişim Teknolojileri",
                 QuestionType = Domain.Enums.QuestionType.TrueFalse,
@@ -107,7 +109,7 @@
 
     private void LoadLanguage()
     {
-        LanguagePairs.Add("TUR", "Türkçe");
-        LanguagePairs.Add("ENG", "Ingilizce");
+        _languagePairs.Add("TUR", "Türkçe");
+        _languagePairs.Add("ENG", "Ingilizce");
     }
 }

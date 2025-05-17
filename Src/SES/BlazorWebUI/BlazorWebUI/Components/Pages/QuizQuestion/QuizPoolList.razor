@@ -1,10 +1,16 @@
-﻿@using Application.Features.QuizQuestions.Queries.GetByLessonId
+﻿@*
+    todo: A new question will be brought from the question root here. A button will be added to transfer the old question to the new period.
+*@
+
+@page "/PoolList"
+@using Application.Features.QuizQuestions.Queries.GetByLessonId
 @using AutoMapper
 @using BlazorWebUI.Client.Pages.Styles.QQ
-
 @rendermode InteractiveServer
-@inject IMapper _mapper 
-@page "/PoolList"
+<PageTitle>Soru Havuzu</PageTitle>
+
+@inject IMapper _mapper
+
 @code {
     private IList<QQBodyDto> _listOfQQBodyDto { get; set; } = [];
 
