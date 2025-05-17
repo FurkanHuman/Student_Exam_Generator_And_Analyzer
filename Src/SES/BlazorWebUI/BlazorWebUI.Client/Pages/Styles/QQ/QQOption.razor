@@ -114,12 +114,12 @@
     [Parameter]
     public EventCallback<ICollection<QuestionOptionDto>> OnSelectedOptions { get; set; }
 
+    private int? _lastSelectedOption = null;
 
     public async Task OnSelectedOptionHandler()
     {
         ICollection<QuestionOptionDto> questionOptionsAfter = QuestionOptions.ToList();
         await OnSelectedOptions.InvokeAsync(questionOptionsAfter);
-        QuestionOptions.Clear();
     }
 
     public void AddOption()
@@ -134,11 +134,13 @@
 
     protected override Task OnParametersSetAsync()
     {
-        if (!IsViewMode)
+        if (!IsViewMode && (QuestionOptions == null || QuestionOptions.Count == 0))
+        {
             BeforeSetup();
+        }
+        _lastSelectedOption = SelectedOption;
         return base.OnParametersSetAsync();
     }
-
 
     private void BeforeSetup()
     {
@@ -147,55 +149,31 @@
         switch (SelectedOption)
         {
             case 1:
-                {
-                    for (int i = 0; i < QQStatic.DefaultOpenEndedOptions; i++)
-                        QuestionOptions.Add(new() { IsCorrect = true });
-                    break;
-                }
-
+                for (int i = 0; i < QQStatic.DefaultOpenEndedOptions; i++)
+                    QuestionOptions.Add(new() { IsCorrect = true });
+                break;
             case 2:
-                {
-                    break;
-                }
-
+                break;
             case 3:
-                {
-                    for (int i = 0; i < QQStatic.DefaultMultipleChoiceOptions; i++)
-                        QuestionOptions.Add(new());
-                    break;
-                }
-
+                for (int i = 0; i < QQStatic.DefaultMultipleChoiceOptions; i++)
+                    QuestionOptions.Add(new());
+                break;
             case 4:
-                {
-                    for (int i = 0; i < QQStatic.DefaultTrueFalseOptions; i++)
-                        QuestionOptions.Add(new() { IsCorrect = (i % 2 == 0) });
-                    break;
-                }
-
+                for (int i = 0; i < QQStatic.DefaultTrueFalseOptions; i++)
+                    QuestionOptions.Add(new() { IsCorrect = (i % 2 == 0) });
+                break;
             case 5:
-                {
-                    for (int i = 0; i < QQStatic.DefaultFillInTheBlankOptions; i++)
-                        QuestionOptions.Add(new() { IsCorrect = true });
-                    break;
-                }
-
+                for (int i = 0; i < QQStatic.DefaultFillInTheBlankOptions; i++)
+                    QuestionOptions.Add(new() { IsCorrect = true });
+                break;
             case 6:
-                {
-                    for (int i = 0; i < QQStatic.DefaultMachingOptions; i++)
-                        QuestionOptions.Add(new() { IsCorrect = true });                    
-                    break;
-                }
-
+                for (int i = 0; i < QQStatic.DefaultMachingOptions; i++)
+                    QuestionOptions.Add(new() { IsCorrect = true });
+                break;
             case 7:
-                {
-                    break;
-                }
-
+                break;
             default:
-                {
-                    break;
-                }
+                break;
         }
-        return;
     }
 }
