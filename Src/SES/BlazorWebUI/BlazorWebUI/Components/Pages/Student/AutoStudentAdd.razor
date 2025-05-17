@@ -1,20 +1,26 @@
-﻿@page "/Auto/MSAdd"
+﻿@*
+    todo: CreateMultiStudentCommand needs reafator with PdfReaderService.GetAllClassesAndStudents method and this page working style.
+    Now working style is not good. All students and classes are displayed after being added to the database, and the deletion process is carried out.
+*@
+@page "/Auto/MSAdd"
 @using Application.Features.Schools.Queries.GetList
 @using Application.Features.Semesters.Queries.GetList
 @using Application.Features.StudentClasses.Queries.GetList
 @using Application.Features.Students.Commands.Delete
 @using Application.Features.Students.Commands.MultiCreate
 @using Application.Features.Teachers.Queries.GetList
+@using BlazorWebUI.Client.Pages.Styles
 @using NArchitecture.Core.Application.Responses
 @using MediatR
 @rendermode InteractiveServer
 
-<h1>Otomatik öğrenci ekleme</h1>
+<PageTitle>Otomatik Öğrenci Ekle</PageTitle>
 
-<br />
+<h1>Otomatik öğrenci ekleme</h1>
+<div class="mb-5" />
 <div class="input-group mb-3">
 
-    <EditForm OnValidSubmit="AddAutoStudent" method="post" enctype="multipart/form-data" Model="multiStudentDto" FormName="StudentMultiAdd">
+    <EditForm OnValidSubmit="AddAutoStudent" method="post" enctype="multipart/form-data" Model="_multiStudentDto" FormName="StudentMultiAdd">
 
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -22,8 +28,8 @@
 
         <div class="input-group mb-3" style="width:15rem;">
             <label class="input-group-text">Okul :</label>
-            <InputSelect class="form-select" id="schoolDD" @bind-Value="multiStudentDto.SchoolId">
-                @foreach (GetListSchoolListItemDto school in SchoolResponse.Items)
+            <InputSelect class="form-select" id="schoolDD" @bind-Value="_multiStudentDto.SchoolId">
+                @foreach (GetListSchoolListItemDto school in _schoolListResponse.Items)
                 {
                     <option value="@school.Id">@school.Name</option>
                 }
@@ -32,8 +38,8 @@
 
         <div class="input-group mb-3" style="width:15rem;">
             <label class="input-group-text">Dönem :</label>
-            <InputSelect class="form-select" id="schoolSemester" @bind-Value="multiStudentDto.SemesterId">
-                @foreach (GetListSemesterListItemDto semester in SemesterResponse.Items)
+            <InputSelect class="form-select" id="schoolSemester" @bind-Value="_multiStudentDto.SemesterId">
+                @foreach (GetListSemesterListItemDto semester in _semesterResponse.Items)
                 {
                     <option value="@semester.Id">@semester.BeginSemesterDate @semester.EndSemesterDate @semester.Name</option>
                 }
@@ -42,8 +48,8 @@
 
         <div class="input-group mb-3" style="width:15rem;">
             <label class="input-group-text">Öğretmen :</label>
-            <InputSelect class="form-select" id="teacher" @bind-Value="multiStudentDto.TeacherId">
-                @foreach (GetListTeacherListItemDto teacher in TeacherResponse.Items)
+            <InputSelect class="form-select" id="teacher" @bind-Value="_multiStudentDto.TeacherId">
+                @foreach (GetListTeacherListItemDto teacher in _teacherResponse.Items)
                 {
                     <option value="@teacher.Id">@teacher.Name @teacher.SurName</option>
                 }
@@ -64,9 +70,7 @@
 
 </div>
 
-<br />
-
-@if (createdMultiStudents.Count > 0)
+@if (_createdMultiStudents.Count > 0)
 {
     <div class="container mt-4">
 
@@ -82,7 +86,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (CreatedMultiStudentResponse st in createdMultiStudents)
+                @foreach (CreatedMultiStudentResponse st in _createdMultiStudents)
                 {
                     <tr>
                         <td>@st.SchoolNumber</td>
@@ -98,64 +102,76 @@
         </table>
     </div>
 }
+
+<ModalDialog @ref="_modalStatus" Title="Eklendi">
+    <div style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 0.25rem;">
+        <p>Öğrenciler başarıyla eklendi</p>
+        <p>Dikkat: Silinen öğrenciler sistemden geri döndürülemeyecek şekilde kalıcı olarak silinir.</p>
+        <button class="btn btn-primary" @onclick="() => _modalStatus.Close()">Kapat</button>
+    </div>
+</ModalDialog>
+
+
 @inject IMediator _mediator
 
 @code {
     [SupplyParameterFromForm]
-    private MultiStudentDto multiStudentDto { get; set; } = new()
-        { TeacherId = 0, SchoolId = 0, SemesterId = 0 };
+    private MultiStudentDto _multiStudentDto { get; set; } = new()
+    { TeacherId = 0, SchoolId = 0, SemesterId = 0 };
 
-    private byte[] fileContent = Array.Empty<byte>();
+    private byte[] _fileContent = Array.Empty<byte>();
 
-    GetListResponse<GetListSchoolListItemDto> SchoolResponse = new();
-    GetListResponse<GetListSemesterListItemDto> SemesterResponse = new();
-    GetListResponse<GetListTeacherListItemDto> TeacherResponse = new();
-    GetListResponse<GetListStudentClassListItemDto> StudentClassResponse = new();
-    ICollection<CreatedMultiStudentResponse> createdMultiStudents = [];
+    GetListResponse<GetListSchoolListItemDto> _schoolListResponse = new();
+    GetListResponse<GetListSemesterListItemDto> _semesterResponse = new();
+    GetListResponse<GetListTeacherListItemDto> _teacherResponse = new();
+    GetListResponse<GetListStudentClassListItemDto> _studentClassResponse = new();
+    ICollection<CreatedMultiStudentResponse> _createdMultiStudents = [];
+
+    private ModalDialog _modalStatus { get; set; } = new();
 
     private async Task DeleteStudent(int studentId)
     {
         await _mediator.Send(new DeleteStudentCommand { Id = studentId, PermanentDelete = true });
 
-        createdMultiStudents = createdMultiStudents.Where(st => st.Id != studentId).ToList();
+        _createdMultiStudents = _createdMultiStudents.Where(st => st.Id != studentId).ToList();
     }
     protected override async Task OnInitializedAsync()
     {
-        SchoolResponse = await _mediator.Send(new GetListSchoolQuery()
+        _schoolListResponse = await _mediator.Send(new GetListSchoolQuery()
+        {
+            PageRequest = new()
             {
-                PageRequest = new()
-                {
-                    PageIndex = 0,
-                    PageSize = int.MaxValue
-                }
-            });
+                PageIndex = 0,
+                PageSize = int.MaxValue
+            }
+        });
 
-        SemesterResponse = await _mediator.Send(new GetListSemesterQuery()
+        _semesterResponse = await _mediator.Send(new GetListSemesterQuery()
+        {
+            PageRequest = new()
             {
-                PageRequest = new()
-                {
-                    PageIndex = 0,
-                    PageSize = int.MaxValue
-                }
-            });
+                PageIndex = 0,
+                PageSize = int.MaxValue
+            }
+        });
 
-        TeacherResponse = await _mediator.Send(new GetListTeacherQuery()
+        _teacherResponse = await _mediator.Send(new GetListTeacherQuery()
+        {
+            PageRequest = new()
             {
-                PageRequest = new()
-                {
-                    PageIndex = 0,
-                    PageSize = int.MaxValue
-                }
-            });
+                PageIndex = 0,
+                PageSize = int.MaxValue
+            }
+        });
 
-        StudentClassResponse = await _mediator.Send(new GetListStudentClassQuery()
+        _studentClassResponse = await _mediator.Send(new GetListStudentClassQuery()
+        {
+            PageRequest = new()
             {
-                PageRequest = new()
-                {
-                    PageIndex = 0,
-                    PageSize = int.MaxValue
-                }
-            });
+                PageIndex = 0,
+                PageSize = int.MaxValue
+            }
+        });
 
         await base.OnInitializedAsync();
     }
@@ -164,26 +180,27 @@
     private async Task FileToMemoryAsync(InputFileChangeEventArgs e)
     {
         IBrowserFile fileFromPdf = e.File;
-        Console.WriteLine(fileFromPdf.Size);
-        if (fileFromPdf == null)
+        if (fileFromPdf.Size == 0)
             return;
 
         using MemoryStream memoryStream = new();
         await fileFromPdf.OpenReadStream().CopyToAsync(memoryStream);
-        fileContent = memoryStream.ToArray();
+        _fileContent = memoryStream.ToArray();
     }
 
     private async Task AddAutoStudent()
     {
         CreateMultiStudentCommand createMultiStudentCommand = new()
-            {
-                PdfFile = fileContent,
-                RefTeacherId = multiStudentDto.TeacherId,
-                SchoolId = multiStudentDto.SchoolId,
-                SemesterId = multiStudentDto.SemesterId,
-            };
+        {
+            PdfFile = _fileContent,
+            RefTeacherId = _multiStudentDto.TeacherId,
+            SchoolId = _multiStudentDto.SchoolId,
+            SemesterId = _multiStudentDto.SemesterId,
+        };
 
-        createdMultiStudents = await _mediator.Send(createMultiStudentCommand);
+        _createdMultiStudents = await _mediator.Send(createMultiStudentCommand);
+
+        _modalStatus.Open();
     }
 
     private record MultiStudentDto
