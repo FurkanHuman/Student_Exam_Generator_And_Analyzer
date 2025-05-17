@@ -13,12 +13,12 @@
 
 <h3>Otomatik Kazanım Ekleyici</h3>
 
-<ModalDialog @ref="ModalDialog" Title="Başarılı bir şekilde eklendi">
+<ModalDialog @ref="_modalDialog" Title="Başarılı bir şekilde eklendi">
 
-    <button class="btn btn-primary" @onclick="() => ModalDialog.Close()">Tamam</button>
+    <button class="btn btn-primary" @onclick="() => _modalDialog.Close()">Tamam</button>
 </ModalDialog>
 
-@if (IsSuccess)
+@if (_isSuccess)
 {
     <br />
     <div class="alert alert-success" role="alert">
@@ -26,20 +26,20 @@
     </div>
 }
 
-<EditForm OnValidSubmit="AddAotuBenefit" Model="autoBenefitDto">
+<EditForm OnValidSubmit="AddAutoBenefit" Model="_autoBenefitDto">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <AntiforgeryToken />
 
     <div class="input-group mb-3" style="width:30rem;">
         <label class="input-group-text">Yıllık Adı :</label>
-        <InputText type="text" class="form-control" @bind-Value="autoBenefitDto.Name" />
+        <InputText type="text" class="form-control" @bind-Value="_autoBenefitDto.Name" />
     </div>
 
     <div class="input-group mb-3" style="width:30rem;">
         <label class="input-group-text">Okul :</label>
-        <InputSelect class="form-select" @bind-Value="autoBenefitDto.SchoolId">
-            @foreach (GetListSchoolListItemDto school in SchoolResponse.Items)
+        <InputSelect class="form-select" @bind-Value="_autoBenefitDto.SchoolId">
+            @foreach (GetListSchoolListItemDto school in _schoolResponse.Items)
             {
                 <option value="@school.Id">@school.Name</option>
             }
@@ -48,8 +48,8 @@
 
     <div class="input-group mb-3" style="width:30rem;">
         <label class="input-group-text">Yıllık Dönemi :</label>
-        <InputSelect class="form-select" @bind-Value="autoBenefitDto.SemesterId">
-            @foreach (GetListSemesterListItemDto semester in SemesterResponse.Items)
+        <InputSelect class="form-select" @bind-Value="_autoBenefitDto.SemesterId">
+            @foreach (GetListSemesterListItemDto semester in _semesterResponse.Items)
             {
                 <option value="@semester.Id">@semester.BeginSemesterDate @semester.EndSemesterDate @semester.Name</option>
             }
@@ -58,8 +58,8 @@
 
     <div class="input-group mb-3" style="width:30rem;">
         <label class="input-group-text">Yıllık Dönem Dersi :</label>
-        <InputSelect class="form-select" @bind-Value="autoBenefitDto.LessonId">
-            @foreach (GetListLessonListItemDto lesson in lessonResponse.Items)
+        <InputSelect class="form-select" @bind-Value="_autoBenefitDto.LessonId">
+            @foreach (GetListLessonListItemDto lesson in _lessonResponse.Items)
             {
                 <option value="@lesson.Id">  @lesson.LessonName @GetSemesterByIdTosString(lesson.SemesterId) </option>
             }
@@ -68,16 +68,14 @@
 
     <div class="input-group mb-3" style="width:30rem;">
         <label class="input-group-text">Yıllık plan Dosyası :</label>
-        <InputFile type="file" name="FileFromPdf" class="form-control" accept=".pdf" OnChange="HandleFileSelected" disabled="@IsChecked" />
+        <InputFile type="file" name="FileFromPdf" class="form-control" accept=".pdf" OnChange="HandleFileSelected" disabled="@_isChecked" />
 
-        <InputCheckbox class="form-check" @bind-Value="IsChecked" style="width:5rem;" />
+        <InputCheckbox class="form-check" @bind-Value="_isChecked" style="width:5rem;" />
         <label class="form-check-label">Elle Giriş</label>
-
-
     </div>
 
     <div class="mb-3">
-        <button type="submit" class="btn btn-primary text-lg-end" disabled="@(!(IsBenefitsOk && IsSubLearningOk && IsLearningOk))">Kaydet</button>
+        <button type="submit" class="btn btn-primary text-lg-end" disabled="@(!(_isBenefitsOk && _isSubLearningOk && _isLearningOk))">Kaydet</button>
     </div>
 
 </EditForm>
@@ -87,7 +85,7 @@
 
 <div>
     <div class="btn btn-outline-info" @onclick="Toggle">
-        @(IsOpen ? "Kapat" : "Aç")
+        @(_isOpen ? "Kapat" : "Aç")
     </div>
     @*
         Todo: üç farklı gösterriş biçimi. düz metin yapıştırma ve düzenleme yapılacak. textboxarea ile yapılması uygundur bu olması gerekir kesin. 
@@ -95,37 +93,37 @@
     *@
 
     <div>
-        @if (IsOpen)
+        @if (_isOpen)
         {
             <h4>Başlıklar</h4>
             <hr />
-            <EditContentList EditContents="EditContentLearning" />
+            <EditContentList EditContents="_editContentLearning" />
             <hr />
 
             <div class="input-group mb-3" style="width:30rem;">
                 <label class="form-check-label">Başlıkların Doğru Olduğunu Onaylıyorum</label>
-                <InputCheckbox class="form-check" @bind-Value="IsLearningOk" style="width:5rem;" />
+                <InputCheckbox class="form-check" @bind-Value="_isLearningOk" style="width:5rem;" />
             </div>
 
             <h4>Alt Başlıklar</h4>
             <hr />
-            <EditContentList EditContents="EditContentSubLearning" />
+            <EditContentList EditContents="_editContentSubLearning" />
             <hr>
 
             <div class="input-group mb-3" style="width:30rem;">
                 <label class="form-check-label">Alt Başlıkların Doğru Olduğunu Onaylıyorum</label>
-                <InputCheckbox class="form-check" @bind-Value="IsSubLearningOk" style="width:5rem;" />
+                <InputCheckbox class="form-check" @bind-Value="_isSubLearningOk" style="width:5rem;" />
             </div>
 
 
             <h4>Kazanımlar</h4>
             <hr />
-            <EditContentList EditContents="EditContentBenefits" />
+            <EditContentList EditContents="_editContentBenefits" />
             <hr>
 
             <div class="input-group mb-3" style="width:30rem;">
                 <label class="form-check-label"> Kazanımların Doğru Olduğunu Onaylıyorum</label>
-                <InputCheckbox class="form-check" @bind-Value="IsBenefitsOk" style="width:5rem;" />
+                <InputCheckbox class="form-check" @bind-Value="_isBenefitsOk" style="width:5rem;" />
             </div>
 
         }
@@ -149,44 +147,43 @@
 
 @code {
     [SupplyParameterFromForm]
-    private RefBenDto autoBenefitDto { get; set; } = new();
+    private RefBenDto _autoBenefitDto { get; set; } = new();
 
-    GetListResponse<GetListLessonListItemDto> lessonResponse = new();
-    GetListResponse<GetListSchoolListItemDto> SchoolResponse = new();
-    GetListResponse<GetListSemesterListItemDto> SemesterResponse = new();
+    GetListResponse<GetListLessonListItemDto> _lessonResponse = new();
+    GetListResponse<GetListSchoolListItemDto> _schoolResponse = new();
+    GetListResponse<GetListSemesterListItemDto> _semesterResponse = new();
+    private string _editContentPlainText { get; set; } = string.Empty;
 
-    private string EditContentPlainText { get; set; } = string.Empty;
-
-    ModalDialog ModalDialog { get; set; } = new();
+    ModalDialog _modalDialog { get; set; } = new();
 
     private List<EditContent> GetAllEditContents()
     {
         List<EditContent> allEditContents = [];
-        allEditContents.AddRange(EditContentBenefits);
-        allEditContents.AddRange(EditContentSubLearning);
-        allEditContents.AddRange(EditContentLearning);
+        allEditContents.AddRange(_editContentBenefits);
+        allEditContents.AddRange(_editContentSubLearning);
+        allEditContents.AddRange(_editContentLearning);
         return allEditContents;
     }
 
-    List<EditContent> EditContentBenefits = new();
-    List<EditContent> EditContentSubLearning = new();
-    List<EditContent> EditContentLearning = new();
+    List<EditContent> _editContentBenefits = new();
+    List<EditContent> _editContentSubLearning = new();
+    List<EditContent> _editContentLearning = new();
 
-    private byte[] fileContent = Array.Empty<byte>();
+    private byte[] _fileContent = Array.Empty<byte>();
 
-    private bool IsSuccess = false;
+    private bool _isSuccess = false;
 
-    private bool IsOpen = false;
+    private bool _isOpen = false;
 
-    private bool IsBenefitsOk = false;
-    private bool IsSubLearningOk = false;
-    private bool IsLearningOk = false;
+    private bool _isBenefitsOk = false;
+    private bool _isSubLearningOk = false;
+    private bool _isLearningOk = false;
 
-    private bool IsChecked { get; set; } = false;
+    private bool _isChecked { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
-        lessonResponse = await _mediator.Send(new GetListLessonQuery()
+        _lessonResponse = await _mediator.Send(new GetListLessonQuery()
             {
                 PageRequest = new()
                 {
@@ -195,7 +192,7 @@
                 }
             });
 
-        SchoolResponse = await _mediator.Send(new GetListSchoolQuery()
+        _schoolResponse = await _mediator.Send(new GetListSchoolQuery()
             {
                 PageRequest = new()
                 {
@@ -204,7 +201,7 @@
                 }
             });
 
-        SemesterResponse = await _mediator.Send(new GetListSemesterQuery()
+        _semesterResponse = await _mediator.Send(new GetListSemesterQuery()
             {
                 PageRequest = new()
                 {
@@ -215,20 +212,20 @@
         await base.OnInitializedAsync();
     }
 
-    private async Task AddAotuBenefit()
+    private async Task AddAutoBenefit()
     {
         List<string> lines = [];
 
-        lines.AddRange(EditContentBenefits.Select(benefit => benefit.Current).Distinct());
-        lines.AddRange(EditContentSubLearning.Select(subLearning => subLearning.Current).Distinct());
-        lines.AddRange(EditContentLearning.Select(learning => learning.Current).Distinct());
+        lines.AddRange(_editContentBenefits.Select(benefit => benefit.Current).Distinct());
+        lines.AddRange(_editContentSubLearning.Select(subLearning => subLearning.Current).Distinct());
+        lines.AddRange(_editContentLearning.Select(learning => learning.Current).Distinct());
 
         ReferenceBenefitDto referenceBenefitDto = _pdfReaderService.ProcessReferenceBenefit(lines);
 
-        referenceBenefitDto.RBName = autoBenefitDto.Name;
-        referenceBenefitDto.LessonId = autoBenefitDto.LessonId;
-        referenceBenefitDto.SemesterId = autoBenefitDto.SemesterId;
-        referenceBenefitDto.SchoolId = autoBenefitDto.SchoolId;
+        referenceBenefitDto.RBName = _autoBenefitDto.Name;
+        referenceBenefitDto.LessonId = _autoBenefitDto.LessonId;
+        referenceBenefitDto.SemesterId = _autoBenefitDto.SemesterId;
+        referenceBenefitDto.SchoolId = _autoBenefitDto.SchoolId;
 
         await _mediator.Send(new CreateReferenceBenefitCommand
             {
@@ -237,7 +234,7 @@
 
         DisplaySuccessMessage();
         lines.Clear();
-        autoBenefitDto.Name = string.Empty;
+        _autoBenefitDto.Name = string.Empty;
     }
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
@@ -249,33 +246,33 @@
         using MemoryStream memoryStream = new();
 
         await file.OpenReadStream().CopyToAsync(memoryStream);
-        fileContent = memoryStream.ToArray();
-        ICollection<RawBenefitReferenceDto> rawRefBenefits = await _pdfReaderService.GetAllReferenceBenefitsWithAltersDtos(fileContent);
+        _fileContent = memoryStream.ToArray();
+        ICollection<RawBenefitReferenceDto> rawRefBenefits = await _pdfReaderService.GetAllReferenceBenefitsWithAltersDtos(_fileContent);
         foreach (RawBenefitReferenceDto rawBenefit in rawRefBenefits)
         {
             if (rawBenefit.Benefits != null)
-                EditContentBenefits.AddRange(rawBenefit.Benefits.Select(benefit => new EditContent { Current = benefit }));
+                _editContentBenefits.AddRange(rawBenefit.Benefits.Select(benefit => new EditContent { Current = benefit }));
 
             if (rawBenefit.SubLearningAreas != null)
-                EditContentSubLearning.AddRange(rawBenefit.SubLearningAreas.Select(subLearning => new EditContent { Current = subLearning }));
+                _editContentSubLearning.AddRange(rawBenefit.SubLearningAreas.Select(subLearning => new EditContent { Current = subLearning }));
 
             if (rawBenefit.LearningAreas != null)
-                EditContentLearning.AddRange(rawBenefit.LearningAreas.Select(learning => new EditContent { Current = learning }));
+                _editContentLearning.AddRange(rawBenefit.LearningAreas.Select(learning => new EditContent { Current = learning }));
         }
-        IsOpen = true;
+        _isOpen = true;
     }
 
     private void DisplaySuccessMessage()
     {
-        ModalDialog.Open();
-        EditContentBenefits.Clear();
-        EditContentSubLearning.Clear();
-        EditContentLearning.Clear();
+        _modalDialog.Open();
+        _editContentBenefits.Clear();
+        _editContentSubLearning.Clear();
+        _editContentLearning.Clear();
     }
 
     private void Toggle(MouseEventArgs e)
     {
-        IsOpen = !IsOpen;
+        _isOpen = !_isOpen;
     }
 
     private void OnCheckboxChanged(ChangeEventArgs e)
@@ -283,12 +280,12 @@
         if (e.Value == null)
             return;
 
-        IsChecked = (bool)e.Value;
+        _isChecked = (bool)e.Value;
     }
 
     private string GetSemesterByIdTosString(int id)
     {
-        GetListSemesterListItemDto s = SemesterResponse.Items.First(x => x.Id == id);
+        GetListSemesterListItemDto s = _semesterResponse.Items.First(x => x.Id == id);
         return $"{s.BeginSemesterDate.Year} - {s.EndSemesterDate.Year} {s.Name}";
     }
 
