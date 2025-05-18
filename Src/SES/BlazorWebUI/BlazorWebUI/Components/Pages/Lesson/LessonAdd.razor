@@ -9,7 +9,7 @@
 <h1>Ders Ekle</h1>
 
 <div>
-    <EditForm Model="lessonDto" FormName="LessonAddForm" OnValidSubmit="OnSubmitAsync">
+    <EditForm Model="_lessonForm" FormName="LessonAddForm" OnValidSubmit="OnSubmitAsync">
         <DataAnnotationsValidator />
         <ValidationSummary />
         <AntiforgeryToken />
@@ -17,22 +17,22 @@
         <div class="input-group mb-3" style="width:35rem;">
             <label class="input-group-text">Ders Adı: </label>
             <InputText type="Text" class="form-control conversion" id="name" style="text-transform:uppercase"
-                       @bind-Value="lessonDto.Name" />
+                       @bind-Value="_lessonForm.Name" />
         </div>
 
         <div class="input-group mb-3" style="width:35rem;">
             <label class="input-group-text">Açıklama: </label>
             <InputText type="Text" class="form-control conversion" id="description" style="text-transform:uppercase"
-                       @bind-Value="lessonDto.Description" />
+                       @bind-Value="_lessonForm.Description" />
         </div>
 
         <div class="input-group mb-3" style="width:35rem;">
             <label class="input-group-text">Dönem: </label>
             <InputSelect class="form-select" id="name" style="text-transform:uppercase"
-                         @bind-Value="lessonDto.SemesterId">
+                         @bind-Value="_lessonForm.SemesterId">
                 <option selected>Seçiniz</option>
 
-                @foreach (GetListSemesterListItemDto semesterListItemDto in getListSemester.Items)
+                @foreach (GetListSemesterListItemDto semesterListItemDto in _getListSemester.Items)
                 {
                     <option value="@semesterListItemDto.Id">
                         @semesterListItemDto.BeginSemesterDate.Year & @semesterListItemDto.EndSemesterDate.Year | @semesterListItemDto.Name
@@ -43,7 +43,7 @@
 
         <div class="input-group mb-3" style="width:35rem;">
             <label class="input-group-text">Sınıf: </label>
-            <InputSelect class="form-select" id="name" style="text-transform:uppercase" @bind-Value="lessonDto.ClassAge">
+            <InputSelect class="form-select" id="name" style="text-transform:uppercase" @bind-Value="_lessonForm.ClassAge">
                 <option selected>Seçiniz</option>
 
                 @for (byte i = 0; i <= 12; i++)
@@ -65,17 +65,17 @@
 @code {
 
     [SupplyParameterFromForm]
-    private LessonDTO lessonDto { get; set; } = new() { Name = string.Empty, Description = string.Empty };
+    private LessonDTO _lessonForm { get; set; } = new() { Name = string.Empty, Description = string.Empty };
 
-    private GetListResponse<GetListSemesterListItemDto> getListSemester = new();
+    private GetListResponse<GetListSemesterListItemDto> _getListSemester = new();
 
     protected override async Task OnInitializedAsync()
     {
         GetListSemesterQuery getListSemesterQuery = new();
         getListSemesterQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
 
-        getListSemester = await _Mediator.Send(getListSemesterQuery);
-        lessonDto.SemesterId = getListSemester.Items.Last().Id;
+        _getListSemester = await _Mediator.Send(getListSemesterQuery);
+        _lessonForm.SemesterId = _getListSemester.Items.Last().Id;
 
         await base.OnInitializedAsync();
     }
@@ -84,10 +84,10 @@
     {
         CreateLessonCommand createLesson = new()
             {
-                LessonName = lessonDto.Name,
-                Description = lessonDto.Description,
-                SemesterId = lessonDto.SemesterId,
-                ClassAge = lessonDto.ClassAge
+                LessonName = _lessonForm.Name,
+                Description = _lessonForm.Description,
+                SemesterId = _lessonForm.SemesterId,
+                ClassAge = _lessonForm.ClassAge
             };
 
         await _Mediator.Send(createLesson);
