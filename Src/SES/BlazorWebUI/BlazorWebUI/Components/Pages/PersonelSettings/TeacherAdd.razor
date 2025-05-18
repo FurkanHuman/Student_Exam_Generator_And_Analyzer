@@ -13,7 +13,7 @@
 <br />
 
 <div class="input-group mb-3">
-    <EditForm method="post" OnValidSubmit="Submit" Model="teacherDto" FormName="TeacherAddForm">
+    <EditForm method="post" OnValidSubmit="Submit" Model="_teacherDto" FormName="TeacherAddForm">
         <DataAnnotationsValidator />
         <ValidationSummary />
         <AntiforgeryToken />
@@ -21,9 +21,9 @@
         {
             <div class="input-group mb-3" style="width:35rem;">
                 <label class="input-group-text">Öğretmen: </label>
-                <InputSelect class="form-select" id="schoolDD" @bind-Value="teacherDto.PersonelId">
+                <InputSelect class="form-select" id="schoolDD" @bind-Value="_teacherDto.PersonelId">
                     <option selected>Seçiniz</option>
-                    @foreach (GetListPersonelListItemDto personelItemDto in GetListPersonel.Items)
+                    @foreach (GetListPersonelListItemDto personelItemDto in _getListPersonel.Items)
                     {
                         <option value="@personelItemDto.Id">@personelItemDto.Name @personelItemDto.SurName @personelItemDto.BirthDate </option>
                     }
@@ -32,9 +32,9 @@
         }
         <div class="input-group mb-3" style="width:35rem;">
             <label class="input-group-text">Dönem: </label>
-            <InputSelect class="form-select" id="schoolDD" @bind-Value="teacherDto.SemesterId">
+            <InputSelect class="form-select" id="schoolDD" @bind-Value="_teacherDto.SemesterId">
                 <option selected>Seçiniz</option>
-                @foreach (GetListSemesterListItemDto semesterListItemDto in GetListSemester.Items)
+                @foreach (GetListSemesterListItemDto semesterListItemDto in _getListSemester.Items)
                 {
                     <option value="@semesterListItemDto.Id">@semesterListItemDto.BeginSemesterDate.Year @semesterListItemDto.EndSemesterDate.Year | @semesterListItemDto.Name </option>
                 }
@@ -43,9 +43,9 @@
 
         <div class="input-group mb-3" style="width:35rem;">
             <label class="input-group-text">Okul: </label>
-            <InputSelect class="form-select" id="schoolDD" @bind-Value="teacherDto.SchoolId">
+            <InputSelect class="form-select" id="schoolDD" @bind-Value="_teacherDto.SchoolId">
                 <option selected value="0">Otomatik</option>
-                @foreach (GetListSchoolListItemDto getListSchooltemDto in GetListSchool.Items)
+                @foreach (GetListSchoolListItemDto getListSchooltemDto in _getListSchool.Items)
                 {
                     <option value="@getListSchooltemDto.Id">@getListSchooltemDto.Name</option>
                 }
@@ -63,7 +63,7 @@
 
 @code {
     [SupplyParameterFromForm]
-    private TeacherAddDto teacherDto { get; set; } = new();
+    private TeacherAddDto _teacherDto { get; set; } = new();
 
     [Parameter]
     public Guid? PersonelId { get; set; }
@@ -71,9 +71,9 @@
     [Parameter]
     public EventCallback TriggerEvent { get; set; }
 
-    private GetListResponse<GetListPersonelListItemDto> GetListPersonel = new();
-    private GetListResponse<GetListSchoolListItemDto> GetListSchool = new();
-    private GetListResponse<GetListSemesterListItemDto> GetListSemester = new();
+    private GetListResponse<GetListPersonelListItemDto> _getListPersonel = new();
+    private GetListResponse<GetListSchoolListItemDto> _getListSchool = new();
+    private GetListResponse<GetListSemesterListItemDto> _getListSemester = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,29 +81,29 @@
         {
             GetListPersonelQuery listPersonelQuery = new();
             listPersonelQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
-            GetListPersonel = await _Mediator.Send(listPersonelQuery);
+            _getListPersonel = await _Mediator.Send(listPersonelQuery);
         }
 
         GetListSchoolQuery listSchoolQuery = new();
         listSchoolQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
-        GetListSchool = await _Mediator.Send(listSchoolQuery);
+        _getListSchool = await _Mediator.Send(listSchoolQuery);
 
         GetListSemesterQuery listSemesterQuery = new();
         listSemesterQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
-        GetListSemester = await _Mediator.Send(listSemesterQuery);
+        _getListSemester = await _Mediator.Send(listSemesterQuery);
 
         await base.OnInitializedAsync();
     }
 
     private async Task Submit()
     {
-        if (teacherDto.SchoolId == 0)
-            teacherDto.SchoolId = GetListSchool.Items.Last().Id;
+        if (_teacherDto.SchoolId == 0)
+            _teacherDto.SchoolId = _getListSchool.Items.Last().Id;
 
         if (PersonelId != null)
-            teacherDto.PersonelId = PersonelId.Value;
+            _teacherDto.PersonelId = PersonelId.Value;
 
-        CreateTeacherCommand teacherCommand = new() { PersonelId = teacherDto.PersonelId, SchoolId = teacherDto.SchoolId, SemesterId = teacherDto.SemesterId };
+        CreateTeacherCommand teacherCommand = new() { PersonelId = _teacherDto.PersonelId, SchoolId = _teacherDto.SchoolId, SemesterId = _teacherDto.SemesterId };
         CreatedTeacherResponse teacherResponse = await _Mediator.Send(teacherCommand);
         await TriggerEvent.InvokeAsync();
     }

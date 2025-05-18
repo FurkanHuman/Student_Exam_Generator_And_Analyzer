@@ -10,6 +10,7 @@
 @using Domain.Entities
 @using Domain.Enums
 
+<PageTitle> Müdür ayarla </PageTitle>
 
 <AuthorizeView Context="RegisterContext">
     <Authorized>
@@ -30,7 +31,7 @@
                     <label class="input-group-text">Dönem Seçiniz:</label>
                     <InputSelect class="form-select" id="principalSG" @bind-Value="_PrincipalSetDto.SemesterId">
                         <option selected>Seçiniz...</option>
-                        @foreach (GetListSemesterListItemDto? semester in semesterList.Items)
+                        @foreach (GetListSemesterListItemDto? semester in _semesterList.Items)
                         {
                             <option value="@semester.Id">@semester.BeginSemesterDate @semester.EndSemesterDate @semester.Name </option>
                         }
@@ -41,7 +42,7 @@
                     <label class="input-group-text">Müdür Seçiniz:</label>
                     <InputSelect class="form-select" id="principalSG" @bind-Value="_PrincipalSetDto.PersonelId">
                         <option selected>Seçiniz...</option>
-                        @foreach (GetListPersonelListItemDto? personel in personelList.Items)
+                        @foreach (GetListPersonelListItemDto? personel in _personelList.Items)
                         {
                             <option value="@personel.Id">@personel.Name @personel.SurName @personel.BirthDate</option>
                         }
@@ -66,18 +67,18 @@
     [SupplyParameterFromForm]
     private PrincipalDto _PrincipalSetDto { get; set; } = new();
 
-    private GetListResponse<GetListSemesterListItemDto> semesterList = new();
-    private GetListResponse<GetListPersonelListItemDto> personelList = new();
+    private GetListResponse<GetListSemesterListItemDto> _semesterList = new();
+    private GetListResponse<GetListPersonelListItemDto> _personelList = new();
 
     protected override async Task OnInitializedAsync()
     {
         GetListSemesterQuery getListSemesterQuery = new();
         getListSemesterQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
-        semesterList = await _IMediatr.Send(getListSemesterQuery);
+        _semesterList = await _IMediatr.Send(getListSemesterQuery);
 
         GetListPersonelQuery getListPersonelQuery = new();
         getListPersonelQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
-        personelList = await _IMediatr.Send(getListPersonelQuery);
+        _personelList = await _IMediatr.Send(getListPersonelQuery);
 
         await base.OnInitializedAsync();
     }
