@@ -1,8 +1,9 @@
 ﻿using NArchitecture.Core.Persistence.Repositories;
+using Domain.Enums;
 
 namespace Domain.Entities;
 
-public class StudentAnswer : Entity<Guid> // öğrencilerin sorulara verdiği cevaplar
+public class StudentAnswer : Entity<Guid>
 {
     public int StudentId { get; set; }
     public virtual Student Student { get; set; }
@@ -13,9 +14,13 @@ public class StudentAnswer : Entity<Guid> // öğrencilerin sorulara verdiği ce
     public Guid? QuestionOptionId { get; set; }
     public virtual QuestionOption? QuestionOption { get; set; }
 
-    public int QuestionScoreId { get; set; }
-    public QuestionScore QuestionScore { get; set; }
+    public int? QuestionScoreId { get; set; }
+    public QuestionScore? QuestionScore { get; set; }
 
     public string? AnswerText { get; set; }
-    public bool IsCorrect { get; set; }
+    public int? GivenScore { get; set; }
+    public bool? IsCorrect { get; set; }
+
+    public EvaluationOrigin EvaluationOrigin { get; set; }
+    public EvaluationStatus EvaluationStatus { get; set; }
 }

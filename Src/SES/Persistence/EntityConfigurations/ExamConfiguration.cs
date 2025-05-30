@@ -37,6 +37,7 @@ internal class ExamConfiguration : IEntityTypeConfiguration<Exam>, IMainConfigur
         builder.HasMany(e => e.Teachers);
         builder.HasMany(e => e.StudentClasses);
         builder.HasMany(e => e.QuizQuestions);
+        builder.HasMany(e => e.StudentAnswers);
 
         builder.Property(e => e.CreatedDate).IsRequired();
         builder.Property(e => e.UpdatedDate);

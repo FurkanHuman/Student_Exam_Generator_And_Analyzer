@@ -10,14 +10,17 @@ namespace Persistence.EntityConfigurations
         public void Configure(EntityTypeBuilder<StudentAnswer> builder)
         {
             builder.HasKey(sa => sa.Id);
-            builder.Property(sa => sa.AnswerText);
-            builder.Property(sa => sa.QuestionScoreId).IsRequired();
-            builder.Property(sa => sa.IsCorrect).IsRequired();
 
             builder.Property(sa => sa.StudentId).IsRequired();
             builder.Property(sa => sa.QuizQuestionId).IsRequired();
+            builder.Property(sa => sa.QuestionScoreId);
             builder.Property(sa => sa.QuestionOptionId);
 
+            builder.Property(sa => sa.EvaluationOrigin).IsRequired();
+            builder.Property(sa => sa.EvaluationStatus).IsRequired();
+            builder.Property(sa => sa.AnswerText);
+            builder.Property(sa => sa.GivenScore);
+            builder.Property(sa => sa.IsCorrect);
 
             builder.HasOne(sa => sa.QuestionScore);
             builder.HasOne(sa => sa.Student);

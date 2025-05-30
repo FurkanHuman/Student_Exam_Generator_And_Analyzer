@@ -29,4 +29,5 @@ public class Exam : Entity<int>
     public IList<Teacher> Teachers { get; set; }
     public IList<StudentClass> StudentClasses { get; set; }
     public IList<QuizQuestion> QuizQuestions { get; set; }
+    public IList<StudentAnswer> StudentAnswers { get; set; }
 }
