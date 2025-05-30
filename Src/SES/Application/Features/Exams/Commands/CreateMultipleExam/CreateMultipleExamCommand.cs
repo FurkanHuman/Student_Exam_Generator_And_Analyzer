@@ -1,4 +1,4 @@
-// todo: this here very refactored here and "single resposibility principle" is not applied
+// todo: the code here will be heavily refactored and the 'single responsibility principle' will be applied
 using Application.Features.Exams.Rules;
 using AutoMapper;
 using NArchitecture.Core.Application.Pipelines.Caching;
@@ -169,7 +169,7 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
             await _examRepository.AddRangeAsync(exams);
 
             CreateMultipleExamResponse response = new();
-            response.FileName = $"{lesson!.LessonName}-{examInfo.SelectedClass}-sýnýflar-{examInfo.CurrentExamNumber}-yazýlý.zip";
+            response.FileName = $"{lesson!.LessonName}-{examInfo.SelectedClass}-sï¿½nï¿½flar-{examInfo.CurrentExamNumber}-yazï¿½lï¿½.zip";
             response.ZipFileMemStream = new MemoryStream(zipFileBytes);
             return response;
         }
