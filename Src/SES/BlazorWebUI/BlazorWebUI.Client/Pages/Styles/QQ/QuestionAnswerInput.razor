@@ -1,0 +1,116 @@
+﻿@*
+    tek asatır tasarımı soldan sağa:
+        soru sırası
+        soruya göre cevaplayıcı komponent
+            
+            notlar: açık uçlu kategorisinde bulunanlarda elle puan girişi olacak. sol üste kopya yada boş gibi seçenekler olacak
+
+                açık uçluda anahtar kelimeye ye (çok tartışmalı: eğer varsa soru içinde anahtar kelimeler işaretlesin yada soruya yazılan cevabı yazsın...???) yada el ile puan girişi
+
+                boşluk doldurmada direkt kelime istenceği için checkboxla işaretleme veya elle puan girişi
+
+                sıralama ve eşlestirme ise sıralamaya göre giriş olacak {A: (textbox girişi)}
+
+                doğru yanlışlarda checkbox ama boş olabilir yani üç durumlu checkboxlar. tabiki seçeneklerde olacak.
+
+                çoktan seçmelide dropdown ile işaretlenen seçenek sadece.
+
+        tam puan butonu
+*@
+@page "/test"
+@rendermode InteractiveAuto
+@code {
+    private QQBodyDto QQBody { get; set; } = new QQBodyDto()
+    {
+        Question = "Bu bir test sorusudur.",
+        SelectedQType = 11,
+        Score = 10,
+        MaxScore = 15,
+        QuestionOptions = new List<QuestionOptionDto>
+        {
+            new QuestionOptionDto { OptionText = "A,B,C", IsCorrect = true }
+        }
+    };
+
+    public QuestionAnswerInput()
+    {
+        this.qQBody = QQBody;
+    }
+
+    [Parameter]
+    public int QuestionOrder { get; set; }
+
+    [Parameter]
+    public int Score { get; set; }
+
+    [Parameter]
+    public QQBodyDto qQBody { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnScoreChanged { get; set; }
+
+    private void HandleScoreChange(int newScore)
+    {
+        Score = newScore;
+        OnScoreChanged.InvokeAsync(newScore);
+    }
+}
+
+@*
+        Tek satır tasarımı:
+        Solda soru sırası, ortada soruya göre cevaplayıcı komponent,
+        sağda "Tam Puan Ver" butonu.
+*@
+
+<div class="form-control mb-3">
+    <div class="d-flex align-items-center justify-content-between">
+
+        <span class="fw-bold me-3">@QuestionOrder. soru</span>
+
+        <div class="flex-grow-1 mx-3">
+            
+            @switch (qQBody.SelectedQType)
+            {
+                case 1: // açık uçlu
+                    {
+                        <div>
+                            <div>
+
+                            </div>
+
+                            <div>
+                            </div>
+                        </div>
+                        break;
+                    }
+                case 3: // çoktan seçmeli
+                    {
+                        break;
+                    }
+                case 4: // doğru yanlış
+                    {
+                        break;
+                    }
+                case 5: // boşluk doldurma
+                    {
+                        break;
+                    }
+                case 6: // eşleştirme
+                    {
+                        break;
+                    }
+                case 7: // sıralama
+                    {
+                        break;
+                    }
+                default:
+                    {
+                        <p>Geçersiz soru tipi.</p>
+                        break;
+                    }
+            }
+
+        </div>
+        <button class="btn btn-primary">Tam Puan Ver</button>
+    </div>
+</div>
