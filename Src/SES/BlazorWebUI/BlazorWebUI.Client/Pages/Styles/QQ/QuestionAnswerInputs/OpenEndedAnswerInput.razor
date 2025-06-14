@@ -1,0 +1,179 @@
+﻿<div class="d-flex align-items-center flex-wrap border rounded">
+    <label class="input-group-text me-3">Anahtar kelimeler:</label>
+
+    @foreach (string keyword in GetOpenEndedKeywords())
+    {
+        <div class="form-check form-check-inline">
+            <InputCheckbox class="form-check-input"
+                           id="@("inlineCheckbox" + keyword)"
+                           ValueChanged="(e) => ToggleOpenEndedAnswerCheck(e, keyword)"
+                           ValueExpression="() => _isCheckBoxCheckedStatus" />
+            <label class="form-check-label" for="@("inlineCheckbox" + keyword)">
+                @keyword
+            </label>
+        </div>
+    }
+</div>
+
+<div class="input-group rounded border" style="width:12rem;">
+    <label class="input-group-text">Puanı:</label>
+    <InputNumber type="number"
+                 class="form-control conversion"
+                 id="ScoreInput"
+                 min="0"
+                 max="@ScoreMax"
+                 TValue="int"
+                 @oninput="OnScoreInputChanged"
+                 @bind-Value="_score" />
+</div>
+
+<div class="d-flex align-items-center gap-2 flex-wrap bg-light text-dark border rounded">
+    <label class="input-group-text">Durum:</label>
+    <InputSelect class="form-select w-auto"
+                 TValue="byte"
+                 @oninput="EvaluationStatusChanged"
+                 @bind-Value="_selectedEvaluationStatus">
+
+        @foreach (KeyValuePair<byte, string> status in QQStatic.EvaluationStatusTUR)
+        {
+            <option value="@status.Key">@status.Value</option>
+        }
+    </InputSelect>
+</div>
+
+@code {
+
+
+
+    private int _score = 0;
+    private readonly bool _isCheckBoxCheckedStatus = false;
+    private string _keywordList { get; set; } = string.Empty;
+    private uint _openEndedKeywordsCount { get; set; }
+    private double _perKeywordScore { get; set; }
+    private uint _selectedKeywordsCount { get; set; }
+
+    private byte _selectedEvaluationStatus { get; set; } = 0;
+
+    [Parameter]
+    public IEnumerable<QuestionOptionDto> QuestionOptions { get; set; } = default!;
+
+    [Parameter]
+    public int ScoreMax { get; set; }
+
+    [Parameter]
+    public EventCallback<ICollection<string>> OnOpenEndedKeywords { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnScore { get; set; }
+
+    [Parameter]
+    public EventCallback<byte> OnEvaluationStatus { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _openEndedKeywordsCount = (uint)GetOpenEndedKeywords().Count();
+    }
+
+
+    private IEnumerable<string> GetOpenEndedKeywords()
+    {
+        if (QuestionOptions == null)
+            yield break;
+
+        foreach (QuestionOptionDto Option in QuestionOptions)
+        {
+            if (string.IsNullOrEmpty(Option?.OptionText))
+                continue;
+            string[]? keywords = Option.OptionText.Split(',');
+
+            foreach (string keyword in keywords)
+            {
+                string trimmedKeyword = keyword.Trim();
+                if (!string.IsNullOrEmpty(trimmedKeyword))
+                    yield return trimmedKeyword;
+            }
+        }
+    }
+
+    private void ToggleOpenEndedAnswerCheck(bool checkStatus, string keyword)
+    {
+        switch (checkStatus)
+        {
+            case true:
+                {
+                    _keywordList += keyword + ",";
+                    _perKeywordScore += (double)ScoreMax / _openEndedKeywordsCount;
+                    break;
+                }
+
+            case false:
+                {
+                    _keywordList = _keywordList.Replace($"{keyword},", string.Empty);
+                    _perKeywordScore -= (double)ScoreMax / _openEndedKeywordsCount;
+                    break;
+                }
+        }
+
+        _score = (int)Math.Round(_perKeywordScore, 2, MidpointRounding.ToEven);
+        UpdateEvaluationStatus();
+    }
+
+
+    private void OnScoreInputChanged(ChangeEventArgs args)
+    {
+        string raw = args.Value?.ToString() ?? string.Empty;
+
+        if (int.TryParse(raw, out int value))
+            _score = Math.Clamp(value, 0, ScoreMax);
+        else
+            _score = 0;
+
+        UpdateEvaluationStatus();
+        OnScore.InvokeAsync(_score);
+    }
+
+    private void UpdateEvaluationStatus()
+    {
+        if (_score < ScoreMax)
+            _selectedEvaluationStatus = 8;
+        else if (_score == ScoreMax)
+            _selectedEvaluationStatus = 9;
+    }
+
+    private void EvaluationStatusChanged(ChangeEventArgs args)
+    {
+        string raw = args.Value?.ToString() ?? string.Empty;
+        if (byte.TryParse(raw, out byte value))
+        {
+            _selectedEvaluationStatus = value;
+
+            OnEvaluationStatus.InvokeAsync(_selectedEvaluationStatus);
+        }
+        else
+        {
+            _selectedEvaluationStatus = 0;
+            OnEvaluationStatus.InvokeAsync(_selectedEvaluationStatus);
+        }
+        ApplyEvaluationStatusEffects();
+    }
+
+    private void ApplyEvaluationStatusEffects()
+    {
+        switch (_selectedEvaluationStatus)
+        {
+            case 0 or 1:
+                {
+                    _score = 0;
+                    _keywordList = string.Empty;
+                    break;
+                }
+            case 9:
+                {
+                    _score = ScoreMax;
+                    break;
+                }
+        }
+        OnScore.InvokeAsync(_score);
+    }
+}

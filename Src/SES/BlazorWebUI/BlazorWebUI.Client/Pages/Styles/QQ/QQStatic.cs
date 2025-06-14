@@ -2,7 +2,20 @@
 
 public static class QQStatic
 {
-    public static IDictionary<byte, string> SelectTypeOptions { get; set; } = new Dictionary<byte, string>
+
+    public static readonly IDictionary<byte, string> EvaluationStatusTUR = new Dictionary<byte, string>()
+    {
+        { 1, "Boş" },
+        { 7, "Yanlış" },
+        { 8, "Kısmen Doğru" },
+        { 9, "Doğru" },
+        { 0, "Henüz değerlendirilmedi" },
+        { 3, "Alakasız cevap" },
+        { 5, "Şüpheli intihal"},
+        { 6, "Onaylı intihal" }
+    };
+
+    public static readonly IDictionary<byte, string> SelectTypeOptions = new Dictionary<byte, string>
     {
         {1, "Açık Uçlu" },
         // { 2, "Kapalı Uçlu" },
