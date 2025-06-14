@@ -1,0 +1,36 @@
+@code
+{
+    private readonly char[] alphabet = Enumerable.Range('A', 26).Select(c => (char)c).ToArray();
+
+    [Parameter]
+    public IEnumerable<QuestionOptionDto> QuestionOptions { get; set; } = default!;
+
+    [Parameter]
+    public int ScoreMax { get; set; }
+
+    [Parameter]
+    public Guid OptionId { get; set; }
+
+}
+
+Guid[] qoIds = QuestionOptions.Select(qo => qo.Id).ToArray();
+<div class="d-flex flex-column flex-md-row align-items-center flex-wrap gap-3 m-2">
+    <label class="input-group-text">Seçenekler: </label>
+
+    <InputRadioGroup TValue="Guid" Name="inlineRadioOptions" @bind-Value="SelectedOptionId">
+        @for (int i = 0; i < QuestionOptions.Count(); i++)
+        {
+            Guid qoId = qoIds[i];
+            string optionId = "radioOption_" + qoId.GetHashCode() + alphabet[i];
+            <div class="form-check form-check-inline mt-1">
+                <InputRadio class="form-check-input ml-2" type="radio" id="@optionId" Value="@qoId" />
+                <label class="form-check-label" for="@optionId">@alphabet[i]</label>
+            </div>
+        }
+
+        <div class="form-check form-check-inline mt-1">
+            <InputRadio class="form-check-input ml-2" type="radio" id="Empty" Value="@Guid.Empty" />
+            <label class="form-check-label" for="Empty">Boş</label>
+        </div>
+    </InputRadioGroup>
+</div>
