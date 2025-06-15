@@ -1,29 +1,62 @@
 @code
 {
     private readonly char[] alphabet = Enumerable.Range('A', 26).Select(c => (char)c).ToArray();
+    private Guid _guidForValueExpression { get; set;} = Guid.Empty;
+
+    private void OnInputOptionChange(Guid args)
+    {
+        _guidForValueExpression = args;
+        if (args==Guid.Empty)
+        {
+            OnOptionId.InvokeAsync(null);
+            OnEvaluationStatus.InvokeAsync(1);
+            OnScore.InvokeAsync(0);
+            return;
+        }
+
+        bool _isCorrect = QuestionOptions.First(x => x.Id == args).IsCorrect;
+
+        switch (_isCorrect)
+        {
+            case true:
+                OnOptionId.InvokeAsync(args);
+                OnEvaluationStatus.InvokeAsync(9);
+                OnScore.InvokeAsync(ScoreMax);
+                break;
+
+            case false:
+                OnOptionId.InvokeAsync(args);
+                OnEvaluationStatus.InvokeAsync(7);
+                OnScore.InvokeAsync(0);
+                break;
+        }
+    }
 
     [Parameter]
     public IEnumerable<QuestionOptionDto> QuestionOptions { get; set; } = default!;
 
     [Parameter]
     public int ScoreMax { get; set; }
+    
+    [Parameter]
+    public EventCallback<byte> OnEvaluationStatus { get; set; }
 
     [Parameter]
-    public Guid OptionId { get; set; }
-
+    public EventCallback<Guid?> OnOptionId { get; set; }
+    
+    [Parameter]
+    public EventCallback<int> OnScore { get; set; }
 }
 
-Guid[] qoIds = QuestionOptions.Select(qo => qo.Id).ToArray();
 <div class="d-flex flex-column flex-md-row align-items-center flex-wrap gap-3 m-2">
     <label class="input-group-text">Seçenekler: </label>
 
-    <InputRadioGroup TValue="Guid" Name="inlineRadioOptions" @bind-Value="SelectedOptionId">
+    <InputRadioGroup TValue="Guid" Name="@($"RadioG_MC_{QuestionOptions.GetHashCode()}")"  ValueExpression="() => _guidForValueExpression" ValueChanged="OnInputOptionChange" Value="@_guidForValueExpression">
         @for (int i = 0; i < QuestionOptions.Count(); i++)
         {
-            Guid qoId = qoIds[i];
-            string optionId = "radioOption_" + qoId.GetHashCode() + alphabet[i];
+            string optionId = "radioOption_" + QuestionOptions.ElementAt(i).Id.GetHashCode() + alphabet[i];
             <div class="form-check form-check-inline mt-1">
-                <InputRadio class="form-check-input ml-2" type="radio" id="@optionId" Value="@qoId" />
+                <InputRadio class="form-check-input ml-2" type="radio" id="@optionId" Value="@QuestionOptions.ElementAt(i).Id" />
                 <label class="form-check-label" for="@optionId">@alphabet[i]</label>
             </div>
         }
