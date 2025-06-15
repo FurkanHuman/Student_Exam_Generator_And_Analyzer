@@ -46,12 +46,19 @@
     
     [Parameter]
     public EventCallback<int> OnScore { get; set; }
+
 }
 
 <div class="d-flex flex-column flex-md-row align-items-center flex-wrap gap-3 m-2">
     <label class="input-group-text">Seçenekler: </label>
 
-    <InputRadioGroup TValue="Guid" Name="@($"RadioG_MC_{QuestionOptions.GetHashCode()}")"  ValueExpression="() => _guidForValueExpression" ValueChanged="OnInputOptionChange" Value="@_guidForValueExpression">
+    <InputRadioGroup
+        Name="@($"RadioG_MC_{QuestionOptions.GetHashCode()}")"
+        TValue="Guid" 
+        Value="@_guidForValueExpression"
+        ValueExpression="() => _guidForValueExpression"
+        ValueChanged="OnInputOptionChange">
+        
         @for (int i = 0; i < QuestionOptions.Count(); i++)
         {
             string optionId = "radioOption_" + QuestionOptions.ElementAt(i).Id.GetHashCode() + alphabet[i];
