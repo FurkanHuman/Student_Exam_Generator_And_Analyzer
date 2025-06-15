@@ -60,7 +60,7 @@
     private QQBodyDto mChoice { get; set; } = new QQBodyDto()
     {
         Question = "Bu bir test sorusudur.",
-        SelectedQType = 4,
+        SelectedQType = 3,
         Score = 10,
         MaxScore = 15,
         QuestionOptions = new List<QuestionOptionDto>
@@ -74,7 +74,7 @@
 
     public QuestionAnswerInput()
     {
-        this.QuestionData = openEnded;
+        this.QuestionData = mChoice;
         QuestionOptions = QuestionData.QuestionOptions;
         IsCustomScore = false;
     }
@@ -247,28 +247,9 @@
                     }
                 case 3: // çoktan seçmeli
                     {
-                        Guid[] qoIds = QuestionOptions.Select(qo => qo.Id).ToArray();
-                        <div class="d-flex flex-column flex-md-row align-items-center flex-wrap gap-3 m-2">
-                        <label class="input-group-text">Seçenekler: </label>
-
-                        <InputRadioGroup TValue="Guid" Name="inlineRadioOptions" @bind-Value="SelectedOptionId">
-                            @for (int i = 0; i < QuestionOptions.Count(); i++)
-                            {
-                                Guid qoId = qoIds[i];
-                                string optionId = "radioOption_"+ qoId.GetHashCode() + alphabet[i];
-                                <div class="form-check form-check-inline mt-1">
-                                    <InputRadio class="form-check-input ml-2" type="radio" id="@optionId" Value="@qoId" />
-                                    <label class="form-check-label" for="@optionId">@alphabet[i]</label>
-                                </div>
-                            }
-
-                            <div class="form-check form-check-inline mt-1">
-                                <InputRadio class="form-check-input ml-2" type="radio" id="Empty" Value="@Guid.Empty" />
-                                <label class="form-check-label" for="Empty">Boş</label>
-                            </div>
-                        </InputRadioGroup>
-                    </div>
-                    break;
+                        <MultipleChoiceAnswerInput QuestionOptions="QuestionOptions"
+                                                   ScoreMax="GetMaxScoreLimit()"/>
+                        break;
                     }
 
                 case 4: // doğru yanlış

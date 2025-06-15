@@ -19,7 +19,7 @@ public class StudentAnswer : Entity<Guid>
 
     public string? AnswerText { get; set; }
     public int? GivenScore { get; set; }
-    public bool? IsCorrect { get; set; }
+    //public bool? IsCorrect { get; set; } // maybe not needed, as it can be derived from EvaluationStatus
 
     public EvaluationOrigin EvaluationOrigin { get; set; }
     public EvaluationStatus EvaluationStatus { get; set; }

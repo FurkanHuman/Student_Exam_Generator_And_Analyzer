@@ -15,6 +15,7 @@ public class MappingProfiles : Profile
             .ForMember(dest => dest.QuestionOptions, opt => opt.MapFrom(src => src.Options));
 
         CreateMap<QuestionOption, QuestionOptionDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.OptionText, opt => opt.MapFrom(src => src.OptionText))
             .ForMember(dest => dest.IsCorrect, opt => opt.MapFrom(src => src.IsCorrect));
     }

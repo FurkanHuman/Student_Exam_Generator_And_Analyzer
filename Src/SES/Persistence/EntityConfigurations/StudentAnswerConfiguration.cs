@@ -20,7 +20,7 @@ namespace Persistence.EntityConfigurations
             builder.Property(sa => sa.EvaluationStatus).IsRequired();
             builder.Property(sa => sa.AnswerText);
             builder.Property(sa => sa.GivenScore);
-            builder.Property(sa => sa.IsCorrect);
+            //builder.Property(sa => sa.IsCorrect); //maybe Not needed, as it can be derived from EvaluationStatus
 
             builder.HasOne(sa => sa.QuestionScore);
             builder.HasOne(sa => sa.Student);
