@@ -1,0 +1,109 @@
+﻿@code {
+    private readonly byte _selectedTFRadio = 0;
+    private int _optionCount { get; set; } = 0;
+    private int _score = 0;
+
+    private readonly IDictionary<Guid, byte> _tFAnswers = new Dictionary<Guid, byte>();
+
+    [Parameter]
+    public IEnumerable<QuestionOptionDto> QuestionOptions { get; set; } = default!;
+
+    [Parameter]
+    public int ScoreMax { get; set; } = 0;
+
+    [Parameter]
+    public EventCallback<byte> OnEvaluationStatus { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnScore { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnEncodedOptionAnswers { get; set; }
+
+    private void ProcessTFSelection(Guid id, byte optionValue)
+    {
+        double perOptionScore = 0;
+        _tFAnswers[id] = optionValue;
+
+        foreach (KeyValuePair<Guid, byte> answerPair in _tFAnswers)
+        {
+            QuestionOptionDto option = QuestionOptions.First(x => x.Id == answerPair.Key);
+
+            bool isCorrect = (answerPair.Value == 1 && option.IsCorrect) || (answerPair.Value == 0 && !option.IsCorrect);
+
+            if (isCorrect)
+                perOptionScore += (double)ScoreMax / _optionCount;
+        }
+
+        _score = (int)Math.Round(perOptionScore, 2, MidpointRounding.ToEven);
+        UpdateState();
+    }
+
+    private void UpdateEvaluationStatus()
+    {
+        if (_score < ScoreMax)
+            OnEvaluationStatus.InvokeAsync(8);
+        else if (_score == ScoreMax)
+            OnEvaluationStatus.InvokeAsync(9);
+        else if (_score == 0)
+            OnEvaluationStatus.InvokeAsync(1);
+    }
+
+    private void UpdateState()
+    {
+        string encodedAnswers = System.Text.Json.JsonSerializer.Serialize(_tFAnswers);
+
+        UpdateEvaluationStatus();
+        OnScore.InvokeAsync(_score);
+        OnEncodedOptionAnswers.InvokeAsync(encodedAnswers);
+    }
+
+    private byte GetAnswer(Guid id)
+    {
+        if (_tFAnswers.TryGetValue(id, out byte value))
+            return value;
+        return 2;
+    }
+
+    private void SetAnswer(Guid id, byte value)
+    {
+        _tFAnswers[id] = value;
+        ProcessTFSelection(id, value);
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        _optionCount = QuestionOptions.Count();
+        foreach (QuestionOptionDto option in QuestionOptions)
+            SetAnswer(option.Id, 2);
+    }
+}
+
+@foreach (QuestionOptionDto option in QuestionOptions)
+{@*note: There is a situation of side-by-side visibility on the large screen. Each loop should be arranged one below the other on the large screen.*@
+    <div class="d-flex align-items-center flex-wrap m-2 border p-2">
+        <InputRadioGroup TValue="byte"
+                         Value="@GetAnswer(option.Id)"
+                         ValueChanged="val => SetAnswer(option.Id, val)"
+                         ValueExpression="()=>_selectedTFRadio"
+                         Name="@($"RadioG_TF_{option.Id.GetHashCode()}")"
+                         class="d-flex gap-2">
+
+            <div class="form-check form-check-inline">
+                <InputRadio class="form-check-input" id="@($"opt_{option.Id.GetHashCode()}_E")" Value="(byte)2" />
+                <label class="form-check-label" for="@($"opt_{option.Id.GetHashCode()}_E")">Boş</label>
+            </div>
+
+            <div class="form-check form-check-inline">
+                <InputRadio class="form-check-input" id="@($"opt_{option.Id.GetHashCode()}_T")" Value="(byte)1" />
+                <label class="form-check-label" for="@($"opt_{option.Id.GetHashCode()}_T")">Doğru</label>
+            </div>
+
+            <div class="form-check form-check-inline">
+                <InputRadio class="form-check-input" id="@($"opt_{option.Id.GetHashCode()}_F")" Value="(byte)0" />
+                <label class="form-check-label" for="@($"opt_{option.Id.GetHashCode()}_F")">Yanlış</label>
+            </div>
+        </InputRadioGroup>
+    </div>
+}
