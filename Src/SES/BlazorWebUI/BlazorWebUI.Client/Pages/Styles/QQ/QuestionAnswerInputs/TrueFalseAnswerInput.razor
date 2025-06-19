@@ -74,6 +74,7 @@
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
+        OnEvaluationStatus.InvokeAsync(0);
         _optionCount = QuestionOptions.Count();
         foreach (QuestionOptionDto option in QuestionOptions)
             SetAnswer(option.Id, 2);
