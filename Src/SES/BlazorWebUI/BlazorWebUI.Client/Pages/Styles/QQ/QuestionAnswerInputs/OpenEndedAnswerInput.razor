@@ -6,6 +6,7 @@
     private int _score { get; set; } = 0;
     private uint _openEndedKeywordsCount { get; set; }
     private uint _selectedKeywordsCount { get; set; }
+    private bool _isCheckBoxCheckedStatus { get; set; } = false;
     private byte _selectedEvaluationStatus { get; set; } = 0;
 
     [Parameter]
@@ -150,8 +151,9 @@
     {
         <div class="form-check form-check-inline">
             <InputCheckbox class="form-check-input" id="@("inlineCheckbox" + keywordStatusPair.Key)"
-                Value="@keywordStatusPair.Value" ValueChanged="(e) => ToggleOpenEndedAnswerCheck(e, keywordStatusPair.Key)"
-                ValueExpression="() => keywordStatusPair.Value" />
+                Value="@keywordStatusPair.Value" 
+                ValueChanged="(e) => ToggleOpenEndedAnswerCheck(e, keywordStatusPair.Key)"
+                ValueExpression="() => _isCheckBoxCheckedStatus" />
             <label class="form-check-label" for="@("inlineCheckbox" + keywordStatusPair.Key)">
                 @keywordStatusPair.Key
             </label>
