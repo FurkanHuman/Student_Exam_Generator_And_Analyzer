@@ -1,6 +1,6 @@
 @code
 {
-    private readonly char[] alphabet = Enumerable.Range('A', 26).Select(c => (char)c).ToArray();
+    private char[] alphabet { get; set; } = Enumerable.Range('A', 26).Select(c => (char)c).ToArray();
     private Guid _guidForValueExpression { get; set;} = Guid.Empty;
 
     private void OnInputOptionChange(Guid args)
