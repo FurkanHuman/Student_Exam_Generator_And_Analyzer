@@ -1,12 +1,11 @@
 ﻿@code {
 
-    private int _score = 0;
-    private readonly bool _isCheckBoxCheckedStatus = false;
+    private IDictionary<string, bool> _keywordCheckedStatusDict { get; set; } = new Dictionary<string, bool>();
     private string _keywordList { get; set; } = string.Empty;
-    private uint _openEndedKeywordsCount { get; set; }
     private double _perKeywordScore { get; set; }
+    private int _score { get; set; } = 0;
+    private uint _openEndedKeywordsCount { get; set; }
     private uint _selectedKeywordsCount { get; set; }
-
     private byte _selectedEvaluationStatus { get; set; } = 0;
 
     [Parameter]
@@ -24,10 +23,12 @@
     [Parameter]
     public EventCallback<byte> OnEvaluationStatus { get; set; }
 
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
-        base.OnInitialized();
+        base.OnParametersSet();
         _openEndedKeywordsCount = (uint)GetOpenEndedKeywords().Count();
+        foreach (string str in GetOpenEndedKeywords())
+            _keywordCheckedStatusDict[str] = false;
     }
 
 
@@ -121,6 +122,7 @@
                 {
                     _score = 0;
                     _keywordList = string.Empty;
+                    _keywordCheckedStatusDict = _keywordCheckedStatusDict.ToDictionary(x => x.Key, x => false);
                     break;
                 }
 
@@ -133,6 +135,7 @@
             case 9:
                 {
                     _score = ScoreMax;
+                    _keywordList = string.Join(",", _keywordCheckedStatusDict.Where(x => x.Value).Select(x => x.Key));
                     break;
                 }
         }
@@ -143,16 +146,14 @@
 <div class="d-flex align-items-center flex-wrap border rounded">
     <label class="input-group-text me-3">Anahtar kelimeler:</label>
 
-    @foreach (string keyword in GetOpenEndedKeywords())
+    @foreach (KeyValuePair<string, bool> keywordStatusPair in _keywordCheckedStatusDict)
     {
         <div class="form-check form-check-inline">
-            @* note: The check status should be reset according to the new suggestion for the InputCheckbox entry based on _selectedEvaluationStatus. *@
-            <InputCheckbox class="form-check-input"
-                           id="@("inlineCheckbox" + keyword)"
-                           ValueChanged="(e) => ToggleOpenEndedAnswerCheck(e, keyword)"
-                           ValueExpression="() => _isCheckBoxCheckedStatus" />
-            <label class="form-check-label" for="@("inlineCheckbox" + keyword)">
-                @keyword
+            <InputCheckbox class="form-check-input" id="@("inlineCheckbox" + keywordStatusPair.Key)"
+                Value="@keywordStatusPair.Value" ValueChanged="(e) => ToggleOpenEndedAnswerCheck(e, keywordStatusPair.Key)"
+                ValueExpression="() => keywordStatusPair.Value" />
+            <label class="form-check-label" for="@("inlineCheckbox" + keywordStatusPair.Key)">
+                @keywordStatusPair.Key
             </label>
         </div>
     }
@@ -160,22 +161,14 @@
 
 <div class="input-group rounded border" style="width:12rem;">
     <label class="input-group-text">Puanı:</label>
-    <InputNumber type="number"
-                 class="form-control conversion"
-                 id="ScoreInput"
-                 min="0"
-                 max="@ScoreMax"
-                 TValue="int"
-                 @oninput="OnScoreInputChanged"
-                 @bind-Value="_score" />
+    <InputNumber type="number" class="form-control conversion" id="ScoreInput" min="0" max="@ScoreMax" TValue="int"
+        @oninput="OnScoreInputChanged" @bind-Value="_score" />
 </div>
 
 <div class="d-flex align-items-center gap-2 flex-wrap bg-light text-dark border rounded">
     <label class="input-group-text">Durum:</label>
-    <InputSelect class="form-select w-auto"
-                 TValue="byte"
-                 @oninput="EvaluationStatusChanged"
-                 @bind-Value="_selectedEvaluationStatus">
+    <InputSelect class="form-select w-auto" TValue="byte" @oninput="EvaluationStatusChanged"
+        @bind-Value="_selectedEvaluationStatus">
 
         @foreach (KeyValuePair<byte, string> status in QQStatic.EvaluationStatusTUR)
         {
