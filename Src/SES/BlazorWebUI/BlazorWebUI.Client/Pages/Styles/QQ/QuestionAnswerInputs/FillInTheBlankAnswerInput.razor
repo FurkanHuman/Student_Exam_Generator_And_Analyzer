@@ -1,15 +1,13 @@
 ﻿@code {
 
-    private int _score = 0;
-    private readonly bool _isCheckBoxCheckedStatus = false;
-
+    private IDictionary<string, bool> _keywordCheckedStatusDict { get; set; } = new Dictionary<string, bool>();
     private string _keywordList { get; set; } = string.Empty;
     private double _perKeywordScore { get; set; }
+    private int _score { get; set; } = 0;
     private uint _fillInTheBlankKeywordsCount { get; set; }
     private uint _selectedKeywordsCount { get; set; }
+    private bool _isCheckBoxCheckedStatus { get; set; } = false;
     private byte _selectedEvaluationStatus { get; set; } = 0;
-
-    private IDictionary<string, bool> _keywordCheckedStatusDict = new Dictionary<string, bool>();
 
     [Parameter]
     public IEnumerable<QuestionOptionDto> QuestionOptions { get; set; } = default!;
