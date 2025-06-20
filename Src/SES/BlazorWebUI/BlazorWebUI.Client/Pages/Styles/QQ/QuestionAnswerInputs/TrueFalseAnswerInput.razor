@@ -1,9 +1,8 @@
 ﻿@code {
-    private readonly byte _selectedTFRadio = 0;
+    private IDictionary<Guid, byte> _tFAnswers { get; set; } = new Dictionary<Guid, byte>();
     private int _optionCount { get; set; } = 0;
-    private int _score = 0;
-
-    private readonly IDictionary<Guid, byte> _tFAnswers = new Dictionary<Guid, byte>();
+    private int _score { get; set; } = 0;
+    private byte _selectedTFRadio { get; set; } = 0;
 
     [Parameter]
     public IEnumerable<QuestionOptionDto> QuestionOptions { get; set; } = default!;
