@@ -1,0 +1,168 @@
+﻿@*Thanks chat Gpt code Copilot, Cloude Sonnet 4 *@
+@code {
+    private int _questionOptionCount { get; set; }
+    private string[] _firstParts { get; set; } = Array.Empty<string>();
+    private string[] _secondParts { get; set; } = Array.Empty<string>();
+    private IDictionary<string, string> _matchSelections { get; set; } = new Dictionary<string, string>();
+    private int _currentScore = 0;
+
+    [Parameter]
+    public IEnumerable<QuestionOptionDto> QuestionOptions { get; set; } = default!;
+    [Parameter]
+    public int ScoreMax { get; set; } = 0;
+    [Parameter]
+    public int Seed { get; set; }
+    [Parameter]
+    public EventCallback<byte> OnEvaluationStatus { get; set; }
+    [Parameter]
+    public EventCallback<string> OnEncodedOptionAnswers { get; set; }
+    [Parameter]
+    public EventCallback<int> OnScore { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        Random _rnd = new(Seed);
+        var shuffledOptions = QuestionOptions
+            .Select(q => (Value: q, Order: _rnd.Next()))
+            .OrderBy(x => x.Order)
+            .Select(x => x.Value)
+            .ToArray();
+        _questionOptionCount = shuffledOptions.Length;
+
+        string[] tempF = new string[_questionOptionCount];
+        string[] tempS = new string[_questionOptionCount];
+
+        for (int i = 0; i < _questionOptionCount; i++)
+        {
+            var parts = shuffledOptions[i].OptionText!.Split(',');
+            tempF[i] = parts[0].Trim();
+            tempS[i] = parts[1].Trim();
+        }
+
+        QQStatic.ShuffleStringArray(ref tempF, _rnd.Next());
+        QQStatic.ShuffleStringArray(ref tempS, _rnd.Next());
+
+        _firstParts = tempF;
+        _secondParts = tempS;
+        _matchSelections.Clear();
+
+        foreach (string key in _secondParts)
+            _matchSelections[key] = "";
+    }
+
+    private void HandleMatchSelectionInput(ChangeEventArgs args, string rightKey)
+    {
+        string? selectedLeftValue = args.Value?.ToString();
+        if (selectedLeftValue == null)
+            return;
+
+        string previousSelection = _matchSelections[rightKey];
+        _matchSelections[rightKey] = selectedLeftValue;
+
+        int newScore = CalculateScore();
+        if (newScore != _currentScore)
+        {
+            _currentScore = newScore;
+            OnScore.InvokeAsync(_currentScore);
+        }
+
+        byte evaluationStatus = UpdateEvaluationStatus(_currentScore);
+        OnEvaluationStatus.InvokeAsync(evaluationStatus);
+
+        string encodedAnswers = EncodeOptionAnswers();
+        OnEncodedOptionAnswers.InvokeAsync(encodedAnswers);
+        Console.WriteLine("---------- "+encodedAnswers);
+        StateHasChanged();
+    }
+
+    private int CalculateScore()
+    {
+        if (_questionOptionCount == 0) return 0;
+
+        int correctMatches = 0;
+        var originalOptions = QuestionOptions.ToArray();
+
+        foreach (var kvp in _matchSelections)
+        {
+            if (string.IsNullOrEmpty(kvp.Value)) continue;
+
+            string rightPart = kvp.Key;
+            string selectedLeftPart = kvp.Value;
+
+            QuestionOptionDto? correctOption = originalOptions.FirstOrDefault(opt =>
+                opt.OptionText != null &&
+                opt.OptionText.Split(',').Length == 2 &&
+                opt.OptionText.Split(',')[0].Trim() == selectedLeftPart &&
+                opt.OptionText.Split(',')[1].Trim() == rightPart);
+
+            if (correctOption != null)
+                correctMatches++;
+            
+        }
+
+        double scorePerMatch = (double)ScoreMax / _questionOptionCount;
+
+        return (int)Math.Round((correctMatches * scorePerMatch), 2, MidpointRounding.ToEven);
+    }
+
+    private byte UpdateEvaluationStatus(int score)
+    {
+        bool hasAnySelection = _matchSelections.Any(kvp => !string.IsNullOrEmpty(kvp.Value));
+
+        if (!hasAnySelection)
+        {
+            return 0;
+        }
+
+        bool allMatchesCompleted = _matchSelections.All(kvp => !string.IsNullOrEmpty(kvp.Value));
+
+        if (allMatchesCompleted)
+        {
+            if (score == ScoreMax)
+                return 9;
+
+            else
+                return 7;
+        }
+
+        return 8;
+    }
+
+    private string EncodeOptionAnswers()
+    {
+        IDictionary<string, string> selections = _matchSelections.Where(kvp => !string.IsNullOrEmpty(kvp.Value))
+                                       .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        return System.Text.Json.JsonSerializer.Serialize(selections);
+    }
+}
+
+<div class="row">
+    <div class="col-12">
+        @for (byte i = 0; i < _questionOptionCount; i++)
+        {
+            string rightKey = _secondParts[i];
+            <div class="row mb-3 align-items-center gx-2">
+                <div class="col-md-4 col-sm-12 mb-2 mb-md-0">
+                    <strong>@QQStatic.Alphabet[i])</strong> @_firstParts[i]
+                </div>
+                <div class="col-md-4 col-sm-12 mb-2 mb-md-0 d-flex align-items-center gap-2">
+                    <strong>@(i + 1))</strong>
+                    <InputSelect class="form-select form-select-sm flex-grow-1"
+                                 TValue="string"
+                                 @oninput="(args) => HandleMatchSelectionInput(args, rightKey)"
+                                 @bind-Value="_matchSelections[rightKey]">
+                        <option value="">-</option>
+                        @for (byte j = 0; j < _firstParts.Length; j++)
+                        {
+                            <option value="@_firstParts[j]">@QQStatic.Alphabet[j]</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="col-md-4 col-sm-12 d-flex align-items-center">
+                    <span class="ms-2">@_secondParts[i]</span>
+                </div>
+            </div>
+        }
+    </div>
+</div>
