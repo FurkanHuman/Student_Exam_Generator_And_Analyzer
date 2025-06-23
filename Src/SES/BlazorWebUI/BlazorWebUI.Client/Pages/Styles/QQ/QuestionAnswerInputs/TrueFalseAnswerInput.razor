@@ -81,29 +81,31 @@
 }
 
 @foreach (QuestionOptionDto option in QuestionOptions)
-{@*note: There is a situation of side-by-side visibility on the large screen. Each loop should be arranged one below the other on the large screen.*@
-    <div class="d-flex align-items-center flex-wrap m-2 border p-2">
-        <InputRadioGroup TValue="byte"
-                         Value="@GetAnswer(option.Id)"
-                         ValueChanged="val => SetAnswer(option.Id, val)"
-                         ValueExpression="()=>_selectedTFRadio"
-                         Name="@($"RadioG_TF_{option.Id.GetHashCode()}")"
-                         class="d-flex gap-2">
+{
+    <div style="display: block; width: 100%;">
+        <div class="d-block w-25 m-0 border p-2 ps-5">
+            <InputRadioGroup TValue="byte"
+                             Value="@GetAnswer(option.Id)"
+                             ValueChanged="val => SetAnswer(option.Id, val)"
+                             ValueExpression="()=>_selectedTFRadio"
+                             Name="@($"RadioG_TF_{option.Id.GetHashCode()}")"
+                             class="d-flex gap-2">
 
-            <div class="form-check form-check-inline">
-                <InputRadio class="form-check-input" id="@($"opt_{option.Id.GetHashCode()}_E")" Value="(byte)2" />
-                <label class="form-check-label" for="@($"opt_{option.Id.GetHashCode()}_E")">Boş</label>
-            </div>
+                <div class="form-check form-check-inline">
+                    <InputRadio class="form-check-input" id="@($"opt_{option.Id.GetHashCode()}_E")" Value="(byte)2" />
+                    <label class="form-check-label" for="@($"opt_{option.Id.GetHashCode()}_E")">Boş</label>
+                </div>
 
-            <div class="form-check form-check-inline">
-                <InputRadio class="form-check-input" id="@($"opt_{option.Id.GetHashCode()}_T")" Value="(byte)1" />
-                <label class="form-check-label" for="@($"opt_{option.Id.GetHashCode()}_T")">Doğru</label>
-            </div>
+                <div class="form-check form-check-inline">
+                    <InputRadio class="form-check-input" id="@($"opt_{option.Id.GetHashCode()}_T")" Value="(byte)1" />
+                    <label class="form-check-label" for="@($"opt_{option.Id.GetHashCode()}_T")">Doğru</label>
+                </div>
 
-            <div class="form-check form-check-inline">
-                <InputRadio class="form-check-input" id="@($"opt_{option.Id.GetHashCode()}_F")" Value="(byte)0" />
-                <label class="form-check-label" for="@($"opt_{option.Id.GetHashCode()}_F")">Yanlış</label>
-            </div>
-        </InputRadioGroup>
+                <div class="form-check form-check-inline">
+                    <InputRadio class="form-check-input" id="@($"opt_{option.Id.GetHashCode()}_F")" Value="(byte)0" />
+                    <label class="form-check-label" for="@($"opt_{option.Id.GetHashCode()}_F")">Yanlış</label>
+                </div>
+            </InputRadioGroup>
+        </div>
     </div>
 }
