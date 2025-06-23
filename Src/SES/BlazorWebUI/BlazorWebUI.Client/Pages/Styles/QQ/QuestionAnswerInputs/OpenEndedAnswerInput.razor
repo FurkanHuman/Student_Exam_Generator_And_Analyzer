@@ -16,7 +16,7 @@
     public int ScoreMax { get; set; }
 
     [Parameter]
-    public EventCallback<ICollection<string>> OnOpenEndedKeywords { get; set; }
+    public EventCallback<string> OnOpenEndedKeywords { get; set; }
 
     [Parameter]
     public EventCallback<int> OnScore { get; set; }
@@ -141,6 +141,7 @@
                 }
         }
         OnScore.InvokeAsync(_score);
+        OnOpenEndedKeywords.InvokeAsync(_keywordList);
     }
 }
 
