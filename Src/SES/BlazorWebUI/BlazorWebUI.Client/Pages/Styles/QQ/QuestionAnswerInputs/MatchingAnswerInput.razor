@@ -1,4 +1,4 @@
-﻿@*Thanks chat Gpt code Copilot, Cloude Sonnet 4 *@
+﻿@*Thanks ChatGpt-code Copilot, Cloude Sonnet 4 *@
 @code {
     private int _questionOptionCount { get; set; }
     private string[] _firstParts { get; set; } = Array.Empty<string>();
@@ -8,26 +8,34 @@
 
     [Parameter]
     public IEnumerable<QuestionOptionDto> QuestionOptions { get; set; } = default!;
+
     [Parameter]
     public int ScoreMax { get; set; } = 0;
+
     [Parameter]
     public int Seed { get; set; }
+
     [Parameter]
     public EventCallback<byte> OnEvaluationStatus { get; set; }
+
     [Parameter]
     public EventCallback<string> OnEncodedOptionAnswers { get; set; }
+
     [Parameter]
     public EventCallback<int> OnScore { get; set; }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
+
         Random _rnd = new(Seed);
-        var shuffledOptions = QuestionOptions
+
+        QuestionOptionDto[]? shuffledOptions = QuestionOptions
             .Select(q => (Value: q, Order: _rnd.Next()))
             .OrderBy(x => x.Order)
             .Select(x => x.Value)
             .ToArray();
+
         _questionOptionCount = shuffledOptions.Length;
 
         string[] tempF = new string[_questionOptionCount];
@@ -35,7 +43,7 @@
 
         for (int i = 0; i < _questionOptionCount; i++)
         {
-            var parts = shuffledOptions[i].OptionText!.Split(',');
+            string[] parts = shuffledOptions[i].OptionText!.Split(',');
             tempF[i] = parts[0].Trim();
             tempS[i] = parts[1].Trim();
         }
@@ -45,8 +53,9 @@
 
         _firstParts = tempF;
         _secondParts = tempS;
-        _matchSelections.Clear();
 
+        _matchSelections.Clear();
+        
         foreach (string key in _secondParts)
             _matchSelections[key] = "";
     }
@@ -72,7 +81,6 @@
 
         string encodedAnswers = EncodeOptionAnswers();
         OnEncodedOptionAnswers.InvokeAsync(encodedAnswers);
-        Console.WriteLine("---------- "+encodedAnswers);
         StateHasChanged();
     }
 
@@ -81,24 +89,24 @@
         if (_questionOptionCount == 0) return 0;
 
         int correctMatches = 0;
-        var originalOptions = QuestionOptions.ToArray();
+        QuestionOptionDto[] originalOptions = QuestionOptions.ToArray();
 
         foreach (var kvp in _matchSelections)
         {
-            if (string.IsNullOrEmpty(kvp.Value)) continue;
+            if (string.IsNullOrEmpty(kvp.Value))
+                continue;
 
             string rightPart = kvp.Key;
             string selectedLeftPart = kvp.Value;
 
-            QuestionOptionDto? correctOption = originalOptions.FirstOrDefault(opt =>
+            QuestionOptionDto? correctOption = Array.Find(originalOptions, (opt =>
                 opt.OptionText != null &&
                 opt.OptionText.Split(',').Length == 2 &&
                 opt.OptionText.Split(',')[0].Trim() == selectedLeftPart &&
-                opt.OptionText.Split(',')[1].Trim() == rightPart);
+                opt.OptionText.Split(',')[1].Trim() == rightPart));
 
             if (correctOption != null)
                 correctMatches++;
-            
         }
 
         double scorePerMatch = (double)ScoreMax / _questionOptionCount;
@@ -111,9 +119,7 @@
         bool hasAnySelection = _matchSelections.Any(kvp => !string.IsNullOrEmpty(kvp.Value));
 
         if (!hasAnySelection)
-        {
             return 0;
-        }
 
         bool allMatchesCompleted = _matchSelections.All(kvp => !string.IsNullOrEmpty(kvp.Value));
 
