@@ -66,7 +66,9 @@ internal static class QuizQuestionCapsule
         string[] firstParts = new string[questionOptions.Count];
         string[] secondParts = new string[questionOptions.Count];
 
-        questionOptions = [.. questionOptions.OrderBy(x => Guid.NewGuid())];
+        questionOptions = [.. questionOptions.Select(q => (Value: q, Order: rnd.Next()))
+                                             .OrderBy(x => x.Order)
+                                             .Select(x => x.Value).ToList()];
 
         for (int i = 0; i < questionOptions.Count; i++)
         {
