@@ -42,5 +42,5 @@
     private ModalDialog ModalDialog { get; set; } = new();
 
     private string selectedQtype(byte type)
-    => QQStatic.SelectTypeOptions.TryGetValue(key: type, value: out string? value) ? value : "Bilinmeyen Tür";
+    => QQStatic.SelectTypeOptionsTUR.TryGetValue(key: type, value: out string? value) ? value : "Bilinmeyen Tür";
 }
