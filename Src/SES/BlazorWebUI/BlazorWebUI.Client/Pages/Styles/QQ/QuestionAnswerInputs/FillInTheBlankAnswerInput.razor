@@ -16,7 +16,7 @@
     public int ScoreMax { get; set; }
 
     [Parameter]
-    public EventCallback<IEnumerable<string>> OnKeywords { get; set; }
+    public EventCallback<string> OnFillInTheBlankKeywords { get; set; }
 
     [Parameter]
     public EventCallback<int> OnScore { get; set; }
@@ -74,6 +74,7 @@
         }
 
         _score = (int)Math.Round(_perKeywordScore, 2, MidpointRounding.ToEven);
+        OnFillInTheBlankKeywords.InvokeAsync(_keywordList);
         UpdateEvaluationStatus();
     }
 
