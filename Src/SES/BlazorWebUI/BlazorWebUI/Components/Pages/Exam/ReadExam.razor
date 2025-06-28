@@ -1,7 +1,25 @@
 ﻿@page "/ReadExam"
+@using Application.Features.Exams.Queries.GetListExamByLessonId
+@using Application.Features.QuizQuestions.Queries.GetQuizQuestionsByIds
+@using AutoMapper
+@using BlazorWebUI.Client.Pages.Styles.QQ
+@using NArchitecture.Core.Application.Responses
 @rendermode InteractiveServer
 @inject IMediator _mediator
-
+@inject IMapper _mapper
 @code {
+    private IEnumerable<QQBodyDto> _quizQuestionsList { get; set; }
 
+
+    private async Task LoadExamFromLoader(IEnumerable<GetListExamByLessonIdDto> args)
+    {
+        IEnumerable<int> QQIds = args.SelectMany(a => a.QuizQuestionsIds).ToHashSet();
+        GetListResponse<GetQuizQuestionsByIdsListItemDto> realQQ = await _mediator.Send(new GetQuizQuestionsByIdsQuery() { Ids = QQIds });
+        _quizQuestionsList = _mapper.Map<IEnumerable<QQBodyDto>>(realQQ.Items);
+    }
 }
+
+
+<div class="m-2">
+    <ExamLoader OnExamsSelected="LoadExamFromLoader" />
+</div>
