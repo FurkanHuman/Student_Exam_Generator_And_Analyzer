@@ -9,6 +9,7 @@ using NArchitecture.Core.CrossCuttingConcerns.Logging.Configurations;
 using NArchitecture.Core.ElasticSearch.Models;
 using NArchitecture.Core.Localization.WebApi;
 using NArchitecture.Core.Mailing;
+using NArchitecture.Core.Persistence.WebApi;
 using Persistence;
 using Persistence.Contexts;
 
@@ -95,6 +96,7 @@ else
     app.UseHsts();
 }
 
+app.UseDbMigrationApplier();
 
 app.UseHttpsRedirection();
 
