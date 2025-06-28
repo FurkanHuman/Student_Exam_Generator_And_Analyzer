@@ -4,6 +4,7 @@ using Application.Features.QuizQuestions.Commands.Update;
 using Application.Features.QuizQuestions.Queries.GetById;
 using Application.Features.QuizQuestions.Queries.GetByLessonId;
 using Application.Features.QuizQuestions.Queries.GetList;
+using Application.Features.QuizQuestions.Queries.GetQuizQuestionsByIds;
 using AutoMapper;
 using Domain.Entities;
 using NArchitecture.Core.Application.Responses;
@@ -38,6 +39,22 @@ public class MappingProfiles : Profile
             .ForMember(destinationMember: qqdto => qqdto.MaxScore, memberOptions: opt => opt.MapFrom(qq => qq.QuestionScore.MaxScore));
 
         CreateMap<IPaginate<QuizQuestion>, GetListResponse<GetListQuizQuestionListItemDto>>();
+
+        CreateMap<QuizQuestion, GetQuizQuestionsByIdsListItemDto>()
+            .ForMember(destinationMember: qqdto => qqdto.Score, memberOptions: opt => opt.MapFrom(qq => qq.QuestionScore.Score))
+            .ForMember(destinationMember: qqdto => qqdto.MaxScore, memberOptions: opt => opt.MapFrom(qq => qq.QuestionScore.MaxScore))
+            .ForMember(destinationMember: qqdto => qqdto.Options, memberOptions: opt => opt.MapFrom(qq => qq.Options.Select(opt => new QuestionOption
+            {
+                Id = opt.Id,
+                OptionText = opt.OptionText,
+                IsCorrect = opt.IsCorrect,
+                CreatedDate = opt.CreatedDate,
+                UpdatedDate = opt.UpdatedDate,
+                DeletedDate = opt.DeletedDate,
+                QuizQuestion = new()
+            })));
+
+        CreateMap<IPaginate<QuizQuestion>, GetListResponse<GetQuizQuestionsByIdsListItemDto>>();
 
         CreateMap<QuizQuestion, GetByLessonIdQuizQuestionListItemDto>()
             .ForMember(destinationMember: qqdto => qqdto.Score, memberOptions: opt => opt.MapFrom(qq => qq.QuestionScore.Score))

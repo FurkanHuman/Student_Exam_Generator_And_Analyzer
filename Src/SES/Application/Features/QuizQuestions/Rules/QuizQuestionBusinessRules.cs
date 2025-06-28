@@ -4,6 +4,7 @@ using Domain.Entities;
 using NArchitecture.Core.Application.Rules;
 using NArchitecture.Core.CrossCuttingConcerns.Exception.Types;
 using NArchitecture.Core.Localization.Abstraction;
+using NArchitecture.Core.Persistence.Paging;
 
 namespace Application.Features.QuizQuestions.Rules;
 
@@ -39,4 +40,22 @@ public class QuizQuestionBusinessRules : BaseBusinessRules
         );
         await QuizQuestionShouldExistWhenSelected(quizQuestion);
     }
+
+    public async Task QuizQuestionShouldExistWhenSelected(IPaginate<QuizQuestion> quizQuestions)
+    {
+        if (quizQuestions == null || quizQuestions.Items.Count == 0)
+        {
+            await throwBusinessException(QuizQuestionsBusinessMessages.QuizQuestionNotExists);
+        }
+
+    }
+
+    public async Task IdsShouldNotBeEmpty(IEnumerable<int> ids)
+    {
+        if (ids == null || !ids.Any())
+        {
+            await throwBusinessException(QuizQuestionsBusinessMessages.IdsShouldNotBeEmpty);
+        }
+    }
+
 }
