@@ -4,6 +4,7 @@ using Application.Features.Students.Commands.MultiCreate;
 using Application.Features.Students.Commands.Update;
 using Application.Features.Students.Queries.GetById;
 using Application.Features.Students.Queries.GetList;
+using Application.Features.Students.Queries.GetStudentsByIds;
 using AutoMapper;
 using Domain.Entities;
 using NArchitecture.Core.Application.Responses;
@@ -31,6 +32,9 @@ public class MappingProfiles : Profile
         CreateMap<Student, DeletedStudentResponse>();
 
         CreateMap<Student, GetByIdStudentResponse>();
+
+        CreateMap<Student, GetStudentsByIdsListItemDto>();
+        CreateMap<IPaginate<Student>, GetListResponse<GetStudentsByIdsListItemDto>>();
 
         CreateMap<Student, GetListStudentListItemDto>();
         CreateMap<IPaginate<Student>, GetListResponse<GetListStudentListItemDto>>();

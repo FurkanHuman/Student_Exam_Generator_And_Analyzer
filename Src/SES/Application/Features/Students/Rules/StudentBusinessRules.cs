@@ -4,6 +4,7 @@ using Domain.Entities;
 using NArchitecture.Core.Application.Rules;
 using NArchitecture.Core.CrossCuttingConcerns.Exception.Types;
 using NArchitecture.Core.Localization.Abstraction;
+using NArchitecture.Core.Persistence.Paging;
 
 namespace Application.Features.Students.Rules;
 
@@ -38,5 +39,19 @@ public class StudentBusinessRules : BaseBusinessRules
             cancellationToken: cancellationToken
         );
         await StudentShouldExistWhenSelected(student);
+    }
+
+    internal async Task IdsShouldNotBeEmpty(IEnumerable<int> ids)
+    {
+        if (ids == null || !ids.Any())
+
+            await throwBusinessException(StudentsBusinessMessages.IdsShouldNotBeEmpty);
+    }
+
+    internal async Task StudentsShouldExistWhenSelected(IPaginate<Student> students)
+    {
+        if (students == null || students.Items.Count == 0)
+            await throwBusinessException(StudentsBusinessMessages.StudentNotExists);
+
     }
 }
