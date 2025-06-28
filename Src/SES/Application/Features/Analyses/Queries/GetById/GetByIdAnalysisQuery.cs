@@ -3,8 +3,6 @@ using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
-using static Application.Features.Analyses.Constants.AnalysesOperationClaims;
 
 namespace Application.Features.Analyses.Queries.GetById;
 
@@ -12,7 +10,7 @@ public class GetByIdAnalysisQuery : IRequest<GetByIdAnalysisResponse>
 {
     public int Id { get; set; }
 
-    
+
 
     public class GetByIdAnalysisQueryHandler : IRequestHandler<GetByIdAnalysisQuery, GetByIdAnalysisResponse>
     {

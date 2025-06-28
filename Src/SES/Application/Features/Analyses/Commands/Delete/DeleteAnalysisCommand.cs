@@ -1,14 +1,11 @@
-using Application.Features.Analyses.Constants;
 using Application.Features.Analyses.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using static Application.Features.Analyses.Constants.AnalysesOperationClaims;
 
 namespace Application.Features.Analyses.Commands.Delete;
 
@@ -16,7 +13,7 @@ public class DeleteAnalysisCommand : IRequest<DeletedAnalysisResponse>, ICacheRe
 {
     public int Id { get; set; }
 
-    
+
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

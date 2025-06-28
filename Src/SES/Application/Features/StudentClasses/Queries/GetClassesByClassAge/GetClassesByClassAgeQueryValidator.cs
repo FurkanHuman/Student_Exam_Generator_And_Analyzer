@@ -4,7 +4,7 @@ namespace Application.Features.StudentClasses.Queries.GetClassesByClassAge;
 
 public class GetClassesByClassAgeQueryValidator : AbstractValidator<GetClassesByClassAgeQuery>
 {
-    public GetClassesByClassAgeQueryValidator() 
+    public GetClassesByClassAgeQueryValidator()
     {
         RuleFor(x => x.ClassAge)
             .NotEmpty()

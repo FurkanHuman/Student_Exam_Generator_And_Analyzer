@@ -1,18 +1,12 @@
-using Application.Features.ReferenceBenefits.Constants;
 using Application.Features.ReferenceBenefits.Rules;
-using Application.Services.Benefits;
-using Application.Services.LearningAreas;
 using Application.Services.PdfFactory.PdfReaderService.Dtos;
 using Application.Services.Repositories;
-using Application.Services.SubLearningAreas;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using static Application.Features.ReferenceBenefits.Constants.ReferenceBenefitsOperationClaims;
 
 namespace Application.Features.ReferenceBenefits.Commands.Create;
 

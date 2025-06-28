@@ -4,7 +4,7 @@ namespace Application.Features.StudentClasses.Queries.GetClassesBySemesterId;
 
 public class GetClassesBySemesterIdQueryValidator : AbstractValidator<GetClassesBySemesterIdQuery>
 {
-    public GetClassesBySemesterIdQueryValidator() 
+    public GetClassesBySemesterIdQueryValidator()
     {
         RuleFor(x => x.SemesterId)
             .NotEmpty().NotNull()

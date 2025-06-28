@@ -1,14 +1,11 @@
-using Application.Features.QuestionScores.Constants;
 using Application.Features.QuestionScores.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using static Application.Features.QuestionScores.Constants.QuestionScoresOperationClaims;
 
 namespace Application.Features.QuestionScores.Commands.Update;
 
@@ -18,7 +15,7 @@ public class UpdateQuestionScoreCommand : IRequest<UpdatedQuestionScoreResponse>
     public required int Score { get; set; }
     public required int MaxScore { get; set; }
 
-    
+
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

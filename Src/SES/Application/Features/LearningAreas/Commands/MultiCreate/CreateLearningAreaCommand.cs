@@ -1,15 +1,12 @@
-using Application.Features.LearningAreas.Constants;
 using Application.Features.LearningAreas.Rules;
 using Application.Services.PdfFactory.PdfReaderService.Dtos;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using static Application.Features.LearningAreas.Constants.LearningAreasOperationClaims;
 
 namespace Application.Features.LearningAreas.Commands.MultiCreate;
 
@@ -37,7 +34,7 @@ public class CreateLearningAreaCommand : IRequest<MultiCreatedLearningAreaRespon
 
         public async Task<MultiCreatedLearningAreaResponse> Handle(CreateLearningAreaCommand request, CancellationToken cancellationToken)
         {
-           ICollection< LearningArea> learningArea = _mapper.Map<ICollection<LearningArea>>(request);
+            ICollection<LearningArea> learningArea = _mapper.Map<ICollection<LearningArea>>(request);
 
             await _learningAreaRepository.AddRangeAsync(learningArea);
 

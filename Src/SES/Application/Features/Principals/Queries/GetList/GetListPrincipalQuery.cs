@@ -3,12 +3,10 @@ using AutoMapper;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Requests;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
-using static Application.Features.Principals.Constants.PrincipalsOperationClaims;
 
 namespace Application.Features.Principals.Queries.GetList;
 
@@ -16,7 +14,7 @@ public class GetListPrincipalQuery : IRequest<GetListResponse<GetListPrincipalLi
 {
     public PageRequest PageRequest { get; set; }
 
-    
+
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListPrincipals({PageRequest.PageIndex},{PageRequest.PageSize})";

@@ -8,6 +8,5 @@ public class CreateBenefitCommandValidator : AbstractValidator<CreateBenefitComm
     {
         RuleFor(c => c.BenefitCode).NotEmpty();
         RuleFor(c => c.Description).NotEmpty();
-        
     }
 }

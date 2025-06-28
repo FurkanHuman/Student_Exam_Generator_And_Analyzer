@@ -2,12 +2,10 @@ using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Requests;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
-using static Application.Features.Analyses.Constants.AnalysesOperationClaims;
 
 namespace Application.Features.Analyses.Queries.GetList;
 
@@ -15,7 +13,7 @@ public class GetListAnalysisQuery : IRequest<GetListResponse<GetListAnalysisList
 {
     public PageRequest PageRequest { get; set; }
 
-    
+
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListAnalyses({PageRequest.PageIndex},{PageRequest.PageSize})";

@@ -1,10 +1,10 @@
 using Application.Features.StudentClasses.Rules;
-using AutoMapper;
-using NArchitecture.Core.Application.Pipelines.Logging;
-using MediatR;
 using Application.Services.Repositories;
-using NArchitecture.Core.Persistence.Paging;
+using AutoMapper;
+using MediatR;
+using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Responses;
+using NArchitecture.Core.Persistence.Paging;
 
 namespace Application.Features.StudentClasses.Queries.GetClassesByClassAge;
 

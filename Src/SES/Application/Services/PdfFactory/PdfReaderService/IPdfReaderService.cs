@@ -1,5 +1,4 @@
 ﻿using Application.Services.PdfFactory.PdfReaderService.Dtos;
-using Domain.Entities;
 
 namespace Application.Services.PdfFactory.PdfReaderService;
 public interface IPdfReaderService

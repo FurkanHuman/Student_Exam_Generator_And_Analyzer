@@ -3,8 +3,6 @@ using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
-using static Application.Features.Benefits.Constants.BenefitsOperationClaims;
 
 namespace Application.Features.Benefits.Queries.GetById;
 
@@ -12,7 +10,7 @@ public class GetByIdBenefitQuery : IRequest<GetByIdBenefitResponse>
 {
     public int Id { get; set; }
 
-    
+
 
     public class GetByIdBenefitQueryHandler : IRequestHandler<GetByIdBenefitQuery, GetByIdBenefitResponse>
     {

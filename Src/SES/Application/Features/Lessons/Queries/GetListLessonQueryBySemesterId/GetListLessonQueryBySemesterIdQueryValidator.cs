@@ -4,7 +4,7 @@ namespace Application.Features.Lessons.Queries.GetListLessonQueryBySemesterId;
 
 public class GetListLessonQueryBySemesterIdQueryValidator : AbstractValidator<GetListLessonQueryBySemesterIdQuery>
 {
-    public GetListLessonQueryBySemesterIdQueryValidator() 
+    public GetListLessonQueryBySemesterIdQueryValidator()
     {
         RuleFor(x => x.SemesterId)
             .NotEmpty()

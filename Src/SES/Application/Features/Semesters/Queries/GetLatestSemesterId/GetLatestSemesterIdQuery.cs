@@ -1,8 +1,8 @@
 using Application.Features.Semesters.Rules;
-using NArchitecture.Core.Application.Pipelines.Caching;
-using MediatR;
 using Application.Services.Repositories;
 using Domain.Entities;
+using MediatR;
+using NArchitecture.Core.Application.Pipelines.Caching;
 
 namespace Application.Features.Semesters.Queries.GetLatestSemesterId;
 

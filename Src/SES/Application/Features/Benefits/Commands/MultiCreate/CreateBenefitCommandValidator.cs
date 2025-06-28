@@ -6,7 +6,7 @@ public class MultiCreateBenefitCommandValidator : AbstractValidator<MultiCreateB
 {
     public MultiCreateBenefitCommandValidator()
     {
-        RuleFor(c => c.MultiBenefits.Select(m=>m.BenefitCode)).NotEmpty();
+        RuleFor(c => c.MultiBenefits.Select(m => m.BenefitCode)).NotEmpty();
         RuleFor(c => c.MultiBenefits.Select(m => m.Description)).NotEmpty();
     }
 }

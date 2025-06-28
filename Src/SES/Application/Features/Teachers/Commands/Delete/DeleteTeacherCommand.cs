@@ -1,14 +1,11 @@
-using Application.Features.Teachers.Constants;
 using Application.Features.Teachers.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using static Application.Features.Teachers.Constants.TeachersOperationClaims;
 
 namespace Application.Features.Teachers.Commands.Delete;
 
@@ -16,7 +13,7 @@ public class DeleteTeacherCommand : IRequest<DeletedTeacherResponse>, ICacheRemo
 {
     public int Id { get; set; }
 
-    
+
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

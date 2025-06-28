@@ -3,8 +3,6 @@ using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
-using static Application.Features.LearningAreas.Constants.LearningAreasOperationClaims;
 
 namespace Application.Features.LearningAreas.Queries.GetById;
 
@@ -12,7 +10,7 @@ public class GetByIdLearningAreaQuery : IRequest<GetByIdLearningAreaResponse>
 {
     public int Id { get; set; }
 
-    
+
 
     public class GetByIdLearningAreaQueryHandler : IRequestHandler<GetByIdLearningAreaQuery, GetByIdLearningAreaResponse>
     {

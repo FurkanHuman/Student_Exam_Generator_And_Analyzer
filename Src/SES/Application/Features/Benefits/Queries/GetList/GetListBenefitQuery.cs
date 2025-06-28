@@ -2,12 +2,10 @@ using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Requests;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
-using static Application.Features.Benefits.Constants.BenefitsOperationClaims;
 
 namespace Application.Features.Benefits.Queries.GetList;
 
@@ -15,7 +13,7 @@ public class GetListBenefitQuery : IRequest<GetListResponse<GetListBenefitListIt
 {
     public PageRequest PageRequest { get; set; }
 
-    
+
 
     public bool BypassCache { get; }
     public string? CacheKey => $"GetListBenefits({PageRequest.PageIndex},{PageRequest.PageSize})";

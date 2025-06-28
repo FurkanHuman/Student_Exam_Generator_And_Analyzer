@@ -1,14 +1,11 @@
-using Application.Features.ReferenceBenefits.Constants;
 using Application.Features.ReferenceBenefits.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using static Application.Features.ReferenceBenefits.Constants.ReferenceBenefitsOperationClaims;
 
 namespace Application.Features.ReferenceBenefits.Commands.Update;
 
@@ -22,7 +19,7 @@ public class UpdateReferenceBenefitCommand : IRequest<UpdatedReferenceBenefitRes
     public required int LearningAreaId { get; set; }
     public required Semester Semester { get; set; }
 
-    
+
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

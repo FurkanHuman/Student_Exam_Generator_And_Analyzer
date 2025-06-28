@@ -1,26 +1,25 @@
 // todo: the code here will be heavily refactored and the 'single responsibility principle' will be applied
 using Application.Features.Exams.Rules;
+using Application.Services.Lessons;
+using Application.Services.PdfFactory.CreateExamPdf;
+using Application.Services.PdfFactory.CreateExamPdf.DTOs;
+using Application.Services.PdfFactory.CreateExamPdf.Helpers;
+using Application.Services.QuizQuestions;
+using Application.Services.ReferenceBenefits;
+using Application.Services.Repositories;
+using Application.Services.Schools;
+using Application.Services.Semesters;
+using Application.Services.Students;
+using Application.Services.Teachers;
 using AutoMapper;
+using Domain.Entities;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using MediatR;
-using Application.Services.PdfFactory.CreateExamPdf.DTOs;
-using Domain.Entities;
-using Application.Services.PdfFactory.CreateExamPdf.Helpers;
-using Application.Services.Repositories;
 using NArchitecture.Core.Persistence.Paging;
-using Application.Services.Students;
-using Application.Services.PdfFactory.CreateExamPdf;
-using Microsoft.EntityFrameworkCore;
-using Application.Services.Lessons;
-using Application.Services.Semesters;
-using Application.Services.Schools;
-using Application.Services.ReferenceBenefits;
 using System.IO.Compression;
-using Application.Services.QuizQuestions;
-using Application.Features.Exams.Commands.Create;
-using Application.Services.Teachers;
 
 namespace Application.Features.Exams.Commands.CreateMultipleExam;
 

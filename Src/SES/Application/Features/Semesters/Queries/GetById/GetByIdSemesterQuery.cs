@@ -3,8 +3,6 @@ using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
-using static Application.Features.Semesters.Constants.SemestersOperationClaims;
 
 namespace Application.Features.Semesters.Queries.GetById;
 
@@ -12,7 +10,7 @@ public class GetByIdSemesterQuery : IRequest<GetByIdSemesterResponse>
 {
     public int Id { get; set; }
 
-    
+
 
     public class GetByIdSemesterQueryHandler : IRequestHandler<GetByIdSemesterQuery, GetByIdSemesterResponse>
     {

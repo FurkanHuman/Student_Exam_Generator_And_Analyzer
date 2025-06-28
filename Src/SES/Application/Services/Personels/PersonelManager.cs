@@ -1,7 +1,6 @@
 using Application.Features.Personels.Rules;
 using Application.Services.Repositories;
 using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using NArchitecture.Core.Persistence.Paging;
 using System.Linq.Expressions;

@@ -1,14 +1,11 @@
-using Application.Features.Principals.Constants;
 using Application.Features.Principals.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using static Application.Features.Principals.Constants.PrincipalsOperationClaims;
 
 namespace Application.Features.Principals.Commands.Update;
 
@@ -21,7 +18,7 @@ public class UpdatePrincipalCommand : IRequest<UpdatedPrincipalResponse>, ICache
     public required School School { get; set; }
     public required Semester Semester { get; set; }
 
-    
+
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

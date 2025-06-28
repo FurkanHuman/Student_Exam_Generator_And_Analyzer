@@ -2,11 +2,11 @@ using Application.Features.Exams.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
-using Domain.Enums;
 
 namespace Application.Features.Exams.Queries.GetListExamByLessonId;
 

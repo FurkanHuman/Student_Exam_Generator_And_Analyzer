@@ -30,7 +30,7 @@ public class MappingProfiles : Profile
         CreateMap<StudentClass, GetListStudentClassListItemDto>();
         CreateMap<IPaginate<StudentClass>, GetListResponse<GetListStudentClassListItemDto>>();
 
-        CreateMap<StudentClass,GetClassesByClassAgeResponse>();
+        CreateMap<StudentClass, GetClassesByClassAgeResponse>();
         CreateMap<IPaginate<StudentClass>, GetListResponse<GetClassesByClassAgeResponse>>();
 
         CreateMap<StudentClass, GetClassesBySemesterIdResponse>();

@@ -10,11 +10,11 @@ namespace Application.Services.PdfFactory.PdfReaderService;
 internal class PdfReaderStudentManager
 {
     private const string _classRegex = @"(?:(Anasınıfı)|(\d+)\. Sınıf)\s*/\s*([A-Z])\s*Şubesi";
-    
-    #pragma warning disable S1144 // Unused private types or members should be removed
+
+#pragma warning disable S1144 // Unused private types or members should be removed
     private const string _studentRegex = @"^(?<ogrenciNo>\d+)\s+(?<adSoyad>[A-Za-zğüşöçİĞÜŞÖÇ]+\s[A-Za-zğüşöçİĞÜŞÖÇ]+(?:\s[A-Za-zğüşöçİĞÜŞÖÇ]+)*)\s+(?<cinsiyet>Kız|Erkek)$";
-    #pragma warning restore S1144 // Unused private types or members should be removed
-    
+#pragma warning restore S1144 // Unused private types or members should be removed
+
     private const string _studentNewRegex = @"^(?<ogrenciNo>\d+)\s+(?<ad>[A-ZĞÜŞÖÇİ]+(?:\s[A-ZĞÜŞÖÇİ]+)*)\s+(?<cinsiyet>Kız|Erkek)\s+(?<soyad>[A-ZĞÜŞÖÇİ]+)$";
 
     private ClassWithStudentsDto? ExtractClassAndStudentsFromPage(string content)

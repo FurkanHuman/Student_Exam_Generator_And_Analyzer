@@ -16,8 +16,8 @@ public class MappingProfiles : Profile
     public MappingProfiles()
     {
         CreateMap<CreateQuestionOptionCommand, QuestionOption>();
-        CreateMap<QuestionOptionAppDto,QuestionOption>();
-   
+        CreateMap<QuestionOptionAppDto, QuestionOption>();
+
         CreateMap<QuestionOption, CreatedQuestionOptionResponse>();
 
         CreateMap<UpdateQuestionOptionCommand, QuestionOption>();

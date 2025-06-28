@@ -4,7 +4,7 @@ using Domain.Entities;
 
 namespace Application.Services.PdfFactory.CreateExamPdf;
 
-public interface IExamPageGenerator: IQuestPDFTestPageGenerator
+public interface IExamPageGenerator : IQuestPDFTestPageGenerator
 {
     byte[] PageGenerate(Exam exam, ref ExamInfo examInfo);
 }

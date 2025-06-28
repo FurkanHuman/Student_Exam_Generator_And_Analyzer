@@ -1,4 +1,3 @@
-using Application.Features.LearningAreas.Commands.Create;
 using FluentValidation;
 
 namespace Application.Features.LearningAreas.Commands.MultiCreate;

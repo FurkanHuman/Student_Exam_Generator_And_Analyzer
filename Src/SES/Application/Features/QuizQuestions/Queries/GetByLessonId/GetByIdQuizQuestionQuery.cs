@@ -36,6 +36,8 @@ public class GetByLessonIdQuizQuestionQuery : IRequest<GetListResponse<GetByLess
                                                                                               size: int.MaxValue,
                                                                                               cancellationToken: cancellationToken);
 
+            await _quizQuestionBusinessRules.QuizQuestionShouldExistWhenSelected(quizQuestion);
+
             GetListResponse<GetByLessonIdQuizQuestionListItemDto> response = _mapper.Map<GetListResponse<GetByLessonIdQuizQuestionListItemDto>>(quizQuestion);
             return response;
         }

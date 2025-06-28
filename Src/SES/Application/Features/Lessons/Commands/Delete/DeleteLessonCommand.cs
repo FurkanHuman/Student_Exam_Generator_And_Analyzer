@@ -1,14 +1,11 @@
-using Application.Features.Lessons.Constants;
 using Application.Features.Lessons.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using static Application.Features.Lessons.Constants.LessonsOperationClaims;
 
 namespace Application.Features.Lessons.Commands.Delete;
 
@@ -16,7 +13,7 @@ public class DeleteLessonCommand : IRequest<DeletedLessonResponse>, ICacheRemove
 {
     public int Id { get; set; }
 
-    
+
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

@@ -1,20 +1,14 @@
-using Application.Features.QuizQuestions.Constants;
 using Application.Features.QuizQuestions.Rules;
 using Application.Services.Benefits;
 using Application.Services.Lessons;
-using Application.Services.QuestionOptions;
-using Application.Services.ReferenceBenefits;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Enums;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using System.Runtime.Intrinsics.X86;
-using static Application.Features.QuizQuestions.Constants.QuizQuestionsOperationClaims;
 
 namespace Application.Features.QuizQuestions.Commands.Create;
 
@@ -59,13 +53,13 @@ public class CreateQuizQuestionCommand : IRequest<CreatedQuizQuestionResponse>, 
             ICollection<QuestionOption> questionOptions = [];
 
             Lesson? lesson = await _lessonService.GetAsync(l => l.Id == request.LessonId, cancellationToken: cancellationToken);
-                lessons.Add(lesson);
+            lessons.Add(lesson);
 
             foreach (int id in request.BenefitIds)
                 benefits.Add(await _benefitService.GetAsync(predicate: b => b.Id == id, cancellationToken: cancellationToken));
 
             foreach (QuestionOptionAppDto? option in request.QQOptions)
-                    questionOptions.Add(new() { IsCorrect = option.IsCorrect, OptionText = option.OptionText, CreatedDate = DateTime.UtcNow});
+                questionOptions.Add(new() { IsCorrect = option.IsCorrect, OptionText = option.OptionText, CreatedDate = DateTime.UtcNow });
 
             QuestionScore questionScore = _mapper.Map<QuestionScore>(request);
             questionScore.CreatedDate = DateTime.UtcNow;

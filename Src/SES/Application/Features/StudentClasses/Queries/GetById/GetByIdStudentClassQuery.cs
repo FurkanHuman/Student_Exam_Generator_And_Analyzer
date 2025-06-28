@@ -3,8 +3,6 @@ using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
-using static Application.Features.StudentClasses.Constants.StudentClassesOperationClaims;
 
 namespace Application.Features.StudentClasses.Queries.GetById;
 
@@ -12,7 +10,7 @@ public class GetByIdStudentClassQuery : IRequest<GetByIdStudentClassResponse>
 {
     public int Id { get; set; }
 
-    
+
 
     public class GetByIdStudentClassQueryHandler : IRequestHandler<GetByIdStudentClassQuery, GetByIdStudentClassResponse>
     {

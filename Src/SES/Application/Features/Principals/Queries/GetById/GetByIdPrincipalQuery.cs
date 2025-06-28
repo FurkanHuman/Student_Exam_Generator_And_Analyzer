@@ -3,8 +3,6 @@ using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
-using static Application.Features.Principals.Constants.PrincipalsOperationClaims;
 
 namespace Application.Features.Principals.Queries.GetById;
 
@@ -12,7 +10,7 @@ public class GetByIdPrincipalQuery : IRequest<GetByIdPrincipalResponse>
 {
     public int Id { get; set; }
 
-    
+
 
     public class GetByIdPrincipalQueryHandler : IRequestHandler<GetByIdPrincipalQuery, GetByIdPrincipalResponse>
     {

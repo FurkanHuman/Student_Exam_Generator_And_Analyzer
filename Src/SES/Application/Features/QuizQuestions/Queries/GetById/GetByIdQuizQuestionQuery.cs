@@ -3,8 +3,6 @@ using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
-using static Application.Features.QuizQuestions.Constants.QuizQuestionsOperationClaims;
 
 namespace Application.Features.QuizQuestions.Queries.GetById;
 
@@ -12,7 +10,7 @@ public class GetByIdQuizQuestionQuery : IRequest<GetByIdQuizQuestionResponse>
 {
     public int Id { get; set; }
 
-    
+
 
     public class GetByIdQuizQuestionQueryHandler : IRequestHandler<GetByIdQuizQuestionQuery, GetByIdQuizQuestionResponse>
     {

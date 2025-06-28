@@ -1,14 +1,11 @@
-using Application.Features.SubLearningAreas.Constants;
 using Application.Features.SubLearningAreas.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using static Application.Features.SubLearningAreas.Constants.SubLearningAreasOperationClaims;
 
 namespace Application.Features.SubLearningAreas.Commands.Create;
 
@@ -17,7 +14,7 @@ public class CreateSubLearningAreaCommand : IRequest<CreatedSubLearningAreaRespo
     public required string Name { get; set; }
     public required int BenefitId { get; set; }
 
-    
+
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

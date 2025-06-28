@@ -1,11 +1,11 @@
 using Application.Features.Semesters.Rules;
-using AutoMapper;
-using NArchitecture.Core.Application.Pipelines.Logging;
-using MediatR;
-using Domain.Entities;
 using Application.Services.Repositories;
-using NArchitecture.Core.Persistence.Paging;
+using AutoMapper;
+using Domain.Entities;
+using MediatR;
+using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Responses;
+using NArchitecture.Core.Persistence.Paging;
 
 namespace Application.Features.StudentClasses.Queries.GetClassesBySemesterId;
 
@@ -13,7 +13,7 @@ public class GetClassesBySemesterIdQuery : IRequest<GetListResponse<GetClassesBy
 {
     public int SemesterId { get; set; }
 
-    public class GetClassesBySemesterIdQueryHandler : IRequestHandler<GetClassesBySemesterIdQuery, GetListResponse< GetClassesBySemesterIdResponse>>
+    public class GetClassesBySemesterIdQueryHandler : IRequestHandler<GetClassesBySemesterIdQuery, GetListResponse<GetClassesBySemesterIdResponse>>
     {
         private readonly IStudentClassRepository _studentClassRepository;
         private readonly IMapper _mapper;

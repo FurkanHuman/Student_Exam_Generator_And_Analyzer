@@ -1,14 +1,11 @@
-using Application.Features.StudentClasses.Constants;
 using Application.Features.StudentClasses.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using static Application.Features.StudentClasses.Constants.StudentClassesOperationClaims;
 
 namespace Application.Features.StudentClasses.Commands.Update;
 
@@ -26,7 +23,7 @@ public class UpdateStudentClassCommand : IRequest<UpdatedStudentClassResponse>, 
     public required Semester Semester { get; set; }
     public required Teacher RefTeacher { get; set; }
 
-    
+
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

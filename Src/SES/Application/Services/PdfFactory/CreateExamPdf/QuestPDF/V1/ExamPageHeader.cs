@@ -13,9 +13,9 @@ internal static class ExamPageHeader
     {
         ExamConstants.CurrentLanguage = examInfo.Language;
 
-        page.Header().PaddingBottom(0.5F,Unit.Centimetre).Row(headerRow =>
+        page.Header().PaddingBottom(0.5F, Unit.Centimetre).Row(headerRow =>
         {
-            headerRow.Spacing(1.15f,Unit.Point);
+            headerRow.Spacing(1.15f, Unit.Point);
             headerRow.RelativeItem(1).AlignLeft().AlignCenter().AlignTop().Column(nameBox =>
             {
                 if (!examInfo.IsAnonymousExamMode)
@@ -57,7 +57,7 @@ internal static class ExamPageHeader
                 examSummary.Item().AlignCenter().Text(QuizQuestionHelpers.InsertDashInString(exam.ExamCode)).Bold();
                 examSummary.Item().AlignCenter().Text(exam.ExamDate.ToShortDateString()).Bold();
                 examSummary.Item().AlignCenter().Text(ExamConstants.Get("score")).Bold();
-                examSummary.Item().AlignCenter().Width(2,Unit.Centimetre).Column(col =>
+                examSummary.Item().AlignCenter().Width(2, Unit.Centimetre).Column(col =>
                 {
                     col.Item().AlignMiddle().AlignRight().Text($"/ {examInfo.ExamScore}").Bold();
                     col.Item().AlignMiddle().AlignRight().Text($"/ {examInfo.ExamScoreStr}").Bold();

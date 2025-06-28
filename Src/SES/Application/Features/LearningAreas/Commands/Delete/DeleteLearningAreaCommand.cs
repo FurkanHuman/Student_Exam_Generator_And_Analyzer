@@ -1,14 +1,11 @@
-using Application.Features.LearningAreas.Constants;
 using Application.Features.LearningAreas.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using static Application.Features.LearningAreas.Constants.LearningAreasOperationClaims;
 
 namespace Application.Features.LearningAreas.Commands.Delete;
 
@@ -16,7 +13,7 @@ public class DeleteLearningAreaCommand : IRequest<DeletedLearningAreaResponse>, 
 {
     public int Id { get; set; }
 
-    
+
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

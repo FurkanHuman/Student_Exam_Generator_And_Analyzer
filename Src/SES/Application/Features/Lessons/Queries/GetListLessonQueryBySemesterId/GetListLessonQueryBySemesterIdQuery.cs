@@ -1,13 +1,13 @@
 using Application.Features.Lessons.Rules;
+using Application.Services.Repositories;
 using AutoMapper;
+using Domain.Entities;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
-using MediatR;
 using NArchitecture.Core.Application.Responses;
-using Application.Services.Repositories;
 using NArchitecture.Core.Persistence.Paging;
-using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Lessons.Queries.GetListLessonQueryBySemesterId;
 
@@ -41,7 +41,7 @@ public class GetListLessonQueryBySemesterIdQuery : IRequest<GetListResponse<GetL
                     .Include(l => l.StudentClasses),
                 cancellationToken: cancellationToken);
 
-            GetListResponse<GetListLessonQueryBySemesterIdDto> response  = _mapper.Map<GetListResponse<GetListLessonQueryBySemesterIdDto>>(lessons);
+            GetListResponse<GetListLessonQueryBySemesterIdDto> response = _mapper.Map<GetListResponse<GetListLessonQueryBySemesterIdDto>>(lessons);
             return response;
         }
     }

@@ -1,5 +1,4 @@
 using NArchitecture.Core.Application.Dtos;
-using NArchitecture.Core.Application.Responses;
 
 namespace Application.Features.Lessons.Queries.GetListLessonQueryBySemesterId;
 

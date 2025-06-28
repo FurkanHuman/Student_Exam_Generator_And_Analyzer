@@ -1,16 +1,13 @@
-using Application.Features.Lessons.Constants;
 using Application.Features.Lessons.Rules;
 using Application.Services.Repositories;
 using Application.Services.StudentClasses;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
 using NArchitecture.Core.Persistence.Paging;
-using static Application.Features.Lessons.Constants.LessonsOperationClaims;
 
 namespace Application.Features.Lessons.Commands.Create;
 

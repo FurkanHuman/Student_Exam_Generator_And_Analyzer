@@ -1,14 +1,11 @@
-using Application.Features.Exams.Constants;
 using Application.Features.Exams.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using static Application.Features.Exams.Constants.ExamsOperationClaims;
 
 namespace Application.Features.Exams.Commands.Update;
 
@@ -32,7 +29,7 @@ public class UpdateExamCommand : IRequest<UpdatedExamResponse>, ICacheRemoverReq
     public required School School { get; set; }
     public required ReferenceBenefit ReferenceBenefit { get; set; }
 
-    
+
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

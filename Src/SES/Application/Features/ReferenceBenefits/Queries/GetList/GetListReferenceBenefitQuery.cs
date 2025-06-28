@@ -3,12 +3,10 @@ using AutoMapper;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Requests;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
-using static Application.Features.ReferenceBenefits.Constants.ReferenceBenefitsOperationClaims;
 
 namespace Application.Features.ReferenceBenefits.Queries.GetList;
 
@@ -37,7 +35,7 @@ public class GetListReferenceBenefitQuery : IRequest<GetListResponse<GetListRefe
             IPaginate<ReferenceBenefit> referenceBenefits = await _referenceBenefitRepository.GetListAsync(
                 index: request.PageRequest.PageIndex,
                 size: request.PageRequest.PageSize,
-                include: rb=> rb.Include(se => se.Semester)
+                include: rb => rb.Include(se => se.Semester)
                                 .Include(sc => sc.School)
                                 .Include(l => l.Lesson),
                 cancellationToken: cancellationToken

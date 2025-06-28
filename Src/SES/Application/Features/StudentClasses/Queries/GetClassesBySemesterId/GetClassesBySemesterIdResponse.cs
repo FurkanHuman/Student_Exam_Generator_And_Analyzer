@@ -2,7 +2,7 @@ using NArchitecture.Core.Application.Responses;
 
 namespace Application.Features.StudentClasses.Queries.GetClassesBySemesterId;
 
-public class GetClassesBySemesterIdResponse : IResponse 
+public class GetClassesBySemesterIdResponse : IResponse
 {
     public int Id { get; set; }
     public string? Name { get; set; }

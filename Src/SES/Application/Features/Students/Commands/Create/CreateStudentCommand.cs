@@ -1,14 +1,11 @@
-using Application.Features.Students.Constants;
 using Application.Features.Students.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using NArchitecture.Core.Application.Pipelines.Authorization;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using static Application.Features.Students.Constants.StudentsOperationClaims;
 
 namespace Application.Features.Students.Commands.Create;
 
@@ -24,7 +21,7 @@ public class CreateStudentCommand : IRequest<CreatedStudentResponse>, ICacheRemo
     public int SemesterId { get; set; }
     public int SchoolId { get; set; }
 
-    
+
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }
