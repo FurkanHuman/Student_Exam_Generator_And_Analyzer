@@ -1,28 +1,7 @@
-﻿@*
-    tek asatır tasarımı soldan sağa:
-        soru sırası
-        soruya göre cevaplayıcı komponent
-            
-            notlar: açık uçlu kategorisinde bulunanlarda elle puan girişi olacak. sol üste kopya yada boş gibi seçenekler olacak
-
-                açık uçluda anahtar kelimeye ye (çok tartışmalı: eğer varsa soru içinde anahtar kelimeler işaretlesin yada soruya yazılan cevabı yazsın...???) yada el ile puan girişi
-
-                boşluk doldurmada direkt kelime istenceği için checkboxla işaretleme veya elle puan girişi
-
-                sıralama ve eşlestirme ise sıralamaya göre giriş olacak {A: (textbox girişi)}
-
-                doğru yanlışlarda checkbox ama boş olabilir yani üç durumlu checkboxlar. tabiki seçeneklerde olacak.
-
-                çoktan seçmelide dropdown ile işaretlenen seçenek sadece.
-
-        tam puan butonu
-*@
-
-@page "/test"
-@using BlazorWebUI.Client.Pages.Styles.QQ.QuestionAnswerInputs
+﻿@using BlazorWebUI.Client.Pages.Styles.QQ.QuestionAnswerInputs
 @rendermode InteractiveAuto
 @code {
-    private IEnumerable<QuestionOptionDto> QuestionOptions { get; set; }
+    private IEnumerable<QuestionOptionDto> QuestionOptions { get; set; } = [];
 
     [Parameter]
     public int QuestionOrder { get; set; }
@@ -37,7 +16,7 @@
     public int Seed { get; set; }
 
     [Parameter]
-    public QQBodyDto QuestionData { get; set; }
+    public QQBodyDto QuestionData { get; set; } = default!;
 
     [Parameter]
     public EventCallback<byte> OnEvaluationStatus { get; set; }
