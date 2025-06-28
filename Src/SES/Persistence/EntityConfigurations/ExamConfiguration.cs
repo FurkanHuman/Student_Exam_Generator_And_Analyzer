@@ -18,6 +18,7 @@ internal class ExamConfiguration : IEntityTypeConfiguration<Exam>, IMainConfigur
         builder.Property(e => e.TotalScore);
         builder.Property(e => e.FooterNote).IsRequired();
         builder.Property(e => e.ExamDate).IsRequired();
+        builder.Property(e => e.EvaluationOrigin).IsRequired();
 
 
         builder.Property(e => e.LessonId).IsRequired();
@@ -32,7 +33,7 @@ internal class ExamConfiguration : IEntityTypeConfiguration<Exam>, IMainConfigur
         builder.HasOne(e => e.Student);
         builder.HasOne(e => e.School);
         builder.HasOne(e => e.ReferenceBenefit);
-        builder.HasOne(e => e.ExamAuthor).WithMany(t => t.ExamAuthors).HasForeignKey(e=>e.ExamAuthorId);
+        builder.HasOne(e => e.ExamAuthor).WithMany(t => t.ExamAuthors).HasForeignKey(e => e.ExamAuthorId);
         builder.HasMany(e => e.Analyses);
         builder.HasMany(e => e.Teachers);
         builder.HasMany(e => e.StudentClasses);
