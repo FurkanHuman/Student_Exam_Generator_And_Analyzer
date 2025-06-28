@@ -1,4 +1,5 @@
-﻿using NArchitecture.Core.Persistence.Repositories;
+﻿using Domain.Enums;
+using NArchitecture.Core.Persistence.Repositories;
 
 namespace Domain.Entities;
 
@@ -24,6 +25,8 @@ public class Exam : Entity<int>
     public School School { get; set; }
     public ReferenceBenefit ReferenceBenefit { get; set; }
     public Teacher ExamAuthor { get; set; }
+
+    public EvaluationOrigin EvaluationOrigin { get; set; }
 
     public IList<Analysis> Analyses { get; set; }
     public IList<Teacher> Teachers { get; set; }
