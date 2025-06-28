@@ -3,6 +3,7 @@ using Application.Features.Exams.Commands.Delete;
 using Application.Features.Exams.Commands.Update;
 using Application.Features.Exams.Queries.GetById;
 using Application.Features.Exams.Queries.GetList;
+using Application.Features.Exams.Queries.GetListExamByLessonId;
 using AutoMapper;
 using Domain.Entities;
 using NArchitecture.Core.Application.Responses;
@@ -24,6 +25,12 @@ public class MappingProfiles : Profile
         CreateMap<Exam, DeletedExamResponse>();
 
         CreateMap<Exam, GetByIdExamResponse>();
+
+        CreateMap<Exam, GetListExamByLessonIdDto>()
+            .ForMember(destinationMember: edto => edto.QuizQuestionsIds, memberOptions: opt => opt.MapFrom(e => e.QuizQuestions.Select(q => q.Id)));
+
+        CreateMap<IPaginate<Exam>, GetListResponse<GetListExamByLessonIdDto>>();
+
 
         CreateMap<Exam, GetListExamListItemDto>();
         CreateMap<IPaginate<Exam>, GetListResponse<GetListExamListItemDto>>();

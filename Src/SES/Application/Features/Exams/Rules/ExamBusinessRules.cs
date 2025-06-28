@@ -25,6 +25,12 @@ public class ExamBusinessRules : BaseBusinessRules
         throw new BusinessException(message);
     }
 
+    public async Task ExamListShouldExistWhenSelected(IPaginate<Exam>? exams)
+    {
+        if (exams == null || exams.Items.Count == 0)
+            await throwBusinessException(ExamsBusinessMessages.ExamListNotExists);
+    }
+
     public void CheckStudentAvailability(IPaginate<Student>? students)
     {
         if (students == null || students.Items.Count == 0)
