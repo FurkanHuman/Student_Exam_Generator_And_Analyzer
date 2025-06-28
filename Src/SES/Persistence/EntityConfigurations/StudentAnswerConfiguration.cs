@@ -15,17 +15,18 @@ namespace Persistence.EntityConfigurations
             builder.Property(sa => sa.QuizQuestionId).IsRequired();
             builder.Property(sa => sa.QuestionScoreId);
             builder.Property(sa => sa.QuestionOptionId);
+            builder.Property(sa => sa.ExamId).IsRequired();
 
             builder.Property(sa => sa.EvaluationOrigin).IsRequired();
             builder.Property(sa => sa.EvaluationStatus).IsRequired();
             builder.Property(sa => sa.AnswerText);
             builder.Property(sa => sa.GivenScore);
-            //builder.Property(sa => sa.IsCorrect); //maybe Not needed, as it can be derived from EvaluationStatus
 
             builder.HasOne(sa => sa.QuestionScore);
             builder.HasOne(sa => sa.Student);
             builder.HasOne(sa => sa.QuizQuestion);
             builder.HasOne(sa => sa.QuestionOption);
+            builder.HasOne(sa => sa.Exam);
 
             builder.Property(sa => sa.CreatedDate).IsRequired();
             builder.Property(sa => sa.UpdatedDate);
