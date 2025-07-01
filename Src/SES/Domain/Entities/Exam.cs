@@ -27,6 +27,7 @@ public class Exam : Entity<int>
     public Teacher ExamAuthor { get; set; }
 
     public EvaluationOrigin EvaluationOrigin { get; set; }
+    public IDictionary<int, int> QuestionOrderMap { get; set; } // key is question Id, value is exam question order
 
     public IList<Analysis> Analyses { get; set; }
     public IList<Teacher> Teachers { get; set; }

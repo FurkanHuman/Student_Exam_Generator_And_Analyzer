@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Persistence.EntityConfigurations.Interfaces;
+using System.Text.Json;
 
 namespace Persistence.EntityConfigurations;
 
@@ -19,7 +20,10 @@ internal class ExamConfiguration : IEntityTypeConfiguration<Exam>, IMainConfigur
         builder.Property(e => e.FooterNote).IsRequired();
         builder.Property(e => e.ExamDate).IsRequired();
         builder.Property(e => e.EvaluationOrigin).IsRequired();
-
+        builder.Property(e => e.QuestionOrderMap).IsRequired()
+                                                 .HasConversion(v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default), 
+                                                                v => JsonSerializer.Deserialize<Dictionary<int, int>>(v, JsonSerializerOptions.Default)!
+                                                                );
 
         builder.Property(e => e.LessonId).IsRequired();
         builder.Property(e => e.SemesterId).IsRequired();
