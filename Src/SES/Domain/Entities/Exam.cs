@@ -9,6 +9,7 @@ public class Exam : Entity<int>
     public string ExamLessonName { get; set; }
     public string ExamCode { get; set; }
     public string FooterNote { get; set; }
+    public string ExamConfigurationStr { get; set; }
     public string? TotalScoreForString { get; set; }
     public int? TotalScore { get; set; }
 

@@ -20,6 +20,7 @@ using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
 using NArchitecture.Core.Persistence.Paging;
 using System.IO.Compression;
+using System.Text.Json;
 
 namespace Application.Features.Exams.Commands.CreateMultipleExam;
 
@@ -119,6 +120,7 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
                     ExamLessonName = request.ExamInfo.ExamName,
                     ExamCode = examCode,
                     FooterNote = request.ExamInfo.FooterNote,
+                    ExamConfigurationStr = JsonSerializer.Serialize(request.ExamInfo, JsonSerializerOptions.Default),
                     TotalScoreForString = request.ExamInfo.ExamScoreStr,
                     TotalScore = request.ExamInfo.ExamScore,
 
