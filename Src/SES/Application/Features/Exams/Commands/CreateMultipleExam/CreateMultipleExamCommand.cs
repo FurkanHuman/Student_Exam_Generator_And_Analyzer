@@ -128,6 +128,8 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
                     SchoolId = school.Id,
                     ReferenceBenefitId = referenceBenefit.Id,
                     ExamAuthorId = examAuthor!.Id,
+                    EvaluationOrigin = 0,
+                    QuestionOrderMap = request.ExamInfo.QQOrder,
 
                     Lesson = lesson!,
                     Semester = semester!,
