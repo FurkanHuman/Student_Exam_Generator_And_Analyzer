@@ -14,5 +14,6 @@ public class GetQuizQuestionsByIdsListItemDto : IResponse, IDto
     public string QuestionBody { get; set; }
     public string QuestionImage { get; set; }
     public QuestionType QuestionType { get; set; }
+    public IDictionary<int, int> QuestionOrderMap { get; set; } // key is question Id, value is exam question order
     public ICollection<QuestionOption> Options { get; set; }
 }
