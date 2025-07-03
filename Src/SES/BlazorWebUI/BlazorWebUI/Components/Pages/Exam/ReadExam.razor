@@ -1,25 +1,117 @@
 ﻿@page "/ReadExam"
 @using Application.Features.Exams.Queries.GetListExamByLessonId
 @using Application.Features.QuizQuestions.Queries.GetQuizQuestionsByIds
+@using Application.Features.Students.Queries.GetStudentsByIds
+@using Application.Services.PdfFactory.CreateExamPdf.DTOs
+@using Application.Services.PdfFactory.CreateExamPdf.Helpers;
 @using AutoMapper
 @using BlazorWebUI.Client.Pages.Styles.QQ
 @using NArchitecture.Core.Application.Responses
+@using System.Text.Json
 @rendermode InteractiveServer
 @inject IMediator _mediator
 @inject IMapper _mapper
 @code {
-    private IEnumerable<QQBodyDto> _quizQuestionsList { get; set; }
+    private bool _isvisibleForLoader { get; set; } = false;
+    private int _selectedStudentId { get; set; } = 0;
+    private int _golablSeed { get; set; } = 0;
 
+    private GetStudentsByIdsListItemDto _selectedStudent { get; set; } = default!;
+
+    private IEnumerable<GetListExamByLessonIdDto> _exams { get; set; } = [];
+    private IEnumerable<QQBodyDto> _quizQuestionsList { get; set; } = [];
+    private IList<QQBodyDto> _quizQuestionsListForExamByOrdered { get; set; } = [];
+
+
+    private GetListResponse<GetStudentsByIdsListItemDto> _students { get; set; } = default!;
+    private GetListResponse<GetQuizQuestionsByIdsListItemDto> _quizQuestions { get; set; } = default!;
 
     private async Task LoadExamFromLoader(IEnumerable<GetListExamByLessonIdDto> args)
     {
-        IEnumerable<int> QQIds = args.SelectMany(a => a.QuizQuestionsIds).ToHashSet();
-        GetListResponse<GetQuizQuestionsByIdsListItemDto> realQQ = await _mediator.Send(new GetQuizQuestionsByIdsQuery() { Ids = QQIds });
-        _quizQuestionsList = _mapper.Map<IEnumerable<QQBodyDto>>(realQQ.Items);
+        if (args == null || !args.Any())
+            return;
+        _exams = args;
+        IEnumerable<int> QuestionIds = args.SelectMany(x => x.QuizQuestionsIds).ToHashSet();
+        IEnumerable<int> StudentIds = args.Select(x => x.StudentId).ToHashSet();
+
+
+        _quizQuestions = await _mediator.Send(new GetQuizQuestionsByIdsQuery() { Ids = QuestionIds });
+        _students = await _mediator.Send(new GetStudentsByIdsQuery() { Ids = StudentIds });
+
+        _quizQuestionsList = _mapper.Map<IEnumerable<QQBodyDto>>(_quizQuestions.Items);
+
+        StateHasChanged();
+    }
+
+    private void SaveExam()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void SelectStudent(ChangeEventArgs args)
+    {
+        string raw = args.Value?.ToString() ?? string.Empty;
+
+        if (int.TryParse(raw, out int value))
+            _selectedStudentId = value;
+        else
+            _selectedStudentId = 0;
+
+        _selectedStudent = _students.Items.FirstOrDefault(x => x.Id == _selectedStudentId, defaultValue: default!);
+        GetListExamByLessonIdDto selectedExam = _exams.FirstOrDefault(x => x.StudentId == _selectedStudentId, default!);
+
+        
+        IList<QQBodyDto> qQBodies = _quizQuestionsList.Where(x => selectedExam.QuizQuestionsIds.Contains(x.Id)).ToList();
+
+        ExamInfo examInfo = JsonSerializer.Deserialize<ExamInfo>(selectedExam.ExamConfigurationStr)!;
+
+        int seed = (int)ExamQQHelper.DecodeBase32String(selectedExam.ExamCode);
+        _golablSeed = seed;
+
+
+        ExamQQHelper.ShuffleQuizQuestions(ref qQBodies, examInfo, seed);
+        ExamQQHelper.ShuffleAllQuestionOptions(ref qQBodies, examInfo, seed);
+        ExamQQHelper.OrderQuizQuestions(qQBodies, examInfo, seed);
+
+        _quizQuestionsListForExamByOrdered = qQBodies;
     }
 }
 
+<ExamLoader OnExamsSelected="LoadExamFromLoader" IsVisible="_isvisibleForLoader" />
 
 <div class="m-2">
-    <ExamLoader OnExamsSelected="LoadExamFromLoader" />
+    <InputSelect TValue="int" @bind-Value="_selectedStudentId" @oninput="SelectStudent">
+        @*öğrenci seçimi*@
+
+        <option value="0">Öğenci seç</option>
+        @foreach (GetStudentsByIdsListItemDto student in _students.Items)
+        {
+            <option value="@student.Id">@($"{student.SchoolNumber} - {student.Name} {student.SurName}") </option>
+        }
+
+    </InputSelect>
+
+    <span>
+        @if (_selectedStudent != null)
+        {
+            <span class="text-success">Selected Student: @($"{_selectedStudent.SchoolNumber} - {_selectedStudent.Name} {_selectedStudent.SurName}")</span>
+        }
+        else
+        {
+            <span class="text-danger">No student selected.</span>
+        }
+    </span>
+
+    <div class="m-2">
+        @foreach (var qq in _quizQuestionsListForExamByOrdered.Select((item, index) => new { item, index }))
+        {
+            <QuestionAnswerInput QuestionData="qq.item" QuestionOrder="@(qq.index + 1)" IsCustomScore="false" Seed="_golablSeed" />
+        }
+    </div>
+
+    <div class="m-5">
+        <button class="btn btn-primary" @onclick="() => SaveExam() ">kayıt et</button>
+    </div>
+
 </div>
+
