@@ -4,7 +4,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @attribute [Authorize(Roles = "admin,director")]
-@page "/admin/Panel"
+@page "/Admin/Panel"
 @rendermode InteractiveServer
 
 @inject UserManager<ApplicationUser> _userManager
