@@ -48,7 +48,7 @@ internal static class ExamPageHeader
             {
                 generalInfo.Item().AlignCenter().Text($"{exam.Semester.BeginSemesterDate.Year} - {exam.Semester.EndSemesterDate.Year}").Bold();
                 generalInfo.Item().AlignCenter().Text(exam.School.Name).Bold();
-                generalInfo.Item().AlignCenter().Text($"{exam.Lesson.LessonName}{ExamConstants.Get("lesson")}").Bold();
+                generalInfo.Item().AlignCenter().Text($"{exam.Lesson.LessonName} {ExamConstants.Get("lesson")}").Bold();
                 generalInfo.Item().AlignCenter().Text($"{examInfo.SelectedClass}. {ExamConstants.Get("clasess")} {exam.Semester.Name}. {ExamConstants.Get("period")} {examInfo.CurrentExamNumber}. {ExamConstants.Get("written_exam")}").Bold();
             });
 
