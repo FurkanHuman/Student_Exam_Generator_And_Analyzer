@@ -1,4 +1,5 @@
 ﻿@page "/SemesterAdd"
+@rendermode InteractiveServer
 @using Application.Features.Semesters.Commands.Create
 @using Application.Features.Semesters.Queries.GetList
 @using BlazorWebUI.Client.Pages.Styles
@@ -114,6 +115,7 @@
         CreatedSemesterResponse result = await _IMediator.Send(semesterCommand);
 
         _modalStatus.Open();
+        StateHasChanged();
     }
 
     private class SemesterForm
