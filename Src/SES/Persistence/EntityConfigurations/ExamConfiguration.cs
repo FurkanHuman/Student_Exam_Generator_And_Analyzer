@@ -22,7 +22,7 @@ internal class ExamConfiguration : IEntityTypeConfiguration<Exam>, IMainConfigur
         builder.Property(e => e.EvaluationOrigin).IsRequired();
         builder.Property(e => e.ExamConfigurationStr).IsRequired();
         builder.Property(e => e.QuestionOrderMap).IsRequired()
-                                                 .HasConversion(v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default), 
+                                                 .HasConversion(v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
                                                                 v => JsonSerializer.Deserialize<Dictionary<int, int>>(v, JsonSerializerOptions.Default)!
                                                                 );
 
