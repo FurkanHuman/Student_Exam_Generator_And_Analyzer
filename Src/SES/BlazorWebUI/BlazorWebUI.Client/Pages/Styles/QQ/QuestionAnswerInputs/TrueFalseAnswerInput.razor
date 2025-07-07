@@ -19,91 +19,139 @@
     [Parameter]
     public EventCallback<string> OnEncodedOptionAnswers { get; set; }
 
+    private string? _lastEncodedAnswers;
+    private int _lastScore = -1;
+    private byte? _lastEvaluationStatus;
+
     private void ProcessTFSelection(Guid id, byte optionValue)
     {
-        double perOptionScore = 0;
+        if (_tFAnswers.TryGetValue(id, out byte currentValue) && currentValue == optionValue)
+            return;
+
         _tFAnswers[id] = optionValue;
+
+        CalculateScore();
+        UpdateState();
+    }
+
+    private void CalculateScore()
+    {
+        double perOptionScore = 0;
 
         foreach (KeyValuePair<Guid, byte> answerPair in _tFAnswers)
         {
-            QuestionOptionDto option = QuestionOptions.First(x => x.Id == answerPair.Key);
+            if (answerPair.Value == 2) continue;
 
-            bool isCorrect = (answerPair.Value == 1 && option.IsCorrect) || (answerPair.Value == 0 && !option.IsCorrect);
+            QuestionOptionDto? option = QuestionOptions.FirstOrDefault(x => x.Id == answerPair.Key);
+            if (option == null) continue;
+
+            bool isCorrect = (answerPair.Value == 1 && option.IsCorrect) ||
+                           (answerPair.Value == 0 && !option.IsCorrect);
 
             if (isCorrect)
                 perOptionScore += (double)ScoreMax / _optionCount;
         }
 
         _score = (int)Math.Round(perOptionScore, 2, MidpointRounding.ToEven);
-        UpdateState();
     }
 
-    private void UpdateEvaluationStatus()
+    private byte GetEvaluationStatus()
     {
-        if (_score < ScoreMax)
-            OnEvaluationStatus.InvokeAsync(8);
+        if (_score < ScoreMax && _score > 0)
+            return 8;
         else if (_score == ScoreMax)
-            OnEvaluationStatus.InvokeAsync(9);
+            return 9;
         else if (_score == 0)
-            OnEvaluationStatus.InvokeAsync(1);
+            return 1;
+        return 0;
     }
 
     private void UpdateState()
     {
-        string encodedAnswers = System.Text.Json.JsonSerializer.Serialize(_tFAnswers);
+        byte currentEvaluationStatus = GetEvaluationStatus();
+        string currentEncodedAnswers = System.Text.Json.JsonSerializer.Serialize(_tFAnswers);
 
-        UpdateEvaluationStatus();
-        OnScore.InvokeAsync(_score);
-        OnEncodedOptionAnswers.InvokeAsync(encodedAnswers);
+        if (_lastEvaluationStatus != currentEvaluationStatus)
+        {
+            _lastEvaluationStatus = currentEvaluationStatus;
+            OnEvaluationStatus.InvokeAsync(currentEvaluationStatus);
+        }
+
+        if (_lastScore != _score)
+        {
+            _lastScore = _score;
+            OnScore.InvokeAsync(_score);
+        }
+
+        if (_lastEncodedAnswers != currentEncodedAnswers)
+        {
+            _lastEncodedAnswers = currentEncodedAnswers;
+            OnEncodedOptionAnswers.InvokeAsync(currentEncodedAnswers);
+        }
     }
 
     private byte GetAnswer(Guid id)
     {
-        if (_tFAnswers.TryGetValue(id, out byte value))
-            return value;
-        return 2;
+        return _tFAnswers.TryGetValue(id, out byte value) ? value : (byte)2;
     }
 
     private void SetAnswer(Guid id, byte value)
     {
-        _tFAnswers[id] = value;
         ProcessTFSelection(id, value);
     }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        OnEvaluationStatus.InvokeAsync(0);
-        _optionCount = QuestionOptions.Count();
-        foreach (QuestionOptionDto option in QuestionOptions)
-            SetAnswer(option.Id, 2);
+        int newOptionCount = QuestionOptions?.Count() ?? 0;
+        if (_optionCount != newOptionCount || _tFAnswers.Count == 0)
+        {
+            _optionCount = newOptionCount;
+            _tFAnswers.Clear();
+
+            if (QuestionOptions != null)
+            {
+                foreach (QuestionOptionDto option in QuestionOptions)
+                {
+                    _tFAnswers[option.Id] = 2;
+                }
+            }
+
+            _lastScore = -1;
+            _lastEvaluationStatus = null;
+            _lastEncodedAnswers = null;
+
+            OnEvaluationStatus.InvokeAsync(0);
+        }
     }
 }
 
-@foreach (QuestionOptionDto option in QuestionOptions)
+@foreach (Guid optionId in QuestionOptions.Select(o => o.Id))
 {
+    int hashCode = optionId.GetHashCode();
+
     <div style="display: block; width: 100%;">
-        <div class="d-block w-25 m-0 border p-2 ps-5">
+        <div class="d-block w-50 m-0 border p-2 ps-5">
             <InputRadioGroup TValue="byte"
-                             Value="@GetAnswer(option.Id)"
-                             ValueChanged="val => SetAnswer(option.Id, val)"
+                             Value="@GetAnswer(optionId)"
+                             ValueChanged="val => SetAnswer(optionId, val)"
                              ValueExpression="()=>_selectedTFRadio"
-                             Name="@($"RadioG_TF_{option.Id.GetHashCode()}")"
+                             Name="@($"RadioG_TF_{hashCode}")"
                              class="d-flex gap-2">
 
                 <div class="form-check form-check-inline">
-                    <InputRadio class="form-check-input" id="@($"opt_{option.Id.GetHashCode()}_E")" Value="(byte)2" />
-                    <label class="form-check-label" for="@($"opt_{option.Id.GetHashCode()}_E")">Boş</label>
+                    <InputRadio class="form-check-input" id="@($"opt_{hashCode}_E")" Value="(byte)2" />
+                    <label class="form-check-label" for="@($"opt_{hashCode}_E")">Boş</label>
                 </div>
 
                 <div class="form-check form-check-inline">
-                    <InputRadio class="form-check-input" id="@($"opt_{option.Id.GetHashCode()}_T")" Value="(byte)1" />
-                    <label class="form-check-label" for="@($"opt_{option.Id.GetHashCode()}_T")">Doğru</label>
+                    <InputRadio class="form-check-input" id="@($"opt_{hashCode}_T")" Value="(byte)1" />
+                    <label class="form-check-label" for="@($"opt_{hashCode}_T")">Doğru</label>
                 </div>
 
                 <div class="form-check form-check-inline">
-                    <InputRadio class="form-check-input" id="@($"opt_{option.Id.GetHashCode()}_F")" Value="(byte)0" />
-                    <label class="form-check-label" for="@($"opt_{option.Id.GetHashCode()}_F")">Yanlış</label>
+                    <InputRadio class="form-check-input" id="@($"opt_{hashCode}_F")" Value="(byte)0" />
+                    <label class="form-check-label" for="@($"opt_{hashCode}_F")">Yanlış</label>
                 </div>
             </InputRadioGroup>
         </div>
