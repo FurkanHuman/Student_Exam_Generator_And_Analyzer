@@ -14,7 +14,10 @@
 @inject IMediator _mediator
 @inject IMapper _mapper
 
-@* Loader bileşeni sayfa yüklendiğinde görünür *@
+<p class="alert alert-warning text-center my-3">
+    Hatalar henüz düzeltilmedi. Lütfen bekleyin ve geri bildirimde bulunmayı unutmayın.
+</p>
+
 <ExamLoader OnExamsSelected="LoadExamFromLoader" IsVisible="_isvisibleForLoader" />
 
 @if (!_lockDown)
@@ -164,8 +167,6 @@
 
     private void SaveExam()
     {
-        // Gerçek kaydetme mantığı buraya eklenebilir.
-        // Örneğin: await _mediator.Send(new SaveExamAnswersCommand { ... });
         _modalOfSaving.Open();
     }
 
@@ -206,8 +207,8 @@
         else
             _selectedStudentId = 0;
 
+        _questionOrder = 0;
         PrepareStudentExam(_selectedStudentId);
-        _questionOrder = 0; // Soru sırasını sıfırla
     }
 
     private void NextStudent()
@@ -220,9 +221,9 @@
         int nextIndex = (currentIndex + 1) % studentIds.Count;
         _selectedStudentId = studentIds[nextIndex];
 
+        _questionOrder = 0;
         PrepareStudentExam(_selectedStudentId);
-        _questionOrder = 0; // Soru sırasını sıfırla
         _modalOfSaving.Close();
-        StateHasChanged(); // UI'ı güncellemek için
+        StateHasChanged();
     }
 }
