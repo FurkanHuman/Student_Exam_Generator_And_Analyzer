@@ -1,9 +1,12 @@
-﻿@*Thanks ChatGpt-code Copilot, Cloude Sonnet 4 *@
+﻿@*Thanks ChatGpt-code Copilot, Cloude Sonnet 4,Gemini 2.5 Pro *@
 @code {
     private int _questionOptionCount { get; set; }
     private string[] _firstParts { get; set; } = Array.Empty<string>();
     private string[] _secondParts { get; set; } = Array.Empty<string>();
     private IDictionary<string, string> _matchSelections { get; set; } = new Dictionary<string, string>();
+
+    private IEnumerable<QuestionOptionDto> _previousQuestionOptions = default!;
+    private int _previousSeed;
     private int _currentScore = 0;
 
     [Parameter]
@@ -27,6 +30,12 @@
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
+
+        if (QuestionOptions == _previousQuestionOptions && Seed == _previousSeed)
+            return;
+
+        _previousQuestionOptions = QuestionOptions;
+        _previousSeed = Seed;
 
         Random _rnd = new(Seed);
 
@@ -55,7 +64,7 @@
         _secondParts = tempS;
 
         _matchSelections.Clear();
-        
+
         foreach (string key in _secondParts)
             _matchSelections[key] = "";
     }
