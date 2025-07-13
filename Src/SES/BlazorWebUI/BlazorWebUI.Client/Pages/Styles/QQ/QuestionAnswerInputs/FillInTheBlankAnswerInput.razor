@@ -29,8 +29,11 @@
 
         _fillInTheBlankKeywordsCount = (uint)GetFillInTheBlankKeywords().Count();
 
-        foreach (string str in GetFillInTheBlankKeywords())
-            _keywordCheckedStatusDict[str] = false;
+        if (_keywordCheckedStatusDict.Count == 0)
+            foreach (string str in GetFillInTheBlankKeywords())
+                _keywordCheckedStatusDict[str] = false;
+
+
     }
 
     private IEnumerable<string> GetFillInTheBlankKeywords()
@@ -56,25 +59,16 @@
     private void ToggleFillInTheBlankAnswerCheck(bool checkStatus, string keyword)
     {
         _keywordCheckedStatusDict[keyword] = checkStatus;
-        switch (checkStatus)
-        {
-            case true:
-                {
-                    _keywordList += keyword + ",";
-                    _perKeywordScore += (double)ScoreMax / _fillInTheBlankKeywordsCount;
-                    break;
-                }
 
-            case false:
-                {
-                    _keywordList = _keywordList.Replace($"{keyword},", string.Empty);
-                    _perKeywordScore -= (double)ScoreMax / _fillInTheBlankKeywordsCount;
-                    break;
-                }
-        }
+        IEnumerable<string> checkedKeywords = _keywordCheckedStatusDict.Where(x => x.Value).Select(x => x.Key);
+        _keywordList = string.Join(",", checkedKeywords);
 
+        _perKeywordScore = (double)ScoreMax * checkedKeywords.Count() / _fillInTheBlankKeywordsCount;
         _score = (int)Math.Round(_perKeywordScore, 2, MidpointRounding.ToEven);
+
         UpdateEvaluationStatus();
+        OnScore.InvokeAsync(_score);
+        OnFillInTheBlankKeywords.InvokeAsync(_keywordList);
     }
 
     private void OnScoreInputChanged(ChangeEventArgs args)
@@ -96,6 +90,7 @@
             _selectedEvaluationStatus = 8;
         else if (_score == ScoreMax)
             _selectedEvaluationStatus = 9;
+        OnEvaluationStatus.InvokeAsync(_selectedEvaluationStatus);
     }
 
     private void EvaluationStatusChanged(ChangeEventArgs args)

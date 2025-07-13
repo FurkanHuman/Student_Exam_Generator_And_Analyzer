@@ -26,10 +26,17 @@
     {
         base.OnParametersSet();
         _openEndedKeywordsCount = (uint)GetOpenEndedKeywords().Count();
-        foreach (string str in GetOpenEndedKeywords())
-            _keywordCheckedStatusDict[str] = false;
+        if (_keywordCheckedStatusDict.Count == 0)
+            foreach (string str in GetOpenEndedKeywords())
+                _keywordCheckedStatusDict[str] = false;
+
+        LoadExistingAnswer();
     }
 
+    private void LoadExistingAnswer()
+    {
+
+    }
 
     private IEnumerable<string> GetOpenEndedKeywords()
     {
@@ -54,27 +61,17 @@
     private void ToggleOpenEndedAnswerCheck(bool checkStatus, string keyword)
     {
         _keywordCheckedStatusDict[keyword] = checkStatus;
-        switch (checkStatus)
-        {
-            case true:
-                {
-                    _keywordList += keyword + ",";
-                    _perKeywordScore += (double)ScoreMax / _openEndedKeywordsCount;
-                    break;
-                }
 
-            case false:
-                {
-                    _keywordList = _keywordList.Replace($"{keyword},", string.Empty);
-                    _perKeywordScore -= (double)ScoreMax / _openEndedKeywordsCount;
-                    break;
-                }
-        }
+        IEnumerable<string> checkedKeywords = _keywordCheckedStatusDict.Where(x => x.Value).Select(x => x.Key);
+        _keywordList = string.Join(",", checkedKeywords);
 
+        _perKeywordScore = (double)ScoreMax * checkedKeywords.Count() / _openEndedKeywordsCount;
         _score = (int)Math.Round(_perKeywordScore, 2, MidpointRounding.ToEven);
-        UpdateEvaluationStatus();
-    }
 
+        UpdateEvaluationStatus();
+        OnScore.InvokeAsync(_score);
+        OnOpenEndedKeywords.InvokeAsync(_keywordList);
+    }
 
     private void OnScoreInputChanged(ChangeEventArgs args)
     {
@@ -95,6 +92,7 @@
             _selectedEvaluationStatus = 8;
         else if (_score == ScoreMax)
             _selectedEvaluationStatus = 9;
+        OnEvaluationStatus.InvokeAsync(_selectedEvaluationStatus);
     }
 
     private void EvaluationStatusChanged(ChangeEventArgs args)
@@ -165,13 +163,13 @@
 <div class="input-group rounded border" style="width:12rem;">
     <label class="input-group-text">Puanı:</label>
     <InputNumber type="number" class="form-control conversion" id="ScoreInput" min="0" max="@ScoreMax" TValue="int"
-        @oninput="OnScoreInputChanged" @bind-Value="_score" />
+                 @oninput="OnScoreInputChanged" @bind-Value="_score" />
 </div>
 
 <div class="d-flex align-items-center gap-2 flex-wrap bg-light text-dark border rounded">
     <label class="input-group-text">Durum:</label>
     <InputSelect class="form-select w-auto" TValue="byte" @oninput="EvaluationStatusChanged"
-        @bind-Value="_selectedEvaluationStatus">
+                 @bind-Value="_selectedEvaluationStatus">
 
         @foreach (KeyValuePair<byte, string> status in QQStatic.EvaluationStatusTUR)
         {
