@@ -1,3 +1,4 @@
+using Application.Features.StudentAnswers.Commands.CreateMultiple;
 using Application.Features.StudentAnswers.Constants;
 using Application.Services.Repositories;
 using Domain.Entities;
@@ -29,6 +30,20 @@ public class StudentAnswerBusinessRules : BaseBusinessRules
         if (studentAnswer == null)
             await throwBusinessException(StudentAnswersBusinessMessages.StudentAnswerNotExists);
     }
+
+    public async Task CheckIfStudentAnswersExistAsync(IList<MultipleStudentAnswer> studentAnswers)
+    {
+        foreach (MultipleStudentAnswer sa in studentAnswers)
+        {
+            bool exists = await _studentAnswerRepository.AnyAsync(s =>
+                                                                  s.StudentId == sa.StudentId &&
+                                                                  s.ExamId == sa.ExamId);
+
+            if (exists)
+                await throwBusinessException(StudentAnswersBusinessMessages.StudentAnswerIsExists);
+        }
+    }
+
 
     public async Task StudentAnswerIdShouldExistWhenSelected(Guid id, CancellationToken cancellationToken)
     {
