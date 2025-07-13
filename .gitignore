@@ -407,3 +407,4 @@ Src/SES/WebAPI/*
 /Src/SES/BlazorWebUI/BlazorWebUI/appsettings.json
 /QuestPdfTest
 /PDFTEST
+/Src/SES/WebAPI/WebAPI.csproj
