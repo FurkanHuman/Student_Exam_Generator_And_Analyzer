@@ -13,7 +13,7 @@ namespace Persistence.EntityConfigurations
 
             builder.Property(sa => sa.StudentId).IsRequired();
             builder.Property(sa => sa.QuizQuestionId).IsRequired();
-            builder.Property(sa => sa.QuestionScoreId);
+
             builder.Property(sa => sa.QuestionOptionId);
             builder.Property(sa => sa.ExamId).IsRequired();
 
@@ -22,7 +22,6 @@ namespace Persistence.EntityConfigurations
             builder.Property(sa => sa.AnswerText);
             builder.Property(sa => sa.GivenScore);
 
-            builder.HasOne(sa => sa.QuestionScore);
             builder.HasOne(sa => sa.Student);
             builder.HasOne(sa => sa.QuizQuestion);
             builder.HasOne(sa => sa.QuestionOption);

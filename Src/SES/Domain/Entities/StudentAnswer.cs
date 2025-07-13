@@ -17,9 +17,6 @@ public class StudentAnswer : Entity<Guid>
     public Guid? QuestionOptionId { get; set; }
     public virtual QuestionOption? QuestionOption { get; set; }
 
-    public int? QuestionScoreId { get; set; }
-    public virtual QuestionScore? QuestionScore { get; set; }
-
     public string? AnswerText { get; set; }
     public int? GivenScore { get; set; }
 
