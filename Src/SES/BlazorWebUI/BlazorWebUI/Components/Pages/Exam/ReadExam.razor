@@ -94,13 +94,17 @@
                     {
                         _questionOrder++;
                         <div class="mb-4">
-                            <QuestionAnswerInput QuestionData="qq"
+                            <QuestionAnswerInput @key="@($"question_{qq.Id}_{_selectedStudentId}")"
+                                                 QuestionData="qq"
+                                                 OnQAnswer="(answer) => QuestionAnswerHandler(answer, qq.Id)"
                                                  IsCustomScore="false"
                                                  Seed="_golablSeed"
-                                                 QuestionOrder="_questionOrder" />
+                                                 QuestionOrder="_questionOrder"
+                                                 ExistingAnswer="@GetExistingAnswer(qq.Id)" />
                         </div>
                     }
                 }
+
                 else if (_selectedStudentId != 0)
                 {
                     <div class="alert alert-info mt-4">
@@ -137,11 +141,12 @@
     private int _questionOrder { get; set; } = 0;
 
     private GetStudentsByIdsListItemDto _selectedStudent { get; set; } = default!;
+    private GetListExamByLessonIdDto _selectedExam { get; set; } = default!;
 
     private IEnumerable<GetListExamByLessonIdDto> _exams { get; set; } = [];
     private IEnumerable<QQBodyDto> _quizQuestionsList { get; set; } = [];
     private IList<QQBodyDto> _quizQuestionsListForExamByOrdered { get; set; } = [];
-
+    private IList<QuestionAnswerDto> _questionAnswers { get; set; } = [];
 
     private GetListResponse<GetStudentsByIdsListItemDto> _students { get; set; } = default!;
     private GetListResponse<GetQuizQuestionsByIdsListItemDto> _quizQuestions { get; set; } = default!;
@@ -165,9 +170,50 @@
         StateHasChanged();
     }
 
+    private void QuestionAnswerHandler(QuestionAnswerDto answer, int id)
+    {
+        _questionOrder = 0;
+        if (answer == null || id <= 0)
+            return;
+
+        QuestionAnswerDto? existingAnswer = _questionAnswers.FirstOrDefault(x => x.QuizQuestionId == id);
+
+        if (existingAnswer != null)
+        {
+            existingAnswer.StudentId = _selectedStudentId;
+            existingAnswer.ExamId = _selectedExam.Id;
+            existingAnswer.AnswerText = answer.AnswerText;
+            existingAnswer.GivenScore = answer.GivenScore;
+            existingAnswer.QuestionOptionId = answer.QuestionOptionId;
+            existingAnswer.EvaluationStatus = answer.EvaluationStatus;
+        }
+
+        else
+        {
+            _questionAnswers.Add(new QuestionAnswerDto
+            {
+                QuizQuestionId = id,
+                AnswerText = answer.AnswerText,
+                GivenScore = answer.GivenScore,
+                QuestionOptionId = answer.QuestionOptionId,
+                EvaluationStatus = answer.EvaluationStatus,
+                StudentId = _selectedStudentId,
+                EvaluationOrigin = 1,
+                ExamId = _selectedExam.Id
+            });
+        }
+    }
+
+    private QuestionAnswerDto? GetExistingAnswer(int questionId)
+    {
+        return _questionAnswers.FirstOrDefault(x => x.QuizQuestionId == questionId);
+    }
+
     private void SaveExam()
     {
+        // save exam logic here
         _modalOfSaving.Open();
+
     }
 
     private void PrepareStudentExam(int studentId)
@@ -176,19 +222,22 @@
         {
             _selectedStudent = default!;
             _quizQuestionsListForExamByOrdered = [];
+            _questionAnswers.Clear();
             return;
         }
 
         _selectedStudent = _students.Items.FirstOrDefault(x => x.Id == studentId, defaultValue: default!);
-        GetListExamByLessonIdDto selectedExam = _exams.FirstOrDefault(x => x.StudentId == studentId, default!);
+        _selectedExam = _exams.FirstOrDefault(x => x.StudentId == studentId, default!);
 
-        if (selectedExam == null) return;
+        if (_selectedExam == null) return;
 
-        IList<QQBodyDto> qQBodies = _quizQuestionsList.Where(x => selectedExam.QuizQuestionsIds.Contains(x.Id)).ToList();
+        _questionAnswers.Clear();
 
-        ExamInfo examInfo = JsonSerializer.Deserialize<ExamInfo>(selectedExam.ExamConfigurationStr)!;
+        IList<QQBodyDto> qQBodies = _quizQuestionsList.Where(x => _selectedExam.QuizQuestionsIds.Contains(x.Id)).ToList();
 
-        int seed = (int)ExamQQHelper.DecodeBase32String(selectedExam.ExamCode);
+        ExamInfo examInfo = JsonSerializer.Deserialize<ExamInfo>(_selectedExam.ExamConfigurationStr)!;
+
+        int seed = (int)ExamQQHelper.DecodeBase32String(_selectedExam.ExamCode);
         _golablSeed = seed;
 
         ExamQQHelper.ShuffleQuizQuestions(ref qQBodies, examInfo, seed);
