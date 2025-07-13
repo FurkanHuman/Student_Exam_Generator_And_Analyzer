@@ -401,6 +401,7 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 Src/SES/Persistence/Migrations/*
+Src/SES/WebAPI/*
 /.sonarqube
 /CMDREader
 /Src/SES/BlazorWebUI/BlazorWebUI/appsettings.json
