@@ -1,6 +1,8 @@
 ﻿@using BlazorWebUI.Client.Pages.Styles.QQ.QuestionAnswerInputs
 @rendermode InteractiveAuto
 @code {
+    private QuestionAnswerDto QuestionAnswer { get; set; } = new();
+
     private IEnumerable<QuestionOptionDto> QuestionOptions { get; set; } = [];
 
     [Parameter]
@@ -16,22 +18,35 @@
     public QQBodyDto QuestionData { get; set; } = default!;
 
     [Parameter]
-    public EventCallback<byte> OnEvaluationStatus { get; set; }
+    public QuestionAnswerDto? ExistingAnswer { get; set; }
 
     [Parameter]
-    public EventCallback<int> OnScore { get; set; }
-
-    [Parameter]
-    public EventCallback<string> OnAnswerText { get; set; }
-
-    [Parameter]
-    public EventCallback<Guid?> OnQOptionAnswerId { get; set; }
+    public EventCallback<QuestionAnswerDto> OnQAnswer { get; set; }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         if (QuestionData != null)
             QuestionOptions = QuestionData.QuestionOptions ?? new List<QuestionOptionDto>();
+
+        if (ExistingAnswer != null)
+        {
+            QuestionAnswer = new QuestionAnswerDto
+            {
+                QuizQuestionId = ExistingAnswer.QuizQuestionId,
+                AnswerText = ExistingAnswer.AnswerText,
+                GivenScore = ExistingAnswer.GivenScore,
+                QuestionOptionId = ExistingAnswer.QuestionOptionId,
+                EvaluationStatus = ExistingAnswer.EvaluationStatus,
+                StudentId = ExistingAnswer.StudentId,
+                ExamId = ExistingAnswer.ExamId,
+                EvaluationOrigin = ExistingAnswer.EvaluationOrigin
+            };
+        }
+        else
+        {
+            QuestionAnswer = new QuestionAnswerDto();
+        }
 
     }
 
@@ -40,6 +55,30 @@
         if (IsCustomScore)
             return QuestionData.MaxScore;
         return QuestionData.Score;
+    }
+
+    private async Task OnScoreChanged(int score)
+    {
+        QuestionAnswer.GivenScore = score;
+        await OnQAnswer.InvokeAsync(QuestionAnswer);
+    }
+
+    private async Task OnAnswerText(string answerText)
+    {
+        QuestionAnswer.AnswerText = answerText;
+        await OnQAnswer.InvokeAsync(QuestionAnswer);
+    }
+
+    private async Task OnEvaluationStatus(byte status)
+    {
+        QuestionAnswer.EvaluationStatus = status;
+        await OnQAnswer.InvokeAsync(QuestionAnswer);
+    }
+
+    private async Task OnOptionId(Guid? optionId)
+    {
+        QuestionAnswer.QuestionOptionId = optionId;
+        await OnQAnswer.InvokeAsync(QuestionAnswer);
     }
 }
 
@@ -58,9 +97,9 @@
                         {
                             <OpenEndedAnswerInput QuestionOptions="QuestionOptions"
                                                   ScoreMax="GetMaxScoreLimit()"
-                                                  OnScore="(s) => OnScore.InvokeAsync(s)"
-                                                  OnOpenEndedKeywords="(k) => OnAnswerText.InvokeAsync(k)"
-                                                  OnEvaluationStatus="(e) => OnEvaluationStatus.InvokeAsync(e)" />
+                                                  OnScore="(s) => OnScoreChanged(s)"
+                                                  OnOpenEndedKeywords="(k) => OnAnswerText(k)"
+                                                  OnEvaluationStatus="(e) => OnEvaluationStatus(e)" />
 
                             break;
                         }
@@ -68,9 +107,9 @@
                         {
                             <MultipleChoiceAnswerInput QuestionOptions="QuestionOptions"
                                                        ScoreMax="GetMaxScoreLimit()"
-                                                       OnScore="(s) => OnScore.InvokeAsync(s)"
-                                                       OnOptionId="(OId)=>OnQOptionAnswerId.InvokeAsync(OId)"
-                                                       OnEvaluationStatus="(e)=>OnEvaluationStatus.InvokeAsync(e)" />
+                                                       OnScore="(s) => OnScoreChanged(s)"
+                                                       OnOptionId="(OId) => OnOptionId(OId)"
+                                                       OnEvaluationStatus="(e) => OnEvaluationStatus(e)" />
                             break;
                         }
 
@@ -78,27 +117,27 @@
                         {
                             <TrueFalseAnswerInput QuestionOptions="QuestionOptions"
                                                   ScoreMax="GetMaxScoreLimit()"
-                                                  OnScore="(s) => OnScore.InvokeAsync(s)"
-                                                  OnEncodedOptionAnswers="(k)=>OnAnswerText.InvokeAsync(k)"
-                                                  OnEvaluationStatus="(e) => OnEvaluationStatus.InvokeAsync(e)" />
+                                                  OnScore="(s) => OnScoreChanged(s)"
+                                                  OnEncodedOptionAnswers="(k) => OnAnswerText(k)"
+                                                  OnEvaluationStatus="(e) => OnEvaluationStatus(e)" />
                             break;
                         }
                     case 5: // Fill in the blank
                         {
                             <FillInTheBlankAnswerInput QuestionOptions="QuestionOptions"
                                                        ScoreMax="GetMaxScoreLimit()"
-                                                       OnScore="(s) => OnScore.InvokeAsync(s)"
-                                                       OnFillInTheBlankKeywords="(k) => OnAnswerText.InvokeAsync(k)"
-                                                       OnEvaluationStatus="(e) => OnEvaluationStatus.InvokeAsync(e)" />
+                                                       OnScore="(s) => OnScoreChanged(s)"
+                                                       OnFillInTheBlankKeywords="(k) => OnAnswerText(k)"
+                                                       OnEvaluationStatus="(e) => OnEvaluationStatus(e)" />
                             break;
                         }
                     case 6: // Matching
                         {
                             <MatchingAnswerInput QuestionOptions="QuestionOptions"
                                                  ScoreMax="GetMaxScoreLimit()"
-                                                 OnScore="(s) => OnScore.InvokeAsync(s)"
-                                                 OnEncodedOptionAnswers="(k) => OnAnswerText.InvokeAsync(k)"
-                                                 OnEvaluationStatus="(e) => OnEvaluationStatus.InvokeAsync(e)"
+                                                 OnScore="(s) => OnScoreChanged(s)"
+                                                 OnEncodedOptionAnswers="(k) => OnAnswerText(k)"
+                                                 OnEvaluationStatus="(e) => OnEvaluationStatus(e)"
                                                  Seed="Seed" />
                             break;
                         }
