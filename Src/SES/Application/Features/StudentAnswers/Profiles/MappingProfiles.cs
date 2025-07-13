@@ -1,4 +1,5 @@
 using Application.Features.StudentAnswers.Commands.Create;
+using Application.Features.StudentAnswers.Commands.CreateMultiple;
 using Application.Features.StudentAnswers.Commands.Delete;
 using Application.Features.StudentAnswers.Commands.Update;
 using Application.Features.StudentAnswers.Queries.GetById;
@@ -24,6 +25,8 @@ public class MappingProfiles : Profile
         CreateMap<StudentAnswer, DeletedStudentAnswerResponse>();
 
         CreateMap<StudentAnswer, GetByIdStudentAnswerResponse>();
+
+        CreateMap<MultipleStudentAnswer, StudentAnswer>();
 
         CreateMap<StudentAnswer, GetListStudentAnswerListItemDto>();
         CreateMap<IPaginate<StudentAnswer>, GetListResponse<GetListStudentAnswerListItemDto>>();

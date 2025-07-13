@@ -1,5 +1,6 @@
 ﻿using Application.Features.QuizQuestions.Queries.GetByLessonId;
 using Application.Features.QuizQuestions.Queries.GetQuizQuestionsByIds;
+using Application.Features.StudentAnswers.Commands.CreateMultiple;
 using AutoMapper;
 using BlazorWebUI.Client.Pages.Styles.QQ;
 using Domain.Entities;
@@ -23,5 +24,7 @@ public class MappingProfiles : Profile
         CreateMap<GetQuizQuestionsByIdsListItemDto, QQBodyDto>()
             .ForMember(dest => dest.SelectedQType, opt => opt.MapFrom(src => src.QuestionType))
             .ForMember(dest => dest.QuestionOptions, opt => opt.MapFrom(src => src.Options));
+        CreateMap<QuestionAnswerDto, MultipleStudentAnswer>();
+
     }
 }
