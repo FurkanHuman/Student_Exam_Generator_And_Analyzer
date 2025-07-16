@@ -1,0 +1,26 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <main>
+        <header class="bg-white border-bottom shadow-sm py-2 px-3 px-md-4">
+            <div class="container-fluid d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                <div class="text-muted small text-center text-md-start">
+                    Bu proje açık kaynaklı, özgür ve tamamen ücretsizdir. Sen de katkı sağlayarak bu yolculuğun bir parçası olabilirsin.
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap justify-content-center">
+                    <a class="btn btn-outline-secondary btn-sm d-flex align-items-center" href="https://github.com/FurkanHuman/Student_Exam_Generator_And_Analyzer" target="_blank" title="GitHub'da Görüntüle">
+                        <img src="github-mark.svg" alt="GitHub" style="height: 1em; margin-right: 0.5em;">GitHub
+                    </a>
+
+                    <a class="btn btn-info btn-sm" href="/SupportMe" target="_blank" title="Projeyi Destekle">
+                        ❤️ Destek Ol
+                    </a>
+                </div>
+            </div>
+        </header>
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
