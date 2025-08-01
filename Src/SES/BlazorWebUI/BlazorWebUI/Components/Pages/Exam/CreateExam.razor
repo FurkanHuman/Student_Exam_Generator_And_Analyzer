@@ -15,6 +15,7 @@
 @using Microsoft.AspNetCore.Identity
 @using NArchitecture.Core.Application.Requests
 @using NArchitecture.Core.Application.Responses
+@using System.Security.Claims
 @rendermode InteractiveServer
 @inject IMediator _mediator
 @inject IMapper _mapper
@@ -49,16 +50,16 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await _authStateProvider.GetAuthenticationStateAsync();
-        var userPrincipal = authState.User;
+        AuthenticationState authState = await _authStateProvider.GetAuthenticationStateAsync();
+        ClaimsPrincipal userPrincipal = authState.User;
 
         if (userPrincipal.Identity?.IsAuthenticated == true)
         {
-            var user = await _userManager.GetUserAsync(userPrincipal);
-            if (user is not null)
+            ApplicationUser? user = await _userManager.GetUserAsync(userPrincipal);
+            if (user != null)
             {
                 Personel? personel = await _personelService.GetByIdAsync(user.PersonelId);
-                if (personel is not null)
+                if (personel != null)
                     _personelGuid = personel.Id;
             }
         }
