@@ -5,15 +5,22 @@
 @using Application.Features.Students.Queries.GetStudentsByIds
 @using Application.Services.PdfFactory.CreateExamPdf.DTOs
 @using Application.Services.PdfFactory.CreateExamPdf.Helpers
+@using Application.Services.Personels
 @using AutoMapper
 @using BlazorWebUI.Client.Pages.Styles
 @using BlazorWebUI.Client.Pages.Styles.QQ
+@using Domain.Entities
+@using Microsoft.AspNetCore.Identity
 @using NArchitecture.Core.Application.Responses
 @using System.Text.Json
+@using System.Security.Claims
 
 @rendermode InteractiveServer
 @inject IMediator _mediator
 @inject IMapper _mapper
+@inject IPersonelService _personelService
+@inject UserManager<ApplicationUser> _userManager
+@inject AuthenticationStateProvider _authStateProvider
 
 <ExamLoader OnExamsSelected="LoadExamFromLoader" IsVisible="_isvisibleForLoader" />
 
@@ -121,6 +128,9 @@
 
 
 @code {
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
     private ModalDialog _modalOfSaving { get; set; } = default!;
 
     private bool _isvisibleForLoader { get; set; } = true;
@@ -128,6 +138,8 @@
     private int _selectedStudentId { get; set; } = 0;
     private int _golablSeed { get; set; } = 0;
     private int _questionOrder { get; set; } = 0;
+
+    private Guid _personelGuid;
 
     private GetStudentsByIdsListItemDto _selectedStudent { get; set; } = default!;
     private GetListExamByLessonIdDto _selectedExam { get; set; } = default!;
@@ -140,6 +152,23 @@
 
     private GetListResponse<GetStudentsByIdsListItemDto> _students { get; set; } = default!;
     private GetListResponse<GetQuizQuestionsByIdsListItemDto> _quizQuestions { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AuthenticationState authState = await _authStateProvider.GetAuthenticationStateAsync();
+        ClaimsPrincipal userPrincipal = authState.User;
+
+        if (userPrincipal.Identity?.IsAuthenticated == true)
+        {
+            ApplicationUser? user = await _userManager.GetUserAsync(userPrincipal);
+            if (user != null)
+            {
+                Personel? personel = await _personelService.GetByIdAsync(user.PersonelId);
+                if (personel != null)
+                    _personelGuid = personel.Id;
+            }
+        }
+    }
 
     private async Task LoadExamFromLoader(IEnumerable<GetListExamByLessonIdDto> args)
     {
@@ -205,7 +234,8 @@
         List<QuestionAnswerDto> questionAnswers = _questionAnswers.ToList();
         CreateMultipleStudentAnswerCommand cmd = new()
         {
-            StudentAnswers = _mapper.Map<IList<MultipleStudentAnswer>>(questionAnswers)
+            StudentAnswers = _mapper.Map<IList<MultipleStudentAnswer>>(questionAnswers),
+            ReviewerPersonelId = _personelGuid
         };
 
         await _mediator.Send(cmd);
