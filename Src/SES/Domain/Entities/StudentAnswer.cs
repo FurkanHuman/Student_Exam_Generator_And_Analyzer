@@ -5,6 +5,9 @@ namespace Domain.Entities;
 
 public class StudentAnswer : Entity<Guid>
 {
+    public int ReviewerTeacherId { get; set; }
+    public Teacher ReviewerTeacher { get; set; }
+
     public int StudentId { get; set; }
     public virtual Student Student { get; set; }
 

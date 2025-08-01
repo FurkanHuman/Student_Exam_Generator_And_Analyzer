@@ -11,6 +11,8 @@ namespace Persistence.EntityConfigurations
         {
             builder.HasKey(sa => sa.Id);
 
+            builder.Property(sa => sa.ReviewerTeacherId).IsRequired();
+
             builder.Property(sa => sa.StudentId).IsRequired();
             builder.Property(sa => sa.QuizQuestionId).IsRequired();
 
@@ -26,6 +28,7 @@ namespace Persistence.EntityConfigurations
             builder.HasOne(sa => sa.QuizQuestion);
             builder.HasOne(sa => sa.QuestionOption);
             builder.HasOne(sa => sa.Exam);
+            builder.HasOne(sa => sa.ReviewerTeacher);
 
             builder.Property(sa => sa.CreatedDate).IsRequired();
             builder.Property(sa => sa.UpdatedDate);
