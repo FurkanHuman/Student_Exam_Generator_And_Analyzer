@@ -6,6 +6,11 @@ public class CreateMultipleStudentAnswerCommandValidator : AbstractValidator<Cre
 {
     public CreateMultipleStudentAnswerCommandValidator()
     {
+        RuleFor(x => x.ReviewerPersonelId)
+            .NotEmpty()
+            .NotNull()
+            .WithMessage("Reviewer personnel ID cannot be empty or null.");
+
         RuleFor(x => x.StudentAnswers)
             .NotEmpty().NotNull()
             .WithMessage("Student answers cannot be empty.");

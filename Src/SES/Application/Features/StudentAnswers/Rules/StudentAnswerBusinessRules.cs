@@ -54,4 +54,11 @@ public class StudentAnswerBusinessRules : BaseBusinessRules
         );
         await StudentAnswerShouldExistWhenSelected(studentAnswer);
     }
+
+    internal async Task CheckIfReviewerTeacherExistsAsync(Teacher? teacher)
+    {
+        if (teacher == null)
+            await throwBusinessException(StudentAnswersBusinessMessages.ReviewerTeacherNotExists);
+
+    }
 }
