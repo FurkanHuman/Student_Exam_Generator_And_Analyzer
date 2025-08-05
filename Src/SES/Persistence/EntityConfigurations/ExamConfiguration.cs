@@ -39,11 +39,11 @@ internal class ExamConfiguration : IEntityTypeConfiguration<Exam>, IMainConfigur
         builder.HasOne(e => e.School);
         builder.HasOne(e => e.ReferenceBenefit);
         builder.HasOne(e => e.ExamAuthor).WithMany(t => t.ExamAuthors).HasForeignKey(e => e.ExamAuthorId);
+        builder.HasOne(e => e.StudentExamAnswer);
         builder.HasMany(e => e.Analyses);
         builder.HasMany(e => e.Teachers);
         builder.HasMany(e => e.StudentClasses);
         builder.HasMany(e => e.QuizQuestions);
-        builder.HasMany(e => e.StudentAnswers);
 
         builder.Property(e => e.CreatedDate).IsRequired();
         builder.Property(e => e.UpdatedDate);

@@ -26,6 +26,7 @@ internal class TeacherConfiguration : IEntityTypeConfiguration<Teacher>, IMainCo
         builder.HasMany(t => t.StudentAnswers);
         builder.HasMany(t => t.Students);
         builder.HasMany(t => t.Lessons);
+        builder.HasMany(t => t.StudentExamAnswers);
 
         builder.Property(t => t.CreatedDate).IsRequired();
         builder.Property(t => t.UpdatedDate);

@@ -26,6 +26,7 @@ public class Exam : Entity<int>
     public School School { get; set; }
     public ReferenceBenefit ReferenceBenefit { get; set; }
     public Teacher ExamAuthor { get; set; }
+    public StudentExamAnswer StudentExamAnswer { get; set; }
 
     public EvaluationOrigin EvaluationOrigin { get; set; }
     public IDictionary<int, int> QuestionOrderMap { get; set; } // key is question Id, value is exam question order
@@ -34,5 +35,4 @@ public class Exam : Entity<int>
     public IList<Teacher> Teachers { get; set; }
     public IList<StudentClass> StudentClasses { get; set; }
     public IList<QuizQuestion> QuizQuestions { get; set; }
-    public IList<StudentAnswer> StudentAnswers { get; set; }
 }

@@ -5,14 +5,8 @@ namespace Domain.Entities;
 
 public class StudentAnswer : Entity<Guid>
 {
-    public int ReviewerTeacherId { get; set; }
-    public Teacher ReviewerTeacher { get; set; }
-
-    public int StudentId { get; set; }
-    public virtual Student Student { get; set; }
-
-    public int ExamId { get; set; }
-    public virtual Exam Exam { get; set; }
+    public Guid StudentExamAnswerId { get; set; }
+    public virtual StudentExamAnswer StudentExamAnswer { get; set; }
 
     public int QuizQuestionId { get; set; }
     public virtual QuizQuestion QuizQuestion { get; set; }
@@ -23,6 +17,6 @@ public class StudentAnswer : Entity<Guid>
     public string? AnswerText { get; set; }
     public int? GivenScore { get; set; }
 
-    public EvaluationOrigin EvaluationOrigin { get; set; }
     public EvaluationStatus EvaluationStatus { get; set; }
+
 }

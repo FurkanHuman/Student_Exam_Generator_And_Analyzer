@@ -17,4 +17,5 @@ public class Teacher : Entity<int>
     public IList<StudentAnswer> StudentAnswers { get; set; }
     public IList<Student> Students { get; set; }
     public IList<Lesson> Lessons { get; set; }
+    public IList<StudentExamAnswer> StudentExamAnswers { get; set; }
 }
