@@ -1,25 +1,18 @@
-name: Build Test
-
-on:
-  push:
-    branches:
-      - '**'
-  pull_request:
-
 jobs:
   build-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      - name: Set up .NET
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x' # Projene uygun versiyon
+          dotnet-version: '8.0.x'
 
-      - name: Restore dependencies
-        run: dotnet restore
+      - name: Restore all existing projects
+        run: find . -name "*.csproj" -exec dotnet restore {} \;
 
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
+      - name: Build all existing projects
+        run: find . -name "*.csproj" -exec dotnet build {} --configuration Release \;
