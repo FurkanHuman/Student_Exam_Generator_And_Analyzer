@@ -27,7 +27,7 @@ COPY ["Src/SES/Application/Application.csproj", "Src/SES/Application/"]
 COPY ["Src/SES/Domain/Domain.csproj", "Src/SES/Domain/"]
 COPY ["Src/SES/Infrastructure/Infrastructure.csproj", "Src/SES/Infrastructure/"]
 COPY ["Src/SES/Persistence/Persistence.csproj", "Src/SES/Persistence/"]
-RUN dotnet restore "./Src/SES/BlazorWebUI/BlazorWebUI/BlazorWebUI.csproj"
+RUN dotnet restore --disable-parallel "Src/SES/BlazorWebUI/BlazorWebUI/BlazorWebUI.csproj"
 
 COPY . .
 WORKDIR "/src/Src/SES/BlazorWebUI/BlazorWebUI"
