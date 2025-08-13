@@ -42,8 +42,8 @@ public class CreateMultipleStudentAnswerCommand : IRequest<CreateMultipleStudent
 
             await _studentAnswerBusinessRules.CheckIfReviewerTeacherExistsAsync(teacher);
 
-            foreach (StudentAnswer studentAnswer in studentAnswers)
-                studentAnswer.ReviewerTeacherId = teacher!.Id;
+            // foreach (StudentAnswer studentAnswer in studentAnswers)
+            //     studentAnswer.ReviewerTeacherId = teacher!.Id;
 
             await _studentAnswerRepository.AddRangeAsync(studentAnswers, cancellationToken);
 

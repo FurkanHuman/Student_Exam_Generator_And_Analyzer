@@ -35,9 +35,10 @@ public class StudentAnswerBusinessRules : BaseBusinessRules
     {
         foreach (MultipleStudentAnswer sa in studentAnswers)
         {
-            bool exists = await _studentAnswerRepository.AnyAsync(s =>
-                                                                  s.StudentId == sa.StudentId &&
-                                                                  s.ExamId == sa.ExamId);
+            bool exists = false;
+            //  await _studentAnswerRepository.AnyAsync(s =>
+            //                                                       s.StudentId == sa.StudentId &&
+            //                                                       s.ExamId == sa.ExamId);
 
             if (exists)
                 await throwBusinessException(StudentAnswersBusinessMessages.StudentAnswerIsExists);
