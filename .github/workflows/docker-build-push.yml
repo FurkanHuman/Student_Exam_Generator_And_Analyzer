@@ -36,6 +36,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./.Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           tags: ${{ secrets.DOCKER_USERNAME }}/ses:${{ env.VERSION }}
