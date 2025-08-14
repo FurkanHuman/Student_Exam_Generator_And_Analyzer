@@ -30,7 +30,7 @@ RUN dotnet restore "Src/SES/BlazorWebUI/BlazorWebUI/BlazorWebUI.csproj" --arch $
 
 COPY . .
 WORKDIR "/src/Src/SES/BlazorWebUI/BlazorWebUI"
-RUN dotnet build "./BlazorWebUI.csproj" -c Release --no-restore
+RUN dotnet build "./BlazorWebUI.csproj" -c Release
 
 # Publish stage
 FROM build AS publish
