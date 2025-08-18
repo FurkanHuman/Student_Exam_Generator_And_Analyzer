@@ -4,7 +4,7 @@ namespace Domain.Entities;
 
 public class Analysis : Entity<int>
 {
-    public string FooterNote { get; set; }
+    public string AIResponse { get; set; }
     public int SemesterId { get; set; }
     public int PrincipalId { get; set; }
     public int SchoolId { get; set; }
@@ -18,6 +18,6 @@ public class Analysis : Entity<int>
     public ReferenceBenefit ReferenceBenefit { get; set; }
 
     public IList<Exam> Exams { get; set; }
-    public IList<StudentAnswer> StudentAnswers { get; set; }
+    public IList<StudentExamAnswer> StudentExamAnswers { get; set; }
     public IList<Teacher> Teachers { get; set; }
 }

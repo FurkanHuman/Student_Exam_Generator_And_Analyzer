@@ -11,7 +11,7 @@ internal class AnalysisConfiguration : IEntityTypeConfiguration<Analysis>, IMain
     {
         builder.HasKey(a => a.Id);
         builder.Property(a => a.Id).IsRequired();
-        builder.Property(a => a.FooterNote);
+        builder.Property(a => a.AIResponse);
         builder.Property(a => a.SemesterId).IsRequired();
         builder.Property(a => a.PrincipalId).IsRequired();
         builder.Property(a => a.SchoolId).IsRequired();
@@ -25,7 +25,7 @@ internal class AnalysisConfiguration : IEntityTypeConfiguration<Analysis>, IMain
         builder.HasOne(a => a.ReferenceBenefit);
 
         builder.HasMany(a => a.Exams);
-        builder.HasMany(a => a.StudentAnswers);
+        builder.HasMany(a => a.StudentExamAnswers);
         builder.HasMany(a => a.Teachers);
 
         builder.Property(a => a.CreatedDate).IsRequired();
