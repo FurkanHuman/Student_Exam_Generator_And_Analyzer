@@ -69,7 +69,16 @@ Whether you’re an individual teacher, a school, or an institution, S.E.S. can 
 
 ## 🔄 Contribution Guidelines
 
-* 💬 Use [Semantic Commit Messages](https://github.com/FurkanHuman/Student_Exam_Generator_And_Analyzer/blob/Main/Docs/Semantic%20Commit%20Messages.md) to keep the git history clean and meaningful.
+* If you are interested in Contributing to this Project checkout the [Contributing Guidelines](https://github.com/FurkanHuman/Student_Exam_Generator_And_Analyzer/blob/Main/CONTRIBUTING.md)
+
+---
+
+# 📝 Feature Requests
+
+If you’d like to see a new feature added, please open a feature request using our  
+[Feature Request Template](https://github.com/FurkanHuman/Student_Exam_Generator_And_Analyzer/blob/Main/.github/ISSUE_TEMPLATE/feature_request.md).
+
+We appreciate your feedback and contributions!
 
 ---
 
