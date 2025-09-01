@@ -60,6 +60,7 @@ If you find a bug or have a suggestion, please open an issue following these gui
 - Describe the problem clearly.
 - Provide steps to reproduce it.
 - Suggest possible solutions if applicable.
+- For more detailed information checkout [Bug Report Guideline](https://github.com/FurkanHuman/Student_Exam_Generator_And_Analyzer/blob/Main/.github/ISSUE_TEMPLATE/bug_report.md).
 
 ## License
 
