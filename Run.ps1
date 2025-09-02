@@ -7,7 +7,7 @@ param(
     [string]$AppNameOrProfile = "SES",
     
     [Parameter(Position = 2)]
-    [string]$ArchitectureOrHttpPort = "amd64",
+    [string]$ArchitectureOrHttpPort = "8080",
     
     [Parameter(Position = 3)]
     [string]$CertPathOrHttpsPort,
