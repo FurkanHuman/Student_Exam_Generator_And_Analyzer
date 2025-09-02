@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Base image
-FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 
 EXPOSE 8080
 EXPOSE 8085
@@ -18,18 +18,24 @@ WORKDIR /app
 # Build stage
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG TARGETARCH
-WORKDIR /src
+WORKDIR /
 
-COPY ["Src/SES/BlazorWebUI/BlazorWebUI/BlazorWebUI.csproj", "Src/SES/BlazorWebUI/BlazorWebUI/"]
-COPY ["Src/SES/Application/Application.csproj", "Src/SES/Application/"]
+# Copy project files in correct order for better caching (pipeline-compatible)
 COPY ["Src/SES/Domain/Domain.csproj", "Src/SES/Domain/"]
-COPY ["Src/SES/Infrastructure/Infrastructure.csproj", "Src/SES/Infrastructure/"]
+COPY ["Src/SES/Application/Application.csproj", "Src/SES/Application/"]
 COPY ["Src/SES/Persistence/Persistence.csproj", "Src/SES/Persistence/"]
+COPY ["Src/SES/Infrastructure/Infrastructure.csproj", "Src/SES/Infrastructure/"]
+COPY ["Src/SES/BlazorWebUI/BlazorWebUI.Client/BlazorWebUI.Client.csproj", "Src/SES/BlazorWebUI/BlazorWebUI.Client/"]
+COPY ["Src/SES/BlazorWebUI/BlazorWebUI/BlazorWebUI.csproj", "Src/SES/BlazorWebUI/BlazorWebUI/"]
 
+# Restore dependencies
 RUN dotnet restore "Src/SES/BlazorWebUI/BlazorWebUI/BlazorWebUI.csproj" --arch $TARGETARCH
 
+# Copy all source code
 COPY . .
-WORKDIR "/src/Src/SES/BlazorWebUI/BlazorWebUI"
+
+# Build the application
+WORKDIR "/Src/SES/BlazorWebUI/BlazorWebUI"
 RUN dotnet build "./BlazorWebUI.csproj" -c Release
 
 # Publish stage
