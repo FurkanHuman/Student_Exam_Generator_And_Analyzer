@@ -27,6 +27,7 @@ APP_NAME=$2
 
 # Validate basic parameters
 if [ -z "$MODE" ] || [ -z "$APP_NAME" ]; then
+    echo "Error: Mode and app name are required"
     show_usage
     exit 1
 fi
@@ -38,22 +39,34 @@ case "$MODE" in
         CERT_PASSWORD=$5
         
         # Validate Docker parameters
-        if [ -z "$ARCHITECTURE" ] || [ -z "$CERT_PATH" ] || [ -z "$CERT_PASSWORD" ]; then
-            echo "Error: Missing parameters for Docker mode"
+        if [ -z "$ARCHITECTURE" ]; then
+            echo "Error: Architecture parameter required for Docker mode"
             show_usage
             exit 1
         fi
         
-        # Validate certificate file exists
-        if [ ! -f "$CERT_PATH" ]; then
-            echo "Error: Certificate file not found: $CERT_PATH"
+        # Check if certificate is provided and validate
+        USE_CERTIFICATE=false
+        if [ -n "$CERT_PATH" ] && [ -n "$CERT_PASSWORD" ]; then
+            if [ ! -f "$CERT_PATH" ]; then
+                echo "Error: Certificate file not found: $CERT_PATH"
+                exit 1
+            fi
+            USE_CERTIFICATE=true
+            echo "Using certificate: $CERT_PATH"
+        elif [ -n "$CERT_PATH" ] || [ -n "$CERT_PASSWORD" ]; then
+            echo "Error: Both certificate path and password must be provided or both omitted"
+            show_usage
             exit 1
+        else
+            echo "Running without HTTPS certificate (HTTP only)"
         fi
         
         echo "=== Building Docker image ==="
         echo "App: $APP_NAME, Architecture: $ARCHITECTURE"
         
         # Build Docker image
+        echo "Running: docker buildx build --platform linux/$ARCHITECTURE -t $APP_NAME:$ARCHITECTURE --load ."
         docker buildx build \
             --platform "linux/$ARCHITECTURE" \
             -t "$APP_NAME:$ARCHITECTURE" \
@@ -68,31 +81,39 @@ case "$MODE" in
         echo "=== Docker Build finished ==="
         
         # Stop and remove existing container if any
-        EXISTING_CONTAINER=$(docker ps -aq --filter "name=^/${APP_NAME}$")
+        EXISTING_CONTAINER=$(docker ps -aq --filter "name=^${APP_NAME}$")
         if [ -n "$EXISTING_CONTAINER" ]; then
             echo "Stopping existing container $APP_NAME..."
-            docker stop "$APP_NAME"
-            docker rm "$APP_NAME"
+            docker stop "$APP_NAME" >/dev/null 2>&1
+            docker rm "$APP_NAME" >/dev/null 2>&1
         fi
-        
-        # Get absolute path for certificate
-        CERT_ABSOLUTE_PATH=$(realpath "$CERT_PATH")
         
         # Run Docker container
         echo "=== Running container $APP_NAME ($ARCHITECTURE) ==="
-        docker run -d --name "$APP_NAME" \
-            -p 8080:8080 -p 8085:8085 \
-            -v "$CERT_ABSOLUTE_PATH:/https/cert.pfx:ro" \
-            -e ASPNETCORE_URLS="http://+:8080;https://+:8085" \
-            -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/cert.pfx \
-            -e ASPNETCORE_Kestrel__Certificates__Default__Password="$CERT_PASSWORD" \
-            "$APP_NAME:$ARCHITECTURE"
+        
+        DOCKER_ARGS="run -d --name $APP_NAME -p 8080:8080 -p 8085:8085 -e ASPNETCORE_URLS=http://+:8080;https://+:8085"
+        
+        # Add certificate mounting if provided
+        if [ "$USE_CERTIFICATE" = true ]; then
+            CERT_ABSOLUTE_PATH=$(realpath "$CERT_PATH")
+            DOCKER_ARGS="$DOCKER_ARGS -v $CERT_ABSOLUTE_PATH:/https/cert.pfx:ro"
+            DOCKER_ARGS="$DOCKER_ARGS -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/cert.pfx"
+            DOCKER_ARGS="$DOCKER_ARGS -e ASPNETCORE_Kestrel__Certificates__Default__Password=$CERT_PASSWORD"
+        fi
+        
+        DOCKER_ARGS="$DOCKER_ARGS $APP_NAME:$ARCHITECTURE"
+        
+        eval "docker $DOCKER_ARGS"
         
         if [ $? -eq 0 ]; then
             echo "=== Container started successfully ==="
             echo "Application is running at:"
             echo "  HTTP:  http://localhost:8080"
-            echo "  HTTPS: https://localhost:8085"
+            if [ "$USE_CERTIFICATE" = true ]; then
+                echo "  HTTPS: https://localhost:8085"
+            else
+                echo "  HTTPS: Not available (no certificate provided)"
+            fi
             echo ""
             echo "To view logs: docker logs $APP_NAME"
             echo "To stop: docker stop $APP_NAME"
@@ -104,6 +125,13 @@ case "$MODE" in
         
     "standalone")
         CONFIGURATION=${3:-Release}
+        
+        # Validate configuration
+        if [ "$CONFIGURATION" != "Debug" ] && [ "$CONFIGURATION" != "Release" ]; then
+            echo "Error: Invalid configuration '$CONFIGURATION'. Use Debug or Release"
+            show_usage
+            exit 1
+        fi
         
         echo "=== Building Standalone Application ==="
         echo "App: $APP_NAME, Configuration: $CONFIGURATION"
@@ -136,9 +164,13 @@ case "$MODE" in
             exit 1
         fi
         
+        # Create publish directory
+        PUBLISH_PATH="../../../../publish/$APP_NAME"
+        mkdir -p "$PUBLISH_PATH"
+        
         # Publish application
         echo "Publishing application..."
-        dotnet publish -c "$CONFIGURATION" -o "../../../../publish/$APP_NAME"
+        dotnet publish -c "$CONFIGURATION" -o "$PUBLISH_PATH"
         
         if [ $? -ne 0 ]; then
             echo "Error: Publish failed"
@@ -153,6 +185,10 @@ case "$MODE" in
         echo "To run the application:"
         echo "  cd publish/$APP_NAME"
         echo "  dotnet BlazorWebUI.dll"
+        echo ""
+        echo "Or run with specific profile from project directory:"
+        echo "  cd Src/SES/BlazorWebUI/BlazorWebUI"
+        echo "  dotnet run --launch-profile Release  # Uses ports 8080/8085"
         ;;
         
     *)
@@ -161,3 +197,5 @@ case "$MODE" in
         exit 1
         ;;
 esac
+
+echo "Script completed successfully!"

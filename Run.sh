@@ -2,101 +2,121 @@
 
 # Function to show usage
 show_usage() {
-    echo "Usage: ./Run.sh <mode> <app_name> [options]"
+    echo "Usage: ./Build.sh <mode> <app_name> [options]"
     echo ""
     echo "Modes:"
-    echo "  docker     - Run Docker container"
-    echo "  standalone - Run standalone .NET application"
-    echo "  dev        - Run in development mode"
+    echo "  docker     - Build and run with Docker"
+    echo "  standalone - Build and run standalone .NET application"
     echo ""
     echo "Docker mode:"
-    echo "  ./Run.sh docker <app_name> <architecture> [cert_path] [cert_password]"
-    echo "  Example: ./Run.sh docker SES amd64"
-    echo "  Example: ./Run.sh docker SES amd64 ./cert.pfx mypassword"
+    echo "  ./Build.sh docker <app_name> <architecture> [cert_path] [cert_password]"
+    echo "  Example: ./Build.sh docker myapp amd64"
+    echo "  Example: ./Build.sh docker myapp amd64 ./cert.pfx mypassword"
     echo ""
     echo "Standalone mode:"
-    echo "  ./Run.sh standalone <app_name> [custom_port_http] [custom_port_https]"
-    echo "  Example: ./Run.sh standalone SES"
-    echo "  Example: ./Run.sh standalone SES 8080 8085"
+    echo "  ./Build.sh standalone <app_name> [configuration]"
+    echo "  Example: ./Build.sh standalone myapp Release"
     echo ""
-    echo "Development mode:"
-    echo "  ./Run.sh dev [profile]"
-    echo "  Example: ./Run.sh dev https"
-    echo "  Example: ./Run.sh dev Release"
-    echo ""
-    echo "Available profiles: http, https, Release, ReleaseDocker"
+    echo "Architectures for Docker: amd64, arm64"
+    echo "Configurations for Standalone: Debug, Release (default: Release)"
 }
 
-# Get parameters with defaults
-MODE=${1:-"dev"}
-APP_NAME=${2:-"SES"}
+# Get parameters
+MODE=$1
+APP_NAME=$2
 
 # Validate basic parameters
-if [ -z "$MODE" ]; then
+if [ -z "$MODE" ] || [ -z "$APP_NAME" ]; then
+    echo "Error: Mode and app name are required"
     show_usage
     exit 1
 fi
 
 case "$MODE" in
     "docker")
-        ARCHITECTURE=${3:-"amd64"}
+        ARCHITECTURE=$3
         CERT_PATH=$4
         CERT_PASSWORD=$5
         
-        # Check if image exists
-        if ! docker image inspect "${APP_NAME}:${ARCHITECTURE}" >/dev/null 2>&1; then
-            echo "Error: Docker image ${APP_NAME}:${ARCHITECTURE} not found"
-            echo "Build the image first with: ./Build.sh docker $APP_NAME $ARCHITECTURE"
+        # Validate Docker parameters
+        if [ -z "$ARCHITECTURE" ]; then
+            echo "Error: Architecture parameter required for Docker mode"
+            show_usage
             exit 1
         fi
         
+        # Check if certificate is provided and validate
+        USE_CERTIFICATE=false
+        if [ -n "$CERT_PATH" ] && [ -n "$CERT_PASSWORD" ]; then
+            if [ ! -f "$CERT_PATH" ]; then
+                echo "Error: Certificate file not found: $CERT_PATH"
+                exit 1
+            fi
+            USE_CERTIFICATE=true
+            echo "Using certificate: $CERT_PATH"
+        elif [ -n "$CERT_PATH" ] || [ -n "$CERT_PASSWORD" ]; then
+            echo "Error: Both certificate path and password must be provided or both omitted"
+            show_usage
+            exit 1
+        else
+            echo "Running without HTTPS certificate (HTTP only)"
+        fi
+        
+        echo "=== Building Docker image ==="
+        echo "App: $APP_NAME, Architecture: $ARCHITECTURE"
+        
+        # Build Docker image
+        echo "Running: docker buildx build --platform linux/$ARCHITECTURE -t $APP_NAME:$ARCHITECTURE --load ."
+        docker buildx build \
+            --platform "linux/$ARCHITECTURE" \
+            -t "$APP_NAME:$ARCHITECTURE" \
+            --load \
+            .
+        
+        if [ $? -ne 0 ]; then
+            echo "Error: Docker build failed"
+            exit 1
+        fi
+        
+        echo "=== Docker Build finished ==="
+        
         # Stop and remove existing container if any
-        EXISTING_CONTAINER=$(docker ps -aq --filter "name=^/${APP_NAME}$")
+        EXISTING_CONTAINER=$(docker ps -aq --filter "name=^${APP_NAME}$")
         if [ -n "$EXISTING_CONTAINER" ]; then
             echo "Stopping existing container $APP_NAME..."
             docker stop "$APP_NAME" >/dev/null 2>&1
             docker rm "$APP_NAME" >/dev/null 2>&1
         fi
         
+        # Run Docker container
         echo "=== Running container $APP_NAME ($ARCHITECTURE) ==="
         
-        # Prepare Docker run command
-        DOCKER_ARGS="run -d --name $APP_NAME -p 8080:8080 -p 8085:8085"
+        DOCKER_ARGS="run -d --name $APP_NAME -p 8080:8080 -p 8085:8085 -e ASPNETCORE_URLS=http://+:8080;https://+:8085"
         
-        # Add certificate if provided
-        if [ -n "$CERT_PATH" ] && [ -n "$CERT_PASSWORD" ]; then
-            if [ ! -f "$CERT_PATH" ]; then
-                echo "Error: Certificate file not found: $CERT_PATH"
-                exit 1
-            fi
-            
+        # Add certificate mounting if provided
+        if [ "$USE_CERTIFICATE" = true ]; then
             CERT_ABSOLUTE_PATH=$(realpath "$CERT_PATH")
             DOCKER_ARGS="$DOCKER_ARGS -v $CERT_ABSOLUTE_PATH:/https/cert.pfx:ro"
+            DOCKER_ARGS="$DOCKER_ARGS -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/cert.pfx"
             DOCKER_ARGS="$DOCKER_ARGS -e ASPNETCORE_Kestrel__Certificates__Default__Password=$CERT_PASSWORD"
-            echo "Using certificate: $CERT_PATH"
-        else
-            echo "Running without HTTPS certificate (HTTP only)"
         fi
         
-        DOCKER_ARGS="$DOCKER_ARGS -e ASPNETCORE_URLS=http://+:8080;https://+:8085 ${APP_NAME}:${ARCHITECTURE}"
+        DOCKER_ARGS="$DOCKER_ARGS $APP_NAME:$ARCHITECTURE"
         
-        # Run container
         eval "docker $DOCKER_ARGS"
         
         if [ $? -eq 0 ]; then
             echo "=== Container started successfully ==="
             echo "Application is running at:"
             echo "  HTTP:  http://localhost:8080"
-            if [ -n "$CERT_PATH" ] && [ -n "$CERT_PASSWORD" ]; then
+            if [ "$USE_CERTIFICATE" = true ]; then
                 echo "  HTTPS: https://localhost:8085"
             else
-                echo "  HTTPS: Not available (no certificate)"
+                echo "  HTTPS: Not available (no certificate provided)"
             fi
             echo ""
-            echo "Useful commands:"
-            echo "  docker logs $APP_NAME -f    # View logs"
-            echo "  docker stop $APP_NAME       # Stop container"
-            echo "  docker exec -it $APP_NAME sh # Enter container"
+            echo "To view logs: docker logs $APP_NAME"
+            echo "To stop: docker stop $APP_NAME"
         else
             echo "Error: Failed to start container"
             exit 1
@@ -104,71 +124,71 @@ case "$MODE" in
         ;;
         
     "standalone")
-        CUSTOM_PORT_HTTP=$3
-        CUSTOM_PORT_HTTPS=$4
+        CONFIGURATION=${3:-Release}
         
-        # Check if published app exists
-        PUBLISH_PATH="publish/$APP_NAME"
-        if [ ! -d "$PUBLISH_PATH" ]; then
-            echo "Error: Published application not found: $PUBLISH_PATH"
-            echo "Build the application first with: ./Build.sh standalone $APP_NAME"
+        # Validate configuration
+        if [ "$CONFIGURATION" != "Debug" ] && [ "$CONFIGURATION" != "Release" ]; then
+            echo "Error: Invalid configuration '$CONFIGURATION'. Use Debug or Release"
+            show_usage
             exit 1
         fi
         
-        if [ ! -f "$PUBLISH_PATH/BlazorWebUI.dll" ]; then
-            echo "Error: BlazorWebUI.dll not found in $PUBLISH_PATH"
+        echo "=== Building Standalone Application ==="
+        echo "App: $APP_NAME, Configuration: $CONFIGURATION"
+        
+        # Navigate to project directory
+        PROJECT_PATH="Src/SES/BlazorWebUI/BlazorWebUI"
+        
+        if [ ! -d "$PROJECT_PATH" ]; then
+            echo "Error: Project directory not found: $PROJECT_PATH"
             exit 1
         fi
         
-        echo "=== Running standalone application ==="
+        cd "$PROJECT_PATH"
         
-        # Set custom ports if provided
-        if [ -n "$CUSTOM_PORT_HTTP" ]; then
-            if [ -n "$CUSTOM_PORT_HTTPS" ]; then
-                export ASPNETCORE_URLS="http://localhost:${CUSTOM_PORT_HTTP};https://localhost:${CUSTOM_PORT_HTTPS}"
-                echo "Using custom ports: HTTP=$CUSTOM_PORT_HTTP, HTTPS=$CUSTOM_PORT_HTTPS"
-            else
-                export ASPNETCORE_URLS="http://localhost:${CUSTOM_PORT_HTTP}"
-                echo "Using custom HTTP port: $CUSTOM_PORT_HTTP"
-            fi
-        else
-            export ASPNETCORE_URLS="http://localhost:8080;https://localhost:8085"
-            echo "Using default ports: HTTP=8080, HTTPS=8085"
+        # Restore dependencies
+        echo "Restoring dependencies..."
+        dotnet restore
+        
+        if [ $? -ne 0 ]; then
+            echo "Error: Failed to restore dependencies"
+            exit 1
         fi
         
-        # Set production environment
-        export ASPNETCORE_ENVIRONMENT=Production
+        # Build application
+        echo "Building application..."
+        dotnet build -c "$CONFIGURATION"
         
-        echo "Starting $APP_NAME..."
-        echo "Press Ctrl+C to stop"
+        if [ $? -ne 0 ]; then
+            echo "Error: Build failed"
+            exit 1
+        fi
+        
+        # Create publish directory
+        PUBLISH_PATH="../../../../publish/$APP_NAME"
+        mkdir -p "$PUBLISH_PATH"
+        
+        # Publish application
+        echo "Publishing application..."
+        dotnet publish -c "$CONFIGURATION" -o "$PUBLISH_PATH"
+        
+        if [ $? -ne 0 ]; then
+            echo "Error: Publish failed"
+            exit 1
+        fi
+        
+        cd - > /dev/null
+        
+        echo "=== Build completed successfully ==="
+        echo "Published to: publish/$APP_NAME"
         echo ""
-        
-        cd "$PUBLISH_PATH"
-        dotnet BlazorWebUI.dll
-        ;;
-        
-    "dev")
-        PROFILE=${APP_NAME:-"https"}  # APP_NAME becomes profile when mode is dev, default to https
-        
-        # Check if we're in the right directory
-        if [ ! -f "Src/SES/BlazorWebUI/BlazorWebUI/BlazorWebUI.csproj" ]; then
-            echo "Error: Please run this script from the solution root directory"
-            exit 1
-        fi
-        
-        echo "=== Running in Development mode ==="
-        echo "Profile: $PROFILE"
-        echo "Press Ctrl+C to stop"
+        echo "To run the application:"
+        echo "  cd publish/$APP_NAME"
+        echo "  dotnet BlazorWebUI.dll"
         echo ""
-        
-        cd "Src/SES/BlazorWebUI/BlazorWebUI"
-        
-        # Run with specified profile
-        if [ "$PROFILE" = "default" ]; then
-            dotnet run
-        else
-            dotnet run --launch-profile "$PROFILE"
-        fi
+        echo "Or run with specific profile from project directory:"
+        echo "  cd Src/SES/BlazorWebUI/BlazorWebUI"
+        echo "  dotnet run --launch-profile Release  # Uses ports 8080/8085"
         ;;
         
     *)
@@ -177,3 +197,5 @@ case "$MODE" in
         exit 1
         ;;
 esac
+
+echo "Script completed successfully!"
