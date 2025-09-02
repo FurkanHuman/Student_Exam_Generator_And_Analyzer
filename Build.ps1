@@ -207,6 +207,10 @@ try {
                 Write-Host "To run the application:" -ForegroundColor Yellow
                 Write-Host "  cd publish\$AppName" -ForegroundColor White
                 Write-Host "  dotnet BlazorWebUI.dll" -ForegroundColor White
+                Write-Host ""
+                Write-Host "Or run with specific profile from project directory:" -ForegroundColor Yellow
+                Write-Host "  cd Src\SES\BlazorWebUI\BlazorWebUI" -ForegroundColor White
+                Write-Host "  dotnet run --launch-profile Release  # Uses ports 8080/8085" -ForegroundColor White
             }
             finally {
                 Pop-Location
