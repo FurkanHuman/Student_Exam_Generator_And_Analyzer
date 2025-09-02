@@ -47,14 +47,29 @@ Whether you’re an individual teacher, a school, or an institution, S.E.S. can 
 
 3. **Build and Run the App**
 
+   For Linux-based systems
+
    ```bash
-   dotnet build
-   dotnet run --urls "http://localhost:5000"
+      # Docker mode
+      ./Build.sh docker SES_App_Name amd64 ./cert.pfx Cert_Password
+
+      # Standalone mode  
+      ./Build.sh standalone SES_App_Name Release
+   ```
+
+   For Windows systems
+
+   ```powershell
+      # Docker mode
+      .\Build.ps1 docker SES_App_Name amd64 .\cert.pfx Cert_Password
+
+      # Standalone mode
+      .\Build.ps1 standalone SES_App_Name Release
    ```
 
 4. **Open in Browser**
 
-   Go to `http://localhost:5000` and log in using the default teacher credentials (see Docs folder).
+   Go to `http://localhost:8080` or `https://localhost:8085` and log in using the default teacher credentials (see Docs folder).
 
 ---
 
