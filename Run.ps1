@@ -1,18 +1,18 @@
 param(
-    [Parameter(Position=0)]
+    [Parameter(Position = 0)]
     [ValidateSet("docker", "standalone", "dev")]
-    [string]$Mode = "dev",
+    [string]$Mode = "standalone",
     
-    [Parameter(Position=1)]
+    [Parameter(Position = 1)]
     [string]$AppNameOrProfile = "SES",
     
-    [Parameter(Position=2)]
+    [Parameter(Position = 2)]
     [string]$ArchitectureOrHttpPort = "amd64",
     
-    [Parameter(Position=3)]
+    [Parameter(Position = 3)]
     [string]$CertPathOrHttpsPort,
     
-    [Parameter(Position=4)]
+    [Parameter(Position = 4)]
     [string]$CertPassword
 )
 
@@ -95,7 +95,8 @@ try {
                 )
                 $useCertificate = $true
                 Write-Host "Using certificate: $CertPath" -ForegroundColor Green
-            } else {
+            }
+            else {
                 Write-Host "Running without HTTPS certificate (HTTP only)" -ForegroundColor Yellow
             }
             
@@ -109,7 +110,8 @@ try {
                 Write-Host "  HTTP:  http://localhost:8080" -ForegroundColor White
                 if ($useCertificate) {
                     Write-Host "  HTTPS: https://localhost:8085" -ForegroundColor White
-                } else {
+                }
+                else {
                     Write-Host "  HTTPS: Not available (no certificate)" -ForegroundColor Yellow
                 }
                 Write-Host ""
@@ -117,7 +119,8 @@ try {
                 Write-Host "  docker logs $AppName -f        # View logs" -ForegroundColor White
                 Write-Host "  docker stop $AppName           # Stop container" -ForegroundColor White
                 Write-Host "  docker exec -it $AppName sh    # Enter container" -ForegroundColor White
-            } else {
+            }
+            else {
                 Write-Host "Error: Failed to start container" -ForegroundColor Red
                 exit 1
             }
@@ -155,11 +158,13 @@ try {
                 if ($CustomPortHttps) {
                     $env:ASPNETCORE_URLS = "http://localhost:${CustomPortHttp};https://localhost:${CustomPortHttps}"
                     Write-Host "Using custom ports: HTTP=$CustomPortHttp, HTTPS=$CustomPortHttps" -ForegroundColor Green
-                } else {
+                }
+                else {
                     $env:ASPNETCORE_URLS = "http://localhost:${CustomPortHttp}"
                     Write-Host "Using custom HTTP port: $CustomPortHttp" -ForegroundColor Green
                 }
-            } else {
+            }
+            else {
                 $env:ASPNETCORE_URLS = "http://localhost:8080;https://localhost:8085"
                 Write-Host "Using default ports: HTTP=8080, HTTPS=8085" -ForegroundColor Green
             }
@@ -199,7 +204,8 @@ try {
             try {
                 if ($Profile -eq "default") {
                     & dotnet run
-                } else {
+                }
+                else {
                     & dotnet run --launch-profile $Profile
                 }
             }
