@@ -2,20 +2,20 @@
 
 # Function to show usage
 show_usage() {
-    echo "Usage: ./Build.sh <mode> <app_name> [options]"
+    echo "Usage: ./Run.sh <mode> <app_name> [options]"
     echo ""
     echo "Modes:"
     echo "  docker     - Build and run with Docker"
     echo "  standalone - Build and run standalone .NET application"
     echo ""
     echo "Docker mode:"
-    echo "  ./Build.sh docker <app_name> <architecture> [cert_path] [cert_password]"
-    echo "  Example: ./Build.sh docker myapp amd64"
-    echo "  Example: ./Build.sh docker myapp amd64 ./cert.pfx mypassword"
+    echo "  ./Run.sh docker <app_name> <architecture> [cert_path] [cert_password] [http_port] [https_port]"
+    echo "  Example: ./Run.sh docker myapp amd64"
+    echo "  Example: ./Run.sh docker myapp amd64 ./cert.pfx mypassword 8080 8085"
     echo ""
     echo "Standalone mode:"
-    echo "  ./Build.sh standalone <app_name> [configuration]"
-    echo "  Example: ./Build.sh standalone myapp Release"
+    echo "  ./Run.sh standalone <app_name> [configuration] [http_port] [https_port]"
+    echo "  Example: ./Run.sh standalone myapp Release 8080 8085"
     echo ""
     echo "Architectures for Docker: amd64, arm64"
     echo "Configurations for Standalone: Debug, Release (default: Release)"
@@ -37,6 +37,8 @@ case "$MODE" in
         ARCHITECTURE=$3
         CERT_PATH=$4
         CERT_PASSWORD=$5
+        PORT_HTTP=${6:-8080}
+        PORT_HTTPS=${7:-8085}
         
         # Validate Docker parameters
         if [ -z "$ARCHITECTURE" ]; then
@@ -65,8 +67,6 @@ case "$MODE" in
         echo "=== Building Docker image ==="
         echo "App: $APP_NAME, Architecture: $ARCHITECTURE"
         
-        # Build Docker image
-        echo "Running: docker buildx build --platform linux/$ARCHITECTURE -t $APP_NAME:$ARCHITECTURE --load ."
         docker buildx build \
             --platform "linux/$ARCHITECTURE" \
             -t "$APP_NAME:$ARCHITECTURE" \
@@ -91,11 +91,15 @@ case "$MODE" in
         # Run Docker container
         echo "=== Running container $APP_NAME ($ARCHITECTURE) ==="
         
-        DOCKER_ARGS="run -d --name $APP_NAME -p 8080:8080 -p 8085:8085 -e ASPNETCORE_URLS=http://+:8080;https://+:8085"
+        DOCKER_ARGS="run -d --name $APP_NAME -p $PORT_HTTP:8080 -p $PORT_HTTPS:8085 -e ASPNETCORE_URLS=http://+:8080;https://+:8085"
         
         # Add certificate mounting if provided
         if [ "$USE_CERTIFICATE" = true ]; then
-            CERT_ABSOLUTE_PATH=$(realpath "$CERT_PATH")
+            if command -v realpath >/dev/null 2>&1; then
+                CERT_ABSOLUTE_PATH=$(realpath "$CERT_PATH")
+            else
+                CERT_ABSOLUTE_PATH=$(readlink -f "$CERT_PATH")
+            fi
             DOCKER_ARGS="$DOCKER_ARGS -v $CERT_ABSOLUTE_PATH:/https/cert.pfx:ro"
             DOCKER_ARGS="$DOCKER_ARGS -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/cert.pfx"
             DOCKER_ARGS="$DOCKER_ARGS -e ASPNETCORE_Kestrel__Certificates__Default__Password=$CERT_PASSWORD"
@@ -108,9 +112,9 @@ case "$MODE" in
         if [ $? -eq 0 ]; then
             echo "=== Container started successfully ==="
             echo "Application is running at:"
-            echo "  HTTP:  http://localhost:8080"
+            echo "  HTTP:  http://localhost:$PORT_HTTP"
             if [ "$USE_CERTIFICATE" = true ]; then
-                echo "  HTTPS: https://localhost:8085"
+                echo "  HTTPS: https://localhost:$PORT_HTTPS"
             else
                 echo "  HTTPS: Not available (no certificate provided)"
             fi
@@ -119,12 +123,15 @@ case "$MODE" in
             echo "To stop: docker stop $APP_NAME"
         else
             echo "Error: Failed to start container"
+            docker rm -f "$APP_NAME" >/dev/null 2>&1
             exit 1
         fi
         ;;
         
     "standalone")
         CONFIGURATION=${3:-Release}
+        PORT_HTTP=${4:-8080}
+        PORT_HTTPS=${5:-8085}
         
         # Validate configuration
         if [ "$CONFIGURATION" != "Debug" ] && [ "$CONFIGURATION" != "Release" ]; then
@@ -136,7 +143,6 @@ case "$MODE" in
         echo "=== Building Standalone Application ==="
         echo "App: $APP_NAME, Configuration: $CONFIGURATION"
         
-        # Navigate to project directory
         PROJECT_PATH="Src/SES/BlazorWebUI/BlazorWebUI"
         
         if [ ! -d "$PROJECT_PATH" ]; then
@@ -146,32 +152,25 @@ case "$MODE" in
         
         cd "$PROJECT_PATH"
         
-        # Restore dependencies
         echo "Restoring dependencies..."
         dotnet restore
-        
         if [ $? -ne 0 ]; then
             echo "Error: Failed to restore dependencies"
             exit 1
         fi
         
-        # Build application
         echo "Building application..."
         dotnet build -c "$CONFIGURATION"
-        
         if [ $? -ne 0 ]; then
             echo "Error: Build failed"
             exit 1
         fi
         
-        # Create publish directory
         PUBLISH_PATH="../../../../publish/$APP_NAME"
         mkdir -p "$PUBLISH_PATH"
         
-        # Publish application
         echo "Publishing application..."
         dotnet publish -c "$CONFIGURATION" -o "$PUBLISH_PATH"
-        
         if [ $? -ne 0 ]; then
             echo "Error: Publish failed"
             exit 1
@@ -184,11 +183,11 @@ case "$MODE" in
         echo ""
         echo "To run the application:"
         echo "  cd publish/$APP_NAME"
-        echo "  dotnet BlazorWebUI.dll"
+        echo "  dotnet BlazorWebUI.dll --urls \"http://localhost:$PORT_HTTP;https://localhost:$PORT_HTTPS\""
         echo ""
         echo "Or run with specific profile from project directory:"
         echo "  cd Src/SES/BlazorWebUI/BlazorWebUI"
-        echo "  dotnet run --launch-profile Release  # Uses ports 8080/8085"
+        echo "  dotnet run --launch-profile Release --urls \"http://localhost:$PORT_HTTP;https://localhost:$PORT_HTTPS\""
         ;;
         
     *)

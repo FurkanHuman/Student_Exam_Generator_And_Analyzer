@@ -52,19 +52,27 @@ Whether you’re an individual teacher, a school, or an institution, S.E.S. can 
    ```bash
       # Docker mode
       ./Build.sh docker SES_App_Name amd64 ./cert.pfx Cert_Password
+      # Run
+      ./Run.sh docker SES_App_Name amd64
 
       # Standalone mode  
-      ./Build.sh standalone SES_App_Name Release
+      ./Build.sh standalone SES_App_Name Release      
+      # Run
+      ./Run.sh standalone SES_App_Name
    ```
 
    For Windows systems
 
    ```powershell
       # Docker mode
-      .\Build.ps1 docker SES_App_Name amd64 .\cert.pfx Cert_Password
+      .\Build.ps1 docker SES_App_Name amd64 .\cert.pfx Cert_Password      
+      # Run
+      .\Run.ps1 docker SES_App_Name amd64
 
       # Standalone mode
-      .\Build.ps1 standalone SES_App_Name Release
+      .\Build.ps1 standalone SES_App_Name Release      
+      # Run
+      .\Run.ps1 standalone SES_App_Name
    ```
 
 4. **Open in Browser**
