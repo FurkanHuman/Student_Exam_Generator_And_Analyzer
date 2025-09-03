@@ -70,6 +70,7 @@ case "$MODE" in
         docker buildx build \
             --platform "linux/$ARCHITECTURE" \
             -t "$APP_NAME:$ARCHITECTURE" \
+            -f ./Dockerfile \
             --load \
             .
         
