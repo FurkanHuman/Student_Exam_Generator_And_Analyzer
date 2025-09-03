@@ -64,22 +64,6 @@ case "$MODE" in
             echo "Running without HTTPS certificate (HTTP only)"
         fi
         
-        echo "=== Building Docker image ==="
-        echo "App: $APP_NAME, Architecture: $ARCHITECTURE"
-        
-        docker buildx build \
-            --platform "linux/$ARCHITECTURE" \
-            -t "$APP_NAME:$ARCHITECTURE" \
-            --load \
-            .
-        
-        if [ $? -ne 0 ]; then
-            echo "Error: Docker build failed"
-            exit 1
-        fi
-        
-        echo "=== Docker Build finished ==="
-        
         # Stop and remove existing container if any
         EXISTING_CONTAINER=$(docker ps -aq --filter "name=^${APP_NAME}$")
         if [ -n "$EXISTING_CONTAINER" ]; then
@@ -91,7 +75,7 @@ case "$MODE" in
         # Run Docker container
         echo "=== Running container $APP_NAME ($ARCHITECTURE) ==="
         
-        DOCKER_ARGS="run -d --name $APP_NAME -p $PORT_HTTP:8080 -p $PORT_HTTPS:8085 -e ASPNETCORE_URLS=http://+:8080;https://+:8085"
+        DOCKER_ARGS="run -d --name $APP_NAME -p $PORT_HTTP:8080 -p $PORT_HTTPS:8085 -e ASPNETCORE_URLS=\"http://+:8080;https://+:8085\""
         
         # Add certificate mounting if provided
         if [ "$USE_CERTIFICATE" = true ]; then

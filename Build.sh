@@ -79,48 +79,6 @@ case "$MODE" in
         fi
         
         echo "=== Docker Build finished ==="
-        
-        # Stop and remove existing container if any
-        EXISTING_CONTAINER=$(docker ps -aq --filter "name=^${APP_NAME}$")
-        if [ -n "$EXISTING_CONTAINER" ]; then
-            echo "Stopping existing container $APP_NAME..."
-            docker stop "$APP_NAME" >/dev/null 2>&1
-            docker rm "$APP_NAME" >/dev/null 2>&1
-        fi
-        
-        # Run Docker container
-        echo "=== Running container $APP_NAME ($ARCHITECTURE) ==="
-        
-        DOCKER_ARGS="run -d --name $APP_NAME -p 8080:8080 -p 8085:8085 -e ASPNETCORE_URLS=http://+:8080;https://+:8085"
-        
-        # Add certificate mounting if provided
-        if [ "$USE_CERTIFICATE" = true ]; then
-            CERT_ABSOLUTE_PATH=$(realpath "$CERT_PATH")
-            DOCKER_ARGS="$DOCKER_ARGS -v $CERT_ABSOLUTE_PATH:/https/cert.pfx:ro"
-            DOCKER_ARGS="$DOCKER_ARGS -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/cert.pfx"
-            DOCKER_ARGS="$DOCKER_ARGS -e ASPNETCORE_Kestrel__Certificates__Default__Password=$CERT_PASSWORD"
-        fi
-        
-        DOCKER_ARGS="$DOCKER_ARGS $APP_NAME:$ARCHITECTURE"
-        
-        eval "docker $DOCKER_ARGS"
-        
-        if [ $? -eq 0 ]; then
-            echo "=== Container started successfully ==="
-            echo "Application is running at:"
-            echo "  HTTP:  http://localhost:8080"
-            if [ "$USE_CERTIFICATE" = true ]; then
-                echo "  HTTPS: https://localhost:8085"
-            else
-                echo "  HTTPS: Not available (no certificate provided)"
-            fi
-            echo ""
-            echo "To view logs: docker logs $APP_NAME"
-            echo "To stop: docker stop $APP_NAME"
-        else
-            echo "Error: Failed to start container"
-            exit 1
-        fi
         ;;
         
     "standalone")
