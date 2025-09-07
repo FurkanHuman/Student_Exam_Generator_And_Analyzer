@@ -243,6 +243,11 @@
                     <label class="form-check-label" for="inlineCheckbox6">Ortak Sınav.</label>
                 </div>
 
+                <div class="form-check form-check mt-1 invisible">
+                    <InputCheckbox disabled class="form-check-input" type="checkbox" id="inlineCheckbox7" @bind-Value="_examInfo.IsGhostExam" />
+                    <label class="form-check-label" for="inlineCheckbox7">Hayalet Sınav Modu.</label>
+                </div>
+
                 <button class="btn btn-secondary mt-4" @onclick="()=>_progressStage--">Geri</button>
                 <button class="btn btn-primary mt-4" @onclick="FirstStageHandle">İleri</button>
 
