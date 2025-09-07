@@ -16,6 +16,7 @@ using Application.Services.Schools;
 using Application.Services.Semesters;
 using Application.Services.StudentAnswers;
 using Application.Services.StudentClasses;
+using Application.Services.StudentExamAnswers; 
 using Application.Services.Students;
 using Application.Services.SubLearningAreas;
 using Application.Services.Teachers;
@@ -83,6 +84,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<ISemesterService, SemesterManager>();
         services.AddScoped<IStudentService, StudentManager>();
         services.AddScoped<IStudentAnswerService, StudentAnswerManager>();
+        services.AddScoped<IStudentExamAnswerService, StudentExamAnswerManager>();
         services.AddScoped<ISubLearningAreaService, SubLearningAreaManager>();
         services.AddScoped<ITeacherService, TeacherManager>();
         services.AddScoped<IStudentClassService, StudentClassManager>();

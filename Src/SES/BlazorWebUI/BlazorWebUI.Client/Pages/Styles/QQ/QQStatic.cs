@@ -15,6 +15,15 @@ public static class QQStatic
         { 6, "Onaylı intihal" }
     };
 
+    public static readonly IDictionary<byte, string> ExamEvaluationStatusTUR = new Dictionary<byte, string> 
+    {
+        { 0, "Henüz değerlendirilmedi" },
+        { 1, "Değerlendirildi" },
+        { 2, "Raporlu"},
+        { 3, "Mazaretli" },
+        { 4, "Geçersiz" }
+    };
+
     public static readonly IDictionary<byte, string> SelectTypeOptionsTUR = new Dictionary<byte, string>
     {
         {1, "Açık Uçlu" },

@@ -8,7 +8,7 @@ namespace Persistence.Contexts;
 public class BaseDbContext(DbContextOptions dbContextOptions, IConfiguration configuration) : DbContext(dbContextOptions)
 {
     protected IConfiguration Configuration { get; set; } = configuration;
-    public DbSet<Analysis> AnalysisHeaders { get; set; }
+    public DbSet<Analysis> Analyses { get; set; }
     public DbSet<Benefit> Benefits { get; set; }
     public DbSet<Exam> Exams { get; set; }
     public DbSet<LearningArea> LearningAreas { get; set; }
@@ -19,12 +19,12 @@ public class BaseDbContext(DbContextOptions dbContextOptions, IConfiguration con
     public DbSet<School> Schools { get; set; }
     public DbSet<Student> Students { get; set; }
     public DbSet<StudentClass> StudentClasses { get; set; }
+    public DbSet<StudentExamAnswer> StudentExamAnswers { get; set; }
     public DbSet<SubLearningArea> SubLearningAreas { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<Semester> Semesters { get; set; }
     public DbSet<QuestionOption> QuestionOptions { get; set; }
     public DbSet<StudentAnswer> StudentAnswers { get; set; }
-    public DbSet<Analysis> Analyses { get; set; }
     public DbSet<Personel> Personels { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
 
