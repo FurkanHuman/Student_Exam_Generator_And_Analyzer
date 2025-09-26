@@ -1,22 +1,22 @@
 # Government Docs
 
 This directory is designated for documents intended for submission to governmental or public institutions.  
-It exists in the spirit of **transparency and accountability**, ensuring that relevant documents are openly accessible when possible.
+It exists in the spirit of **transparency and accountability**, ensuring that relevant documents are openly accessible when appropriate.
 
-⚠️ **Important Notes**:
+**Important Notes**:
 
 - Documents containing **personal, sensitive, or confidential data** will be subject to redaction or censorship before publication.  
-- Certain files are required to remain in **Turkish** due to legal or procedural obligations when submitted to Turkish authorities. These documents will not be translated into English.  
-- Only finalized and approved materials will be placed here; drafts or internal notes will not be included.
+- Certain files must remain in their **original language** or in the **language required by the receiving institution**. These documents will not be translated.  
+- Only finalized and formally approved materials will be placed here; drafts or internal notes will not be included.
 
-This repository respects both **legal compliance** and **data protection regulations**, balancing openness with privacy and security.
+This repository is managed in compliance with **legal requirements** and **data protection regulations**, balancing openness with privacy and security.
 
 ---
 
-### Disclaimer
+### Notice
 
-The presence of a document in this directory does not imply endorsement, approval, or validation by any governmental or public institution.  
-All documents are provided **solely for transparency purposes** and should be interpreted within that context.
+The availability of a document in this directory does not constitute endorsement, certification, or validation by any governmental or public institution.  
+All documents are made accessible strictly for **transparency purposes**. No legal liability or responsibility is assumed regarding their interpretation, accuracy, or use outside their intended scope.
 
 <!--
  Copyright 2025 Furkan Bozkurt
