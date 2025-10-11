@@ -75,9 +75,50 @@ Whether you’re an individual teacher, a school, or an institution, S.E.S. can 
       .\Run.ps1 standalone SES_App_Name
    ```
 
-4. **Open in Browser**
+## 🏗 Architecture Overview
 
-   Go to `http://localhost:8080` or `https://localhost:8085` and log in using the default teacher credentials (see Docs folder).
+The S.E.S. solution follows a **multi-layered architecture**:
+
+* **BlazorWebUI** – UI / main entry point  
+* **BlazorWebUI.Client** – Client-side logic  
+* **Application** – Application services and logic
+* **Domain** – Database Entities  
+* **Infrastructure** – Data access & external services  
+* **Persistence** – Database / storage  
+
+---
+
+## 🚀 Running the Application
+
+1. Open the solution in your IDE.  
+2. Set **BlazorWebUI** as the **Startup Project**.  
+3. Restore dependencies:
+
+   ```bash
+   dotnet restore
+   ```
+
+   Build the solution:
+
+   ```bash
+   dotnet build
+   ```
+
+   Run the application:
+
+   ```bash
+   dotnet run --project Src/SES/BlazorWebUI/BlazorWebUI.csproj
+   ```
+
+4. Open your browser and navigate to `https://localhost:5001` (or the port specified in your configuration).
+
+<!-- ## 🧪 Running Tests
+
+Set Tests project as startup in IDE, or run
+
+   ```bash
+   dotnet test
+   ``` -->
 
 ---
 
