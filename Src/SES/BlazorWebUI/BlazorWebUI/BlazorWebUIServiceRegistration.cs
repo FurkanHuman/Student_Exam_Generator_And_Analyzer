@@ -2,6 +2,7 @@
 using Domain.Entities;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using System.Reflection;
 
 namespace BlazorWebUI;
 
@@ -9,8 +10,8 @@ public static class BlazorWebUIServiceRegistration
 {
     public static IServiceCollection AddBlazorWebUIServiceRegistration(this IServiceCollection services)
     {
-        services.AddAutoMapper(typeof(MappingProfiles));
-        services.AddScoped<IdentityUserAccessor>();
+
+        services.AddAutoMapper(cfg => { }, Assembly.GetExecutingAssembly());
         services.AddScoped<IdentityRedirectManager>();
         services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
         services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();

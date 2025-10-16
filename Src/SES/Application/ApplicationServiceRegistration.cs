@@ -16,7 +16,7 @@ using Application.Services.Schools;
 using Application.Services.Semesters;
 using Application.Services.StudentAnswers;
 using Application.Services.StudentClasses;
-using Application.Services.StudentExamAnswers; 
+using Application.Services.StudentExamAnswers;
 using Application.Services.Students;
 using Application.Services.SubLearningAreas;
 using Application.Services.Teachers;
@@ -50,7 +50,7 @@ public static class ApplicationServiceRegistration
 
 
     {
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        services.AddAutoMapper(cfg => { }, Assembly.GetExecutingAssembly());
         services.AddMediatR(configuration =>
         {
             configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
