@@ -32,6 +32,17 @@ Whether you’re an individual teacher, a school, or an institution, S.E.S. can 
 
 ---
 
+## 💻 Demo
+
+A small live demo of S.E.S. is available on the following subdomains:
+
+* [ses.furkanhuman.app](https://ses.furkanhuman.app)
+* [oss.furkanhuman.app](https://oss.furkanhuman.app)
+
+This demo allows you to explore the system with sample data. Please note that it is for demonstration purposes only.
+
+---
+
 ## 🚀 How to Get Started
 
 1. **Clone the Repository**
@@ -131,6 +142,13 @@ Set Tests project as startup in IDE, or run
 
 ---
 
+## 🔒 Privacy & Security Notice
+
+For legal reasons, certain links, adapters, or external service providers are **not included** in this repository.  
+Users are responsible for configuring and managing any required integrations themselves.
+
+---
+
 ## 🔄 Contribution Guidelines
 
 * If you are interested in Contributing to this Project checkout the [Contributing Guidelines](https://github.com/FurkanHuman/Student_Exam_Generator_And_Analyzer/blob/Main/CONTRIBUTING.md)
@@ -145,6 +163,17 @@ If you’d like to see a new feature added, please open a feature request using 
 We appreciate your feedback and contributions!
 
 ---
+
+<!-- ## 🌐 Community & Support
+
+Join the S.E.S. community or stay updated through:
+
+* [Discord Server](https://discord.gg/example)  
+* [Community App Invite](https://community.example.com/invite)  
+
+Feel free to ask questions, share feedback, or contribute to the project.
+
+--- -->
 
 ## 💖 Support the Project
 
