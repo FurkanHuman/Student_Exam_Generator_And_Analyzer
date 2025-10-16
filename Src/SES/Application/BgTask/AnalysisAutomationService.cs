@@ -52,8 +52,12 @@ internal class AnalysisAutomationService(IMediator mediatr, IExamService examSer
 
             ReferenceBenefit refBenefit = examGroup.First().ReferenceBenefit;
 
+            string studentClassName =$"{examGroup.First().Student.StudentClass.ClassAge}/{examGroup.First().Student.StudentClass.ClassBranch}";
+            string analysisName = $"Auto - {examGroup.First().Lesson.LessonName} - {studentClassName} - {refBenefit.ReferenceBenefitName}"; // note: name is changable
+
             Analysis analysis = new()
             {
+                Name = analysisName,
                 LessonId = examGroup.Key.LessonId,
                 ReferenceBenefitId = refBenefit.Id,
                 PrincipalId = lastPrincipal.Id,

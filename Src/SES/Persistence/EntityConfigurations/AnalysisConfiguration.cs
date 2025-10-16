@@ -11,6 +11,7 @@ internal class AnalysisConfiguration : IEntityTypeConfiguration<Analysis>, IMain
     {
         builder.HasKey(a => a.Id);
         builder.Property(a => a.Id).IsRequired();
+        builder.Property(a => a.Name).IsRequired();
         builder.Property(a => a.AIResponse);
         builder.Property(a => a.SemesterId).IsRequired();
         builder.Property(a => a.PrincipalId).IsRequired();

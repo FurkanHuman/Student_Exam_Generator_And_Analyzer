@@ -4,6 +4,7 @@ namespace Domain.Entities;
 
 public class Analysis : Entity<int>
 {
+    public string Name { get; set; }
     public string AIResponse { get; set; }
     public int SemesterId { get; set; }
     public int PrincipalId { get; set; }
