@@ -168,7 +168,7 @@ We appreciate your feedback and contributions!
 
 Join the S.E.S. community or stay updated through:
 
-* [Discord Community](https://discord.gg/efRbrdrZft)  
+* [Discord Community](https://discord.gg/VFYGuCcR)  
 * [Whatsapp Community](https://chat.whatsapp.com/ITLsdZrvWBoAcmNZJvtZMr?mode=wwt)
 * [Telegram Community](https://t.me/+hSkOKOKD4thhYzA0)  
 
