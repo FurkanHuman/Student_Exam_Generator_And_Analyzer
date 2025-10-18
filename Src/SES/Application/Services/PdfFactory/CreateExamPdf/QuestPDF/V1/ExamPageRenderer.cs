@@ -8,60 +8,45 @@ namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
 
 public class ExamPageRenderer : IExamPageGenerator
 {
-    private static readonly byte QuestionsPerPage = 6;
-
     IDocument IQuestPDFTestPageGenerator.PageGenerate(Exam exam, ref ExamInfo examInfo)
     {
-        if (exam.QuizQuestions.Count <= QuestionsPerPage)
-            return FrontPageGenerate(exam, examInfo);
-        return Document.Merge(FrontPageGenerate(exam, examInfo), BackPageGenerate(exam, examInfo));
+        return GenerateDocument(exam, ref examInfo);
     }
 
     public byte[] PageGenerate(Exam exam, ref ExamInfo examInfo)
     {
-        if (exam.QuizQuestions.Count <= QuestionsPerPage)
-            return FrontPageGenerate(exam, examInfo).GeneratePdf();
-        return Document.Merge(FrontPageGenerate(exam, examInfo), BackPageGenerate(exam, examInfo)).GeneratePdf();
+        return GenerateDocument(exam, ref examInfo).GeneratePdf();
     }
 
-    private static IDocument FrontPageGenerate(Exam exam, ExamInfo examInfo) => Document.Create(document =>
-    {
-        document.Page(page =>
+    private static IDocument GenerateDocument(Exam exam, ref ExamInfo refExamInfo)
+    {ExamInfo examInfo = refExamInfo;
+
+        return Document.Create(document =>
         {
-            page.DefaultTextStyle(ts => ts.FontFamily(Fonts.Arial));
+            document.Page(page =>
+            {
+                PageSettings(page); 
+                
+                page.Background().Svg(WatermarkSVG("v0.0.1-alpha-09 S.E.S"));
 
-            page.MarginTop(2, Unit.Centimetre);
-            page.MarginBottom(2, Unit.Centimetre);
-            page.MarginRight(2, Unit.Centimetre);
-            page.MarginLeft(2.5f, Unit.Centimetre);
-            page.Size(pageSize: PageSizes.A4);
-            // custom page design  
-            page.Background().Svg(WatermarkSVG("v0.0.1-alpha-04 S.E.S"));
-            page.ExamHeader(exam, examInfo);
-            page.ExamQuestionContent(exam, 0, Math.Min(QuestionsPerPage, exam.QuizQuestions.Count), examInfo);
-            page.ExamFooter(exam, examInfo);
+                page.ExamHeader(exam, examInfo);
+
+                page.ExamQuestionContent(exam, examInfo);
+            
+                page.ExamFooter(exam, examInfo);
+            });
         });
-    });
+    }
 
-
-    private static IDocument BackPageGenerate(Exam exam, ExamInfo examInfo) => Document.Create(document =>
+    private static void PageSettings(PageDescriptor page)
     {
-        document.Page(page =>
-        {
-            page.DefaultTextStyle(ts => ts.FontFamily(Fonts.Arial));
-
-            page.MarginTop(2, Unit.Centimetre);
-            page.MarginBottom(2, Unit.Centimetre);
-            page.MarginRight(2, Unit.Centimetre);
-            page.MarginLeft(2.5f, Unit.Centimetre);
-
-            page.Size(pageSize: PageSizes.A4);
-            // custom page design
-            page.Background().Svg(WatermarkSVG("v0.0.1-alpha-04 S.E.S"));
-            page.ExamQuestionContent(exam, QuestionsPerPage, Math.Min(QuestionsPerPage * 2, exam.QuizQuestions.Count), examInfo);
-            page.ExamFooter(exam, examInfo);
-        });
-    });
+        page.DefaultTextStyle(ts => ts.FontFamily(Fonts.Arial));
+        page.MarginTop(2, Unit.Centimetre);
+        page.MarginBottom(2, Unit.Centimetre);
+        page.MarginRight(2, Unit.Centimetre);
+        page.MarginLeft(2.5f, Unit.Centimetre);
+        page.Size(PageSizes.A4);
+    }
 
     private static string WatermarkSVG(string text)
     {

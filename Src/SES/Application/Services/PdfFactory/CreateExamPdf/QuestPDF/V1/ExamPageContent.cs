@@ -8,7 +8,7 @@ namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
 
 internal static class ExamPageContent
 {
-    internal static PageDescriptor ExamQuestionContent(this PageDescriptor page, Exam exam, int queryStart, int queryEnd, ExamInfo examInfo)
+    internal static void ExamQuestionContent(this PageDescriptor page, Exam exam, ExamInfo examInfo)
     {
         IList<QuizQuestion> quizQuestions = exam.QuizQuestions;
 
@@ -29,15 +29,13 @@ internal static class ExamPageContent
             {
                 column.Spacing(20);
 
-                for (int i = queryStart; i < queryEnd && i < exam.QuizQuestions.Count; i++)
+                for (int i = 0; i < exam.QuizQuestions.Count; i++)
                     column.Item()
                           .ShowEntire()
                           .PaddingBottom(20)
                           .QuestionBody(exam, i, examInfo, (int)seed);
             });
         });
-
-        return page;
     }
 
     private static IContainer QuestionBody(this IContainer container, Exam exam, int index, ExamInfo examInfo, int seed)

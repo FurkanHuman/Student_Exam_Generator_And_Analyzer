@@ -9,14 +9,15 @@ namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
 
 internal static class ExamPageHeader
 {
-    internal static PageDescriptor ExamHeader(this PageDescriptor page, Exam exam, ExamInfo examInfo)
+    private const int ShowPageNumber = 1;
+    internal static void ExamHeader(this PageDescriptor page, Exam exam, ExamInfo examInfo)
     {
         ExamConstants.CurrentLanguage = examInfo.Language;
 
-        page.Header().PaddingBottom(0.5F, Unit.Centimetre).Row(headerRow =>
+        page.Header().ShowIf(h => h.PageNumber == ShowPageNumber).PaddingBottom(0.5F, Unit.Centimetre).Row(headerRow =>
         {
             headerRow.Spacing(1.15f, Unit.Point);
-            headerRow.RelativeItem(1).AlignLeft().AlignCenter().AlignTop().Column(nameBox =>
+            headerRow.RelativeItem(1).ShowIf(!examInfo.IsGhostExam).AlignLeft().AlignCenter().AlignTop().Column(nameBox =>
             {
                 if (!examInfo.IsAnonymousExamMode)
                 {
@@ -64,6 +65,5 @@ internal static class ExamPageHeader
                 });
             });
         });
-        return page;
     }
 }
