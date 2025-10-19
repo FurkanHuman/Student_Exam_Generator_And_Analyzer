@@ -18,7 +18,7 @@ public class ExamPageRenderer : IExamPageGenerator
         return GenerateDocument(exam, ref examInfo).GeneratePdf();
     }
 
-    private static IDocument GenerateDocument(Exam exam, ref ExamInfo refExamInfo)
+    private static Document GenerateDocument(Exam exam, ref ExamInfo refExamInfo)
     {ExamInfo examInfo = refExamInfo;
 
         return Document.Create(document =>
