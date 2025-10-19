@@ -164,16 +164,17 @@ We appreciate your feedback and contributions!
 
 ---
 
-<!-- ## 🌐 Community & Support
+## 🌐 Community & Support
 
 Join the S.E.S. community or stay updated through:
 
-* [Discord Server](https://discord.gg/example)  
-* [Community App Invite](https://community.example.com/invite)  
+* [Discord Community](https://discord.gg/MeSEk6XB2q)  
+* [Whatsapp Community](https://chat.whatsapp.com/ITLsdZrvWBoAcmNZJvtZMr?mode=wwt)
+* [Telegram Community](https://t.me/+hSkOKOKD4thhYzA0)  
 
 Feel free to ask questions, share feedback, or contribute to the project.
 
---- -->
+---
 
 ## 💖 Support the Project
 
