@@ -28,8 +28,20 @@ public static class PersistenceServiceRegistration
 
         services.AddScoped<PostgreSqlDbContext>(provider => provider.GetRequiredService<IDbContextFactory<PostgreSqlDbContext>>().CreateDbContext());
 
-        services.AddDbContext<PostgreSqlUserDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("PostgreSqlUserDbConnectionStrings"),
-                m => m.MigrationsAssembly(typeof(PostgreSqlUserDbContext).Assembly.FullName)).UseSnakeCaseNamingConvention(), ServiceLifetime.Scoped);
+        services.AddDbContextFactory<PostgreSqlUserDbContext>(options =>
+        {
+            options.UseNpgsql(
+                configuration.GetConnectionString("PostgreSqlUserDbConnectionStrings"),
+                npgsqlOptions =>
+                {
+                    npgsqlOptions.MigrationsAssembly(typeof(PostgreSqlUserDbContext).Assembly.FullName);
+                    npgsqlOptions.EnableRetryOnFailure(3);
+                    npgsqlOptions.CommandTimeout(60);
+                })
+                .UseSnakeCaseNamingConvention();
+        }, ServiceLifetime.Scoped);
+
+        services.AddScoped<PostgreSqlUserDbContext>(provider => provider.GetRequiredService<IDbContextFactory<PostgreSqlUserDbContext>>().CreateDbContext());
 
         services.AddScoped<IAnalysisRepository, AnalysisRepository>();
         services.AddScoped<IBenefitRepository, BenefitRepository>();
