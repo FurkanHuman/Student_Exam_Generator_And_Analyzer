@@ -21,6 +21,8 @@ show_usage() {
     echo "Configurations for Standalone: Debug, Release (default: Release)"
 }
 
+cd ..
+
 # Get parameters
 MODE=$1
 APP_NAME=$2

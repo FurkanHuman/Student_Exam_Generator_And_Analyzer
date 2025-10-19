@@ -58,6 +58,12 @@ This demo allows you to explore the system with sample data. Please note that it
 
 3. **Build and Run the App**
 
+   First, navigate to the **Scripts** folder.
+
+   ```bash
+      cd Scripts
+   ```
+
    For Linux-based systems
 
    ```bash
@@ -155,7 +161,7 @@ Users are responsible for configuring and managing any required integrations the
 
 ---
 
-# 📝 Feature Requests
+## 📝 Feature Requests
 
 If you’d like to see a new feature added, please open a feature request using our  
 [Feature Request Template](https://github.com/FurkanHuman/Student_Exam_Generator_And_Analyzer/blob/Main/.github/ISSUE_TEMPLATE/feature_request.md).

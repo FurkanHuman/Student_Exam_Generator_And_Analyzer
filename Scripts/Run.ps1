@@ -13,9 +13,10 @@ param(
     [string]$CertPathOrHttpsPort,
     
     [Parameter(Position = 4)]
-    [string]$CertPassword
+    [SecureString]$CertPassword
 )
-
+    
+set-Location ..
 function Show-Usage {
     Write-Host "Usage: .\Run.ps1 <mode> [options]" -ForegroundColor Yellow
     Write-Host ""

@@ -13,12 +13,13 @@ param(
     [string]$CertPathOrEmpty,
     
     [Parameter(Position = 4)]
-    [string]$CertPassword,
+    [securestring]$CertPassword,
     
     [ValidateSet("Debug", "Release")]
     [string]$Configuration = "Release"
 )
-
+    
+Set-Location ..
 function Show-Usage {
     Write-Host "Usage: .\Build.ps1 <mode> <app_name> [options]" -ForegroundColor Yellow
     Write-Host ""
