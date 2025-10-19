@@ -1,5 +1,6 @@
 using Application.Services.Analyses;
 using Application.Services.Benefits;
+using Application.Services.CalculatorFactory;
 using Application.Services.Exams;
 using Application.Services.LearningAreas;
 using Application.Services.Lessons;
@@ -93,6 +94,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<ILessonService, LessonManager>();
         services.AddScoped<IPersonelService, PersonelManager>();
         services.AddScoped<IPdfReaderService, PdfReaderManager>();
+        services.AddScoped<AnalysisDetailTableCalculator>();
 
         services.AddScoped<PdfReaderStudentManager>();
         services.AddScoped<IExamPageGenerator, ExamPageRenderer>();
