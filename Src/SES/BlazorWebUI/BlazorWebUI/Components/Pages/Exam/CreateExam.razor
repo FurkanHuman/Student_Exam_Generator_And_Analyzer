@@ -29,6 +29,8 @@
 @code
 {
     private Guid _personelGuid;
+    private Guid _tempPersonelId;
+    private bool _personelLoaded = false;
 
     private bool _isCheckBoxCheckedStatus { get; set; } = false;
 
@@ -47,7 +49,7 @@
 
     private Dictionary<int, int> _orderedQQ { get; set; } = new();
     private ExamInfo _examInfo { get; set; } = new();
-
+ 
     protected override async Task OnInitializedAsync()
     {
         AuthenticationState authState = await _authStateProvider.GetAuthenticationStateAsync();
@@ -56,14 +58,34 @@
         if (userPrincipal.Identity?.IsAuthenticated == true)
         {
             ApplicationUser? user = await _userManager.GetUserAsync(userPrincipal);
-            if (user != null)
+            if (user != null && user.PersonelId != Guid.Empty)
             {
-                Personel? personel = await _personelService.GetByIdAsync(user.PersonelId);
-                if (personel != null)
-                    _personelGuid = personel.Id;
+                _tempPersonelId = user.PersonelId;  // ← DB çağrısı YOK, sadece ID sakla
             }
         }
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_personelLoaded && _tempPersonelId != Guid.Empty)
+        {
+            _personelLoaded = true;
+            try
+            {
+                Personel? personel = await _personelService.GetByIdAsync(_tempPersonelId);
+                if (personel != null)
+                {
+                    _personelGuid = personel.Id;
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+    }
+
 
     private void ToggleQuestInList(bool isSelected, QQBodyDto qQBody)
     {

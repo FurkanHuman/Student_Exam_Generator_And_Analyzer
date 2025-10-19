@@ -25,21 +25,33 @@
 
     private int? _selectedSemesterId { get; set; }
     private int? _selectedLessonId { get; set; }
+    private bool _dataLoaded = false;
 
     private GetListResponse<GetListSemesterListItemDto> GetListSemesters { get; set; } = new();
     private GetListResponse<GetListLessonQueryBySemesterIdDto> GetListLessons { get; set; } = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        PageRequest pR = new() { PageIndex = 0, PageSize = int.MaxValue };
-        GetListSemesters = await _mediatr.Send(new GetListSemesterQuery() { PageRequest = pR });
-
-        if (!_includePreviousSemesters)
+        if (firstRender && !_dataLoaded)
         {
-            _selectedSemesterId = GetListSemesters.Items.Last()?.Id;
-            GetListLessons = await _mediatr.Send(new GetListLessonQueryBySemesterIdQuery() { SemesterId = _selectedSemesterId!.Value });
+            _dataLoaded = true;
+            try
+            {
+                PageRequest pR = new() { PageIndex = 0, PageSize = int.MaxValue };
+                GetListSemesters = await _mediatr.Send(new GetListSemesterQuery() { PageRequest = pR });
+
+                if (!_includePreviousSemesters)
+                {
+                    _selectedSemesterId = GetListSemesters.Items.Last()?.Id;
+                    GetListLessons = await _mediatr.Send(new GetListLessonQueryBySemesterIdQuery() { SemesterId = _selectedSemesterId!.Value });
+                }
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
         }
-        await base.OnInitializedAsync();
     }
 
     private async Task SelectSemester(int semesterId)

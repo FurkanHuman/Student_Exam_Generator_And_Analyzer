@@ -12,9 +12,21 @@ public static class PersistenceServiceRegistration
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<BaseDbContext>(opt => opt.UseInMemoryDatabase("BaseDb"), ServiceLifetime.Transient);
+ 
+        services.AddDbContextFactory<PostgreSqlDbContext>(options =>
+        {
+            options.UseNpgsql(
+                configuration.GetConnectionString("PostgreSqlDbConnectionStrings"),
+                npgsqlOptions =>
+                {
+                    npgsqlOptions.MigrationsAssembly(typeof(PostgreSqlDbContext).Assembly.FullName);
+                    npgsqlOptions.EnableRetryOnFailure(3);
+                    npgsqlOptions.CommandTimeout(60);
+                })
+                .UseSnakeCaseNamingConvention();
+        }, ServiceLifetime.Scoped);
 
-        services.AddDbContext<PostgreSqlDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("PostgreSqlDbConnectionStrings"),
-            m => m.MigrationsAssembly(typeof(PostgreSqlDbContext).Assembly.FullName)).UseSnakeCaseNamingConvention(), ServiceLifetime.Scoped);
+        services.AddScoped<PostgreSqlDbContext>(provider => provider.GetRequiredService<IDbContextFactory<PostgreSqlDbContext>>().CreateDbContext());
 
         services.AddDbContext<PostgreSqlUserDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("PostgreSqlUserDbConnectionStrings"),
                 m => m.MigrationsAssembly(typeof(PostgreSqlUserDbContext).Assembly.FullName)).UseSnakeCaseNamingConvention(), ServiceLifetime.Scoped);

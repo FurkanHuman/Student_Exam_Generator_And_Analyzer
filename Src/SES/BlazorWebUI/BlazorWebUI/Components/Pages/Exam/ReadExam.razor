@@ -38,7 +38,6 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            @*note: is here changes to ghost mode *@
                             <div class="mb-3">
                                 <label for="studentSelect" class="form-label fw-bold">Öğrenci Seçimi</label>
                                 <InputSelect id="studentSelect" class="form-select form-select-lg" TValue="int" @bind-Value="_selectedStudentId" @oninput="SelectStudent">
@@ -156,6 +155,8 @@
     private int _questionOrder { get; set; } = 0;
 
     private Guid _personelGuid;
+    private Guid _tempPersonelId; 
+    private bool _personelLoaded = false; 
 
     private GetStudentsByIdsListItemDto _selectedStudent { get; set; } = default!;
     private GetListExamByLessonIdDto _selectedExam { get; set; } = default!;
@@ -168,7 +169,6 @@
 
     private GetListResponse<GetStudentsByIdsListItemDto> _students { get; set; } = default!;
     private GetListResponse<GetQuizQuestionsByIdsListItemDto> _quizQuestions { get; set; } = default!;
-
     protected override async Task OnInitializedAsync()
     {
         AuthenticationState authState = await _authStateProvider.GetAuthenticationStateAsync();
@@ -177,11 +177,28 @@
         if (userPrincipal.Identity?.IsAuthenticated == true)
         {
             ApplicationUser? user = await _userManager.GetUserAsync(userPrincipal);
-            if (user != null)
+            if (user != null && user.PersonelId != Guid.Empty)
+                _tempPersonelId = user.PersonelId;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_personelLoaded && _tempPersonelId != Guid.Empty)
+        {
+            _personelLoaded = true;
+            try
             {
-                Personel? personel = await _personelService.GetByIdAsync(user.PersonelId);
+                Personel? personel = await _personelService.GetByIdAsync(_tempPersonelId);
                 if (personel != null)
+                {
                     _personelGuid = personel.Id;
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
             }
         }
     }
