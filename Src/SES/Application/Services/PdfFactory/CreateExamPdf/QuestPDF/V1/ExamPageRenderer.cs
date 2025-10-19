@@ -27,7 +27,7 @@ public class ExamPageRenderer : IExamPageGenerator
             {
                 PageSettings(page); 
                 
-                page.Background().Svg(WatermarkSVG("v0.0.1-alpha-09 S.E.S"));
+                page.Background().ShowIf(examInfo.ShowWatermark).Svg(WatermarkSVG("v0.0.1-alpha-09 S.E.S"));
 
                 page.ExamHeader(exam, examInfo);
 
