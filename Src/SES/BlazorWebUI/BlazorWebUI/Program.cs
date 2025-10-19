@@ -109,8 +109,14 @@ app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(BlazorWebUI.Client._Imports).Assembly)
     .DisableAntiforgery();
 
-
-app.UseResponseLocalization();
+app.Use(async (context, next) =>
+{
+    if (string.IsNullOrEmpty(context.Request.Headers.AcceptLanguage))
+    {
+        context.Request.Headers.AcceptLanguage = "tr-TR";
+    }
+    await next();
+});
 app.MapAdditionalIdentityEndpoints();
 
 await app.RunAsync();

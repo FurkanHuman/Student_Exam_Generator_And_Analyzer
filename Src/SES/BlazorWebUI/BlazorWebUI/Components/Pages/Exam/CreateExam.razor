@@ -162,8 +162,24 @@
     private async Task getSemesterIdFromQuizPoolLoader(int args)
     {
         _semesterId = args;
-        _semesterClassList = await _mediator.Send(new GetClassesBySemesterIdQuery() { SemesterId = _semesterId });
-        _classAgeList = _semesterClassList.Items.Select(ca => ca.ClassAge).Order().ToHashSet();
+
+        try
+        {
+           await InvokeAsync(async () =>
+            {
+                _semesterClassList = await _mediator.Send(new GetClassesBySemesterIdQuery() { SemesterId = _semesterId });
+                _classAgeList = _semesterClassList.Items.Select(ca => ca.ClassAge).Order().ToHashSet();
+                StateHasChanged();
+            });
+        }
+        catch (ObjectDisposedException ex)
+        {
+            Console.WriteLine($"ServiceProvider disposed: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in getSemesterIdFromQuizPoolLoader: {ex.Message}");
+        }
     }
 }
 
@@ -191,7 +207,7 @@
 
                 <div class="input-group mb-3" style="width:20rem;">
                     <label class="input-group-text">Sınav Tarihi: </label>
-                    <InputDate type="InputDateType.Date" class="form-control conversion" id="name" EnableMinMax="true" Min="@DateTime.Now.Date.ToString("yyyy-MM-dd")" Placeholder="Sınav Tarihi:" @bind-Value="_examInfo.ExamScheduledDate" />
+                    <InputDate Type="InputDateType.Date" class="form-control conversion" id="name" EnableMinMax="true" Min="@DateTime.Now.Date.ToString("yyyy-MM-dd")" Placeholder="Sınav Tarihi:" @bind-Value="_examInfo.ExamScheduledDate" />
                 </div>
 
                 <div class="input-group mb-3" style="width:15rem;">
