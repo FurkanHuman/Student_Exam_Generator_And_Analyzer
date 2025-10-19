@@ -3,7 +3,6 @@ using Application.Services.Exams;
 using Application.Services.Principals;
 using Application.Services.Repositories;
 using Domain.Entities;
-using Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
@@ -44,16 +43,15 @@ internal class AnalysisAutomationService(IMediator mediatr, IExamService examSer
 
         foreach (IGrouping<(int LessonId, int StudentClassId, int hashCode), Exam> examGroup in groupedByLessonAndClassWithHashCode)
         {
-            IList<StudentExamAnswer> studentExamAnswers = [.. examGroup.Select(e => e.StudentExamAnswer)
-                                                                       .Where(sea => sea.ExamEvaluationStatus != ExamEvaluationStatus.NotEvaluated)];
+            IList<StudentExamAnswer> studentExamAnswers = [.. examGroup.Select(e => e.StudentExamAnswer)];
 
             IList<Teacher> teachers = [.. examGroup.SelectMany(e => e.Teachers)
                                                    .DistinctBy(t => t.Id)];
 
             ReferenceBenefit refBenefit = examGroup.First().ReferenceBenefit;
 
-            string studentClassName =$"{examGroup.First().Student.StudentClass.ClassAge}/{examGroup.First().Student.StudentClass.ClassBranch}";
-            string analysisName = $"Auto - {examGroup.First().Lesson.LessonName} - {studentClassName} - {refBenefit.ReferenceBenefitName}"; // note: name is changable
+            string studentClassName = $"{examGroup.First().Student.StudentClass.ClassAge}/{examGroup.First().Student.StudentClass.ClassBranch}";
+            string analysisName = $"Auto - {examGroup.First().Lesson.LessonName} - {studentClassName} - {refBenefit.ReferenceBenefitName} Anlasis"; // note: name is changable
 
             Analysis analysis = new()
             {
@@ -100,18 +98,16 @@ internal class AnalysisAutomationService(IMediator mediatr, IExamService examSer
 
     private async Task<IPaginate<Exam>?> GetExamsReadyForAnalysis(int activeSemesterId, DateOnly today, CancellationToken stoppingToken)
     {
-        return await examService.GetListAsync(e => e.EvaluationOrigin != EvaluationOrigin.NotEvaluated
-                                                                      && e.SemesterId == activeSemesterId
-                                                                      && e.ExamDate.AddDays(DelayInDays) == today,
-                                                                      include: e => e.Include(e => e.StudentExamAnswer)
-                                                                                     .Include(e => e.Student)
-                                                                                     .Include(e => e.StudentClasses)
-                                                                                     .Include(e => e.Teachers)
-                                                                                     .Include(e => e.ReferenceBenefit),
-
-                                                                      index: 0,
-                                                                      size: int.MaxValue,
-                                                                      cancellationToken: stoppingToken);
+        return await examService.GetListAsync(e => e.SemesterId == activeSemesterId
+                                                && e.ExamDate.AddDays(DelayInDays) == today,
+                                                include: e => e.Include(e => e.StudentExamAnswer)
+                                                               .Include(e => e.Student)
+                                                               .Include(e => e.StudentClasses)
+                                                               .Include(e => e.Teachers)
+                                                               .Include(e => e.ReferenceBenefit),
+                                                index: 0,
+                                                size: int.MaxValue,
+                                                cancellationToken: stoppingToken);
     }
 
     private async Task<int?> IsWithinSemesterDateRange()
