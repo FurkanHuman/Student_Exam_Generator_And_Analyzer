@@ -110,7 +110,7 @@ public static class ApplicationServiceRegistration
         Func<IServiceCollection, Type, IServiceCollection>? addWithLifeCycle = null
     )
     {
-        var types = assembly.GetTypes().Where(t => t.IsSubclassOf(type) && type != t).ToList();
+        List<Type> types = assembly.GetTypes().Where(t => t.IsSubclassOf(type) && type != t).ToList();
         foreach (Type? item in types)
             if (addWithLifeCycle == null)
                 services.AddScoped(item);
