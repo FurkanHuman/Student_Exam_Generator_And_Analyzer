@@ -20,7 +20,6 @@ public static class PersistenceServiceRegistration
                 npgsqlOptions =>
                 {
                     npgsqlOptions.MigrationsAssembly(typeof(PostgreSqlDbContext).Assembly.FullName);
-                    npgsqlOptions.EnableRetryOnFailure(3);
                     npgsqlOptions.CommandTimeout(60);
                 })
                 .UseSnakeCaseNamingConvention();
@@ -35,7 +34,6 @@ public static class PersistenceServiceRegistration
                 npgsqlOptions =>
                 {
                     npgsqlOptions.MigrationsAssembly(typeof(PostgreSqlUserDbContext).Assembly.FullName);
-                    npgsqlOptions.EnableRetryOnFailure(3);
                     npgsqlOptions.CommandTimeout(60);
                 })
                 .UseSnakeCaseNamingConvention();
