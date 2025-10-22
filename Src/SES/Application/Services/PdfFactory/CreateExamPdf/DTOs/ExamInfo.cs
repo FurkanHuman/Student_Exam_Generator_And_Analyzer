@@ -20,5 +20,5 @@ public class ExamInfo
     public bool IsCommonExam { get; set; } = true;
     public bool IsGhostExam { get; set; } = false; // exam without student info and readers do not know who they are.
     public bool PracticeExam { get; set; } = false; // practice exam 
-    public bool ShowWatermark { get; set; } = false;
+    public bool ShowWatermark { get; set; } = true;
 }
