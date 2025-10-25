@@ -1,5 +1,7 @@
 ﻿using Application.Services.PdfFactory.CreateExamPdf.DTOs;
 using Domain.Entities;
+using NArchitecture.Core.Security.Entities;
+using QuestPDF.Drawing;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -40,7 +42,10 @@ public class ExamPageRenderer : IExamPageGenerator
 
     private static void PageSettings(PageDescriptor page)
     {
-        page.DefaultTextStyle(ts => ts.FontFamily(Fonts.Arial));
+        using FileStream font_Stream = File.OpenRead("Fonts\\Arial\\ARIAL.TTF");
+        FontManager.RegisterFont(font_Stream);
+
+        page.DefaultTextStyle(ts => ts.FontFamily("ARIAL.TTF"));
         page.MarginTop(2, Unit.Centimetre);
         page.MarginBottom(2, Unit.Centimetre);
         page.MarginRight(2, Unit.Centimetre);
