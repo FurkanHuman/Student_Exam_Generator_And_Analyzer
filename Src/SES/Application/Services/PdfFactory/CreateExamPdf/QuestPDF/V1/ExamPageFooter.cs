@@ -10,11 +10,11 @@ internal static class ExamPageFooter
 {
     internal static void ExamFooter(this PageDescriptor page, Exam exam, ExamInfo examInfo)
     {
-        page.Footer().Height(1.3f, Unit.Centimetre).Column(footerNotes =>
+        page.Footer().Column(footerNotes =>
         {
             string examAuthor = $"{exam.ExamAuthor.Personel.Name} {exam.ExamAuthor.Personel.SurName}";
-            footerNotes.Item().AlignCenter().Text(examAuthor).FontSize(12);
-            footerNotes.Item().AlignCenter().Text(exam.FooterNote).FontSize(12);
+            footerNotes.Item().AlignCenter().Text(examAuthor).FontSize(10);
+            footerNotes.Item().AlignCenter().Text(exam.FooterNote).FontSize(10);
             footerNotes.Item().AlignCenter().Text(QuizQuestionHelpers.InsertDashInString(exam.ExamCode)).FontSize(7);
         });
     }

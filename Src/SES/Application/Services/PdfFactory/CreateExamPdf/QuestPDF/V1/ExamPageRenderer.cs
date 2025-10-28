@@ -40,7 +40,7 @@ public class ExamPageRenderer : IExamPageGenerator
 
     private static void PageSettings(PageDescriptor page)
     {
-        page.DefaultTextStyle(ts => ts.FontFamily(Fonts.Arial));
+        page.DefaultTextStyle(ts => ts.FontFamily(Fonts.Arial).FontSize(11));
         page.MarginTop(2, Unit.Centimetre);
         page.MarginBottom(2, Unit.Centimetre);
         page.MarginRight(2, Unit.Centimetre);
