@@ -2,7 +2,6 @@
 using Application.Services.PdfFactory.CreateExamPdf.Helpers;
 using Domain.Entities;
 using QuestPDF.Fluent;
-using QuestPDF.Infrastructure;
 
 namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
 

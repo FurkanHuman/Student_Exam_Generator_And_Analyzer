@@ -2,6 +2,7 @@
 using Application.Services.PdfFactory.CreateExamPdf.Helpers;
 using Domain.Entities;
 using QuestPDF.Fluent;
+using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
 namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
@@ -23,17 +24,22 @@ internal static class ExamPageContent
         page.Content().MultiColumn(multi =>
         {
             multi.Columns(2);
-            multi.Spacing(10);
+            multi.Spacing(20);
+
+            multi.Spacer().AlignCenter().LineVertical(2).LineColor(Colors.Black);
+            multi.BalanceHeight(false);
 
             multi.Content().Column(column =>
             {
-                column.Spacing(20);
+                column.Spacing(10);
 
                 for (int i = 0; i < exam.QuizQuestions.Count; i++)
+                {
                     column.Item()
                           .ShowEntire()
-                          .PaddingBottom(20)
+                          .PaddingBottom(10)
                           .QuestionBody(exam, i, examInfo, (int)seed);
+                }
             });
         });
     }
@@ -43,8 +49,8 @@ internal static class ExamPageContent
         container.Row(row =>
         {
             row.Spacing(10);
-            row.AutoItem().AlignMiddle().AlignTop().Text($"{index + 1})");
-            row.RelativeItem(1).AlignMiddle().QuizQuestion(exam.QuizQuestions[index], examInfo, seed);
+            row.AutoItem().AlignTop().Text($"{index + 1})");
+            row.RelativeItem(1).QuizQuestion(exam.QuizQuestions[index], examInfo, seed);
         });
 
         return container;
