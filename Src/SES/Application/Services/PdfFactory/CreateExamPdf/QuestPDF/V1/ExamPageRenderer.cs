@@ -1,5 +1,7 @@
 ﻿using Application.Services.PdfFactory.CreateExamPdf.DTOs;
 using Domain.Entities;
+using NArchitecture.Core.Security.Entities;
+using QuestPDF.Drawing;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
