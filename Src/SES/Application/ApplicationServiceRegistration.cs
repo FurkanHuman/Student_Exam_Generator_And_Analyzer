@@ -100,6 +100,8 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IExamPageGenerator, ExamPageRenderer>();
 
         QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+        QuestPDF.Settings.CheckIfAllTextGlyphsAreAvailable = false;
+
         return services;
     }
 
