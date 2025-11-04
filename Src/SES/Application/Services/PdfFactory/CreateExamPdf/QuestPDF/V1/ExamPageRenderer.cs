@@ -1,5 +1,7 @@
 ﻿using Application.Services.PdfFactory.CreateExamPdf.DTOs;
+using Application.Services.PdfFactory.CreateExamPdf.Helpers;
 using Domain.Entities;
+using QuestPDF.Drawing.Exceptions;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -22,6 +24,34 @@ public class ExamPageRenderer : IExamPageGenerator
     {
         ExamInfo examInfo = refExamInfo;
 
+        const byte MaxRetryCount = 3;
+
+        for (byte retryCount = 0; retryCount < MaxRetryCount; retryCount++)
+        {
+            try
+            {
+                return DrawExamPage(exam, examInfo);
+            }
+
+            catch (Exception ex) when (ex is DocumentDrawingException || ex is DocumentComposeException)
+            {
+                return HandleDocumentException($"Document Layout Error: {ex.Message}");
+            }
+
+            catch (Exception ex)
+            {
+                exam.ExamCode = QuizQuestionHelpers.GenerateBase32String();
+
+                if (retryCount == MaxRetryCount - 1)
+                    return HandleDocumentException($"Document Retry Failure after {MaxRetryCount} attempts. Last error: {ex.Message}");
+            }
+        }
+
+        return HandleDocumentException("Unexpected document generation failure.");
+    }
+
+    private static Document DrawExamPage(Exam exam, ExamInfo examInfo)
+    {
         return Document.Create(document =>
         {
             document.Page(page =>
@@ -39,6 +69,17 @@ public class ExamPageRenderer : IExamPageGenerator
         });
     }
 
+    private static Document HandleDocumentException(string errorMessage)
+    {
+        return Document.Create(document =>
+        {
+            document.Page(page =>
+            {
+                PageSettings(page);
+                page.Content().AlignCenter().AlignMiddle().Text(errorMessage).FontSize(14).FontColor(Colors.Red.Medium);
+            });
+        });
+    }
 
     private static void PageSettings(PageDescriptor page)
     {
