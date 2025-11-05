@@ -1,3 +1,4 @@
+using Application.BgTask;
 using Application.Services.Analyses;
 using Application.Services.Benefits;
 using Application.Services.CalculatorFactory;
@@ -95,7 +96,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IPersonelService, PersonelManager>();
         services.AddScoped<IPdfReaderService, PdfReaderManager>();
         services.AddScoped<AnalysisDetailTableCalculator>();
-
+        services.AddScoped<AnalysisAutomationService>();
         services.AddScoped<PdfReaderStudentManager>();
         services.AddScoped<IExamPageGenerator, ExamPageRenderer>();
 
