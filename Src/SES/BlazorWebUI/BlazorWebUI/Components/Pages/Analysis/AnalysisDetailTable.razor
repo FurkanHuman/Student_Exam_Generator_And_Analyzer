@@ -1,0 +1,185 @@
+@using Application.Services.CalculatorFactory
+@inject AnalysisDetailTableCalculator Calculator
+
+<div class="container-fluid p-4">
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
+            </div>
+        </div>
+    }
+    else if (analysisData != null && analysisData.Any())
+    {
+        @foreach (AnalysisDetailTableDto examData in analysisData)
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Sınav Kodu: @examData.ExamCode</h4>
+                    <small>Toplam Soru Sayısı: @examData.QuestionCount</small>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover table-sm mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th class="text-center align-middle" style="width: 80px;">Ö. No</th>
+                                    <th class="align-middle" style="width: 200px;">Ad + Soyad</th>
+                                    @for (int i = 1; i <= examData.QuestionCount; i++)
+                                    {
+                                        <th class="text-center align-middle" style="width: 50px;">S@i</th>
+                                    }
+                                    <th class="text-center align-middle bg-warning text-dark" style="width: 100px;">Toplam Puan</th>
+                                    <th class="text-center align-middle bg-info text-dark" style="width: 100px;">Geçti/Kaldı</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (StudentTableDto student in examData.Students)
+                                {
+                                    int totalScore = student.StudentAnswerScores.Sum(s => s.GivenScore);
+                                    (bool IsPassed, string Status) passFail = GetPassFailStatus(totalScore);
+
+                                    <tr class="align-middle">
+                                        <td class="text-center fw-semibold">@student.SchoolNumber</td>
+                                        <td class="fw-medium">@student.Name @student.Surname</td>
+                                        @foreach (StudentAnswerScore score in student.StudentAnswerScores)
+                                        {
+                                            <td class="text-center fw-semibold" style="background-color: @GetScoreColor(score.GivenScore); color: @GetScoreTextColor(score.GivenScore);">
+                                                @score.GivenScore
+                                            </td>
+                                        }
+                                        <td class="text-center fw-bold bg-warning text-dark fs-6">@totalScore</td>
+                                        <td class="text-center fw-bold fs-6" style="background-color: @(passFail.IsPassed ? "#28a745" : "#dc3545"); color: white;">
+                                            @passFail.Status
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else if (!isLoading && errorMessage != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @errorMessage
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int AnalysisId { get; set; }
+
+    private IList<AnalysisDetailTableDto>? analysisData;
+    private bool isLoading = true;
+    private string? errorMessage;
+
+    private const int PassingScore = 50;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = null;
+
+            analysisData = await Calculator.CalculateAsync(AnalysisId);
+
+        }
+        catch (InvalidOperationException ex)
+        {
+            errorMessage = $"Analiz bulunamadı: {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Veri yüklenirken hata oluştu: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private string GetScoreColor(int score)
+    {
+        // Puan bazlı renklendirme - istediğiniz gibi özelleştirebilirsiniz
+        return score switch
+        {
+            >= 85 => "#28a745", // Koyu Yeşil (Çok iyi)
+            >= 70 => "#17a2b8", // Mavi (İyi)
+            >= 60 => "#ffc107", // Sarı (Orta)
+            >= 50 => "#fd7e14", // Turuncu (Zayıf)
+            _ => "#dc3545"      // Kırmızı (Çok zayıf)
+        };
+    }
+
+    private string GetScoreTextColor(int score)
+    {
+        // Puan rengi yeterince koyu ise beyaz, açıksa siyah metin
+        return score switch
+        {
+            >= 85 => "white",
+            >= 70 => "white",
+            >= 60 => "black",
+            >= 50 => "white",
+            _ => "white"
+        };
+    }
+
+    private (bool IsPassed, string Status) GetPassFailStatus(int totalScore)
+    {
+        switch (totalScore)
+        {
+            case >= 85:
+                return (true, "Pekiyi");
+            case >= 70:
+                return (true, "İyi");
+            case >= 60:
+                return (true, "Orta");
+            case >= 50:
+                return (true, "Geçer");
+            default:
+                return (false, $"Geçmez");
+        }
+    }
+}
+
+<style>
+    .table-sm td, .table-sm th {
+        padding: 0.4rem;
+        vertical-align: middle;
+    }
+
+    .table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .table-responsive {
+        max-height: 75vh;
+        overflow-y: auto;
+    }
+
+    .table-bordered td, .table-bordered th {
+        border: 2px solid #dee2e6;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        border-bottom: 3px solid rgba(0,0,0,0.125);
+    }
+</style>
