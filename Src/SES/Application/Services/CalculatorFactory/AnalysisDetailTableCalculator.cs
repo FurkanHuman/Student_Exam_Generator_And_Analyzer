@@ -98,14 +98,14 @@ namespace Application.Services.CalculatorFactory
         public string Name { get; init; } = string.Empty;
         public string Surname { get; init; } = string.Empty;
         public string SchoolNumber { get; init; } = string.Empty;
-        public IList<StudentAnswerScore> StudentAnswerScores { get; init; } = new List<StudentAnswerScore>();
+        public IList<StudentAnswerScore> StudentAnswerScores { get; init; } = [];
     }
 
     public record AnalysisDetailTableDto
     {
         public string ExamCode { get; init; } = string.Empty;
         public int QuestionCount { get; init; }
-        public IList<StudentTableDto> Students { get; init; } = new List<StudentTableDto>();
+        public IList<StudentTableDto> Students { get; init; } = [];
     }
 
     public record StudentAnswerScore
