@@ -2,6 +2,7 @@
 using Application.Services.ImageService;
 using Infrastructure.Adapters.AIService;
 using Infrastructure.Adapters.ImageService;
+using Infrastructure.Adapters.MediaService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,13 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<ImageServiceBase, CloudinaryImageServiceAdapter>();
         services.AddKeyedScoped<IAIService, OpenAIServiceAdapter>("OpenAI");
         
+        services.AddHttpClient<ZeroFileMediaServiceAdapter>()
+            .ConfigureHttpClient((sp, client) =>
+            {
+                IConfiguration config = sp.GetRequiredService<IConfiguration>();
+                client.BaseAddress = new Uri(config["ZeroFile:ServiceAddress"]!);
+            });
+
         return services;
     }
 }
