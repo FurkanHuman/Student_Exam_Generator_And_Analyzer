@@ -13,7 +13,6 @@ public class ZeroFileMediaServiceAdapter
         _httpClient = httpClient;
     }
 
-
     public async Task<Dictionary<string, string>> UploadFile(byte[] fileBytes, string fileName, CancellationToken cancellationToken)
     {
         using MultipartFormDataContent form = [];
@@ -47,7 +46,6 @@ public class ZeroFileMediaServiceAdapter
 
         return (bytesFile, meta);
     }
-
 
     public async Task<Dictionary<string, string>> DeleteFile(string id, CancellationToken cancellationToken)
     {
