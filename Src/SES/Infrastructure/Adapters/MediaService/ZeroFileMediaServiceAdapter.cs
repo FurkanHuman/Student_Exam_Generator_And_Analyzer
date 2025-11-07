@@ -13,25 +13,6 @@ public class ZeroFileMediaServiceAdapter
         _httpClient = httpClient;
     }
 
-    // shared method to read JSON responses
-    private static async Task<Dictionary<string, string>> ReadJsonResponse(HttpResponseMessage response, CancellationToken cancellationToken)
-    {
-        string json = await response.Content.ReadAsStringAsync(cancellationToken);
-
-        if (string.IsNullOrWhiteSpace(json))
-            return [];
-
-        try
-        {
-            Dictionary<string, string>? data = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-            return data != null && data.Count > 0 ? data : [];
-        }
-
-        catch (JsonException)
-        {
-            return [];
-        }
-    }
 
     public async Task<Dictionary<string, string>> UploadFile(byte[] fileBytes, string fileName, CancellationToken cancellationToken)
     {
@@ -50,21 +31,23 @@ public class ZeroFileMediaServiceAdapter
         return await ReadJsonResponse(response, cancellationToken);
     }
 
-    public async Task<(byte[], Dictionary<string, string>)> DownloadFile(string id, CancellationToken cancellationToken)
+    public async Task<(byte[] FileBytes, Dictionary<string, string> Meta)> DownloadFile(string id, CancellationToken cancellationToken)
     {
-        Dictionary<string, string> meta = await GetFileMeta(id, cancellationToken);
-
         using HttpResponseMessage response = await _httpClient.GetAsync($"/media/{id}", cancellationToken);
-        
         response.EnsureSuccessStatusCode();
 
-        byte[] bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+        byte[] bytesFile = await response.Content.ReadAsByteArrayAsync(cancellationToken);
 
-        if (bytes.Length > 0 || meta.Count > 0)
-            return (bytes, meta);
+        Dictionary<string, string> meta = new(StringComparer.OrdinalIgnoreCase);
+        foreach (KeyValuePair<string, IEnumerable<string>> header in response.Headers)
+            meta[header.Key] = string.Join(", ", header.Value);
 
-        return ([], []);
+        foreach (KeyValuePair<string, IEnumerable<string>> header in response.Content.Headers)
+            meta[header.Key] = string.Join(", ", header.Value);
+
+        return (bytesFile, meta);
     }
+
 
     public async Task<Dictionary<string, string>> DeleteFile(string id, CancellationToken cancellationToken)
     {
@@ -92,5 +75,24 @@ public class ZeroFileMediaServiceAdapter
 
         return await ReadJsonResponse(response, cancellationToken);
     }
-}
 
+    // shared method to read JSON responses
+    private static async Task<Dictionary<string, string>> ReadJsonResponse(HttpResponseMessage response, CancellationToken cancellationToken)
+    {
+        string json = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(json))
+            return [];
+
+        try
+        {
+            Dictionary<string, string>? data = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            return data != null && data.Count > 0 ? data : [];
+        }
+
+        catch (JsonException)
+        {
+            return [];
+        }
+    }
+}
