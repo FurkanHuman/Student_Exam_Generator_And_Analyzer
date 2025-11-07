@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace Infrastructure.Adapters.MediaService;
@@ -13,11 +12,10 @@ public class ZeroFileMediaServiceAdapter
         _httpClient = httpClient;
     }
 
-
     public async Task<Dictionary<string, string>> UploadFile(byte[] fileBytes, string fileName, CancellationToken cancellationToken)
     {
         using MultipartFormDataContent form = [];
-        
+
         ByteArrayContent fileContent = new(fileBytes);
 
         fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
@@ -25,7 +23,7 @@ public class ZeroFileMediaServiceAdapter
         form.Add(fileContent, "file", fileName);
 
         using HttpResponseMessage response = await _httpClient.PostAsync($"/upload", form, cancellationToken);
-        
+
         response.EnsureSuccessStatusCode();
 
         return await ReadJsonResponse(response, cancellationToken);
@@ -48,11 +46,10 @@ public class ZeroFileMediaServiceAdapter
         return (bytesFile, meta);
     }
 
-
     public async Task<Dictionary<string, string>> DeleteFile(string id, CancellationToken cancellationToken)
     {
         using HttpResponseMessage response = await _httpClient.DeleteAsync($"/media/{id}", cancellationToken);
-        
+
         response.EnsureSuccessStatusCode();
 
         return await ReadJsonResponse(response, cancellationToken);
@@ -61,7 +58,7 @@ public class ZeroFileMediaServiceAdapter
     public async Task<Dictionary<string, string>> GetFileMeta(string id, CancellationToken cancellationToken)
     {
         using HttpResponseMessage response = await _httpClient.GetAsync($"/meta/{id}", cancellationToken);
-        
+
         response.EnsureSuccessStatusCode();
 
         return await ReadJsonResponse(response, cancellationToken);
@@ -70,7 +67,7 @@ public class ZeroFileMediaServiceAdapter
     public async Task<Dictionary<string, string>> GetHealth(CancellationToken cancellationToken)
     {
         using HttpResponseMessage response = await _httpClient.GetAsync($"/health", cancellationToken);
-        
+
         response.EnsureSuccessStatusCode();
 
         return await ReadJsonResponse(response, cancellationToken);
