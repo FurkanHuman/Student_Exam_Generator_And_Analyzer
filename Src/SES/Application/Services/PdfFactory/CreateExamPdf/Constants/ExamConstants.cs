@@ -15,7 +15,8 @@ internal static class ExamConstants
                 { "period", "Dönem" },
                 { "written_exam", "Yazılı Sınavı" },
                 { "clasess", "Sınıflar" },
-                { "lesson", "Dersi" }
+                { "lesson", "Dersi" },
+                { "ImageNotFound", "İlgili Resim Bulunamadı" }
             }
         },
 
@@ -23,15 +24,16 @@ internal static class ExamConstants
             {
                 { "name", "Name" },
                 { "surname","Surname" },
-                { "class_age","Class" },
+                { "class_age", "Class" },
                 { "class_branch", "Branch" },
                 { "number", "Num" },
                 { "score", "Score" },
                 { "exams", "Exams" },
-                { "period","Period" },
+                { "period", "Period" },
                 { "written_exam", "Written Exam" },
                 { "clasess", "Classes" },
-                { "lesson", "Lesson" }
+                { "lesson", "Lesson" },
+                { "ImageNotFound", "Image Is Not Found" }
             }
         }
     };
@@ -40,9 +42,9 @@ internal static class ExamConstants
 
     public static string Get(string key)
     {
-        if (_examConstants.TryGetValue(CurrentLanguage, out var langDict) &&
-            langDict.TryGetValue(key, out var value))
-            return value;
-        return key;
+        return _examConstants.TryGetValue(CurrentLanguage, out var langDict) &&
+            langDict.TryGetValue(key, out var value)
+            ? value
+            : key;
     }
 }

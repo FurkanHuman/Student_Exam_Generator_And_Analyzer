@@ -1,4 +1,5 @@
-﻿using Application.Services.PdfFactory.CreateExamPdf.DTOs;
+﻿using Application.Services.ImageService;
+using Application.Services.PdfFactory.CreateExamPdf.DTOs;
 using Application.Services.PdfFactory.CreateExamPdf.Helpers;
 using Domain.Entities;
 using QuestPDF.Drawing.Exceptions;
@@ -10,6 +11,13 @@ namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
 
 public class ExamPageRenderer : IExamPageGenerator
 {
+    private readonly IImageServices _imageServices;
+
+    public ExamPageRenderer(IImageServices imageServices)
+    {
+        _imageServices = imageServices;
+    }
+
     IDocument IQuestPDFTestPageGenerator.PageGenerate(Exam exam, ref ExamInfo examInfo)
     {
         return GenerateDocument(exam, ref examInfo);
@@ -20,7 +28,7 @@ public class ExamPageRenderer : IExamPageGenerator
         return GenerateDocument(exam, ref examInfo).GeneratePdf();
     }
 
-    private static Document GenerateDocument(Exam exam, ref ExamInfo refExamInfo)
+    private Document GenerateDocument(Exam exam, ref ExamInfo refExamInfo)
     {
         ExamInfo examInfo = refExamInfo;
 
@@ -50,7 +58,7 @@ public class ExamPageRenderer : IExamPageGenerator
         return HandleDocumentException("Unexpected document generation failure.");
     }
 
-    private static Document DrawExamPage(Exam exam, ExamInfo examInfo)
+    private Document DrawExamPage(Exam exam, ExamInfo examInfo)
     {
         return Document.Create(document =>
         {
@@ -62,7 +70,7 @@ public class ExamPageRenderer : IExamPageGenerator
 
                 page.ExamHeader(exam, examInfo);
 
-                page.ExamQuestionContent(exam, examInfo);
+                page.ExamQuestionContent(exam, examInfo, _imageServices);
 
                 page.ExamFooter(exam, examInfo);
             });

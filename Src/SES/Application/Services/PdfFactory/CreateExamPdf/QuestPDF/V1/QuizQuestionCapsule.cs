@@ -1,9 +1,11 @@
-﻿using Application.Services.PdfFactory.CreateExamPdf.Constants;
+﻿using Application.Services.ImageService;
+using Application.Services.PdfFactory.CreateExamPdf.Constants;
 using Application.Services.PdfFactory.CreateExamPdf.DTOs;
 using Application.Services.PdfFactory.CreateExamPdf.Helpers;
 using Domain.Entities;
 using Domain.Enums;
 using QuestPDF.Fluent;
+using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
 namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
@@ -12,10 +14,11 @@ internal static class QuizQuestionCapsule
 {
     private static readonly char[] Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
 
-    internal static IContainer QuizQuestion(this IContainer container, QuizQuestion question, ExamInfo examInfo, int seed)
+    internal static IContainer QuizQuestion(this IContainer container, QuizQuestion question, ExamInfo examInfo, int seed, IImageServices imageServices)
     {
         if (question.QuestionType == QuestionType.FillInTheBlank)
             RenderFillInTheBlankMask(ref question);
+
         container.Column(col =>
         {
             col.Item().Row(row =>
@@ -26,7 +29,16 @@ internal static class QuizQuestionCapsule
 
                     if (!string.IsNullOrEmpty(question.QuestionImageURL))
                     {
-                        innerCol.Item().Image(question.QuestionImageURL).FitArea();
+                        // todo: is here difrent methology is aplicatipable for async image download?
+
+                        (byte[] FileBytes, Dictionary<string, object> Meta) =
+                            imageServices.DownloadFileAsync(question.QuestionImageURL, CancellationToken.None).GetAwaiter().GetResult();
+
+                        if (Meta != null && Meta.Count > 0)
+                            innerCol.Item().AlignCenter().Image(FileBytes).FitArea().WithCompressionQuality(ImageCompressionQuality.VeryLow);
+
+                        else
+                            innerCol.Item().Text(ExamConstants.Get("ImageNotFound")).FontColor(Colors.Red.Medium);
                     }
 
                     if (!string.IsNullOrEmpty(question.QuestionBody))
