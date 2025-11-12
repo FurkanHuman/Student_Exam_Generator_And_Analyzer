@@ -161,6 +161,7 @@
 
         FileData fileData = new()
             {
+                FileName = file.Name,
                 MemoryStream = memoryStream,
                 ContentType = file.ContentType,
                 FileExtension = Path.GetExtension(file.Name),

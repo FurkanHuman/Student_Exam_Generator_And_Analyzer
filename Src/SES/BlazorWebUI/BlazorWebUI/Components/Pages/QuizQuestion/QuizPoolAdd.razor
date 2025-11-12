@@ -3,6 +3,7 @@
 @using Application.Features.ReferenceBenefits.Queries.GetListByIdReferenceBenefitBenefit
 @using BlazorWebUI.Client.Pages.Styles.QQ
 @using Application.Features.ReferenceBenefits.Queries.GetById
+@using Application.Services.ImageService;
 @using Domain.Enums
 @using NArchitecture.Core.Application.Responses
 @rendermode InteractiveServer
@@ -16,6 +17,7 @@
 <QQBody OnQQBodyData="HandleQuizPoolAddAsync" CheckboxItems="@CheckboxItems" OnQQBenefitLoader="UpdateQQBenefitLoaderVisibility" />
 
 @inject IMediator _mediator
+@inject IImageService _imageService
 
 @code {
     protected override Task OnInitializedAsync()
@@ -38,19 +40,27 @@
             foreach (QuestionOptionDto optionDto in qQBodyDto.QuestionOptions)
                 optionAppDtos.Add(new() { IsCorrect = optionDto.IsCorrect, OptionText = optionDto.OptionText });
 
+        string? questionImageId = null;
+
+        if (qQBodyDto.FileData != null)
+        {
+            Dictionary<string, object> uploaded = await _imageService.UploadFileAsync(qQBodyDto.FileData.MemoryStream, qQBodyDto.FileData.FileName, CancellationToken.None);
+            questionImageId = uploaded.GetValueOrDefault("id")!.ToString();
+        }
+
         await _mediator.Send(new CreateQuizQuestionCommand()
-            {
-                RefBenefitId = _refBenefitId,
-                LessonId = _lessonId,
-                BenefitIds = qQBodyDto.SelectedBenefits.Keys,
-                QuestionType = (QuestionType)qQBodyDto.SelectedQType,
-                MaxScore = qQBodyDto.MaxScore,
-                Score = qQBodyDto.Score,
-                QuestionBody = qQBodyDto.Question,
-                Question = qQBodyDto.QuestionBody,
-                QuestionImage = null,
-                QQOptions = optionAppDtos
-            });
+        {
+            RefBenefitId = _refBenefitId,
+            LessonId = _lessonId,
+            BenefitIds = qQBodyDto.SelectedBenefits.Keys,
+            QuestionType = (QuestionType)qQBodyDto.SelectedQType,
+            MaxScore = qQBodyDto.MaxScore,
+            Score = qQBodyDto.Score,
+            QuestionBody = qQBodyDto.Question,
+            Question = qQBodyDto.QuestionBody,
+            QuestionImage = questionImageId,
+            QQOptions = optionAppDtos
+        });
     }
 
     private async Task HandleBenefitId(int id)
