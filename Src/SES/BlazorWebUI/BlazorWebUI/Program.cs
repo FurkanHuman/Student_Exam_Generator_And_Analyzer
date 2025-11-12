@@ -7,7 +7,6 @@ using Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using NArchitecture.Core.CrossCuttingConcerns.Logging.Configurations;
 using NArchitecture.Core.ElasticSearch.Models;
-using NArchitecture.Core.Localization.WebApi;
 using NArchitecture.Core.Mailing;
 using NArchitecture.Core.Persistence.WebApi;
 using Persistence;
@@ -50,7 +49,7 @@ builder.Services.AddApplicationServices(
 
     fileLogConfiguration: builder.Configuration.GetSection("SeriLogConfigurations:FileLogConfiguration").Get<FileLogConfiguration>()
          ?? throw new InvalidOperationException("FileLogConfiguration section cannot found in configuration."),
-    
+
     elasticSearchConfig: builder.Configuration.GetSection("ElasticSearchConfig").Get<ElasticSearchConfig>()
          ?? throw new InvalidOperationException("ElasticSearchConfig section cannot found in configuration.")
 );

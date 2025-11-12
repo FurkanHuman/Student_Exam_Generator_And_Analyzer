@@ -6,5 +6,5 @@ public static class StudentAnswersBusinessMessages
 
     public const string StudentAnswerNotExists = "StudentAnswerNotExists";
     public const string StudentAnswerIsExists = "StudentAnswerIsExists";
-    public const string ReviewerTeacherNotExists= "ReviewerTeacherNotExists";
+    public const string ReviewerTeacherNotExists = "ReviewerTeacherNotExists";
 }

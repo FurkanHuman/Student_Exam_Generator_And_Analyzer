@@ -3,7 +3,7 @@ using NArchitecture.Core.Persistence.Repositories;
 
 namespace Domain.Entities;
 
-public class StudentExamAnswer: Entity<Guid>
+public class StudentExamAnswer : Entity<Guid>
 {
     public int ReviewerTeacherId { get; set; }
     public virtual Teacher ReviewerTeacher { get; set; }

@@ -217,41 +217,41 @@ internal static class PdfReaderReferenceBenefitManager
     {
         Regex _learningAreaRegex = new(LearningAreaPattern, RegexOptions.Compiled);
         Match match = _learningAreaRegex.Match(line);
-        if (!match.Success)
-            return null;
-        return new LearningAreaDto
-        {
-            LACode = match.Groups[1].Value,
-            Description = match.Groups[2].Value,
-            SubLearningAreas = []
-        };
+        return !match.Success
+            ? null
+            : new LearningAreaDto
+            {
+                LACode = match.Groups[1].Value,
+                Description = match.Groups[2].Value,
+                SubLearningAreas = []
+            };
     }
 
     private static SubLearningDto? ExtractSubLearningArea(string line)
     {
         Regex _subLearningAreaRegex = new(SubLearningAreaPattern, RegexOptions.Compiled);
         Match match = _subLearningAreaRegex.Match(line);
-        if (!match.Success)
-            return null;
-        return new SubLearningDto
-        {
-            SLCode = match.Groups[1].Value,
-            Description = match.Groups[2].Value,
-            Benefits = []
-        };
+        return !match.Success
+            ? null
+            : new SubLearningDto
+            {
+                SLCode = match.Groups[1].Value,
+                Description = match.Groups[2].Value,
+                Benefits = []
+            };
     }
 
     private static BenefitDto? ExtractBenefitDetails(string line)
     {
         Regex _learningAreaRegex = new(BenefitPatternToTwoGroup, RegexOptions.Compiled);
         Match match = _learningAreaRegex.Match(line);
-        if (!match.Success)
-            return null;
-        return new BenefitDto
-        {
-            BCode = match.Groups[1].Value,
-            Description = match.Groups[2].Value
-        };
+        return !match.Success
+            ? null
+            : new BenefitDto
+            {
+                BCode = match.Groups[1].Value,
+                Description = match.Groups[2].Value
+            };
     }
 
     // huge thanks ChatGPT And Copilot

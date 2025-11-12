@@ -26,8 +26,8 @@ namespace Application.Services.CalculatorFactory
             List<AnalysisDetailTableDto> result = [.. (analysis.Exams ?? Enumerable.Empty<Exam>())
                 .Select(exam =>
                 {
-                    string examCode = exam.ExamCode; List<StudentTableDto> studentDtos = GetStudentTableDtos(exam, analysis); 
-                    
+                    string examCode = exam.ExamCode; List<StudentTableDto> studentDtos = GetStudentTableDtos(exam, analysis);
+
                     int questionCount = GetQuestionCount(studentDtos);
 
                     return new AnalysisDetailTableDto

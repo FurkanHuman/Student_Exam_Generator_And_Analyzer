@@ -12,7 +12,7 @@ public static class PersistenceServiceRegistration
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<BaseDbContext>(opt => opt.UseInMemoryDatabase("BaseDb"), ServiceLifetime.Transient);
- 
+
         services.AddDbContextFactory<PostgreSqlDbContext>(options =>
         {
             options.UseNpgsql(

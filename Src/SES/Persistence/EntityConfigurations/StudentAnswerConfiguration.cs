@@ -15,7 +15,7 @@ internal class StudentAnswerConfiguration : IEntityTypeConfiguration<StudentAnsw
         builder.Property(sa => sa.QuizQuestionId).IsRequired();
         builder.Property(sa => sa.EvaluationStatus).IsRequired();
         builder.Property(sa => sa.QuestionOptionId);
-        
+
         builder.Property(sa => sa.AnswerText);
         builder.Property(sa => sa.GivenScore);
 

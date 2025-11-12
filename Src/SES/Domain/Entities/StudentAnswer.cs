@@ -1,5 +1,5 @@
-﻿using NArchitecture.Core.Persistence.Repositories;
-using Domain.Enums;
+﻿using Domain.Enums;
+using NArchitecture.Core.Persistence.Repositories;
 
 namespace Domain.Entities;
 

@@ -15,7 +15,7 @@ public static class QQStatic
         { 6, "Onaylı intihal" }
     };
 
-    public static readonly IDictionary<byte, string> ExamEvaluationStatusTUR = new Dictionary<byte, string> 
+    public static readonly IDictionary<byte, string> ExamEvaluationStatusTUR = new Dictionary<byte, string>
     {
         { 0, "Henüz değerlendirilmedi" },
         { 1, "Değerlendirildi" },

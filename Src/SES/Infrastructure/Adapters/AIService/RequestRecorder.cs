@@ -7,7 +7,7 @@ internal static class RequestRecorder
     {
         string logFileName = $"{DateTime.Now:ddMMyyyy_HHmmss_ffff}.log";
 
-        string logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, LogPath,modelName, logFileName);
+        string logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, LogPath, modelName, logFileName);
 
         Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)!);
 

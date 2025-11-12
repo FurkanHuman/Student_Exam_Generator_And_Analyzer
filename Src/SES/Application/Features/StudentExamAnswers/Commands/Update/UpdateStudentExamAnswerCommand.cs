@@ -2,11 +2,10 @@ using Application.Features.StudentExamAnswers.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using Domain.Enums;
+using MediatR;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
-using MediatR;
-using Domain.Enums;
-using Domain.Enums;
 
 namespace Application.Features.StudentExamAnswers.Commands.Update;
 

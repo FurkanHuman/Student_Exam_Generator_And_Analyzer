@@ -1,9 +1,8 @@
-using BlazorWebUI.Client;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
-namespace Identity.Client
+namespace BlazorWebUI.Client
 {
     // This is a client-side AuthenticationStateProvider that determines the user's authentication state by
     // looking for data persisted in the page when it was rendered on the server. This authentication state will

@@ -172,7 +172,7 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
             await _examRepository.AddRangeAsync(exams);
 
             CreateMultipleExamResponse response = new();
-            response.FileName = $"{lesson!.LessonName}-{examInfo.SelectedClass}-s�n�flar-{examInfo.CurrentExamNumber}-yaz�l�.zip";
+            response.FileName = $"{lesson!.LessonName}-{examInfo.SelectedClass}-sınıflar-{examInfo.CurrentExamNumber}-yazılı.zip";
             response.ZipFileMemStream = new MemoryStream(zipFileBytes);
             return response;
         }

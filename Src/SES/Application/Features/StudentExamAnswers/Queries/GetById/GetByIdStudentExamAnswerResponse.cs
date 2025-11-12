@@ -1,6 +1,5 @@
+using Domain.Enums;
 using NArchitecture.Core.Application.Responses;
-using Domain.Enums;
-using Domain.Enums;
 
 namespace Application.Features.StudentExamAnswers.Queries.GetById;
 
