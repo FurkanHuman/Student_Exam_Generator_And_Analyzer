@@ -12,7 +12,7 @@ public static class InfrastructureServiceRegistration
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
     {
         services.AddScoped<ImageServiceBase, CloudinaryImageServiceAdapter>();
-        services.AddScoped<IImageServices, ZeroFileMediaServiceAdapter>();
+        services.AddScoped<IImageService, ZeroFileMediaServiceAdapter>();
         services.AddKeyedScoped<IAIService, OpenAIServiceAdapter>("OpenAI");
 
         services.AddHttpClient<ZeroFileMediaServiceAdapter>();

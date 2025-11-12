@@ -11,9 +11,9 @@ namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
 
 public class ExamPageRenderer : IExamPageGenerator
 {
-    private readonly IImageServices _imageServices;
+    private readonly IImageService _imageServices;
 
-    public ExamPageRenderer(IImageServices imageServices)
+    public ExamPageRenderer(IImageService imageServices)
     {
         _imageServices = imageServices;
     }

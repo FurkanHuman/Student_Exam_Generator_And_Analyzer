@@ -9,7 +9,7 @@ namespace Application.Services.PdfFactory.CreateExamPdf.QuestPDF.V1;
 
 internal static class ExamPageContent
 {
-    internal static void ExamQuestionContent(this PageDescriptor page, Exam exam, ExamInfo examInfo, ImageService.IImageServices imageServices)
+    internal static void ExamQuestionContent(this PageDescriptor page, Exam exam, ExamInfo examInfo, ImageService.IImageService imageServices)
     {
         IList<QuizQuestion> quizQuestions = exam.QuizQuestions;
 
@@ -44,7 +44,7 @@ internal static class ExamPageContent
         });
     }
 
-    private static IContainer QuestionBody(this IContainer container, Exam exam, int index, ExamInfo examInfo, int seed, ImageService.IImageServices imageServices)
+    private static IContainer QuestionBody(this IContainer container, Exam exam, int index, ExamInfo examInfo, int seed, ImageService.IImageService imageServices)
     {
         container.Row(row =>
         {

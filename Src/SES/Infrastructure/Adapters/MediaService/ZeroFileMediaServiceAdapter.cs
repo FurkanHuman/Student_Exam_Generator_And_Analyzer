@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace Infrastructure.Adapters.MediaService;
 
-public class ZeroFileMediaServiceAdapter : IImageServices
+public class ZeroFileMediaServiceAdapter : IImageService
 {
     private readonly HttpClient _httpClient;
 
@@ -13,6 +13,10 @@ public class ZeroFileMediaServiceAdapter : IImageServices
     {
         _httpClient = httpClient;
         _httpClient.BaseAddress = new Uri(configuration["ZeroFile:ServiceAddress"]!);
+    }
+    public Task<Dictionary<string, object>> UploadFileAsync(MemoryStream memoryStream, string fileName, CancellationToken cancellationToken)
+    {
+        return UploadFileAsync(memoryStream.ToArray(), fileName, cancellationToken);
     }
 
     public async Task<Dictionary<string, object>> UploadFileAsync(FileStream fileStream, CancellationToken cancellationToken)
@@ -101,7 +105,7 @@ public class ZeroFileMediaServiceAdapter : IImageServices
 
             data["url"] = response.RequestMessage?.RequestUri?.ToString() ?? string.Empty;
 
-            return data.Count > 1 ? data : [];
+            return data;
         }
         catch (JsonException)
         {

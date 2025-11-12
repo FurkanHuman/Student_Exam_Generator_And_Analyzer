@@ -14,7 +14,7 @@ internal static class QuizQuestionCapsule
 {
     private static readonly char[] Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
 
-    internal static IContainer QuizQuestion(this IContainer container, QuizQuestion question, ExamInfo examInfo, int seed, IImageServices imageServices)
+    internal static IContainer QuizQuestion(this IContainer container, QuizQuestion question, ExamInfo examInfo, int seed, IImageService imageServices)
     {
         if (question.QuestionType == QuestionType.FillInTheBlank)
             RenderFillInTheBlankMask(ref question);
