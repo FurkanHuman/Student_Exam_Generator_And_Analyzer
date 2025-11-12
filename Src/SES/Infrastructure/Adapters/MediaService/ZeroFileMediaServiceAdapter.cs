@@ -1,21 +1,32 @@
-﻿using System.Net.Http.Headers;
+﻿using Application.Services.ImageService;
+using Microsoft.Extensions.Configuration;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace Infrastructure.Adapters.MediaService;
 
-public class ZeroFileMediaServiceAdapter
+public class ZeroFileMediaServiceAdapter : IImageServices
 {
     private readonly HttpClient _httpClient;
 
-    public ZeroFileMediaServiceAdapter(HttpClient httpClient)
+    public ZeroFileMediaServiceAdapter(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
+        _httpClient.BaseAddress = new Uri(configuration["ZeroFile:ServiceAddress"]!);
     }
 
-    public async Task<Dictionary<string, string>> UploadFile(byte[] fileBytes, string fileName, CancellationToken cancellationToken)
+    public async Task<Dictionary<string, object>> UploadFileAsync(FileStream fileStream, CancellationToken cancellationToken)
+    {
+        MemoryStream memoryStream = new();
+
+        await fileStream.CopyToAsync(memoryStream, cancellationToken);
+
+        return await UploadFileAsync(memoryStream.ToArray(), Path.GetFileName(fileStream.Name), cancellationToken);
+    }
+
+    public async Task<Dictionary<string, object>> UploadFileAsync(byte[] fileBytes, string fileName, CancellationToken cancellationToken)
     {
         using MultipartFormDataContent form = [];
-
         ByteArrayContent fileContent = new(fileBytes);
 
         fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
@@ -24,57 +35,60 @@ public class ZeroFileMediaServiceAdapter
 
         using HttpResponseMessage response = await _httpClient.PostAsync($"/upload", form, cancellationToken);
 
-        response.EnsureSuccessStatusCode();
-
-        return await ReadJsonResponse(response, cancellationToken);
+        return await ReadJsonResponseAsync(response, cancellationToken);
     }
 
-    public async Task<(byte[] FileBytes, Dictionary<string, string> Meta)> DownloadFile(string id, CancellationToken cancellationToken)
+    public async Task<(byte[] FileBytes, Dictionary<string, object> Meta)> DownloadFileAsync(string id, CancellationToken cancellationToken)
     {
         using HttpResponseMessage response = await _httpClient.GetAsync($"/media/{id}", cancellationToken);
-        response.EnsureSuccessStatusCode();
 
         byte[] bytesFile = await response.Content.ReadAsByteArrayAsync(cancellationToken);
 
-        Dictionary<string, string> meta = new(StringComparer.OrdinalIgnoreCase);
-        foreach (KeyValuePair<string, IEnumerable<string>> header in response.Headers)
-            meta[header.Key] = string.Join(", ", header.Value);
-
-        foreach (KeyValuePair<string, IEnumerable<string>> header in response.Content.Headers)
-            meta[header.Key] = string.Join(", ", header.Value);
+        Dictionary<string, object> meta = ReadFileHeaders(response);
 
         return (bytesFile, meta);
     }
 
-    public async Task<Dictionary<string, string>> DeleteFile(string id, CancellationToken cancellationToken)
+    public async Task<Dictionary<string, object>> DeleteFileAsync(string id, CancellationToken cancellationToken)
     {
         using HttpResponseMessage response = await _httpClient.DeleteAsync($"/media/{id}", cancellationToken);
 
-        response.EnsureSuccessStatusCode();
-
-        return await ReadJsonResponse(response, cancellationToken);
+        return await ReadJsonResponseAsync(response, cancellationToken);
     }
 
-    public async Task<Dictionary<string, string>> GetFileMeta(string id, CancellationToken cancellationToken)
+    public async Task<Dictionary<string, object>> GetFileMetaAsync(string id, CancellationToken cancellationToken)
     {
         using HttpResponseMessage response = await _httpClient.GetAsync($"/meta/{id}", cancellationToken);
 
-        response.EnsureSuccessStatusCode();
-
-        return await ReadJsonResponse(response, cancellationToken);
+        return await ReadJsonResponseAsync(response, cancellationToken);
     }
 
-    public async Task<Dictionary<string, string>> GetHealth(CancellationToken cancellationToken)
+    public async Task<Dictionary<string, object>> GetHealthAsync(CancellationToken cancellationToken)
     {
         using HttpResponseMessage response = await _httpClient.GetAsync($"/health", cancellationToken);
 
-        response.EnsureSuccessStatusCode();
+        return await ReadJsonResponseAsync(response, cancellationToken);
+    }
+    private static Dictionary<string, object> ReadFileHeaders(HttpResponseMessage response)
+    {
+        // 404 or empty content is returned as empty meta
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound || response.Content.Headers.ContentLength == 0 || response.Headers == null)
+            return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
-        return await ReadJsonResponse(response, cancellationToken);
+        Dictionary<string, object> meta = new(StringComparer.OrdinalIgnoreCase);
+        foreach (KeyValuePair<string, IEnumerable<string>> header in from KeyValuePair<string, IEnumerable<string>> header in response.Headers
+                                                                     where header.Key.StartsWith("X-", StringComparison.OrdinalIgnoreCase)
+                                                                     select header)
+
+        {
+            meta[header.Key[2..]] = header.Value;
+        }
+
+        return meta;
     }
 
     // shared method to read JSON responses
-    private static async Task<Dictionary<string, string>> ReadJsonResponse(HttpResponseMessage response, CancellationToken cancellationToken)
+    private static async Task<Dictionary<string, object>> ReadJsonResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
     {
         string json = await response.Content.ReadAsStringAsync(cancellationToken);
 
@@ -83,13 +97,17 @@ public class ZeroFileMediaServiceAdapter
 
         try
         {
-            Dictionary<string, string>? data = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-            return data != null && data.Count > 0 ? data : [];
-        }
+            Dictionary<string, object> data = JsonSerializer.Deserialize<Dictionary<string, object>>(json) ?? [];
 
+            data["url"] = response.RequestMessage?.RequestUri?.ToString() ?? string.Empty;
+
+            return data.Count > 1 ? data : [];
+        }
         catch (JsonException)
         {
             return [];
         }
+
     }
+
 }
