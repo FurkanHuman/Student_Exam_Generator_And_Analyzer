@@ -2,6 +2,7 @@ using Application;
 using BlazorWebUI;
 using BlazorWebUI.Components;
 using BlazorWebUI.Components.Account;
+using BlazorWebUI.Extensions;
 using Domain.Entities;
 using Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -117,5 +118,6 @@ app.Use(async (context, next) =>
     await next();
 });
 app.MapAdditionalIdentityEndpoints();
+app.MapZeroFileProxy();
 
 await app.RunAsync();

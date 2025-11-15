@@ -15,7 +15,8 @@ public class MappingProfiles : Profile
         CreateMap<GetByLessonIdQuizQuestionListItemDto, QQBodyDto>()
             .ForMember(dest => dest.SelectedQType, opt => opt.MapFrom(src => src.QuestionType))
             .ForMember(dest => dest.SelectedBenefits, opt => opt.MapFrom(dest => dest.Benefits.ToDictionary(d => d.Id, d => $"{d.BenefitCode} {d.Description}")))
-            .ForMember(dest => dest.QuestionOptions, opt => opt.MapFrom(src => src.Options));
+            .ForMember(dest => dest.QuestionOptions, opt => opt.MapFrom(src => src.Options))
+            .ForMember(dest => dest.FileData,  opt => opt.MapFrom(src =>  new FileData() { Id = src.QuestionImage }));
 
         CreateMap<QuestionOption, QuestionOptionDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))

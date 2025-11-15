@@ -60,6 +60,7 @@ public class MappingProfiles : Profile
         CreateMap<QuizQuestion, GetByLessonIdQuizQuestionListItemDto>()
             .ForMember(destinationMember: qqdto => qqdto.Score, memberOptions: opt => opt.MapFrom(qq => qq.QuestionScore.Score))
             .ForMember(destinationMember: qqdto => qqdto.MaxScore, memberOptions: opt => opt.MapFrom(qq => qq.QuestionScore.MaxScore))
+            .ForMember(destinationMember: qqdto => qqdto.QuestionImage, memberOptions: opt => opt.MapFrom(qq => qq.QuestionImageURL))
             .ForMember(destinationMember: qqdto => qqdto.Benefits, memberOptions: opt => opt.MapFrom(qq => qq.Benefits.Select(opt => new Benefit
             {
                 Id = opt.Id,

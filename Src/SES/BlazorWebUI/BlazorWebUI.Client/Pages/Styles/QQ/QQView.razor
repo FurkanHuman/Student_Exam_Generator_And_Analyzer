@@ -1,45 +1,78 @@
-﻿<div class="card p-4 mb-3 shadow-lg">
-    <p><strong>Soru Türü:</strong> @selectedQtype(QQBody.SelectedQType)</p>
-    <div class="d-flex justify-content-between align-items-center">
-        <h3 class="mb-0"><strong>Soru Detayları</strong></h3>
-        <button class="btn btn-primary fs-5" @onclick="() => ModalDialog.Open()">Kazanımları görüntüle</button>
-        <span class="badge bg-primary fs-5">@QQBody.Score / @QQBody.MaxScore</span>
-    </div>
+﻿@if (QQBody != null)
+{
+    <div class="card p-4 mb-3 shadow-lg">
+        <p><strong>Soru Türü:</strong> @selectedQtype(QQBody.SelectedQType)</p>
 
-    <hr />
-
-    @if (!string.IsNullOrEmpty(QQBody.QuestionBody))
-    {
-        <p class="text-muted" style="white-space: pre-line;"> @QQBody.QuestionBody</p>
-    }
-
-    <p class="fs-5" style="white-space: pre-line;"><strong>@QQBody.Question</strong></p>
-
-    <hr />
-
-    <h5>Seçenekler</h5>
-    <QQOption QuestionOptions="QQBody.QuestionOptions" SelectedOption="QQBody.SelectedQType" IsViewMode="true" />
-</div>
-
-<ModalDialog @ref="@ModalDialog" Title="Soru Kazanımları">
-    <div class="row">
-        <div style="max-height: 30rem; overflow-y: auto;">
-            @foreach (KeyValuePair<int, string> benefitPair in QQBody.SelectedBenefits)
-            {
-                <div class="form-check align-items-center p-2 mb-2">
-                    @benefitPair.Value
-                </div>
-            }
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="mb-0"><strong>Soru Detayları</strong></h3>
+            <div class="d-flex gap-2 align-items-center">
+                <button class="btn btn-primary" @onclick="() => ModalDialog.Open()">
+                    Kazanımları görüntüle
+                </button>
+                <span class="badge bg-primary fs-5">@QQBody.Score / @QQBody.MaxScore</span>
+            </div>
         </div>
+
+        <hr />
+
+        @if (QQBody.FileData != null && !string.IsNullOrWhiteSpace(QQBody.FileData.Id))
+        {
+            <div class="mb-3">
+                <img class="img-fluid rounded shadow-sm d-block mx-auto"
+                     style="max-width: 100%; max-height: 25rem; object-fit: contain;"
+                     src="@($"/proxy/media/{QQBody.FileData.Id}")"
+                     alt="Soru görseli" />
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(QQBody.QuestionBody))
+        {
+            <p class="text-muted" style="white-space: pre-line;">@QQBody.QuestionBody</p>
+        }
+
+        <p class="fs-5" style="white-space: pre-line;"><strong>@QQBody.Question</strong></p>
+
+        <hr />
+
+        <h5>Seçenekler</h5>
+        <QQOption QuestionOptions="QQBody.QuestionOptions"
+                  SelectedOption="QQBody.SelectedQType"
+                  IsViewMode="true" />
     </div>
-</ModalDialog>
+
+    <ModalDialog @ref="@ModalDialog" Title="Soru Kazanımları">
+        <div class="row">
+            <div style="max-height: 30rem; overflow-y: auto;">
+                @if (QQBody.SelectedBenefits?.Any() == true)
+                {
+                    @foreach (var benefitPair in QQBody.SelectedBenefits)
+                    {
+                        <div class="form-check align-items-center p-2 mb-2 border-bottom">
+                            @benefitPair.Value
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted text-center p-3">Kazanım bulunamadı.</p>
+                }
+            </div>
+        </div>
+    </ModalDialog>
+}
+else
+{
+    <div class="card p-4 mb-3">
+        <p class="text-muted">Soru verisi yükleniyor...</p>
+    </div>
+}
 
 @code
 {
     [Parameter]
-    public QQBodyDto? QQBody { get; set; } = new();
+    public QQBodyDto? QQBody { get; set; }
 
-    private ModalDialog ModalDialog { get; set; } = new();
+    private ModalDialog ModalDialog { get; set; } = default!;
 
     private string selectedQtype(byte type)
     => QQStatic.SelectTypeOptionsTUR.TryGetValue(key: type, value: out string? value) ? value : "Bilinmeyen Tür";
