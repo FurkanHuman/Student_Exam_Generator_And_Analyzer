@@ -1,7 +1,9 @@
 ﻿using Application.Services.Analyses;
+using Application.Services.PdfFactory.CreateExamPdf.DTOs;
+using Application.Services.PdfFactory.CreateExamPdf.Helpers;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using NArchitecture.Core.Persistence.Paging;
+using System.Text.Json;
 
 namespace Application.Services.CalculatorFactory;
 
@@ -16,9 +18,7 @@ public class AnalysisDetailTableCalculator
 
     public async Task<IList<AnalysisDetailTableDto>> CalculateAsync(int analysisId, CancellationToken cancellationToken = default)
     {
-        IPaginate<Analysis>? analyses = await GetAnalysesByIdAsync(analysisId, cancellationToken);
-
-        Analysis? analysis = analyses?.Items?.FirstOrDefault();
+        Analysis? analysis = await GetAnalysisByIdAsync(analysisId, cancellationToken);
 
         if (analysis == null)
             throw new InvalidOperationException($"Analysis with Id {analysisId} not found.");
@@ -26,7 +26,13 @@ public class AnalysisDetailTableCalculator
         List<AnalysisDetailTableDto> result = [.. (analysis.Exams ?? Enumerable.Empty<Exam>())
             .Select(exam =>
             {
-                string examCode = exam.ExamCode; List<StudentTableDto> studentDtos = GetStudentTableDtos(exam, analysis);
+                string examCode = exam.ExamCode;
+
+                uint seed = QuizQuestionHelpers.DecodeBase32String(examCode);
+
+                ExamInfo? examInfo = DeserializeExamInfo(exam);
+
+                List<StudentTableDto> studentDtos = GetStudentTableDtos(exam, analysis, (int)seed, examInfo);
 
                 int questionCount = GetQuestionCount(studentDtos);
 
@@ -41,6 +47,30 @@ public class AnalysisDetailTableCalculator
         return result;
     }
 
+    private static ExamInfo? DeserializeExamInfo(Exam exam)
+    {
+        try
+        {
+            return !string.IsNullOrEmpty(exam.ExamConfigurationStr)
+                ? JsonSerializer.Deserialize<ExamInfo>(exam.ExamConfigurationStr)
+                : new ExamInfo
+                {
+                    QQOrder = new Dictionary<int, int>(),
+                    IsRandomizeQuestions = false,
+                    IsRandomizeOptions = false
+                };
+        }
+        catch
+        {
+            return new ExamInfo
+            {
+                QQOrder = new Dictionary<int, int>(),
+                IsRandomizeQuestions = false,
+                IsRandomizeOptions = false
+            };
+        }
+    }
+
     private static int GetQuestionCount(List<StudentTableDto> studentDtos)
     {
         return studentDtos
@@ -50,43 +80,111 @@ public class AnalysisDetailTableCalculator
             .Count();
     }
 
-    private static List<StudentTableDto> GetStudentTableDtos(Exam exam, Analysis analysis)
+    private static List<StudentTableDto> GetStudentTableDtos(Exam exam, Analysis analysis, int seed, ExamInfo? examInfo)
     {
         return [.. (analysis.StudentExamAnswers ?? Enumerable.Empty<StudentExamAnswer>())
                     .Where(sea => sea.ExamId == exam.Id)
-                    .Select(sea => new StudentTableDto
+                    .Select(sea =>
                     {
-                        Id = sea.Student.Id,
-                        Name = sea.Student.Name,
-                        Surname = sea.Student.SurName,
-                        SchoolNumber = sea.Student.SchoolNumber,
-                        StudentAnswerScores = [.. (sea.StudentAnswers ?? Enumerable.Empty<StudentAnswer>())
-                            .Where(sa => sa.QuizQuestion != null)
-                            .Select(sa => new StudentAnswerScore
+                        List<StudentAnswer> studentAnswers = [.. (sea.StudentAnswers ?? Enumerable.Empty<StudentAnswer>()).Where(sa => sa.QuizQuestion != null)];
+
+                        List<QuizQuestion> quizQuestions = [.. studentAnswers
+                            .Select(sa => sa.QuizQuestion)
+                            .Where(qq => qq != null)
+                            .Distinct()];
+
+
+                        List<int> orderedQuestionIds = GetOrderedQuestionIds(quizQuestions, seed, examInfo);
+                        List<StudentAnswerScore?> studentAnswerScores = [.. orderedQuestionIds
+                            .Select((questionId, index) =>
                             {
-                                QuestionId = sa.QuizQuestionId,
-                                StudentAnswerId = sa.Id,
-                                GivenScore = sa.GivenScore ?? 0,
-                                StudentId = sa.StudentExamAnswer.StudentId
+                                StudentAnswer? studentAnswer = studentAnswers.FirstOrDefault(sa => sa.QuizQuestionId == questionId);
+
+                                return studentAnswer != null ? new StudentAnswerScore
+                                {
+                                    QuestionId = questionId,
+                                    StudentAnswerId = studentAnswer.Id,
+                                    GivenScore = studentAnswer.GivenScore ?? 0,
+                                    StudentId = studentAnswer.StudentExamAnswer.StudentId
+                                } : null;
                             })
-                            .OrderBy(s => s.QuestionId)]
+                            .Where(s => s != null)];
+
+                        return new StudentTableDto
+                        {
+                            Id = sea.Student.Id,
+                            Name = sea.Student.Name,
+                            Surname = sea.Student.SurName,
+                            SchoolNumber = sea.Student.SchoolNumber,
+                            StudentAnswerScores = studentAnswerScores!
+                        };
                     })
                     .OrderBy(s => s.SchoolNumber)];
     }
 
-    private async Task<IPaginate<Analysis>?> GetAnalysesByIdAsync(int analysisId, CancellationToken cancellationToken)
+    private static List<int> GetOrderedQuestionIds(List<QuizQuestion> quizQuestions, int seed, ExamInfo? examInfo)
     {
-        return await _analysisService.GetListAsync(
+        List<QuizQuestion> orderedQuestions = ApplySameOrderingLogic(quizQuestions, seed, examInfo);
+        return [.. orderedQuestions.Select(qq => qq.Id)];
+    }
+
+    private static List<QuizQuestion> ApplySameOrderingLogic(List<QuizQuestion> quizQuestions, int seed, ExamInfo? examInfo)
+    {
+        if (examInfo == null)
+        {
+            return [.. quizQuestions.OrderBy(q => q.Id)
+                                    .ThenBy(q => new Random(seed * quizQuestions.Count).Next(int.MinValue, int.MaxValue))];
+        }
+
+        IList<QuizQuestion> questions = [.. quizQuestions];
+
+        if (examInfo.IsRandomizeQuestions)
+        {
+            questions = [.. questions.OrderBy(q => q.Id)];
+            Random rnd = new Random(seed * questions.Count);
+            questions = [.. questions.OrderBy(q => rnd.Next(int.MinValue, int.MaxValue))];
+        }
+
+        if (examInfo.QQOrder != null && examInfo.QQOrder.Count > 0)
+        {
+            Random random = new Random(seed);
+
+            List<KeyValuePair<int, int>> orderedPairs = [.. examInfo.QQOrder.OrderBy(kvp => kvp.Key)];
+            HashSet<int> orderedIds = [.. orderedPairs.Select(x => x.Value)];
+
+            List<QuizQuestion?> ordered = [.. orderedPairs
+                .Select(p => questions.FirstOrDefault(q => q.Id == p.Value))
+                .Where(q => q != null)];
+
+            List<QuizQuestion> unordered = [.. questions
+                .Where(q => !orderedIds.Contains(q.Id))
+                .OrderBy(q => random.Next())];
+
+            foreach (QuizQuestion q in unordered)
+            {
+                int insertIndex = random.Next(0, ordered.Count + 1);
+                ordered.Insert(insertIndex, q);
+            }
+
+            questions = [.. ordered.Cast<QuizQuestion>()];
+        }
+
+        return [.. questions];
+    }
+
+    private async Task<Analysis?> GetAnalysisByIdAsync(int analysisId, CancellationToken cancellationToken)
+    {
+        return await _analysisService.GetAsync(
             predicate: a => a.Id == analysisId,
             include: a => a
                 .Include(a => a.Exams)
+                    .ThenInclude(e => e.QuizQuestions)
                 .Include(a => a.StudentExamAnswers)
                     .ThenInclude(sea => sea.Student)
                 .Include(a => a.StudentExamAnswers)
                     .ThenInclude(sea => sea.StudentAnswers)
                         .ThenInclude(sa => sa.QuizQuestion),
-            index: 0,
-            size: int.MaxValue,
+
             cancellationToken: cancellationToken
         );
     }
