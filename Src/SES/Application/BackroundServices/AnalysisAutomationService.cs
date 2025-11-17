@@ -9,7 +9,7 @@ using Microsoft.Extensions.Hosting;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
 
-namespace Application.BgTask;
+namespace Application.BackroundServices;
 internal class AnalysisAutomationService(IMediator mediatr, IExamService examService, IPrincipalService principalService, IAnalysisRepository analysisRepository) : BackgroundService
 {
     private const int DelayInDays = 15;
