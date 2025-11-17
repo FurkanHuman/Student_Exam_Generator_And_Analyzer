@@ -1,0 +1,117 @@
+﻿@using Application.Services.CalculatorFactory
+@inject AnalysisGeneralStatisticsCounterCalculator _generalCounterCalculator
+
+@if (isLoading)
+{
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Yükleniyor...</span>
+        </div>
+    </div>
+}
+else if (statistics != null)
+{
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-3 text-primary">📊 Genel İstatistikler</h4>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center bg-info text-white">
+                    <h5 class="card-title">Sınava Giren</h5>
+                    <h2 class="mb-0">@statistics.AttendeesCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center bg-warning text-white">
+                    <h5 class="card-title">Sınava Girmeyen</h5>
+                    <h2 class="mb-0">@statistics.AbsenteesCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center bg-info text-white">
+                    <h5 class="card-title">özürlü+özürsüz Raporlu</h5>
+                    <h2 class="mb-0">@statistics.ExcusedCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center bg-success text-white">
+                    <h5 class="card-title">Başarılı</h5>
+                    <h2 class="mb-0">@statistics.PassedCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center bg-danger text-white">
+                    <h5 class="card-title">Başarısız</h5>
+                    <h2 class="mb-0">@statistics.FailedCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center bg-info text-white">
+                    <h5 class="card-title">Toplam</h5>
+                    <h2 class="mb-0">@statistics.TotalCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center bg-warning text-white">
+                    <h5 class="card-title">Okunmamışlar</h5>
+                    <h2 class="mb-0">@statistics.NotReadingCount</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (!isLoading && errorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+@code
+{
+    [Parameter]
+    public int AnalysisId { get; set; }
+
+    private AnalysisGeneralExamStatisticsCounters statistics;
+    private bool isLoading = true;
+    private string? errorMessage;
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = null;
+
+
+            statistics = await _generalCounterCalculator.CalculateAsync(analysisId: AnalysisId);
+
+        }
+        catch (InvalidOperationException ex)
+        {
+            errorMessage = $"Analiz bulunamadı: {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Veri yüklenirken hata oluştu: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
+
+}

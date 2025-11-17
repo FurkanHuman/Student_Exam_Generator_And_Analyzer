@@ -96,6 +96,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IPersonelService, PersonelManager>();
         services.AddScoped<IPdfReaderService, PdfReaderManager>();
         services.AddScoped<AnalysisDetailTableCalculator>();
+        services.AddScoped<AnalysisGeneralStatisticsCounterCalculator>();
         services.AddScoped<AnalysisAutomationService>();
         services.AddScoped<PdfReaderStudentManager>();
         services.AddScoped<IExamPageGenerator, ExamPageRenderer>();
