@@ -43,10 +43,10 @@
                                     <tr class="align-middle">
                                         <td class="text-center fw-semibold">@student.SchoolNumber</td>
                                         <td class="fw-medium">@student.Name @student.Surname</td>
-                                        @foreach (StudentAnswerScore score in student.StudentAnswerScores)
+                                        @foreach (int score in student.StudentAnswerScores.Select(sas => sas.GivenScore))
                                         {
-                                            <td class="text-center fw-semibold" style="background-color: @GetScoreColor(score.GivenScore); color: @GetScoreTextColor(score.GivenScore);">
-                                                @score.GivenScore
+                                            <td class="text-center fw-semibold" style="background-color: @GetScoreColor(score); color: @GetScoreTextColor(score);">
+                                                @score
                                             </td>
                                         }
                                         <td class="text-center fw-bold bg-warning text-dark fs-6">@totalScore</td>
