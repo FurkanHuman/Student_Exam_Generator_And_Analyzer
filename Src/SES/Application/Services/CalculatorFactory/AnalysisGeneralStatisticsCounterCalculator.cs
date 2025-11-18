@@ -6,17 +6,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services.CalculatorFactory;
 
-public class AnalysisGeneralStatisticsCounterCalculator
+public class AnalysisGeneralStatisticsCounterCalculator : AnalysisCalculatorFactory<AnalysisGeneralExamStatisticsCounters>
 {
-    private readonly IAnalysisService _analysisService;
-    private const int _passScore = 50;
+    private const int _passScore = 50; // note: This pass score is the well-known passing grade set by the
+                                       // Ministry of National Education of the Republic of Turkey for primary, middle, and high schools.
+                                       // (It is subject to change)
 
-    public AnalysisGeneralStatisticsCounterCalculator(IAnalysisService analysisService)
+    public AnalysisGeneralStatisticsCounterCalculator(IAnalysisService analysisService) : base(analysisService)
     {
-        _analysisService = analysisService;
+
     }
 
-    public async Task<AnalysisGeneralExamStatisticsCounters> CalculateAsync(int analysisId, CancellationToken cancellationToken = default)
+    public override async Task<AnalysisGeneralExamStatisticsCounters> CalculateAsync(int analysisId, CancellationToken cancellationToken = default)
     {
         Analysis? analsis = await _analysisService.GetAsync(predicate: a => a.Id == analysisId,
                                                             include: ai => ai.Include(a => a.StudentExamAnswers)
@@ -29,7 +30,6 @@ public class AnalysisGeneralStatisticsCounterCalculator
 
         if (DifrenceExamAndStudentExamAnswers(analsis) < 0)
             throw new InvalidOperationException("Student exam answers count cannot be greater than exams count. Data Integrity is broken");
-
 
         return new AnalysisGeneralExamStatisticsCounters()
         {
@@ -70,6 +70,7 @@ public class AnalysisGeneralStatisticsCounterCalculator
                                                  ExamEvaluationStatus.ExcusedWithReport
         );
     }
+
     private static int AbsenteesCount(Analysis analysis)
     {
         return analysis.StudentExamAnswers.Count(sea =>
@@ -81,16 +82,16 @@ public class AnalysisGeneralStatisticsCounterCalculator
         );
     }
 
-
     private static int PassedCount(Analysis analysis)
     {
-        return analysis.StudentExamAnswers.Count(sea => sea.StudentAnswers.Sum(sa => sa.GivenScore) >= _passScore);
+        return analysis.StudentExamAnswers.Count(sea => (sea.StudentAnswers?.Sum(sa => sa.GivenScore) ?? 0) >= _passScore);
     }
 
     private static int FailedCount(Analysis analysis)
     {
-        return analysis.StudentExamAnswers.Count(sea => sea.StudentAnswers.Sum(sa => sa.GivenScore) < _passScore);
+        return analysis.StudentExamAnswers.Count(sea => (sea.StudentAnswers?.Sum(sa => sa.GivenScore) ?? 0) < _passScore);
     }
+
     private static int TotalCount(Analysis analysis)
     {
         return analysis.StudentExamAnswers?.Count ?? 0;

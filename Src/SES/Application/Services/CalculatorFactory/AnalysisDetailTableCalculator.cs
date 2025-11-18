@@ -7,16 +7,14 @@ using System.Text.Json;
 
 namespace Application.Services.CalculatorFactory;
 
-public class AnalysisDetailTableCalculator
+public class AnalysisDetailTableCalculator : AnalysisCalculatorFactory<IList<AnalysisDetailTableDto>>
 {
-    private readonly IAnalysisService _analysisService;
-
-    public AnalysisDetailTableCalculator(IAnalysisService analysisService)
+    public AnalysisDetailTableCalculator(IAnalysisService analysisService) : base(analysisService)
     {
-        _analysisService = analysisService;
+
     }
 
-    public async Task<IList<AnalysisDetailTableDto>> CalculateAsync(int analysisId, CancellationToken cancellationToken = default)
+    public override async Task<IList<AnalysisDetailTableDto>> CalculateAsync(int analysisId, CancellationToken cancellationToken = default)
     {
         Analysis? analysis = await GetAnalysisByIdAsync(analysisId, cancellationToken);
 
