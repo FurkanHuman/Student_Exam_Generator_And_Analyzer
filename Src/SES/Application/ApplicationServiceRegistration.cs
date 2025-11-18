@@ -95,8 +95,11 @@ public static class ApplicationServiceRegistration
         services.AddScoped<ILessonService, LessonManager>();
         services.AddScoped<IPersonelService, PersonelManager>();
         services.AddScoped<IPdfReaderService, PdfReaderManager>();
-        services.AddScoped<AnalysisDetailTableCalculator>();
-        services.AddScoped<AnalysisGeneralStatisticsCounterCalculator>();
+
+        services.AddScoped<IAnalysisCalculatorFactory<IList<AnalysisDetailTableDto>>, AnalysisDetailTableCalculator>();
+        services.AddScoped<IAnalysisCalculatorFactory<AnalysisGeneralExamStatisticsCounters>, AnalysisGeneralStatisticsCounterCalculator>();
+        services.AddScoped<IAnalysisCalculatorFactory<Dictionary<int, double>>, AnalysisQuestionAveragesCalculator>();
+
         services.AddScoped<AnalysisAutomationService>();
         services.AddScoped<PdfReaderStudentManager>();
         services.AddScoped<IExamPageGenerator, ExamPageRenderer>();
@@ -112,7 +115,7 @@ public static class ApplicationServiceRegistration
         Func<IServiceCollection, Type, IServiceCollection>? addWithLifeCycle = null
     )
     {
-        List<Type> types = assembly.GetTypes().Where(t => t.IsSubclassOf(type) && type != t).ToList();
+        List<Type> types = [.. assembly.GetTypes().Where(t => t.IsSubclassOf(type) && type != t)];
         foreach (Type? item in types)
             if (addWithLifeCycle == null)
                 services.AddScoped(item);
