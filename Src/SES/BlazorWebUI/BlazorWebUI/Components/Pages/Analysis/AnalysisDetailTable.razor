@@ -74,6 +74,11 @@
     [Parameter]
     public int AnalysisId { get; set; }
 
+    [Parameter]
+    public EventCallback<ICollection<string>> OnStatuses { get; set; }
+
+    private ICollection<string> totalStatuses = [];
+
     private IList<AnalysisDetailTableDto>? analysisData;
     private bool isLoading = true;
     private string? errorMessage;
@@ -137,19 +142,42 @@
 
     private (bool IsPassed, string Status) GetPassFailStatus(int totalScore)
     {
+        bool IsPassed = true;
+        string Status;
+
         switch (totalScore)
         {
             case >= 85:
-                return (true, "Pekiyi");
+                {
+                    Status = "Pek İyi";
+                    break;
+                }
             case >= 70:
-                return (true, "İyi");
+                {
+                    Status = "İyi";
+                    break;
+                }
             case >= 60:
-                return (true, "Orta");
+                {
+                    Status = "Orta";
+                    break;
+                }
             case >= 50:
-                return (true, "Geçer");
+                {
+                    Status = "Geçer";
+                    break;
+                }
             default:
-                return (false, $"Geçmez");
+                {
+                    IsPassed = false;
+                    Status = "Geçmez";
+                    break;
+                }
         }
+
+        totalStatuses.Add(Status);
+        OnStatuses.InvokeAsync(totalStatuses);
+        return (IsPassed, Status);
     }
 }
 

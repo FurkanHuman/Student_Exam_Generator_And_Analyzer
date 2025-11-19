@@ -37,6 +37,48 @@ else if (analysisData != null)
             </div>
         </div>
     </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-3">🎯 Sınıf Başarı Tablosu</h5>
+                    <div class="row text-center">
+                        <div class="col-md-2 col-sm-4 col-6 mb-3">
+                            <div class="p-3 bg-danger text-white rounded">
+                                <h6>Geçmez</h6>
+                                <h4>@successDistribution.Fail</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-6 mb-3">
+                            <div class="p-3 bg-warning text-white rounded">
+                                <h6>Geçer</h6>
+                                <h4>@successDistribution.Pass</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-6 mb-3">
+                            <div class="p-3 bg-info text-white rounded">
+                                <h6>Orta</h6>
+                                <h4>@successDistribution.Average</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-6 mb-3">
+                            <div class="p-3 bg-primary text-white rounded">
+                                <h6>İyi</h6>
+                                <h4>@successDistribution.Good</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-6 mb-3">
+                            <div class="p-3 bg-success text-white rounded">
+                                <h6>Pek İyi</h6>
+                                <h4>@successDistribution.VeryGood</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 else if (!isLoading && errorMessage != null)
 {
@@ -51,6 +93,7 @@ else if (!isLoading && errorMessage != null)
     public int AnalysisId { get; set; }
 
     private Dictionary<int, double> analysisData;
+    private SuccessDistribution successDistribution = new();
     private bool isLoading = true;
     private string? errorMessage;
 
@@ -81,5 +124,23 @@ else if (!isLoading && errorMessage != null)
         {
             isLoading = false;
         }
+    }
+
+    private void SuccessDistributionBuilder(ICollection<string> statuses)
+    {
+        successDistribution.Fail = statuses.Count(s => s == "Geçmez");
+        successDistribution.Pass = statuses.Count(s => s == "Geçer");
+        successDistribution.Average = statuses.Count(s => s == "Orta");
+        successDistribution.Good = statuses.Count(s => s == "İyi");
+        successDistribution.VeryGood = statuses.Count(s => s == "Pek İyi");
+    }
+
+    public class SuccessDistribution
+    {
+        public int Fail { get; set; }
+        public int Pass { get; set; }
+        public int Average { get; set; }
+        public int Good { get; set; }
+        public int VeryGood { get; set; }
     }
 }
