@@ -1,5 +1,5 @@
 ﻿@using Application.Services.CalculatorFactory
-@inject AnalysisGeneralStatisticsCounterCalculator _generalCounterCalculator
+@inject IAnalysisCalculatorFactory<AnalysisGeneralExamStatisticsCounters> CalculatorFactory
 
 @if (isLoading)
 {
@@ -96,7 +96,7 @@ else if (!isLoading && errorMessage != null)
             errorMessage = null;
 
 
-            statistics = await _generalCounterCalculator.CalculateAsync(analysisId: AnalysisId);
+            statistics = await CalculatorFactory.CalculateAsync(analysisId: AnalysisId);
 
         }
         catch (InvalidOperationException ex)

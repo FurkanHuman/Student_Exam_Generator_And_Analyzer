@@ -1,5 +1,5 @@
 @using Application.Services.CalculatorFactory
-@inject AnalysisDetailTableCalculator Calculator
+@inject IAnalysisCalculatorFactory<IList<AnalysisDetailTableDto>> CalculatorFactory
 
 <div class="container-fluid p-4">
     @if (isLoading)
@@ -97,7 +97,7 @@
             isLoading = true;
             errorMessage = null;
 
-            analysisData = await Calculator.CalculateAsync(AnalysisId);
+            analysisData = await CalculatorFactory.CalculateAsync(AnalysisId);
 
         }
         catch (InvalidOperationException ex)
