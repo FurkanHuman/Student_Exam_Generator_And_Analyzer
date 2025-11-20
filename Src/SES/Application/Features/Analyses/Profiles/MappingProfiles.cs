@@ -25,7 +25,11 @@ public class MappingProfiles : Profile
 
         CreateMap<Analysis, GetByIdAnalysisResponse>();
 
-        CreateMap<Analysis, GetListAnalysisListItemDto>();
+        CreateMap<Analysis, GetListAnalysisListItemDto>()
+            .ForMember(destinationMember: ald => ald.SemesterName, memberOptions: mo => mo.MapFrom(a => a.Semester.Name))
+            .ForMember(destinationMember: ald => ald.SemesterStartDate, memberOptions: mo => mo.MapFrom(a => a.Semester.BeginSemesterDate))
+            .ForMember(destinationMember: ald => ald.SemesterEndDate, memberOptions: mo => mo.MapFrom(a => a.Semester.EndSemesterDate))
+            .ForMember(destinationMember: ald => ald.LessonName, memberOptions: mo => mo.MapFrom(a => a.Lesson.LessonName));
         CreateMap<IPaginate<Analysis>, GetListResponse<GetListAnalysisListItemDto>>();
     }
 }
