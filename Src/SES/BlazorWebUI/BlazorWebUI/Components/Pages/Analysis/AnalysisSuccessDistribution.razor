@@ -1,0 +1,50 @@
+﻿@using Application.Services.CalculatorFactory
+@if (SuccessDistribution != null)
+{
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-3">🎯 Sınıf Başarı Tablosu</h5>
+                    <div class="row text-center">
+                        <div class="col-md-2 col-sm-4 col-6 mb-3">
+                            <div class="p-3 bg-danger text-white rounded">
+                                <h6>Geçmez</h6>
+                                <h4>@SuccessDistribution.Fail</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-6 mb-3">
+                            <div class="p-3 bg-warning text-white rounded">
+                                <h6>Geçer</h6>
+                                <h4>@SuccessDistribution.Pass</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-6 mb-3">
+                            <div class="p-3 bg-info text-white rounded">
+                                <h6>Orta</h6>
+                                <h4>@SuccessDistribution.Average</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-6 mb-3">
+                            <div class="p-3 bg-primary text-white rounded">
+                                <h6>İyi</h6>
+                                <h4>@SuccessDistribution.Good</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-6 mb-3">
+                            <div class="p-3 bg-success text-white rounded">
+                                <h6>Pek İyi</h6>
+                                <h4>@SuccessDistribution.VeryGood</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@code
+{
+    [Parameter]
+    public SuccessDistribution? SuccessDistribution { get; set; }
+}
