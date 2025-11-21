@@ -1,18 +1,9 @@
 @using Application.Services.CalculatorFactory
-@inject IAnalysisCalculatorFactory<IList<AnalysisDetailTableDto>> CalculatorFactory
 
 <div class="container-fluid p-4">
-    @if (isLoading)
+    @if (DetailTableData != null && DetailTableData.Any())
     {
-        <div class="text-center">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Yükleniyor...</span>
-            </div>
-        </div>
-    }
-    else if (analysisData != null && analysisData.Any())
-    {
-        @foreach (AnalysisDetailTableDto examData in analysisData)
+        @foreach (AnalysisDetailTableDto examData in DetailTableData)
         {
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
@@ -28,7 +19,7 @@
                                     <th class="align-middle" style="width: 200px;">Ad + Soyad</th>
                                     @for (int i = 1; i <= examData.QuestionCount; i++)
                                     {
-                                        <th class="text-center align-middle" style="width: 50px;">S@i</th>
+                                        <th class="text-center align-middle" style="width: 50px;">S @i</th>
                                     }
                                     <th class="text-center align-middle bg-warning text-dark" style="width: 100px;">Toplam Puan</th>
                                     <th class="text-center align-middle bg-info text-dark" style="width: 100px;">Geçti/Kaldı</th>
@@ -62,74 +53,29 @@
             </div>
         }
     }
-    else if (!isLoading && errorMessage != null)
-    {
-        <div class="alert alert-danger" role="alert">
-            @errorMessage
-        </div>
-    }
 </div>
 
 @code {
-    [Parameter]
-    public int AnalysisId { get; set; }
 
     [Parameter]
-    public EventCallback<ICollection<string>> OnStatuses { get; set; }
+    public IList<AnalysisDetailTableDto>? DetailTableData { get; set; }
 
-    private ICollection<string> totalStatuses = [];
-
-    private IList<AnalysisDetailTableDto>? analysisData;
-    private bool isLoading = true;
-    private string? errorMessage;
-
-    private const int PassingScore = 50;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadDataAsync();
-    }
-
-    private async Task LoadDataAsync()
-    {
-        try
-        {
-            isLoading = true;
-            errorMessage = null;
-
-            analysisData = await CalculatorFactory.CalculateAsync(AnalysisId);
-
-        }
-        catch (InvalidOperationException ex)
-        {
-            errorMessage = $"Analiz bulunamadı: {ex.Message}";
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Veri yüklenirken hata oluştu: {ex.Message}";
-        }
-        finally
-        {
-            isLoading = false;
-        }
-    }
+    private const int PassingScore = 5;
 
     private string GetScoreColor(int score)
     {
-        // Puan bazlı renklendirme - istediğiniz gibi özelleştirebilirsiniz
         return score switch
         {
-            >= 85 => "#28a745", // Koyu Yeşil (Çok iyi)
-            >= 70 => "#17a2b8", // Mavi (İyi)
-            >= 60 => "#ffc107", // Sarı (Orta)
-            >= 50 => "#fd7e14", // Turuncu (Zayıf)
-            _ => "#dc3545"      // Kırmızı (Çok zayıf)
+            >= 85 => "#28a745",
+            >= 70 => "#17a2b8",
+            >= 60 => "#ffc107",
+            >= 50 => "#fd7e14",
+            _ => "#dc3545"
         };
     }
 
     private string GetScoreTextColor(int score)
     {
-        // Puan rengi yeterince koyu ise beyaz, açıksa siyah metin
         return score switch
         {
             >= 85 => "white",
@@ -142,42 +88,19 @@
 
     private (bool IsPassed, string Status) GetPassFailStatus(int totalScore)
     {
-        bool IsPassed = true;
-        string Status;
-
         switch (totalScore)
         {
             case >= 85:
-                {
-                    Status = "Pek İyi";
-                    break;
-                }
+                return (true, "Pek iyi");
             case >= 70:
-                {
-                    Status = "İyi";
-                    break;
-                }
+                return (true, "İyi");
             case >= 60:
-                {
-                    Status = "Orta";
-                    break;
-                }
+                return (true, "Orta");
             case >= 50:
-                {
-                    Status = "Geçer";
-                    break;
-                }
+                return (true, "Geçer");
             default:
-                {
-                    IsPassed = false;
-                    Status = "Geçmez";
-                    break;
-                }
+                return (false, $"Geçmez");
         }
-
-        totalStatuses.Add(Status);
-        OnStatuses.InvokeAsync(totalStatuses);
-        return (IsPassed, Status);
     }
 }
 
