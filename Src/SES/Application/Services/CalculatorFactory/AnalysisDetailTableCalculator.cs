@@ -21,27 +21,35 @@ public class AnalysisDetailTableCalculator : AnalysisCalculatorFactory<IList<Ana
         if (analysis == null)
             throw new InvalidOperationException($"Analysis with Id {analysisId} not found.");
 
-        List<AnalysisDetailTableDto> result = [.. (analysis.Exams ?? Enumerable.Empty<Exam>())
-            .Select(exam =>
+        List<AnalysisDetailTableDto> result =
+        [.. (analysis.Exams ?? Enumerable.Empty<Exam>())
+        .GroupBy(e => e.ExamCode)
+        .Select(group =>
+        {
+            string examCode = group.Key;
+
+            Exam exam = group.First();
+            uint seed = QuizQuestionHelpers.DecodeBase32String(examCode);
+            ExamInfo? examInfo = DeserializeExamInfo(exam);
+
+
+            List<StudentTableDto> studentDtos =
+            [
+                .. group.SelectMany(gExam =>
+                    GetStudentTableDtos(gExam, analysis, (int)seed, examInfo)
+                )
+            ];
+
+            int questionCount = GetQuestionCount(studentDtos);
+
+            return new AnalysisDetailTableDto
             {
-                string examCode = exam.ExamCode;
-
-                uint seed = QuizQuestionHelpers.DecodeBase32String(examCode);
-
-                ExamInfo? examInfo = DeserializeExamInfo(exam);
-
-                List<StudentTableDto> studentDtos = GetStudentTableDtos(exam, analysis, (int)seed, examInfo);
-
-                int questionCount = GetQuestionCount(studentDtos);
-
-                return new AnalysisDetailTableDto
-                {
-                    ExamCode = examCode,
-                    QuestionCount = questionCount,
-                    Students = studentDtos
-                };
-            })];
-
+                ExamCode = examCode,
+                QuestionCount = questionCount,
+                Students = studentDtos
+            };
+        })
+        ];
         return result;
     }
 
