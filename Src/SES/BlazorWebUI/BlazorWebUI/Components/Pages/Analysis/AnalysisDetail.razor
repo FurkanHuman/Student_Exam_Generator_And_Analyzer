@@ -1,0 +1,174 @@
+﻿@page "/Analysis/{Id:int}"
+@layout FullScreenLayout
+@rendermode InteractiveServer
+@using Application.Services.Analyses
+@using BlazorWebUI.Components.Layout
+@using Application.Services.CalculatorFactory
+
+<PageTitle>Analiz Detayı - @Id</PageTitle>
+
+<div class="container-fluid">
+    @if (currentStep < 4)
+    {
+        <div class="text-center my-5">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
+            </div>
+            <h4 class="mt-3">@GetLoadingMessage()</h4>
+            <div class="progress mt-3" style="max-width: 400px; margin: 0 auto;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                    style="width: @((currentStep * 25))%" aria-valuenow="@currentStep" aria-valuemin="0" aria-valuemax="4">
+                    @currentStep/4
+                </div>
+            </div>
+        </div>
+    }
+    <div class="container-fluid py-4 print-container">
+        @if (currentStep >= 1)
+        {
+            <AnalysisGeneralIstatistic Statistics="generalStatistics" />
+        }
+
+        @if (currentStep >= 2)
+        {
+            <AnalysisDetailTable DetailTableData="detailTableData" />
+        }
+
+        @if (currentStep >= 3)
+        {
+            <AnalysisQuestionAveragesStatistics QuestionAverages="questionAverages" />
+        }
+
+        @if (currentStep >= 4)
+        {
+            <AnalysisSuccessDistribution SuccessDistribution="successDistribution" />
+        }
+
+        <div class="row d-print-none">
+            <div class="col-12 text-center">
+                <button class="btn btn-primary btn-lg" @onclick="PrintPage">
+                    <i class="bi bi-printer"></i> Yazdır
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; }
+
+    // Injected JS Runtime for printing
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; } = default!;
+
+    // Injected Calculators
+    [Inject]
+    private IAnalysisCalculatorFactory<AnalysisGeneralExamStatisticsCounters> GeneralStatsCalculator { get; set; } =
+    default!;
+
+    [Inject]
+    private IAnalysisCalculatorFactory<IList<AnalysisDetailTableDto>> DetailTableCalculator { get; set; } = default!;
+
+    [Inject]
+    private IAnalysisCalculatorFactory<Dictionary<int, double>> QuestionAveragesCalculator { get; set; } = default!;
+
+    [Inject]
+    private IAnalysisCalculatorFactory<SuccessDistribution> SuccessDistributionCalculator { get; set; } = default!;
+
+    // Data containers
+    private AnalysisGeneralExamStatisticsCounters? generalStatistics;
+    private IList<AnalysisDetailTableDto>? detailTableData;
+    private Dictionary<int, double>? questionAverages;
+    private SuccessDistribution? successDistribution;
+
+    private ICollection<string> statusesBrigde = new List<string>();
+
+    // Loading state
+    private int currentStep = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Step 1: General Statistics
+            currentStep = 0;
+            StateHasChanged();
+
+            generalStatistics = await GeneralStatsCalculator.CalculateAsync(Id);
+            currentStep = 1;
+            StateHasChanged();
+
+            // Step 2: Detail Table
+            detailTableData = await DetailTableCalculator.CalculateAsync(Id);
+            currentStep = 2;
+            StateHasChanged();
+
+            // Step 3: Question Averages
+            questionAverages = await QuestionAveragesCalculator.CalculateAsync(Id);
+            currentStep = 3;
+            StateHasChanged();
+
+            // Step 4: Success Distribution
+            successDistribution = await SuccessDistributionCalculator.CalculateAsync(Id);
+            currentStep = 4;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            // Error handling
+            Console.WriteLine($"Error loading analysis: {ex.Message}");
+        }
+    }
+
+    private string GetLoadingMessage()
+    {
+        return currentStep switch
+        {
+            0 => "📊 Genel istatistikler yükleniyor...",
+            1 => "📋 Öğrenci detay tablosu yükleniyor...",
+            2 => "📈 Soru ortalamaları hesaplanıyor...",
+            _ => "Veriler yükleniyor..."
+        };
+    }
+    private async Task PrintPage()
+    {
+        await JSRuntime.InvokeVoidAsync("window.print");
+    }
+
+    private void BrigdeMethod(ICollection<string> args) => statusesBrigde = args;
+}
+<style>
+    @@media print {
+        .d-print-none {
+            display: none !important;
+        }
+
+        .print-container {
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .card {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        .table {
+            font-size: 12px;
+        }
+
+        .badge {
+            color: #000 !important;
+            border: 1px solid #000;
+        }
+    }
+
+    @@media (max-width: 25rem) {
+        .table-responsive {
+            font-size: 12px;
+        }
+    }
+</style>
