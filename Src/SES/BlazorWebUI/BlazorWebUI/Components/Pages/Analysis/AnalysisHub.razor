@@ -1,0 +1,42 @@
+﻿@page "/Analysis/Hub"
+@rendermode InteractiveServer
+@inject IMediator _mediator
+@inject NavigationManager Nav
+@using Application.Features.Analyses.Queries.GetList
+@using NArchitecture.Core.Application.Requests
+@using NArchitecture.Core.Application.Responses
+
+<PageTitle>Analiz Merkezi</PageTitle>
+
+<div class="d-flex flex-column gap-3">
+    @foreach (var analysis in _analysisList.Items)
+    {
+        <div class="p-3 border rounded shadow-sm d-flex justify-content-between align-items-center">
+            <div class="d-flex flex-column">
+                <span><strong>@analysis.Name</strong></span>
+                <span>@analysis.LessonName</span>
+                <span>@analysis.SemesterStartDate.ToString("dd-MM-yyyy") → @analysis.SemesterEndDate.ToString("dd-MM-yyyy")</span>
+            </div>
+
+            <button class="btn btn-primary"
+                    @onclick="@(() => NavigateToDetail(analysis.Id))">
+                Seç
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    private GetListResponse<GetListAnalysisListItemDto> _analysisList { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        PageRequest pg = new() { PageIndex = 0, PageSize = int.MaxValue };
+        _analysisList = await _mediator.Send(new GetListAnalysisQuery { PageRequest = pg });
+    }
+
+    private void NavigateToDetail(int id)
+    {
+        Nav.NavigateTo($"/analysis/{id}");
+    }
+}
