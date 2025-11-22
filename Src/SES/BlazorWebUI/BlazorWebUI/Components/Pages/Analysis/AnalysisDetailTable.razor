@@ -1,120 +1,143 @@
 @using Application.Services.CalculatorFactory
 
-<div class="container-fluid p-4">
-    @if (DetailTableData != null && DetailTableData.Any())
-    {
-        @foreach (AnalysisDetailTableDto examData in DetailTableData)
-        {
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Sınav Kodu: @examData.ExamCode</h4>
-                    <small>Toplam Soru Sayısı: @examData.QuestionCount</small>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover table-sm mb-0">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th class="text-center align-middle" style="width: 80px;">Ö. No</th>
-                                    <th class="align-middle" style="width: 200px;">Ad + Soyad</th>
-                                    @for (int i = 1; i <= examData.QuestionCount; i++)
-                                    {
-                                        <th class="text-center align-middle" style="width: 50px;">S @i</th>
-                                    }
-                                    <th class="text-center align-middle bg-warning text-dark" style="width: 100px;">Toplam Puan</th>
-                                    <th class="text-center align-middle bg-info text-dark" style="width: 100px;">Geçti/Kaldı</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (StudentTableDto student in examData.Students)
-                                {
-                                    int totalScore = student.StudentAnswerScores.Sum(s => s.GivenScore);
-                                    (bool IsPassed, string Status) passFail = GetPassFailStatus(totalScore);
+@if (DetailTableData != null && DetailTableData.Any())
+{
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-3 text-primary">
+                <i class="bi bi-table"></i> Öğrenci Detay Tablosu
+            </h4>
+        </div>
+    </div>
 
-                                    <tr class="align-middle">
-                                        <td class="text-center fw-semibold">@student.SchoolNumber</td>
-                                        <td class="fw-medium">@student.Name @student.Surname</td>
-                                        @foreach (int score in student.StudentAnswerScores.Select(sas => sas.GivenScore))
-                                        {
-                                            <td class="text-center fw-semibold" style="background-color: @GetScoreColor(score); color: @GetScoreTextColor(score);">
-                                                @score
-                                            </td>
-                                        }
-                                        <td class="text-center fw-bold bg-warning text-dark fs-6">@totalScore</td>
-                                        <td class="text-center fw-bold fs-6" style="background-color: @(passFail.IsPassed ? "#28a745" : "#dc3545"); color: white;">
-                                            @passFail.Status
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+    @foreach (AnalysisDetailTableDto examData in DetailTableData)
+    {
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-info text-black-50">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">
+                            <i class="bi bi-file-earmark-text"></i> Sınav Kodu: @examData.ExamCode
+                        </h4>
+                        <small>
+                            <i class="bi bi-question-circle"></i> Toplam Soru Sayısı: @examData.QuestionCount
+                        </small>
                     </div>
                 </div>
             </div>
-        }
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover table-sm mb-0">
+                        <thead class="table-dark sticky-top">
+                            <tr>
+                                <th class="text-center align-middle" style="min-width: 5rem;">Ö. No</th>
+                                <th class="align-middle" style="min-width: 12.5rem;">Ad + Soyad</th>
+                                @for (int i = 1; i <= examData.QuestionCount; i++)
+                                {
+                                    <th class="text-center align-middle" style="min-width: 3.125rem;">S@(i)</th>
+                                }
+                                <th class="text-center align-middle bg-warning text-dark" style="min-width: 6.25rem;">Toplam</th>
+                                <th class="text-center align-middle bg-info text-dark" style="min-width: 7.5rem;">Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (StudentTableDto student in examData.Students)
+                            {
+                                int totalScore = student.StudentAnswerScores.Sum(s => s.GivenScore);
+                                (bool IsPassed, string Status) passFail = GetPassFailStatus(totalScore);
+
+                                <tr class="align-middle @GetRowClass(totalScore)">
+                                    <td class="text-center fw-semibold">@student.SchoolNumber</td>
+                                    <td class="fw-medium">@student.Name @student.Surname</td>
+                                    @foreach (int score in student.StudentAnswerScores.Select(sas => sas.GivenScore))
+                                    {
+                                        <td class="text-center">
+                                            <span class="badge @GetScoreBadgeClass(score) fs-6 px-2 py-1">
+                                                @score
+                                            </span>
+                                        </td>
+                                    }
+                                    <td class="text-center">
+                                        <span class="badge bg-warning text-dark fs-5 px-3 py-2 fw-bold">
+                                            @totalScore
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge @GetStatusBadgeClass(passFail.Status) fs-5 px-3 py-2">
+                                            @passFail.Status
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     }
-</div>
+}
 
 @code {
-
     [Parameter]
     public IList<AnalysisDetailTableDto>? DetailTableData { get; set; }
 
-    private const int PassingScore = 5;
-
-    private string GetScoreColor(int score)
+    private string GetRowClass(int totalScore)
     {
-        return score switch
+        return totalScore switch
         {
-            >= 85 => "#28a745",
-            >= 70 => "#17a2b8",
-            >= 60 => "#ffc107",
-            >= 50 => "#fd7e14",
-            _ => "#dc3545"
+            >= 85 => "table-success",
+            >= 70 => "table-primary",
+            >= 60 => "table-info",
+            >= 50 => "table-warning",
+            _ => "table-danger"
         };
     }
 
-    private string GetScoreTextColor(int score)
+    private string GetScoreBadgeClass(int score)
     {
         return score switch
         {
-            >= 85 => "white",
-            >= 70 => "white",
-            >= 60 => "black",
-            >= 50 => "white",
-            _ => "white"
+            >= 8 => "bg-success text-white",
+            >= 6 => "bg-primary text-white",
+            >= 4 => "bg-info text-white",
+            >= 2 => "bg-warning text-dark",
+            _ => "bg-danger text-white"
+        };
+    }
+
+    private string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "Pek iyi" => "bg-success text-white",
+            "İyi" => "bg-primary text-white",
+            "Orta" => "bg-info text-white",
+            "Geçer" => "bg-warning text-dark",
+            _ => "bg-danger text-white"
         };
     }
 
     private (bool IsPassed, string Status) GetPassFailStatus(int totalScore)
     {
-        switch (totalScore)
+        return totalScore switch
         {
-            case >= 85:
-                return (true, "Pek iyi");
-            case >= 70:
-                return (true, "İyi");
-            case >= 60:
-                return (true, "Orta");
-            case >= 50:
-                return (true, "Geçer");
-            default:
-                return (false, $"Geçmez");
-        }
+            >= 85 => (true, "Pek iyi"),
+            >= 70 => (true, "İyi"),
+            >= 60 => (true, "Orta"),
+            >= 50 => (true, "Geçer"),
+            _ => (false, "Geçmez")
+        };
     }
 }
 
 <style>
     .table-sm td, .table-sm th {
-        padding: 0.4rem;
+        padding: 0.5rem;
         vertical-align: middle;
     }
 
     .table thead th {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.1);
     }
 
     .table-responsive {
@@ -122,15 +145,11 @@
         overflow-y: auto;
     }
 
-    .table-bordered td, .table-bordered th {
-        border: 2px solid #dee2e6;
+    .table-hover tbody tr {
+        transition: background-color 0.2s ease;
     }
 
-    .table-hover tbody tr:hover {
-        background-color: rgba(0,0,0,0.05);
-    }
-
-    .card-header {
-        border-bottom: 3px solid rgba(0,0,0,0.125);
-    }
+        .table-hover tbody tr:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
 </style>

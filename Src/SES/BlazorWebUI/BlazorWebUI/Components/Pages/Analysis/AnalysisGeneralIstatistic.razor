@@ -4,61 +4,85 @@
 {
     <div class="row mb-4">
         <div class="col-12">
-            <h4 class="mb-3 text-primary">📊 Genel İstatistikler</h4>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h4 class="text-primary mb-0">
+                    <i class="bi bi-bar-chart-fill"></i> Genel İstatistikler
+                </h4>
+                <span class="badge bg-primary">@Statistics.TotalCount Öğrenci</span>
+            </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center bg-info text-white">
-                    <h5 class="card-title">Sınava Giren</h5>
-                    <h2 class="mb-0">@Statistics.AttendeesCount</h2>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 hover-lift">
+                <div class="card-body text-center p-4 bg-gradient-info text-white rounded">
+                    <div class="mb-3">
+                        <i class="bi bi-check-circle-fill" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h6 class="text-white-50 mb-2">Sınava Giren</h6>
+                    <h2 class="mb-0 display-5 fw-bold">@Statistics.AttendeesCount</h2>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center bg-warning text-white">
-                    <h5 class="card-title">Sınava Girmeyen</h5>
-                    <h2 class="mb-0">@Statistics.AbsenteesCount</h2>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 hover-lift">
+                <div class="card-body text-center p-4 bg-gradient-warning text-white rounded">
+                    <div class="mb-3">
+                        <i class="bi bi-x-circle-fill" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h6 class="text-white-50 mb-2">Sınava Girmeyen</h6>
+                    <h2 class="mb-0 display-5 fw-bold">@Statistics.AbsenteesCount</h2>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center bg-info text-white">
-                    <h5 class="card-title">Özürlü+Özürsüz Raporlu</h5>
-                    <h2 class="mb-0">@Statistics.ExcusedCount</h2>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 hover-lift">
+                <div class="card-body text-center p-4 bg-gradient-success text-white rounded">
+                    <div class="mb-3">
+                        <i class="bi bi-trophy-fill" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h6 class="text-white-50 mb-2">Başarılı</h6>
+                    <h2 class="mb-0 display-5 fw-bold">@Statistics.PassedCount</h2>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center bg-success text-white">
-                    <h5 class="card-title">Başarılı</h5>
-                    <h2 class="mb-0">@Statistics.PassedCount</h2>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 hover-lift">
+                <div class="card-body text-center p-4 bg-gradient-danger text-white rounded">
+                    <div class="mb-3">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h6 class="text-white-50 mb-2">Başarısız</h6>
+                    <h2 class="mb-0 display-5 fw-bold">@Statistics.FailedCount</h2>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-3">
+
+        <div class="col-lg-4 col-md-6 mb-3">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center bg-danger text-white">
-                    <h5 class="card-title">Başarısız</h5>
-                    <h2 class="mb-0">@Statistics.FailedCount</h2>
+                <div class="card-body text-center p-3 bg-light rounded">
+                    <small class="text-muted d-block mb-2">Mazeret/Rapor</small>
+                    <h4 class="mb-0 text-secondary">@Statistics.ExcusedCount</h4>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-3">
+
+        <div class="col-lg-4 col-md-6 mb-3">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center bg-info text-white">
-                    <h5 class="card-title">Toplam</h5>
-                    <h2 class="mb-0">@Statistics.TotalCount</h2>
+                <div class="card-body text-center p-3 bg-light rounded">
+                    <small class="text-muted d-block mb-2">Okunmamış</small>
+                    <h4 class="mb-0 text-secondary">@Statistics.NotReadingCount</h4>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-3">
+
+        <div class="col-lg-4 col-md-6 mb-3">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center bg-warning text-white">
-                    <h5 class="card-title">Okunmamışlar</h5>
-                    <h2 class="mb-0">@Statistics.NotReadingCount</h2>
+                <div class="card-body text-center p-3 bg-primary text-white rounded">
+                    <small class="text-white-50 d-block mb-2">Toplam</small>
+                    <h4 class="mb-0">@Statistics.TotalCount</h4>
                 </div>
             </div>
         </div>
@@ -71,3 +95,29 @@
     public AnalysisGeneralExamStatisticsCounters? Statistics { get; set; }
 }
 
+<style>
+    .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-0.3125rem);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+
+    .bg-gradient-info {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    }
+
+    .bg-gradient-warning {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    }
+
+    .bg-gradient-danger {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    }
+</style>
