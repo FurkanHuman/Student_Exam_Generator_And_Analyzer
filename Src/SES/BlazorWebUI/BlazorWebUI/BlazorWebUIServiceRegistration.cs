@@ -1,4 +1,5 @@
-﻿using BlazorWebUI.Components.Account;
+﻿using ApexCharts;
+using BlazorWebUI.Components.Account;
 using Domain.Entities;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +13,7 @@ public static class BlazorWebUIServiceRegistration
     {
 
         services.AddAutoMapper(cfg => { }, Assembly.GetExecutingAssembly());
+        services.AddApexCharts();
         services.AddScoped<IdentityRedirectManager>();
         services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
         services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();

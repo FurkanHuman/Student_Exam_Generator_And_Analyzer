@@ -13,6 +13,7 @@
     <None Remove="Components\Pages\Auth\**" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Blazor-ApexCharts" Version="6.0.2" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.21" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.21" />
