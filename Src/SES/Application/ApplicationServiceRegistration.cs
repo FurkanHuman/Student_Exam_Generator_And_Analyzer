@@ -100,6 +100,8 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IAnalysisCalculatorFactory<AnalysisGeneralExamStatisticsCounters>, AnalysisGeneralStatisticsCounterCalculator>();
         services.AddScoped<IAnalysisCalculatorFactory<Dictionary<int, double>>, AnalysisQuestionAveragesCalculator>();
         services.AddScoped<IAnalysisCalculatorFactory<SuccessDistribution>, AnalysisSuccessDistribbutionMEBCalculator>();
+        services.AddScoped<IAnalysisCalculatorFactory<AdvancedStatisticsData>, AnalysisAdvancedStatisticsCalculator>();
+        services.AddScoped<IAnalysisCalculatorFactory<List<List<StudentPerformanceDto>>>, AnalysisClusteringFactory>();
 
         services.AddScoped<AnalysisAutomationService>();
         services.AddScoped<PdfReaderStudentManager>();
