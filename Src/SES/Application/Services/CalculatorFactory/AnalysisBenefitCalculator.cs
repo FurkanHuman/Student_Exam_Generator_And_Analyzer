@@ -7,7 +7,7 @@ namespace Application.Services.CalculatorFactory;
 public class AnalysisBenefitCalculator : AnalysisCalculatorFactory<BenefitAnalysisResultDto>
 {
     private readonly IAnalysisCalculatorFactory<IList<AnalysisDetailTableDto>> _detailCalculator;
-    private const double MaxBenefitScore = 4.0;
+    private const double MaxBenefitScore = 4.0; // 4 based on the scoring system
 
     public AnalysisBenefitCalculator(
         IAnalysisService analysisService,
@@ -20,9 +20,9 @@ public class AnalysisBenefitCalculator : AnalysisCalculatorFactory<BenefitAnalys
     public override async Task<BenefitAnalysisResultDto> CalculateAsync(int analysisId, CancellationToken cancellationToken = default)
     {
 
-        var detailTables = await _detailCalculator.CalculateAsync(analysisId, cancellationToken);
+        IList<AnalysisDetailTableDto> detailTables = await _detailCalculator.CalculateAsync(analysisId, cancellationToken);
 
-        var analysis = await _analysisService.GetAsync(
+        Analysis? analysis = await _analysisService.GetAsync(
             predicate: a => a.Id == analysisId,
             include: a => a
                 .Include(a => a.Exams)
@@ -34,13 +34,13 @@ public class AnalysisBenefitCalculator : AnalysisCalculatorFactory<BenefitAnalys
         if (analysis == null)
             throw new InvalidOperationException($"Analysis with Id {analysisId} not found.");
 
-        var result = new BenefitAnalysisResultDto();
+        BenefitAnalysisResultDto result = new();
 
-        var allStudents = detailTables.SelectMany(t => t.Students).ToList();
+        List<StudentTableDto> allStudents = detailTables.SelectMany(t => t.Students).ToList();
 
-        foreach (var student in allStudents)
+        foreach (StudentTableDto student in allStudents)
         {
-            var studentAnalysis = CalculateStudentBenefits(student, analysis);
+            StudentBenefitAnalysisDto studentAnalysis = CalculateStudentBenefits(student, analysis);
             result.StudentAnalyses.Add(studentAnalysis);
         }
 
@@ -53,53 +53,53 @@ public class AnalysisBenefitCalculator : AnalysisCalculatorFactory<BenefitAnalys
 
     private StudentBenefitAnalysisDto CalculateStudentBenefits(StudentTableDto student, Analysis analysis)
     {
-        var studentAnalysis = new StudentBenefitAnalysisDto
+        StudentBenefitAnalysisDto studentAnalysis = new StudentBenefitAnalysisDto
         {
             StudentId = student.Id,
             StudentName = $"{student.Name} {student.Surname}"
         };
 
-        var allBenefits = analysis.Exams
+        List<Benefit> allBenefits = [.. analysis.Exams
             .SelectMany(e => e.QuizQuestions)
             .SelectMany(qq => qq.Benefits ?? Enumerable.Empty<Benefit>())
-            .DistinctBy(b => b.Id)
-            .ToList();
+            .DistinctBy(b => b.Id)];
 
-        foreach (var benefit in allBenefits)
+        foreach (Benefit benefit in allBenefits)
         {
-            var benefitScore = CalculateBenefitScoreForStudent(benefit, student, analysis);
+            BenefitScoreDto benefitScore = CalculateBenefitScoreForStudent(benefit, student, analysis);
             studentAnalysis.BenefitScores.Add(benefitScore);
         }
 
-        studentAnalysis.AverageBenefitScore = studentAnalysis.BenefitScores.Any()
-            ? studentAnalysis.BenefitScores.Average(b => b.Score)
-            : 0;
+        if (studentAnalysis.BenefitScores.Count != 0)
+            studentAnalysis.AverageBenefitScore = studentAnalysis.BenefitScores.Average(b => b.Score);
+        
+        else
+            studentAnalysis.AverageBenefitScore = 0;
 
         return studentAnalysis;
     }
 
     private BenefitScoreDto CalculateBenefitScoreForStudent(Benefit benefit, StudentTableDto student, Analysis analysis)
     {
-        var benefitScore = new BenefitScoreDto
+        BenefitScoreDto benefitScore = new()
         {
             BenefitCode = benefit.BenefitCode ?? "",
             Description = benefit.Description ?? ""
         };
 
-        var questionsWithBenefit = analysis.Exams
+        List<QuizQuestion> questionsWithBenefit = [.. analysis.Exams
             .SelectMany(e => e.QuizQuestions)
-            .Where(qq => qq.Benefits != null && qq.Benefits.Any(b => b.Id == benefit.Id))
-            .ToList();
+            .Where(qq => qq.Benefits != null && qq.Benefits.Any(b => b.Id == benefit.Id))];
 
         benefitScore.TotalQuestions = questionsWithBenefit.Count;
 
         double totalBenefitScore = 0;
 
-        foreach (var question in questionsWithBenefit)
+        foreach (QuizQuestion question in questionsWithBenefit)
         {
             int k = question.Benefits?.Count ?? 1;
 
-            var studentAnswer = student.StudentAnswerScores
+            StudentAnswerScore? studentAnswer = student.StudentAnswerScores
                 .FirstOrDefault(sa => sa.QuestionId == question.Id);
 
             double questionScore = studentAnswer?.GivenScore ?? 0;
@@ -119,26 +119,23 @@ public class AnalysisBenefitCalculator : AnalysisCalculatorFactory<BenefitAnalys
 
     private List<BenefitScoreDto> CalculateClassAverageBenefits(List<StudentBenefitAnalysisDto> studentAnalyses)
     {
-        if (!studentAnalyses.Any())
-            return new List<BenefitScoreDto>();
+        if (studentAnalyses.Count == 0)
+            return [];
 
-        // Tüm kazanımları topla
-        var allBenefitCodes = studentAnalyses
+        List<string> allBenefitCodes = [.. studentAnalyses
             .SelectMany(sa => sa.BenefitScores)
             .Select(b => b.BenefitCode)
-            .Distinct()
-            .ToList();
+            .Distinct()];
 
-        var classAverages = new List<BenefitScoreDto>();
+        List<BenefitScoreDto> classAverages = [];
 
-        foreach (var benefitCode in allBenefitCodes)
+        foreach (string benefitCode in allBenefitCodes)
         {
-            var benefitScores = studentAnalyses
+            List<BenefitScoreDto> benefitScores = [.. studentAnalyses
                 .SelectMany(sa => sa.BenefitScores)
-                .Where(b => b.BenefitCode == benefitCode)
-                .ToList();
+                .Where(b => b.BenefitCode == benefitCode)];
 
-            if (benefitScores.Any())
+            if (benefitScores.Count != 0)
             {
                 classAverages.Add(new BenefitScoreDto
                 {
@@ -154,9 +151,9 @@ public class AnalysisBenefitCalculator : AnalysisCalculatorFactory<BenefitAnalys
         return classAverages.OrderBy(b => b.BenefitCode).ToList();
     }
 
-    private Dictionary<string, int> CalculateBenefitStatusDistribution(List<BenefitScoreDto> benefits)
+    private static Dictionary<string, int> CalculateBenefitStatusDistribution(List<BenefitScoreDto> benefits)
     {
-        var distribution = new Dictionary<string, int>
+        Dictionary<string, int> distribution = new()
         {
             ["Çok İyi"] = 0,
             ["İyi"] = 0,
@@ -165,16 +162,16 @@ public class AnalysisBenefitCalculator : AnalysisCalculatorFactory<BenefitAnalys
             ["Yetersiz"] = 0
         };
 
-        foreach (var benefit in benefits)
+        foreach (BenefitScoreDto benefit in benefits)
         {
-            var status = GetBenefitStatus(benefit.Score);
+            string status = GetBenefitStatus(benefit.Score);
             distribution[status]++;
         }
 
         return distribution;
     }
 
-    private string GetBenefitStatus(double score)
+    private static string GetBenefitStatus(double score)
     {
         return score switch
         {

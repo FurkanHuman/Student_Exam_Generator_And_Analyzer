@@ -18,12 +18,12 @@
     else
     {
         <AnalysisGeneralIstatistic Statistics="generalStatistics" />
-        <AnalysisDetailTable DetailTableData="detailTableData" />
+        <AnalysisDetailTable DetailTableData="detailTableData" PassingScore="passingScore" />
         <AnalysisQuestionAveragesStatistics QuestionAverages="questionAverages" />
         <AnalysisSuccessDistribution SuccessDistribution="successDistribution" />
         <AnalysisChartsPage AdvancedData="advancedStatisticsData" ClusteredStudents="clusteredStudents" />
         <AnalysisBenefitTable BenefitAnalysis="benefitAnalysisResult" />
-
+        <AnalysisResponsiblePersonnel  />
         <div class="row d-print-none">
             <div class="col-12 text-center">
                 <button class="btn btn-primary btn-lg" @onclick="PrintPage">
@@ -36,32 +36,35 @@
 
 @code
 {
-    [Parameter] 
+    [Parameter]
     public int Id { get; set; }
 
-    [Inject] 
+    [Inject]
     private IJSRuntime JSRuntime { get; set; } = default!;
 
-    [Inject] 
+    [Inject]
     private IAnalysisCalculatorFactory<AnalysisGeneralExamStatisticsCounters> GeneralStatsCalculator { get; set; } = default!;
-    
+
     [Inject]
     private IAnalysisCalculatorFactory<IList<AnalysisDetailTableDto>> DetailTableCalculator { get; set; } = default!;
-    
+
     [Inject]
     private IAnalysisCalculatorFactory<Dictionary<int, double>> QuestionAveragesCalculator { get; set; } = default!;
-    
+
     [Inject]
     private IAnalysisCalculatorFactory<SuccessDistribution> SuccessDistributionCalculator { get; set; } = default!;
-    
+
     [Inject]
     private IAnalysisCalculatorFactory<AdvancedStatisticsData> AdvancedChartsCalculator { get; set; } = default!;
 
-    [Inject] 
+    [Inject]
     private IAnalysisCalculatorFactory<List<List<StudentPerformanceDto>>> ClusteringCalculator { get; set; } = default!;
 
     [Inject]
-    private IAnalysisCalculatorFactory<BenefitAnalysisResultDto> analysisCalculatorFactory { get; set; } = default!;
+    private IAnalysisCalculatorFactory<BenefitAnalysisResultDto> BenefitAnalysisCalculator { get; set; } = default!;
+
+    [Inject]
+    private IAnalysisCalculatorFactory<int> AnalysisLessonPassingScoreCalculator { get; set; } = default!;
 
     private AnalysisGeneralExamStatisticsCounters? generalStatistics;
     private IList<AnalysisDetailTableDto>? detailTableData;
@@ -71,6 +74,8 @@
     private List<List<StudentPerformanceDto>>? clusteredStudents;
     private BenefitAnalysisResultDto? benefitAnalysisResult;
 
+    private int passingScore = 50;
+
     private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
@@ -78,6 +83,8 @@
         try
         {
             isLoading = true;
+
+            passingScore = await AnalysisLessonPassingScoreCalculator.CalculateAsync(Id);
 
             generalStatistics = await GeneralStatsCalculator.CalculateAsync(Id);
 
@@ -91,7 +98,7 @@
 
             clusteredStudents = await ClusteringCalculator.CalculateAsync(Id);
 
-            benefitAnalysisResult = await analysisCalculatorFactory.CalculateAsync(Id);
+            benefitAnalysisResult = await BenefitAnalysisCalculator.CalculateAsync(Id);
         }
         catch (Exception ex)
         {

@@ -6,33 +6,33 @@ public class AnalysisClusteringFactory : AnalysisCalculatorFactory<List<List<Stu
 {
     private readonly IAnalysisCalculatorFactory<AdvancedStatisticsData> _innerCalculator;
 
-    public AnalysisClusteringFactory(IAnalysisCalculatorFactory<AdvancedStatisticsData> innerCalculator,IAnalysisService analysisService) : base(analysisService)
+    public AnalysisClusteringFactory(IAnalysisCalculatorFactory<AdvancedStatisticsData> innerCalculator, IAnalysisService analysisService) : base(analysisService)
     {
         _innerCalculator = innerCalculator;
     }
-    
+
     public override async Task<List<List<StudentPerformanceDto>>> CalculateAsync(int analysisId, CancellationToken cancellationToken = default)
     {
-        AdvancedStatisticsData advancedStatisticsData =  await _innerCalculator.CalculateAsync(analysisId, cancellationToken);
+        AdvancedStatisticsData advancedStatisticsData = await _innerCalculator.CalculateAsync(analysisId, cancellationToken);
 
         List<StudentPerformanceDto> students = advancedStatisticsData.ClusteringData;
 
         return PerformKMeansClustering(students, 4);
     }
 
-    private List<List<StudentPerformanceDto>> PerformKMeansClustering(List<StudentPerformanceDto> students, int clusterCount)
+    private static List<List<StudentPerformanceDto>> PerformKMeansClustering(List<StudentPerformanceDto> students, int clusterCount)
     {
         if (students.Count < clusterCount)
             clusterCount = students.Count;
 
-        var normalizedData = NormalizeData(students);
+        List<double[]> normalizedData = NormalizeData(students);
 
-        var clusters = KMeans(normalizedData, clusterCount);
+        int[] clusters = KMeans(normalizedData, clusterCount);
 
-        var result = new List<List<StudentPerformanceDto>>();
+        List<List<StudentPerformanceDto>> result = [];
         for (int i = 0; i < clusterCount; i++)
         {
-            result.Add(new List<StudentPerformanceDto>());
+            result.Add([]);
         }
 
         for (int i = 0; i < students.Count; i++)
@@ -43,51 +43,52 @@ public class AnalysisClusteringFactory : AnalysisCalculatorFactory<List<List<Stu
         return result;
     }
 
-    private List<double[]> NormalizeData(List<StudentPerformanceDto> students)
+    private static List<double[]> NormalizeData(List<StudentPerformanceDto> students)
     {
-        var normalized = new List<double[]>();
+        List<double[]> normalized = [];
 
-        var scores = students.Select(s => s.TotalScore).ToList();
-        var blankRates = students.Select(s => s.BlankRate).ToList();
+        List<double> scores = [.. students.Select(s => s.TotalScore)];
+        List<double> blankRates = [.. students.Select(s => s.BlankRate)];
 
         double scoreMin = scores.Min();
         double scoreMax = scores.Max();
         double blankMin = blankRates.Min();
         double blankMax = blankRates.Max();
 
-        foreach (var student in students)
+        foreach (StudentPerformanceDto student in students)
         {
-            normalized.Add(new[]
-            {
+            normalized.Add(
+            [
                 Normalize(student.TotalScore, scoreMin, scoreMax),
                 Normalize(student.BlankRate, blankMin, blankMax)
-            });
+            ]);
         }
 
         return normalized;
     }
 
-    private double Normalize(double value, double min, double max)
+    private static double Normalize(double value, double min, double max)
     {
-        if (max == min) return 0;
+        double epsilon = 1e-10;
+        if (Math.Abs(min - max) < epsilon) return 0;
         return (value - min) / (max - min);
     }
 
-    private int[] KMeans(List<double[]> data, int k, int maxIterations = 100)
+    private static int[] KMeans(List<double[]> data, int k, int maxIterations = 100)
     {
-        var random = new Random(42);
+        Random random = new(42); // Fixed seed for reproducible results; basically the universe's default config file.
         int n = data.Count;
         int dim = data[0].Length;
 
-        var centroids = new List<double[]>();
-        var usedIndices = new HashSet<int>();
+        List<double[]> centroids = [];
+        HashSet<int> usedIndices = [];
+
         for (int i = 0; i < k; i++)
         {
             int idx;
             do
-            {
                 idx = random.Next(n);
-            } while (usedIndices.Contains(idx));
+            while (usedIndices.Contains(idx));
 
             usedIndices.Add(idx);
             centroids.Add((double[])data[idx].Clone());
@@ -113,21 +114,17 @@ public class AnalysisClusteringFactory : AnalysisCalculatorFactory<List<List<Stu
 
             for (int c = 0; c < k; c++)
             {
-                var clusterPoints = data.Where((_, idx) => assignments[idx] == c).ToList();
-                if (clusterPoints.Any())
-                {
+                List<double[]> clusterPoints = [.. data.Where((_, idx) => assignments[idx] == c)];
+                if (clusterPoints.Count != 0)
                     for (int d = 0; d < dim; d++)
-                    {
                         centroids[c][d] = clusterPoints.Average(p => p[d]);
-                    }
-                }
             }
         }
 
         return assignments;
     }
 
-    private int FindNearestCentroid(double[] point, List<double[]> centroids)
+    private static int FindNearestCentroid(double[] point, List<double[]> centroids)
     {
         int nearest = 0;
         double minDist = double.MaxValue;
@@ -145,7 +142,7 @@ public class AnalysisClusteringFactory : AnalysisCalculatorFactory<List<List<Stu
         return nearest;
     }
 
-    private double EuclideanDistance(double[] a, double[] b)
+    private static double EuclideanDistance(double[] a, double[] b)
     {
         double sum = 0;
         for (int i = 0; i < a.Length; i++)

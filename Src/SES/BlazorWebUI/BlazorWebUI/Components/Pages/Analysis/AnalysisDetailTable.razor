@@ -81,6 +81,9 @@
     [Parameter]
     public IList<AnalysisDetailTableDto>? DetailTableData { get; set; }
 
+    [Parameter]
+    public int PassingScore { get; set; } = 50;
+
     private string GetRowClass(int totalScore)
     {
         return totalScore switch
@@ -124,7 +127,7 @@
             >= 85 => (true, "Pek iyi"),
             >= 70 => (true, "İyi"),
             >= 60 => (true, "Orta"),
-            >= 50 => (true, "Geçer"),
+            int s when s >= 50 => (true, "Geçer"),
             _ => (false, "Geçmez")
         };
     }

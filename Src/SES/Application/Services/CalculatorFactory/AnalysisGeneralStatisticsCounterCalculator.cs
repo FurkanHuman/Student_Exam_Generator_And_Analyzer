@@ -8,10 +8,6 @@ namespace Application.Services.CalculatorFactory;
 
 public class AnalysisGeneralStatisticsCounterCalculator : AnalysisCalculatorFactory<AnalysisGeneralExamStatisticsCounters>
 {
-    private const int _passScore = 50; // note: This pass score is the well-known passing grade set by the
-                                       // Ministry of National Education of the Republic of Turkey for primary, middle, and high schools.
-                                       // (It is subject to change)
-
     public AnalysisGeneralStatisticsCounterCalculator(IAnalysisService analysisService) : base(analysisService)
     {
 
@@ -19,6 +15,7 @@ public class AnalysisGeneralStatisticsCounterCalculator : AnalysisCalculatorFact
 
     public override async Task<AnalysisGeneralExamStatisticsCounters> CalculateAsync(int analysisId, CancellationToken cancellationToken = default)
     {
+        await LoadPassingScoreAsync(analysisId, cancellationToken);
         Analysis? analsis = await _analysisService.GetAsync(predicate: a => a.Id == analysisId,
                                                             include: ai => ai.Include(a => a.StudentExamAnswers)
                                                                              .ThenInclude(sea => sea.StudentAnswers)
@@ -36,8 +33,8 @@ public class AnalysisGeneralStatisticsCounterCalculator : AnalysisCalculatorFact
             AttendeesCount = AttendeesCount(analsis),
             AbsenteesCount = AbsenteesCount(analsis),
             ExcusedCount = ExcusedCount(analsis),
-            FailedCount = FailedCount(analsis),
-            PassedCount = PassedCount(analsis),
+            FailedCount = FailedCount(analsis, PassingScore),
+            PassedCount = PassedCount(analsis, PassingScore),
             NotReadingCount = NotReadingCount(analsis),
             TotalCount = TotalCount(analsis)
         };
@@ -82,14 +79,14 @@ public class AnalysisGeneralStatisticsCounterCalculator : AnalysisCalculatorFact
         );
     }
 
-    private static int PassedCount(Analysis analysis)
+    private static int PassedCount(Analysis analysis, int passingScore)
     {
-        return analysis.StudentExamAnswers.Count(sea => (sea.StudentAnswers?.Sum(sa => sa.GivenScore) ?? 0) >= _passScore);
+        return analysis.StudentExamAnswers.Count(sea => (sea.StudentAnswers?.Sum(sa => sa.GivenScore) ?? 0) >= passingScore);
     }
 
-    private static int FailedCount(Analysis analysis)
+    private static int FailedCount(Analysis analysis, int passingScore)
     {
-        return analysis.StudentExamAnswers.Count(sea => (sea.StudentAnswers?.Sum(sa => sa.GivenScore) ?? 0) < _passScore);
+        return analysis.StudentExamAnswers.Count(sea => (sea.StudentAnswers?.Sum(sa => sa.GivenScore) ?? 0) < passingScore);
     }
 
     private static int TotalCount(Analysis analysis)

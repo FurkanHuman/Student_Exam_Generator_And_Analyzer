@@ -19,22 +19,22 @@ public class AnalysisAdvancedStatisticsCalculator : AnalysisCalculatorFactory<Ad
 
     public override async Task<AdvancedStatisticsData> CalculateAsync(int analysisId, CancellationToken cancellationToken = default)
     {
-        var detailTables = await _detailCalculator.CalculateAsync(analysisId, cancellationToken);
-        var questionAverages = await _averagesCalculator.CalculateAsync(analysisId, cancellationToken);
+        IList<AnalysisDetailTableDto> detailTables = await _detailCalculator.CalculateAsync(analysisId, cancellationToken);
+        Dictionary<int, double> questionAverages = await _averagesCalculator.CalculateAsync(analysisId, cancellationToken);
 
-        var result = new AdvancedStatisticsData
+        AdvancedStatisticsData result = new AdvancedStatisticsData
         {
             QuestionAverages = questionAverages
         };
 
-        var allStudents = detailTables.SelectMany(t => t.Students).ToList();
+        List<StudentTableDto> allStudents = detailTables.SelectMany(t => t.Students).ToList();
 
-        result.StudentScores = allStudents.Select(s => new StudentScoreDto
+        result.StudentScores = [.. allStudents.Select(s => new StudentScoreDto
         {
             StudentId = s.Id,
             StudentName = $"{s.Name} {s.Surname}",
             TotalScore = s.StudentAnswerScores.Sum(sa => sa.GivenScore)
-        }).ToList();
+        })];
 
         result.QuestionStats = CalculateQuestionStats(detailTables);
 
@@ -47,23 +47,21 @@ public class AnalysisAdvancedStatisticsCalculator : AnalysisCalculatorFactory<Ad
         return result;
     }
 
-    private List<QuestionAnswerStatsDto> CalculateQuestionStats(IList<AnalysisDetailTableDto> tables)
+    private static List<QuestionAnswerStatsDto> CalculateQuestionStats(IList<AnalysisDetailTableDto> tables)
     {
-        var allQuestions = tables
+        List<int> allQuestions = [.. tables
             .SelectMany(t => t.Students)
             .SelectMany(s => s.StudentAnswerScores)
             .Select(sa => sa.QuestionId)
             .Distinct()
-            .OrderBy(q => q)
-            .ToList();
+            .OrderBy(q => q)];
 
-        return allQuestions.Select((qId, index) =>
+        return [.. allQuestions.Select((qId, index) =>
         {
-            var answersForQuestion = tables
+            List<StudentAnswerScore> answersForQuestion = [.. tables
                 .SelectMany(t => t.Students)
                 .SelectMany(s => s.StudentAnswerScores)
-                .Where(sa => sa.QuestionId == qId)
-                .ToList();
+                .Where(sa => sa.QuestionId == qId)];
 
             return new QuestionAnswerStatsDto
             {
@@ -74,12 +72,12 @@ public class AnalysisAdvancedStatisticsCalculator : AnalysisCalculatorFactory<Ad
                 PartialCount = answersForQuestion.Count(a => a.GivenScore >= 4 && a.GivenScore < 7),
                 TotalStudents = answersForQuestion.Count
             };
-        }).ToList();
+        })];
     }
 
-    private List<StudentPerformanceDto> CalculateClusteringData(List<StudentTableDto> students)
+    private static List<StudentPerformanceDto> CalculateClusteringData(List<StudentTableDto> students)
     {
-        return students.Select(s =>
+        return [.. students.Select(s =>
         {
             int total = s.StudentAnswerScores.Count;
             int blankCount = s.StudentAnswerScores.Count(sa => sa.GivenScore == 0);
@@ -95,12 +93,12 @@ public class AnalysisAdvancedStatisticsCalculator : AnalysisCalculatorFactory<Ad
                 WrongRate = total > 0 ? (wrongCount * 100.0 / total) : 0,
                 CorrectRate = total > 0 ? (correctCount * 100.0 / total) : 0
             };
-        }).ToList();
+        })];
     }
 
-    private List<StudentPerformanceDetailDto> CalculatePerformanceData(List<StudentTableDto> students)
+    private static List<StudentPerformanceDetailDto> CalculatePerformanceData(List<StudentTableDto> students)
     {
-        return students.Select(s =>
+        return [.. students.Select(s =>
         {
             int total = s.StudentAnswerScores.Count;
             int correctCount = s.StudentAnswerScores.Count(sa => sa.GivenScore >= 7);
@@ -118,10 +116,10 @@ public class AnalysisAdvancedStatisticsCalculator : AnalysisCalculatorFactory<Ad
                 BlankCount = blankCount,
                 PartialCount = partialCount
             };
-        }).ToList();
+        })];
     }
 
-    private List<MultiDimensionalDataDto> CalculateParallelData(List<StudentTableDto> students)
+    private static List<MultiDimensionalDataDto> CalculateParallelData(List<StudentTableDto> students)
     {
         return students.Select(s =>
         {
