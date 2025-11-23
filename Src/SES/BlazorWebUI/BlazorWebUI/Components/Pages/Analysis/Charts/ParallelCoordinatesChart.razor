@@ -1,0 +1,33 @@
+﻿@using Application.Services.CalculatorFactory
+@inject IJSRuntime JS
+
+<div class="card">
+    <div class="card-header">
+        <h3>Çoklu Boyut Analizi</h3>
+        <p class="text-muted">Her öğrencinin performans profilini gösterir</p>
+    </div>
+    <div class="card-body">
+        <svg width="100%" height="500" id="parallelChart"></svg>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<MultiDimensionalDataDto> StudentProfiles { get; set; } = new();
+
+    // HATA ÇÖZÜMÜ: firstRender şartını kaldırdık.
+    // Veri varsa JS fonksiyonunu tetikle. JS tarafı önceki çizimi temizliyor.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (StudentProfiles.Any())
+        {
+            await RenderParallelCoordinates();
+        }
+    }
+
+    private async Task RenderParallelCoordinates()
+    {
+        var jsData = System.Text.Json.JsonSerializer.Serialize(StudentProfiles);
+        await JS.InvokeVoidAsync("renderParallelCoordinates", jsData);
+    }
+}

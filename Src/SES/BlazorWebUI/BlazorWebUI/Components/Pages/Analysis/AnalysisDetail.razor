@@ -8,63 +8,73 @@
 <PageTitle>Analiz Detayı - @Id</PageTitle>
 
 <div class="container-fluid py-4 print-container">
-    <AnalysisGeneralIstatistic Statistics="generalStatistics" />
-
-    <AnalysisDetailTable DetailTableData="detailTableData" />
-
-    <AnalysisQuestionAveragesStatistics QuestionAverages="questionAverages" />
-
-    <AnalysisSuccessDistribution SuccessDistribution="successDistribution" />
-    <AnalysisAdvancedCharts AdvancedData="advancedStatisticsData"/>
-
-
-    <div class="row d-print-none">
-        <div class="col-12 text-center">
-            <button class="btn btn-primary btn-lg" @onclick="PrintPage">
-                <i class="bi bi-printer"></i> Yazdır
-            </button>
+    @if (isLoading)
+    {
+        <div class="text-center my-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Analiz verileri sırayla yükleniyor...</p>
         </div>
-    </div>
+    }
+    else
+    {
+        <AnalysisGeneralIstatistic Statistics="generalStatistics" />
+        <AnalysisDetailTable DetailTableData="detailTableData" />
+        <AnalysisQuestionAveragesStatistics QuestionAverages="questionAverages" />
+        <AnalysisSuccessDistribution SuccessDistribution="successDistribution" />
+
+        <AnalysisChartsPage AdvancedData="advancedStatisticsData"
+                                ClusteredStudents="clusteredStudents" />
+
+        <div class="row d-print-none">
+            <div class="col-12 text-center">
+                <button class="btn btn-primary btn-lg" @onclick="PrintPage">
+                    <i class="bi bi-printer"></i> Yazdır
+                </button>
+            </div>
+        </div>
+    }
 </div>
 
 @code
 {
-    [Parameter]
+    [Parameter] 
     public int Id { get; set; }
 
-    // Injected JS Runtime for printing
-    [Inject]
+    [Inject] 
     private IJSRuntime JSRuntime { get; set; } = default!;
 
-    // Injected Calculators
-    [Inject]
+    [Inject] 
     private IAnalysisCalculatorFactory<AnalysisGeneralExamStatisticsCounters> GeneralStatsCalculator { get; set; } = default!;
-
+    
     [Inject]
     private IAnalysisCalculatorFactory<IList<AnalysisDetailTableDto>> DetailTableCalculator { get; set; } = default!;
-
+    
     [Inject]
     private IAnalysisCalculatorFactory<Dictionary<int, double>> QuestionAveragesCalculator { get; set; } = default!;
-
+    
     [Inject]
     private IAnalysisCalculatorFactory<SuccessDistribution> SuccessDistributionCalculator { get; set; } = default!;
-
+    
     [Inject]
     private IAnalysisCalculatorFactory<AdvancedStatisticsData> AdvancedChartsCalculator { get; set; } = default!;
 
-    // Data containers
+    [Inject] 
+    private IAnalysisCalculatorFactory<List<List<StudentPerformanceDto>>> ClusteringCalculator { get; set; } = default!;
+
     private AnalysisGeneralExamStatisticsCounters? generalStatistics;
     private IList<AnalysisDetailTableDto>? detailTableData;
     private Dictionary<int, double>? questionAverages;
     private SuccessDistribution? successDistribution;
     private AdvancedStatisticsData? advancedStatisticsData;
+    private List<List<StudentPerformanceDto>>? clusteredStudents;
 
-    private ICollection<string> statusesBrigde = new List<string>();
+    private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            isLoading = true;
 
             generalStatistics = await GeneralStatsCalculator.CalculateAsync(Id);
 
@@ -75,11 +85,16 @@
             successDistribution = await SuccessDistributionCalculator.CalculateAsync(Id);
 
             advancedStatisticsData = await AdvancedChartsCalculator.CalculateAsync(Id);
+
+            clusteredStudents = await ClusteringCalculator.CalculateAsync(Id);
         }
         catch (Exception ex)
         {
-            // Error handling
-            Console.WriteLine($"Error loading analysis: {ex.Message}");
+            Console.WriteLine($"Analiz yüklenirken hata: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 
@@ -87,39 +102,4 @@
     {
         await JSRuntime.InvokeVoidAsync("window.print");
     }
-
-    private void BrigdeMethod(ICollection<string> args) => statusesBrigde = args;
 }
-<style>
-    @@media print {
-        .d-print-none {
-            display: none !important;
-        }
-
-        .print-container {
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        .card {
-            break-inside: avoid;
-            page-break-inside: avoid;
-        }
-
-        .table {
-            font-size: 12px;
-        }
-
-        .badge {
-            color: #000 !important;
-            border: 1px solid #000;
-        }
-    }
-
-    @@media (max-width: 25rem) {
-        .table-responsive {
-            font-size: 12px;
-        }
-    }
-</style>

@@ -1,0 +1,114 @@
+﻿@using ApexCharts
+@using Application.Services.CalculatorFactory
+
+<div class="card">
+    <div class="card-header">
+        <h3>Performans vs Hız Analizi</h3>
+        <p class="text-muted">Öğrenci davranış tiplerini belirle</p>
+    </div>
+    <div class="card-body">
+        <ApexChart TItem="PerformancePoint"
+                   Title="Puan vs Boş Bırakma Oranı"
+                   Height="500">
+
+            <ApexPointSeries TItem="PerformancePoint"
+                             Items="DataPoints"
+                             Name="Öğrenciler"
+                             SeriesType="SeriesType.Scatter"
+                             XValue="@(e => e.TotalScore)"
+                             YValue="@(e => (decimal)e.BlankPercentage)" />
+        </ApexChart>
+
+        <div class="mt-3">
+            <h5>Davranış Tipleri:</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="alert alert-success">
+                        <strong>🎯 Başarılı Grup</strong><br />
+                        Yüksek puan + Az boş: @SuccessfulStudents.Count öğrenci
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-warning">
+                        <strong>⚡ Stratejik Grup</strong><br />
+                        Yüksek puan + Çok boş: @StrategicStudents.Count öğrenci
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-info">
+                        <strong>💪 Çabalayan Grup</strong><br />
+                        Düşük puan + Az boş: @StrugglingStudents.Count öğrenci
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-danger">
+                        <strong>🚨 Risk Grubu</strong><br />
+                        Düşük puan + Çok boş: @RiskStudents.Count öğrenci
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<StudentPerformanceDetailDto> Students { get; set; } = new();
+
+    private List<PerformancePoint> DataPoints { get; set; } = new();
+    private List<StudentPerformanceDetailDto> SuccessfulStudents { get; set; } = new();
+    private List<StudentPerformanceDetailDto> StrategicStudents { get; set; } = new();
+    private List<StudentPerformanceDetailDto> StrugglingStudents { get; set; } = new();
+    private List<StudentPerformanceDetailDto> RiskStudents { get; set; } = new();
+
+    protected override void OnParametersSet()
+    {
+        CalculateScatterData();
+        CategorizeStudents();
+    }
+
+    private void CalculateScatterData()
+    {
+        DataPoints = Students.Select(s => new PerformancePoint
+        {
+            StudentName = s.StudentName,
+            TotalScore = s.TotalScore,
+            BlankPercentage = CalculateBlankPercentage(s)
+        }).ToList();
+    }
+
+    private void CategorizeStudents()
+    {
+        double avgScore = Students.Average(s => s.TotalScore);
+        double avgBlank = Students.Average(s => CalculateBlankPercentage(s));
+
+        SuccessfulStudents = Students
+            .Where(s => s.TotalScore >= avgScore && CalculateBlankPercentage(s) < avgBlank)
+            .ToList();
+
+        StrategicStudents = Students
+            .Where(s => s.TotalScore >= avgScore && CalculateBlankPercentage(s) >= avgBlank)
+            .ToList();
+
+        StrugglingStudents = Students
+            .Where(s => s.TotalScore < avgScore && CalculateBlankPercentage(s) < avgBlank)
+            .ToList();
+
+        RiskStudents = Students
+            .Where(s => s.TotalScore < avgScore && CalculateBlankPercentage(s) >= avgBlank)
+            .ToList();
+    }
+
+    private double CalculateBlankPercentage(StudentPerformanceDetailDto student)
+    {
+        int total = student.CorrectCount + student.WrongCount + student.BlankCount;
+        return total == 0 ? 0 : Math.Round((student.BlankCount * 100.0) / total, 2);
+    }
+
+    public class PerformancePoint
+    {
+        public string StudentName { get; set; } = string.Empty;
+        public double TotalScore { get; set; }
+        public double BlankPercentage { get; set; }
+    }
+}
