@@ -15,8 +15,6 @@
     [Parameter]
     public List<MultiDimensionalDataDto> StudentProfiles { get; set; } = new();
 
-    // HATA ÇÖZÜMÜ: firstRender şartını kaldırdık.
-    // Veri varsa JS fonksiyonunu tetikle. JS tarafı önceki çizimi temizliyor.
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (StudentProfiles.Any())

@@ -21,9 +21,8 @@
         <AnalysisDetailTable DetailTableData="detailTableData" />
         <AnalysisQuestionAveragesStatistics QuestionAverages="questionAverages" />
         <AnalysisSuccessDistribution SuccessDistribution="successDistribution" />
-
-        <AnalysisChartsPage AdvancedData="advancedStatisticsData"
-                                ClusteredStudents="clusteredStudents" />
+        <AnalysisChartsPage AdvancedData="advancedStatisticsData" ClusteredStudents="clusteredStudents" />
+        <AnalysisBenefitTable BenefitAnalysis="benefitAnalysisResult" />
 
         <div class="row d-print-none">
             <div class="col-12 text-center">
@@ -61,12 +60,16 @@
     [Inject] 
     private IAnalysisCalculatorFactory<List<List<StudentPerformanceDto>>> ClusteringCalculator { get; set; } = default!;
 
+    [Inject]
+    private IAnalysisCalculatorFactory<BenefitAnalysisResultDto> analysisCalculatorFactory { get; set; } = default!;
+
     private AnalysisGeneralExamStatisticsCounters? generalStatistics;
     private IList<AnalysisDetailTableDto>? detailTableData;
     private Dictionary<int, double>? questionAverages;
     private SuccessDistribution? successDistribution;
     private AdvancedStatisticsData? advancedStatisticsData;
     private List<List<StudentPerformanceDto>>? clusteredStudents;
+    private BenefitAnalysisResultDto? benefitAnalysisResult;
 
     private bool isLoading = true;
 
@@ -87,6 +90,8 @@
             advancedStatisticsData = await AdvancedChartsCalculator.CalculateAsync(Id);
 
             clusteredStudents = await ClusteringCalculator.CalculateAsync(Id);
+
+            benefitAnalysisResult = await analysisCalculatorFactory.CalculateAsync(Id);
         }
         catch (Exception ex)
         {

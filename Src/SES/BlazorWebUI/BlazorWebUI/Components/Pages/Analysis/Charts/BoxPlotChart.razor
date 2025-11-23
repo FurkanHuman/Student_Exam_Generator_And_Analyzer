@@ -15,7 +15,6 @@
     [Parameter]
     public List<StudentScoreDto> StudentScores { get; set; } = new();
 
-    // Her render'da çakışmayı önlemek için benzersiz ID
     private string ChartContainerId { get; set; } = "boxplot-" + Guid.NewGuid().ToString();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -51,13 +50,12 @@
 
             var jsonData = System.Text.Json.JsonSerializer.Serialize(chartData);
 
-            // Dinamik ID'yi gönderiyoruz
             await JS.InvokeVoidAsync("renderCustomBoxPlot", ChartContainerId, jsonData, "Puan Dağılımı");
         }
         catch (Exception ex)
         {
-            // C# tarafındaki hata diğer bileşenleri etkilemesin diye logluyoruz
-            Console.WriteLine($"BoxPlot Render Hatası: {ex.Message}");
+
+            Console.WriteLine($"BoxPlot Render Error: {ex.Message}");
         }
     }
 
