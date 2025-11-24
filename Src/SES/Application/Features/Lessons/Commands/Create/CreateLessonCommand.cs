@@ -14,6 +14,8 @@ namespace Application.Features.Lessons.Commands.Create;
 public class CreateLessonCommand : IRequest<CreatedLessonResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required string LessonName { get; set; }
+    public int PassingScore { get; set; }
+    public bool IsMandatory { get; set; } = false;
     public required string Description { get; set; }
     public required int SemesterId { get; set; }
     public required int ClassAge { get; set; }
