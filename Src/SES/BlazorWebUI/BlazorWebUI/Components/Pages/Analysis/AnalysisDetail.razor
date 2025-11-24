@@ -1,10 +1,11 @@
 ﻿@page "/Analysis/{Id:int}"
 @layout FullScreenLayout
 @rendermode InteractiveServer
-@using Application.Features.Analyses.Queries.GetByIdGetResponsiblePersonnel
+@using Application.Features.Analyses.Queries.GetByIdAnalysisGetResponsiblePersonnel
+@using Application.Features.Analyses.Queries.GetByIdAnalysisLessonPassingScore
 @using Application.Services.Analyses
-@using BlazorWebUI.Components.Layout
 @using Application.Services.CalculatorFactory
+@using BlazorWebUI.Components.Layout
 
 <PageTitle>Analiz Detayı - @Id</PageTitle>
 
@@ -67,9 +68,6 @@
     [Inject]
     private IAnalysisCalculatorFactory<BenefitAnalysisResultDto> BenefitAnalysisCalculator { get; set; } = default!;
 
-    [Inject]
-    private IAnalysisCalculatorFactory<int> AnalysisLessonPassingScoreCalculator { get; set; } = default!;
-
     private AnalysisGeneralExamStatisticsCounters? generalStatistics;
     private IList<AnalysisDetailTableDto>? detailTableData;
     private Dictionary<int, double>? questionAverages;
@@ -89,7 +87,7 @@
         {
             isLoading = true;
 
-            passingScore = await AnalysisLessonPassingScoreCalculator.CalculateAsync(Id);
+            passingScore = await Mediator.Send(new GetByIdAnalysisLessonPassingScoreQuery { Id = Id });
 
             generalStatistics = await GeneralStatsCalculator.CalculateAsync(Id);
 
