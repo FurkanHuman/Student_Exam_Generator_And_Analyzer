@@ -1,6 +1,7 @@
 ﻿@page "/Analysis/{Id:int}"
 @layout FullScreenLayout
 @rendermode InteractiveServer
+@using Application.Features.Analyses.Queries.GetByIdGetResponsiblePersonnel
 @using Application.Services.Analyses
 @using BlazorWebUI.Components.Layout
 @using Application.Services.CalculatorFactory
@@ -23,7 +24,7 @@
         <AnalysisSuccessDistribution SuccessDistribution="successDistribution" />
         <AnalysisChartsPage AdvancedData="advancedStatisticsData" ClusteredStudents="clusteredStudents" />
         <AnalysisBenefitTable BenefitAnalysis="benefitAnalysisResult" />
-        <AnalysisResponsiblePersonnel  />
+        <AnalysisResponsiblePersonnel ResponsiblePersonnel="responsiblePersonnel" />
         <div class="row d-print-none">
             <div class="col-12 text-center">
                 <button class="btn btn-primary btn-lg" @onclick="PrintPage">
@@ -41,6 +42,9 @@
 
     [Inject]
     private IJSRuntime JSRuntime { get; set; } = default!;
+
+    [Inject]
+    private IMediator Mediator { get; set; } = default!;
 
     [Inject]
     private IAnalysisCalculatorFactory<AnalysisGeneralExamStatisticsCounters> GeneralStatsCalculator { get; set; } = default!;
@@ -73,7 +77,8 @@
     private AdvancedStatisticsData? advancedStatisticsData;
     private List<List<StudentPerformanceDto>>? clusteredStudents;
     private BenefitAnalysisResultDto? benefitAnalysisResult;
-
+    private GetByIdGetResponsiblePersonnelResponse? responsiblePersonnel;
+    
     private int passingScore = 50;
 
     private bool isLoading = true;
@@ -99,6 +104,8 @@
             clusteredStudents = await ClusteringCalculator.CalculateAsync(Id);
 
             benefitAnalysisResult = await BenefitAnalysisCalculator.CalculateAsync(Id);
+
+            responsiblePersonnel = await Mediator.Send(new GetByIdGetResponsiblePersonnelQuery { Id = Id });
         }
         catch (Exception ex)
         {
