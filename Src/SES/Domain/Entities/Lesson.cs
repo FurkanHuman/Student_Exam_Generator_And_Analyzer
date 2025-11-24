@@ -6,7 +6,7 @@ public class Lesson : Entity<int>
 {
     public string LessonName { get; set; }
     public string Description { get; set; }
-    public int PassingScore { get; set; } = 50;
+    public int PassingScore { get; set; }
     public bool IsMandatory { get; set; } = false;
     public int SemesterId { get; set; }
     public Semester Semester { get; set; }
