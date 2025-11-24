@@ -1,0 +1,167 @@
+﻿@using Application.Services.CalculatorFactory
+
+@if (QuestionAverages != null && SuccessDistribution != null)
+{
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-3 text-primary">🤖 Yapay Zeka Analizi</h4>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-9">
+                            <h5 class="mb-4 text-primary">
+                                <i class="bi bi-lightbulb"></i> Sınav Analizi ve Öneriler
+                            </h5>
+
+                            @if (!string.IsNullOrEmpty(AIResponse))
+                            {
+                                <div class="alert alert-info">
+                                    <div class="mb-3">
+                                        <strong><i class="bi bi-robot"></i> AI Yanıtı:</strong>
+                                    </div>
+                                    <div style="white-space: pre-wrap;">@AIResponse</div>
+                                </div>
+                            }
+
+                                <div class="bg-light p-4 rounded">
+                                    <div class="mb-3">
+                                        <strong><i class="bi bi-graph-up"></i> Genel Değerlendirme:</strong>
+                                        <p class="mb-0 mt-2">
+                                            Sınıf ortalaması @GetClassAverage().ToString("F2")
+                                            ile @GetPerformanceLevel(GetClassAverage()) seviyesinde bir performans göstermektedir.
+                                        </p>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <strong><i class="bi bi-trophy"></i> Güçlü Alanlar:</strong>
+                                        <p class="mb-0 mt-2">
+                                            En yüksek başarı gösterilen sorular: @GetTopQuestions()
+                                        </p>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <strong><i class="bi bi-arrow-up-circle"></i> Gelişim Alanları:</strong>
+                                        <p class="mb-0 mt-2">
+                                            Düşük performans gösterilen sorular: @GetWeakQuestions()
+                                        </p>
+                                    </div>
+
+                                    <div class="mb-0">
+                                        <strong><i class="bi bi-clipboard-check"></i> Öneriler:</strong>
+                                        <p class="mb-0 mt-2">
+                                            @GetRecommendations()
+                                        </p>
+                                    </div>
+                                </div>
+                        </div>
+
+                        <div class="col-lg-3">
+                            <div class="card bg-primary text-white border-0">
+                                <div class="card-body text-center">
+                                    <div class="mb-3">
+                                        <i class="bi bi-robot" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <h5 class="mb-3">AI Model</h5>
+                                    <p class="small mb-2">GPT-4 Education Analytics</p>
+                                    <p class="small mb-2">
+                                        <i class="bi bi-calendar3"></i>
+                                        @DateTime.Now.ToString("dd.MM.yyyy")
+                                    </p>
+                                    <div class="mt-3">
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar bg-success"
+                                                 role="progressbar"
+                                                 style="width: 50%">
+                                            </div>
+                                        </div>
+                                        <small class="mt-1 d-block">Güvenilirlik: Bilinmiyor</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code
+{
+    [Parameter]
+    public Dictionary<int, double>? QuestionAverages { get; set; }
+
+    [Parameter]
+    public SuccessDistribution? SuccessDistribution { get; set; }
+
+    [Parameter]
+    public string? AIResponse { get; set; }
+
+    private double GetClassAverage()
+    {
+        return QuestionAverages?.Values.Sum() ?? 0.0;
+    }
+
+    private string GetPerformanceLevel(double average)
+    {
+        return average switch
+        {
+            >= 85 => "çok yüksek",
+            >= 70 => "yüksek",
+            >= 55 => "orta",
+            >= 40 => "düşük",
+            _ => "çok düşük"
+        };
+    }
+
+    private string GetTopQuestions()
+    {
+        if (QuestionAverages == null || !QuestionAverages.Any())
+            return "Veri yok";
+
+        var top = QuestionAverages
+            .OrderByDescending(x => x.Value)
+            .Take(3)
+            .Select(x => x.Key.ToString());
+
+        return string.Join(", ", top);
+    }
+
+    private string GetWeakQuestions()
+    {
+        if (QuestionAverages == null || !QuestionAverages.Any())
+            return "Veri yok";
+
+        var weak = QuestionAverages
+            .OrderBy(x => x.Value)
+            .Take(3)
+            .Select(x => x.Key.ToString());
+
+        return string.Join(", ", weak);
+    }
+
+    private string GetRecommendations()
+    {
+        var recommendations = new List<string>();
+        double classAvg = GetClassAverage();
+
+        if (classAvg < 50)
+        {
+            recommendations.Add("Temel kavramların tekrar edilmesi önerilir.");
+        }
+
+        if (SuccessDistribution != null && SuccessDistribution.Fail > 5)
+        {
+            recommendations.Add("Bireysel destekleme çalışmaları planlanmalıdır.");
+        }
+
+        if (QuestionAverages != null && QuestionAverages.Values.Count(v => v < 5.0) > 3)
+        {
+            recommendations.Add("Zor sorular için ek çalışmalar yapılmalıdır.");
+        }
+
+        return recommendations.Any()
+            ? string.Join(" ", recommendations)
+            : "Genel olarak başarılı bir sınav performansı gösterilmiştir.";
+    }
+}
