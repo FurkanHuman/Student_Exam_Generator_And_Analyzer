@@ -27,9 +27,5 @@ public abstract class AnalysisCalculatorFactory<TResult>(IAnalysisService analys
 
         if (analysis?.Lesson != null)
             PassingScore = analysis.Lesson.PassingScore;
-
-        else
-            PassingScore = 50; // Default fallback
-
     }
 }
