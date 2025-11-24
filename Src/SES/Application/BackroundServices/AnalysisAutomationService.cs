@@ -18,7 +18,6 @@ internal class AnalysisAutomationService(IMediator mediatr, IExamService examSer
     {
         int? activeSemesterIdTask = await IsWithinSemesterDateRange();
 
-
         if (!activeSemesterIdTask.HasValue)
             return;
 
@@ -102,9 +101,11 @@ internal class AnalysisAutomationService(IMediator mediatr, IExamService examSer
                                                 && e.ExamDate.AddDays(DelayInDays) == today,
                                                 include: e => e.Include(e => e.StudentExamAnswer)
                                                                .Include(e => e.Student)
+                                                                    .ThenInclude(s => s.StudentClass)
                                                                .Include(e => e.StudentClasses)
                                                                .Include(e => e.Teachers)
-                                                               .Include(e => e.ReferenceBenefit),
+                                                               .Include(e => e.ReferenceBenefit)
+                                                               .Include(e => e.Lesson),
                                                 index: 0,
                                                 size: int.MaxValue,
                                                 cancellationToken: stoppingToken);
