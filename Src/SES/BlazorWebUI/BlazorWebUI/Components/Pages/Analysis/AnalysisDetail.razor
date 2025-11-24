@@ -77,7 +77,7 @@
     private AdvancedStatisticsData? advancedStatisticsData;
     private List<List<StudentPerformanceDto>>? clusteredStudents;
     private BenefitAnalysisResultDto? benefitAnalysisResult;
-    private GetByIdGetResponsiblePersonnelResponse? responsiblePersonnel;
+    private GetByIdAnalysisGetResponsiblePersonnelResponse? responsiblePersonnel;
     
     private int passingScore = 50;
 
@@ -105,7 +105,7 @@
 
             benefitAnalysisResult = await BenefitAnalysisCalculator.CalculateAsync(Id);
 
-            responsiblePersonnel = await Mediator.Send(new GetByIdGetResponsiblePersonnelQuery { Id = Id });
+            responsiblePersonnel = await Mediator.Send(new GetByIdAnalysisGetResponsiblePersonnelQuery { Id = Id });
         }
         catch (Exception ex)
         {

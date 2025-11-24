@@ -1,4 +1,4 @@
-﻿@using Application.Features.Analyses.Queries.GetByIdGetResponsiblePersonnel
+﻿@using Application.Features.Analyses.Queries.GetByIdAnalysisGetResponsiblePersonnel
 @if (ResponsiblePersonnel != null)
 {
     <div class="row mb-4">
@@ -89,5 +89,5 @@
 @code
 {
     [Parameter]
-    public GetByIdGetResponsiblePersonnelResponse ResponsiblePersonnel { get; set; } = default!;
+    public GetByIdAnalysisGetResponsiblePersonnelResponse ResponsiblePersonnel { get; set; } = default!;
 }

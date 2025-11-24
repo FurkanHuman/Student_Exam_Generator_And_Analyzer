@@ -4,24 +4,24 @@ using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Features.Analyses.Queries.GetByIdGetResponsiblePersonnel;
+namespace Application.Features.Analyses.Queries.GetByIdAnalysisGetResponsiblePersonnel;
 
-public class GetByIdGetResponsiblePersonnelQuery : IRequest<GetByIdGetResponsiblePersonnelResponse>
+public class GetByIdAnalysisGetResponsiblePersonnelQuery : IRequest<GetByIdAnalysisGetResponsiblePersonnelResponse>
 {
     public int Id { get; set; }
 
-    public class GetByIdGetResponsiblePersonnelQueryHandler : IRequestHandler<GetByIdGetResponsiblePersonnelQuery, GetByIdGetResponsiblePersonnelResponse>
+    public class GetByIdAnalysisGetResponsiblePersonnelQueryHandler : IRequestHandler<GetByIdAnalysisGetResponsiblePersonnelQuery, GetByIdAnalysisGetResponsiblePersonnelResponse>
     {
         private readonly IAnalysisRepository _analysisRepository;
         private readonly AnalysisBusinessRules _analysisBusinessRules;
 
-        public GetByIdGetResponsiblePersonnelQueryHandler(IAnalysisRepository analysisRepository, AnalysisBusinessRules analysisBusinessRules)
+        public GetByIdAnalysisGetResponsiblePersonnelQueryHandler(IAnalysisRepository analysisRepository, AnalysisBusinessRules analysisBusinessRules)
         {
             _analysisRepository = analysisRepository;
             _analysisBusinessRules = analysisBusinessRules;
         }
 
-        public async Task<GetByIdGetResponsiblePersonnelResponse> Handle(GetByIdGetResponsiblePersonnelQuery request, CancellationToken cancellationToken)
+        public async Task<GetByIdAnalysisGetResponsiblePersonnelResponse> Handle(GetByIdAnalysisGetResponsiblePersonnelQuery request, CancellationToken cancellationToken)
         {
             await _analysisBusinessRules.AnalysisIdShouldExistWhenSelected(request.Id, cancellationToken);
             Analysis? analysis = await _analysisRepository.GetAsync(

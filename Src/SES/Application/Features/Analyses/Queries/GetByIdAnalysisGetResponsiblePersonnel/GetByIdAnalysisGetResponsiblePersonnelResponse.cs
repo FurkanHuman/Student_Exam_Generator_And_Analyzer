@@ -1,8 +1,8 @@
 ﻿using NArchitecture.Core.Application.Responses;
 
-namespace Application.Features.Analyses.Queries.GetByIdGetResponsiblePersonnel;
+namespace Application.Features.Analyses.Queries.GetByIdAnalysisGetResponsiblePersonnel;
 
-public class GetByIdGetResponsiblePersonnelResponse:IResponse
+public class GetByIdAnalysisGetResponsiblePersonnelResponse:IResponse
 {
     public string Principal { get; set; }
     public string ExamAuthorTeacher { get; set; }
