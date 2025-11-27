@@ -52,25 +52,8 @@
     private IMediator Mediator { get; set; } = default!;
 
     [Inject]
-    private IAnalysisCalculatorFactory<AnalysisGeneralExamStatisticsCounters> GeneralStatsCalculator { get; set; } = default!;
+    private AnalysisComputationEngine analysisCalculatorFactory { get; set; } = default!;
 
-    [Inject]
-    private IAnalysisCalculatorFactory<IList<AnalysisDetailTableDto>> DetailTableCalculator { get; set; } = default!;
-
-    [Inject]
-    private IAnalysisCalculatorFactory<Dictionary<int, double>> QuestionAveragesCalculator { get; set; } = default!;
-
-    [Inject]
-    private IAnalysisCalculatorFactory<SuccessDistribution> SuccessDistributionCalculator { get; set; } = default!;
-
-    [Inject]
-    private IAnalysisCalculatorFactory<AdvancedStatisticsData> AdvancedChartsCalculator { get; set; } = default!;
-
-    [Inject]
-    private IAnalysisCalculatorFactory<List<List<StudentPerformanceDto>>> ClusteringCalculator { get; set; } = default!;
-
-    [Inject]
-    private IAnalysisCalculatorFactory<BenefitAnalysisResultDto> BenefitAnalysisCalculator { get; set; } = default!;
 
     private AnalysisGeneralExamStatisticsCounters? generalStatistics;
     private IList<AnalysisDetailTableDto>? detailTableData;
@@ -94,15 +77,19 @@
 
             passingScore = await Mediator.Send(new GetByIdAnalysisLessonPassingScoreQuery { Id = Id });
 
-            generalStatistics = await GeneralStatsCalculator.CalculateAsync(Id);
+            generalStatistics = await analysisCalculatorFactory.GeneralStatsCalculator.CalculateAsync(Id);
 
-            detailTableData = await DetailTableCalculator.CalculateAsync(Id);
+            detailTableData = await analysisCalculatorFactory.DetailTableCalculator.CalculateAsync(Id);
 
-            questionAverages = await QuestionAveragesCalculator.CalculateAsync(Id);
+            questionAverages = await analysisCalculatorFactory.QuestionAveragesCalculator.CalculateAsync(Id);
 
-            successDistribution = await SuccessDistributionCalculator.CalculateAsync(Id);
+            successDistribution = await analysisCalculatorFactory.SuccessDistributionCalculator.CalculateAsync(Id);
 
-            advancedStatisticsData = await AdvancedChartsCalculator.CalculateAsync(Id);
+            advancedStatisticsData = await analysisCalculatorFactory.AdvancedChartsCalculator.CalculateAsync(Id);
+
+            clusteredStudents = await analysisCalculatorFactory.ClusteringCalculator.CalculateAsync(Id);
+
+            benefitAnalysisResult = await analysisCalculatorFactory.BenefitAnalysisCalculator.CalculateAsync(Id);
 
             radarData = await analysisCalculatorFactory.RadarCalculator.CalculateAsync(Id);
 
