@@ -11,34 +11,39 @@
         </div>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-lg-6 mb-4">
-            <BoxPlotChart StudentScores="@AdvancedData.StudentScores" /> 
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <BoxPlotChart StudentScores="@AdvancedData.StudentScores" />
         </div>
-        <div class="col-lg-6 mb-4">
+
+        <div class="col-lg-6">
             <QuestionHeatmap QuestionAverages="@AdvancedData.QuestionAverages"
                              MaxScore="10" />
         </div>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-12 mb-4">
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
             <StackedBarChart QuestionStats="@AdvancedData.QuestionStats" />
         </div>
-    </div>
-
-    <div class="row mb-4">
-        <div class="col-12 mb-4">
+        <div class="col-lg-6">
             <StudentClusteringChart ClusteredData="@ClusteredStudents" />
         </div>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-lg-6 mb-4">
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
             <PerformanceScatterPlot Students="@AdvancedData.PerformanceData" />
         </div>
-        <div class="col-lg-6 mb-4">
+
+        <div class="col-lg-6">
             <ParallelCoordinatesChart StudentProfiles="@AdvancedData.ParallelData" />
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <AnalysisBenefitRadarChart RadarData="RadarData" />
         </div>
     </div>
 }
@@ -55,4 +60,7 @@ else
 
     [Parameter]
     public List<List<StudentPerformanceDto>>? ClusteredStudents { get; set; }
+
+    [Parameter]
+    public BenefitRadarResultDto? RadarData { get; set; }
 }

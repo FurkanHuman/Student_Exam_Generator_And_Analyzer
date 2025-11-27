@@ -6,6 +6,7 @@
 @using Application.Services.Analyses
 @using Application.Services.CalculatorFactory
 @using BlazorWebUI.Components.Layout
+@using BlazorWebUI.Components.Pages.Analysis.Charts
 
 <PageTitle>Analiz Detayı - @Id</PageTitle>
 
@@ -23,7 +24,9 @@
         <AnalysisDetailTable DetailTableData="detailTableData" PassingScore="passingScore" />
         <AnalysisQuestionAveragesStatistics QuestionAverages="questionAverages" />
         <AnalysisSuccessDistribution SuccessDistribution="successDistribution" />
-        <AnalysisChartsPage AdvancedData="advancedStatisticsData" ClusteredStudents="clusteredStudents" />
+        <AnalysisChartsPage AdvancedData="advancedStatisticsData"
+                            ClusteredStudents="clusteredStudents"
+                            RadarData="radarData" />
         <AnalysisBenefitTable BenefitAnalysis="benefitAnalysisResult" />
         <AnalysisAIInsights SuccessDistribution="successDistribution" QuestionAverages="questionAverages" AIResponse="Beklemede kalın şuan AI ile görüşmelerimiz Sürüyor..."/>
         <AnalysisResponsiblePersonnel ResponsiblePersonnel="responsiblePersonnel" />
@@ -76,6 +79,7 @@
     private AdvancedStatisticsData? advancedStatisticsData;
     private List<List<StudentPerformanceDto>>? clusteredStudents;
     private BenefitAnalysisResultDto? benefitAnalysisResult;
+    private BenefitRadarResultDto? radarData;
     private GetByIdAnalysisGetResponsiblePersonnelResponse? responsiblePersonnel;
     
     private int passingScore;
@@ -100,7 +104,7 @@
 
             advancedStatisticsData = await AdvancedChartsCalculator.CalculateAsync(Id);
 
-            clusteredStudents = await ClusteringCalculator.CalculateAsync(Id);
+            radarData = await analysisCalculatorFactory.RadarCalculator.CalculateAsync(Id);
 
             benefitAnalysisResult = await BenefitAnalysisCalculator.CalculateAsync(Id);
 
