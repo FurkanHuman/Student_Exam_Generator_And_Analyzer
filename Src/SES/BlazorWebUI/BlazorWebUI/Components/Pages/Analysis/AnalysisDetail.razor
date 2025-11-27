@@ -15,7 +15,7 @@
     {
         <div class="text-center my-5">
             <div class="spinner-border text-primary" role="status"></div>
-            <p>Analiz verileri sırayla yükleniyor...</p>
+            <p>Analiz verileri yükleniyor...</p>
         </div>
     }
     else
@@ -71,8 +71,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
             isLoading = true;
 
             passingScore = await Mediator.Send(new GetByIdAnalysisLessonPassingScoreQuery { Id = Id });
@@ -96,16 +94,9 @@
             benefitAnalysisResult = await BenefitAnalysisCalculator.CalculateAsync(Id);
 
             responsiblePersonnel = await Mediator.Send(new GetByIdAnalysisGetResponsiblePersonnelQuery { Id = Id });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Analiz yüklenirken hata: {ex.Message}");
-        }
-        finally
-        {
+
             isLoading = false;
         }
-    }
 
     private async Task PrintPage()
     {
