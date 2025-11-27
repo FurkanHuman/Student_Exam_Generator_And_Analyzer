@@ -8,6 +8,7 @@ public class GetListAnalysisListItemDto : IDto
     public string Name { get; set; }
     public string LessonName { get; set; }
     public string SemesterName { get; set; }
+    public bool HasAiResponse { get; set; }
     public DateOnly SemesterStartDate { get; set; }
     public DateOnly SemesterEndDate { get; set; }
 }
