@@ -1,82 +1,126 @@
-﻿@using Application.Services.CalculatorFactory
+﻿@using Application.Services.AIService.Models
+@using Application.Services.CalculatorFactory
 
-@if (QuestionAverages != null && SuccessDistribution != null)
+<div class="card p-4 shadow-sm">
+@if (aIAnalysisResponse != null)
 {
+    
     <div class="row mb-4">
         <div class="col-12">
-            <h4 class="mb-3 text-primary">🤖 Yapay Zeka Analizi</h4>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="text-primary mb-0">
+                    <i class="bi bi-robot"></i> Yapay Zeka Analizi
+                </h4>
+                <div class="badge bg-primary p-2">
+                    <i class="bi bi-calendar3"></i> @aIAnalysisResponse.GeneratedAt.ToString("dd.MM.yyyy HH:mm")
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-3">
+                        <i class="bi bi-clipboard-data"></i> Genel Değerlendirme
+                    </h5>
+                    <div class="alert alert-info mb-3">
+                        <strong>Özet:</strong>
+                        <div class="mt-2" style="white-space: pre-wrap;">@aIAnalysisResponse.GeneralEvaluation.Summary</div>
+                    </div>
+                    <div class="mb-3">
+                        <span class="badge bg-success me-2">Performans: @aIAnalysisResponse.GeneralEvaluation.PerformanceLevel</span>
+                        <span class="badge bg-info">Güven Skoru: @aIAnalysisResponse.GeneralEvaluation.ConfidenceScore.ToString("P0")</span>
+                    </div>
+                    <div class="alert alert-secondary">
+                        <strong>Norm Karşılaştırması:</strong>
+                        <div class="mt-2">@aIAnalysisResponse.GeneralEvaluation.ComparisonToNorm</div>
+                    </div>
+                    <div class="mt-3">
+                        <strong class="d-block mb-2">Temel Bulgular:</strong>
+                        <ul class="list-group list-group-flush">
+                            @foreach (string finding in aIAnalysisResponse.GeneralEvaluation.KeyFindings)
+                            {
+                                <li class="list-group-item">
+                                    <i class="bi bi-check-circle text-success"></i> @finding
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card bg-gradient text-white border-0 h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-robot" style="font-size: 3.5rem;"></i>
+                    </div>
+                    <h5 class="mb-3">AI Model Bilgisi</h5>
+                    <p class="mb-2"><strong>Model:</strong> @aIAnalysisResponse.ModelVersion</p>
+                    <div class="mt-4">
+                        <div class="progress mb-2" style="height: 10px; background-color: rgba(255,255,255,0.3);">
+                            <div class="progress-bar bg-light"
+                                 role="progressbar"
+                                 style="width: @((aIAnalysisResponse.GeneralEvaluation.ConfidenceScore * 100).ToString("F0"))%">
+                            </div>
+                        </div>
+                        <small>Güvenilirlik: @aIAnalysisResponse.GeneralEvaluation.ConfidenceScore.ToString("P0")</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
+                    <h5 class="card-title text-primary mb-4">
+                        <i class="bi bi-diagram-3"></i> SWOT Analizi
+                    </h5>
                     <div class="row">
-                        <div class="col-lg-9">
-                            <h5 class="mb-4 text-primary">
-                                <i class="bi bi-lightbulb"></i> Sınav Analizi ve Öneriler
-                            </h5>
-
-                            @if (!string.IsNullOrEmpty(AIResponse))
-                            {
-                                <div class="alert alert-info">
-                                    <div class="mb-3">
-                                        <strong><i class="bi bi-robot"></i> AI Yanıtı:</strong>
-                                    </div>
-                                    <div style="white-space: pre-wrap;">@AIResponse</div>
-                                </div>
-                            }
-
-                                <div class="bg-light p-4 rounded">
-                                    <div class="mb-3">
-                                        <strong><i class="bi bi-graph-up"></i> Genel Değerlendirme:</strong>
-                                        <p class="mb-0 mt-2">
-                                            Sınıf ortalaması @GetClassAverage().ToString("F2")
-                                            ile @GetPerformanceLevel(GetClassAverage()) seviyesinde bir performans göstermektedir.
-                                        </p>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <strong><i class="bi bi-trophy"></i> Güçlü Alanlar:</strong>
-                                        <p class="mb-0 mt-2">
-                                            En yüksek başarı gösterilen sorular: @GetTopQuestions()
-                                        </p>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <strong><i class="bi bi-arrow-up-circle"></i> Gelişim Alanları:</strong>
-                                        <p class="mb-0 mt-2">
-                                            Düşük performans gösterilen sorular: @GetWeakQuestions()
-                                        </p>
-                                    </div>
-
-                                    <div class="mb-0">
-                                        <strong><i class="bi bi-clipboard-check"></i> Öneriler:</strong>
-                                        <p class="mb-0 mt-2">
-                                            @GetRecommendations()
-                                        </p>
-                                    </div>
-                                </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="p-3 bg-success bg-opacity-10 rounded">
+                                <h6 class="text-success mb-3"><i class="bi bi-star"></i> Güçlü Yönler</h6>
+                                <ul class="mb-0">
+                                    @foreach (string strength in aIAnalysisResponse.Analysis.Strengths)
+                                    {
+                                        <li class="mb-2">@strength</li>
+                                    }
+                                </ul>
+                            </div>
                         </div>
-
-                        <div class="col-lg-3">
-                            <div class="card bg-primary text-white border-0">
-                                <div class="card-body text-center">
-                                    <div class="mb-3">
-                                        <i class="bi bi-robot" style="font-size: 3rem;"></i>
-                                    </div>
-                                    <h5 class="mb-3">AI Model</h5>
-                                    <p class="small mb-2">GPT-4 Education Analytics</p>
-                                    <p class="small mb-2">
-                                        <i class="bi bi-calendar3"></i>
-                                        @DateTime.Now.ToString("dd.MM.yyyy")
-                                    </p>
-                                    <div class="mt-3">
-                                        <div class="progress" style="height: 8px;">
-                                            <div class="progress-bar bg-success"
-                                                 role="progressbar"
-                                                 style="width: 50%">
-                                            </div>
-                                        </div>
-                                        <small class="mt-1 d-block">Güvenilirlik: Bilinmiyor</small>
-                                    </div>
-                                </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="p-3 bg-danger bg-opacity-10 rounded">
+                                <h6 class="text-danger mb-3"><i class="bi bi-exclamation-triangle"></i> Zayıf Yönler</h6>
+                                <ul class="mb-0">
+                                    @foreach (string weakness in aIAnalysisResponse.Analysis.Weaknesses)
+                                    {
+                                        <li class="mb-2">@weakness</li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="p-3 bg-info bg-opacity-10 rounded">
+                                <h6 class="text-info mb-3"><i class="bi bi-lightbulb"></i> Fırsatlar</h6>
+                                <ul class="mb-0">
+                                    @foreach (string opportunity in aIAnalysisResponse.Analysis.Opportunities)
+                                    {
+                                        <li class="mb-2">@opportunity</li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="p-3 bg-warning bg-opacity-10 rounded">
+                                <h6 class="text-warning mb-3"><i class="bi bi-shield-exclamation"></i> Tehditler</h6>
+                                <ul class="mb-0">
+                                    @foreach (string threat in aIAnalysisResponse.Analysis.Threats)
+                                    {
+                                        <li class="mb-2">@threat</li>
+                                    }
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -84,84 +128,286 @@
             </div>
         </div>
     </div>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-4">
+                        <i class="bi bi-person-check"></i> Öğrenci Davranış Analizi
+                    </h5>
+                    <div class="alert alert-light border">
+                        <strong>Genel Davranış Kalıbı:</strong>
+                        <p class="mb-0 mt-2">@aIAnalysisResponse.StudentBehavior.OverallBehaviorPattern</p>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h6 class="text-secondary mb-3"><i class="bi bi-eye"></i> Gözlemlenen Kalıplar</h6>
+                                <ul class="list-group">
+                                    @foreach (string pattern in aIAnalysisResponse.StudentBehavior.ObservedPatterns)
+                                    {
+                                        <li class="list-group-item">@pattern</li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h6 class="text-secondary mb-3"><i class="bi bi-bullseye"></i> Stratejik Davranış</h6>
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <p><strong>Stratejik Öğrenci Sayısı:</strong> @aIAnalysisResponse.StudentBehavior.StrategicBehavior.StrategicStudentCount</p>
+                                        <p><strong>Strateji:</strong> @aIAnalysisResponse.StudentBehavior.StrategicBehavior.StrategyDescription</p>
+                                        <p>
+                                            <strong>Etkililik:</strong>
+                                            <span class="badge @(aIAnalysisResponse.StudentBehavior.StrategicBehavior.IsEffective ? "bg-success" : "bg-warning")">
+                                                @(aIAnalysisResponse.StudentBehavior.StrategicBehavior.IsEffective ? "Etkili" : "Geliştirilmeli")
+                                            </span>
+                                        </p>
+                                        <p class="mb-0"><strong>Öneri:</strong> @aIAnalysisResponse.StudentBehavior.StrategicBehavior.Recommendation</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning mt-3">
+                        <h6 class="alert-heading"><i class="bi bi-exclamation-circle"></i> Risk Faktörleri</h6>
+                        <p><strong>Risk Altındaki Öğrenci Sayısı:</strong> @aIAnalysisResponse.StudentBehavior.RiskIndicators.StudentsAtRisk</p>
+                        <p><strong>Ciddiyet Seviyesi:</strong> @aIAnalysisResponse.StudentBehavior.RiskIndicators.SeverityLevel</p>
+                        <ul class="mb-0">
+                            @foreach (string risk in aIAnalysisResponse.StudentBehavior.RiskIndicators.IdentifiedRisks)
+                            {
+                                <li>@risk</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-4">
+                        <i class="bi bi-book"></i> Öğretim Önerileri
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 border border-danger rounded">
+                                <h6 class="text-danger mb-3"><i class="bi bi-lightning-charge"></i> Acil Eylemler</h6>
+                                <ul class="small mb-0">
+                                    @foreach (string action in aIAnalysisResponse.Recommendations.ImmediateActions)
+                                    {
+                                        <li class="mb-2">@action</li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 border border-warning rounded">
+                                <h6 class="text-warning mb-3"><i class="bi bi-calendar-week"></i> Kısa Vadeli Hedefler</h6>
+                                <ul class="small mb-0">
+                                    @foreach (string goal in aIAnalysisResponse.Recommendations.ShortTermGoals)
+                                    {
+                                        <li class="mb-2">@goal</li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 border border-success rounded">
+                                <h6 class="text-success mb-3"><i class="bi bi-calendar-range"></i> Uzun Vadeli Stratejiler</h6>
+                                <ul class="small mb-0">
+                                    @foreach (string strategy in aIAnalysisResponse.Recommendations.LongTermStrategies)
+                                    {
+                                        <li class="mb-2">@strategy</li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="text-secondary mb-2"><i class="bi bi-layers"></i> Farklılaştırma Önerileri</h6>
+                        <div class="p-3 bg-light rounded">
+                            <ul class="mb-0">
+                                @foreach (string suggestion in aIAnalysisResponse.Recommendations.DifferentiationSuggestions)
+                                {
+                                    <li class="mb-2">@suggestion</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-4">
+                        <i class="bi bi-question-circle"></i> Soru Bazlı Analizler
+                    </h5>
+                    <div class="accordion" id="questionInsightsAccordion">
+                        @foreach (QuestionInsight insight in aIAnalysisResponse.QuestionInsights)
+                        {
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading@insight.QuestionOrder">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapse@insight.QuestionOrder">
+                                        <strong>Soru @insight.QuestionOrder</strong>
+                                        @if (insight.RequiresReview)
+                                        {
+                                            <span class="badge bg-warning ms-2">Gözden Geçirilmeli</span>
+                                        }
+                                        <span class="badge bg-secondary ms-2">@insight.DifficultyAssessment</span>
+                                    </button>
+                                </h2>
+                                <div id="collapse@insight.QuestionOrder" class="accordion-collapse collapse"
+                                     data-bs-parent="#questionInsightsAccordion">
+                                    <div class="accordion-body">
+                                        <div class="mb-3">
+                                            <strong>Performans Analizi:</strong>
+                                            <p class="mt-2">@insight.PerformanceAnalysis</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>Yaygın Hatalar:</strong>
+                                            <ul class="mt-2">
+                                                @foreach (string mistake in insight.CommonMistakes)
+                                                {
+                                                    <li>@mistake</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <strong>Gelişim Önerileri:</strong>
+                                            <ul class="mt-2">
+                                                @foreach (string suggestion in insight.ImprovementSuggestions)
+                                                {
+                                                    <li>@suggestion</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-4">
+                        <i class="bi bi-trophy"></i> Kazanım Analizleri
+                    </h5>
+                    <div class="row">
+                        @foreach (BenefitInsight benefit in aIAnalysisResponse.BenefitInsights.OrderBy(b => b.PriorityLevel))
+                        {
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 border-primary">
+                                    <div class="card-header bg-primary text-black-50">
+                                        <strong>@benefit.BenefitCode</strong>
+                                        <span class="badge bg-light text-dark float-end">Öncelik: @benefit.PriorityLevel</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-2">
+                                            <strong>Hakimiyet Seviyesi:</strong>
+                                            <span class="badge bg-info">@benefit.MasteryLevel</span>
+                                        </div>
+                                        <p class="mb-3">@benefit.Analysis</p>
+                                        <div>
+                                            <strong class="d-block mb-2">Öğretim Stratejileri:</strong>
+                                            <ul class="small mb-0">
+                                                @foreach (string strategy in benefit.TeachingStrategies)
+                                                {
+                                                    <li>@strategy</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-4">
+                        <i class="bi bi-clipboard-pulse"></i> Müdahale Stratejileri
+                    </h5>
+                    @foreach (InterventionStrategy intervention in aIAnalysisResponse.Interventions)
+                    {
+                        <div class="card mb-3 border-warning">
+                            <div class="card-header bg-warning bg-opacity-25">
+                                <strong>Hedef Grup: @intervention.TargetGroup</strong>
+                                <span class="badge bg-dark float-end">@intervention.AffectedStudentCount Öğrenci</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-secondary mb-2">Müdahaleler:</h6>
+                                        <ul>
+                                            @foreach (string specific in intervention.SpecificInterventions)
+                                            {
+                                                <li>@specific</li>
+                                            }
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Zaman Çizelgesi:</strong> @intervention.Timeline</p>
+                                        <p><strong>Sorumlu:</strong> @intervention.ResponsibleParty</p>
+                                        @if (intervention.SuccessIndicators.Count > 0)
+                                        {
+                                            <div>
+                                                <strong>Başarı Göstergeleri:</strong>
+                                                <ul class="small mb-0">
+                                                    @foreach (string indicator in intervention.SuccessIndicators)
+                                                    {
+                                                        <li>@indicator</li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
+else
+{
+    <div class="row mb-4">
+        <div class="col-12">
+
+            <h4 class="text-primary mb-2">
+                <i class="bi bi-robot"></i> Yapay Zeka Analizi
+            </h4>
+
+            <p class="text-muted mb-0 ps-1">
+                Şu anda yapay zekâ analizi bulunmuyor; sistem operasyonel olarak hazır, ancak henüz kendisine iletilmiş bir değerlendirme olmadığı için stratejik sessizliğini koruyor.
+            </p>
+
+        </div>
+    </div>
+}
+</div>
 @code
 {
     [Parameter]
-    public Dictionary<int, double>? QuestionAverages { get; set; }
-
-    [Parameter]
-    public SuccessDistribution? SuccessDistribution { get; set; }
-
-    [Parameter]
-    public string? AIResponse { get; set; }
-
-    private double GetClassAverage()
-    {
-        return QuestionAverages?.Values.Sum() ?? 0.0;
-    }
-
-    private string GetPerformanceLevel(double average)
-    {
-        return average switch
-        {
-            >= 85 => "çok yüksek",
-            >= 70 => "yüksek",
-            >= 55 => "orta",
-            >= 40 => "düşük",
-            _ => "çok düşük"
-        };
-    }
-
-    private string GetTopQuestions()
-    {
-        if (QuestionAverages == null || !QuestionAverages.Any())
-            return "Veri yok";
-
-        var top = QuestionAverages
-            .OrderByDescending(x => x.Value)
-            .Take(3)
-            .Select(x => x.Key.ToString());
-
-        return string.Join(", ", top);
-    }
-
-    private string GetWeakQuestions()
-    {
-        if (QuestionAverages == null || !QuestionAverages.Any())
-            return "Veri yok";
-
-        var weak = QuestionAverages
-            .OrderBy(x => x.Value)
-            .Take(3)
-            .Select(x => x.Key.ToString());
-
-        return string.Join(", ", weak);
-    }
-
-    private string GetRecommendations()
-    {
-        var recommendations = new List<string>();
-        double classAvg = GetClassAverage();
-
-        if (classAvg < 50)
-        {
-            recommendations.Add("Temel kavramların tekrar edilmesi önerilir.");
-        }
-
-        if (SuccessDistribution != null && SuccessDistribution.Fail > 5)
-        {
-            recommendations.Add("Bireysel destekleme çalışmaları planlanmalıdır.");
-        }
-
-        if (QuestionAverages != null && QuestionAverages.Values.Count(v => v < 5.0) > 3)
-        {
-            recommendations.Add("Zor sorular için ek çalışmalar yapılmalıdır.");
-        }
-
-        return recommendations.Any()
-            ? string.Join(" ", recommendations)
-            : "Genel olarak başarılı bir sınav performansı gösterilmiştir.";
-    }
+    public AIAnalysisResponse? aIAnalysisResponse { get; set; }
 }

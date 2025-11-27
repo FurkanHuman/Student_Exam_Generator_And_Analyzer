@@ -13,6 +13,7 @@ public static class InfrastructureServiceRegistration
     {
         services.AddScoped<ImageServiceBase, CloudinaryImageServiceAdapter>();
         services.AddScoped<IImageService, ZeroFileMediaServiceAdapter>();
+        services.AddScoped<IAIServiceFactory, AIServiceFactory>();
         services.AddKeyedScoped<IAIService, OpenAIServiceAdapter>("OpenAI");
 
         services.AddHttpClient<ZeroFileMediaServiceAdapter>();

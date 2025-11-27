@@ -6,9 +6,9 @@ This document explains how student-level data can be transformed into meaningful
 
 ## Feature → Visualization Mapping
 
-| **Feature** | **Preprocessing** | **Metric** | **Recommended Visualization** | **Notes** |
-|-------------|-------------------|------------|-------------------------------|-----------|
-| Student performance per exam / topic | Normalize to percentages, z-score | Euclidean / Ward linkage | Dendrogram, Heatmap | Reveals natural groups of students with similar success patterns. |
+| **Feature** | **Preprocessing** | **Metric** | **Recommended Visualization** | **Notes** | **Status** |
+|-------------|-------------------|------------|-------------------------------|-----------|------------|
+| Student performance per exam / topic | Normalize to percentages, z-score | Euclidean / Ward linkage | Dendrogram, Heatmap | Reveals natural groups of students with similar success patterns. | ✅
 | Error-type distribution (correct, wrong, blank, partial) | Convert to proportions (sums to 1) | Cosine | Stacked Bar, Dendrogram | Shows *how* students fail; useful for remediation. |
 | Topic or skill-based averages | Aggregate by learning area | Euclidean | Radar Chart, Heatmap | Clear view of strengths/weaknesses per student. |
 | Temporal progression (exam history) | Trend calculation, moving average | Euclidean / Correlation | Line Chart | Identifies improvement or decline over time. |
@@ -18,6 +18,7 @@ This document explains how student-level data can be transformed into meaningful
 ---
 
 **Summary:**  
+
 - **Dendrogram + Heatmap** → overall class grouping  
 - **Radar Chart** → individual student profile  
 - **Stacked Bar / Box Plot** → error types & demographic comparisons  

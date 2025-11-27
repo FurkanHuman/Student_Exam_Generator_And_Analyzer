@@ -29,7 +29,8 @@ public class MappingProfiles : Profile
             .ForMember(destinationMember: ald => ald.SemesterName, memberOptions: mo => mo.MapFrom(a => a.Semester.Name))
             .ForMember(destinationMember: ald => ald.SemesterStartDate, memberOptions: mo => mo.MapFrom(a => a.Semester.BeginSemesterDate))
             .ForMember(destinationMember: ald => ald.SemesterEndDate, memberOptions: mo => mo.MapFrom(a => a.Semester.EndSemesterDate))
-            .ForMember(destinationMember: ald => ald.LessonName, memberOptions: mo => mo.MapFrom(a => a.Lesson.LessonName));
+            .ForMember(destinationMember: ald => ald.LessonName, memberOptions: mo => mo.MapFrom(a => a.Lesson.LessonName))
+            .ForMember(destinationMember: ald => ald.HasAiResponse, memberOptions: mo => mo.MapFrom(a => !string.IsNullOrEmpty(a.AIResponse)));
         CreateMap<IPaginate<Analysis>, GetListResponse<GetListAnalysisListItemDto>>();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Application.Services.AIService;
 using Application.Services.AIService.Models;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Schema.Generation;
 using OpenAI;
 using OpenAI.Chat;
@@ -17,7 +18,7 @@ public class OpenAIServiceAdapter : IAIService
 
     public OpenAIServiceAdapter(IConfiguration configuration)
     {
-        _systemPrompt = File.ReadAllText(SYSTEMPromptPath);
+        //_systemPrompt = File.ReadAllText(SYSTEMPromptPath);
         _aIClient = new(configuration.GetSection("OpenAiApiKey").Get<string>());
     }
 
@@ -56,5 +57,41 @@ public class OpenAIServiceAdapter : IAIService
         await RequestRecorder.RecordAsync(request: _systemPrompt + "\n" + outgoingModeljJsonStr, response: response, modelName: aiModel, cancellationToken: cancellationToken);
 
         return questions;
+    }
+
+    public async Task<AIAnalysisResponse> GenerateAnalysisFromAIAsync(AIAnalysisRequest analysisRequest, string provider, string aiModel, CancellationToken cancellationToken)
+    {
+        List<ChatMessage> chatMessages =
+        [
+            new SystemChatMessage(
+                "Generate a detailed analysis based on the following data. " +
+                "Response language is Turkish: " + JsonSerializer.Serialize(analysisRequest)
+            )
+        ];
+
+        ChatClient chatClient = _aIClient.GetChatClient(aiModel);
+
+        JSchemaGenerator generator = new();
+        string jsonSchema = generator.Generate(typeof(AIAnalysisResponse)).ToString();
+
+        ChatCompletionOptions completionOptions = new()
+        {
+            Temperature = 1f,
+            MaxOutputTokenCount = 15000,
+            TopP = 1,
+            FrequencyPenalty = 0,
+            PresencePenalty = 0,
+            ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(jsonSchemaFormatName: "AIAnalysisResponse", jsonSchema: BinaryData.FromString(jsonSchema), jsonSchemaIsStrict: false)
+        };
+
+
+        ChatCompletion chat = await chatClient.CompleteChatAsync(messages: chatMessages, options: completionOptions, cancellationToken: cancellationToken);
+
+        string storageJson = JsonSerializer.Serialize(chat);
+        await RequestRecorder.RecordAsync(request: JsonSerializer.Serialize(analysisRequest), response: storageJson, modelName: aiModel, cancellationToken: cancellationToken);
+
+        AIAnalysisResponse response = JsonSerializer.Deserialize<AIAnalysisResponse>(chat.Content[0].Text)!;
+
+        return response;
     }
 }

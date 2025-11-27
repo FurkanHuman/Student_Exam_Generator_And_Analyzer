@@ -1,8 +1,10 @@
 ﻿@page "/Analysis/{Id:int}"
 @layout FullScreenLayout
 @rendermode InteractiveServer
+@using Application.Features.Analyses.Queries.GetByIdAnalysisAIResponse
 @using Application.Features.Analyses.Queries.GetByIdAnalysisGetResponsiblePersonnel
 @using Application.Features.Analyses.Queries.GetByIdAnalysisLessonPassingScore
+@using Application.Services.AIService.Models
 @using Application.Services.Analyses
 @using Application.Services.CalculatorFactory
 @using BlazorWebUI.Components.Layout
@@ -28,7 +30,7 @@
                             ClusteredStudents="clusteredStudents"
                             RadarData="radarData" />
         <AnalysisBenefitTable BenefitAnalysis="benefitAnalysisResult" />
-        <AnalysisAIInsights SuccessDistribution="successDistribution" QuestionAverages="questionAverages" AIResponse="Beklemede kalın şuan AI ile görüşmelerimiz Sürüyor..."/>
+        <AnalysisAIInsights aIAnalysisResponse="aIAnalysisResponse" />
         <AnalysisResponsiblePersonnel ResponsiblePersonnel="responsiblePersonnel" />
         <div class="row d-print-none">
             <div class="col-12 text-center">
@@ -63,8 +65,9 @@
     private List<List<StudentPerformanceDto>>? clusteredStudents;
     private BenefitAnalysisResultDto? benefitAnalysisResult;
     private BenefitRadarResultDto? radarData;
+    private AIAnalysisResponse? aIAnalysisResponse;
     private GetByIdAnalysisGetResponsiblePersonnelResponse? responsiblePersonnel;
-    
+
     private int passingScore;
 
     private bool isLoading = true;
@@ -91,12 +94,12 @@
 
             radarData = await analysisCalculatorFactory.RadarCalculator.CalculateAsync(Id);
 
-            benefitAnalysisResult = await BenefitAnalysisCalculator.CalculateAsync(Id);
-
+            aIAnalysisResponse = await Mediator.Send(new GetByIdAnalysisAIResponseQuery { Id = Id });
+            
             responsiblePersonnel = await Mediator.Send(new GetByIdAnalysisGetResponsiblePersonnelQuery { Id = Id });
 
             isLoading = false;
-        }
+    }
 
     private async Task PrintPage()
     {
