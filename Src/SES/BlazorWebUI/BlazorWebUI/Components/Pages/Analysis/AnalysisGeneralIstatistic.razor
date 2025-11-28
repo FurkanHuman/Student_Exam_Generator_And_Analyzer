@@ -4,91 +4,100 @@
 {
     <div class="row mb-4">
         <div class="col-12">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <h4 class="text-primary mb-0">
-                    <i class="bi bi-bar-chart-fill"></i> Genel İstatistikler
-                </h4>
-                <span class="badge bg-primary">@Statistics.TotalCount Öğrenci</span>
-            </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 hover-lift">
-                <div class="card-body text-center p-4 bg-gradient-info text-white rounded">
-                    <div class="mb-3">
-                        <i class="bi bi-check-circle-fill" style="font-size: 2.5rem;"></i>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 pb-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5 class="text-primary mb-0">
+                            <i class="bi bi-bar-chart-fill"></i> Genel İstatistikler
+                        </h5>
+                        <span class="badge bg-primary">@Statistics.TotalCount Öğrenci</span>
                     </div>
-                    <h6 class="text-white-50 mb-2">Sınava Giren</h6>
-                    <h2 class="mb-0 display-5 fw-bold">@Statistics.AttendeesCount</h2>
                 </div>
-            </div>
-        </div>
+                <div class="card-body">
 
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 hover-lift">
-                <div class="card-body text-center p-4 bg-gradient-warning text-white rounded">
-                    <div class="mb-3">
-                        <i class="bi bi-x-circle-fill" style="font-size: 2.5rem;"></i>
+
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center p-4 bg-gradient-info text-white rounded">
+                                    <div class="mb-3">
+                                        <i class="bi bi-check-circle-fill" style="font-size: 2.5rem;"></i>
+                                    </div>
+                                    <h6 class="text-white-50 mb-2">Sınava Giren</h6>
+                                    <h2 class="mb-0 display-5 fw-bold">@Statistics.AttendeesCount</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center p-4 bg-gradient-warning text-white rounded">
+                                    <div class="mb-3">
+                                        <i class="bi bi-x-circle-fill" style="font-size: 2.5rem;"></i>
+                                    </div>
+                                    <h6 class="text-white-50 mb-2">Sınava Girmeyen</h6>
+                                    <h2 class="mb-0 display-5 fw-bold">@Statistics.AbsenteesCount</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center p-4 bg-gradient-success text-white rounded">
+                                    <div class="mb-3">
+                                        <i class="bi bi-trophy-fill" style="font-size: 2.5rem;"></i>
+                                    </div>
+                                    <h6 class="text-white-50 mb-2">Başarılı</h6>
+                                    <h2 class="mb-0 display-5 fw-bold">@Statistics.PassedCount</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center p-4 bg-gradient-danger text-white rounded">
+                                    <div class="mb-3">
+                                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 2.5rem;"></i>
+                                    </div>
+                                    <h6 class="text-white-50 mb-2">Başarısız</h6>
+                                    <h2 class="mb-0 display-5 fw-bold">@Statistics.FailedCount</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center p-3 bg-light rounded">
+                                    <small class="text-muted d-block mb-2">Mazeret/Rapor</small>
+                                    <h4 class="mb-0 text-secondary">@Statistics.ExcusedCount</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center p-3 bg-light rounded">
+                                    <small class="text-muted d-block mb-2">Okunmamış</small>
+                                    <h4 class="mb-0 text-secondary">@Statistics.NotReadingCount</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center p-3 bg-primary text-white rounded">
+                                    <small class="text-white-50 d-block mb-2">Toplam</small>
+                                    <h4 class="mb-0">@Statistics.TotalCount</h4>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
-                    <h6 class="text-white-50 mb-2">Sınava Girmeyen</h6>
-                    <h2 class="mb-0 display-5 fw-bold">@Statistics.AbsenteesCount</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 hover-lift">
-                <div class="card-body text-center p-4 bg-gradient-success text-white rounded">
-                    <div class="mb-3">
-                        <i class="bi bi-trophy-fill" style="font-size: 2.5rem;"></i>
-                    </div>
-                    <h6 class="text-white-50 mb-2">Başarılı</h6>
-                    <h2 class="mb-0 display-5 fw-bold">@Statistics.PassedCount</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100 hover-lift">
-                <div class="card-body text-center p-4 bg-gradient-danger text-white rounded">
-                    <div class="mb-3">
-                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 2.5rem;"></i>
-                    </div>
-                    <h6 class="text-white-50 mb-2">Başarısız</h6>
-                    <h2 class="mb-0 display-5 fw-bold">@Statistics.FailedCount</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center p-3 bg-light rounded">
-                    <small class="text-muted d-block mb-2">Mazeret/Rapor</small>
-                    <h4 class="mb-0 text-secondary">@Statistics.ExcusedCount</h4>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center p-3 bg-light rounded">
-                    <small class="text-muted d-block mb-2">Okunmamış</small>
-                    <h4 class="mb-0 text-secondary">@Statistics.NotReadingCount</h4>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center p-3 bg-primary text-white rounded">
-                    <small class="text-white-50 d-block mb-2">Toplam</small>
-                    <h4 class="mb-0">@Statistics.TotalCount</h4>
                 </div>
             </div>
         </div>
     </div>
 }
-
 @code
 {
     [Parameter]

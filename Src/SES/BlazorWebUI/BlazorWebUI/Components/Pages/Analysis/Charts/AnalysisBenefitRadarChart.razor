@@ -1,11 +1,11 @@
 ﻿@using ApexCharts
 @using Application.Services.CalculatorFactory
 
-<div class="card">
-    <div class="card-header">
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 pt-4 pb-3">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h3>Kazanım Radar Analizi</h3>
+                <h5 class="text-primary mb-0">Kazanım Radar Analizi</h5>
                 <p class="text-muted mb-0">
                     @if (ShowClassAverage)
                     {
@@ -113,16 +113,16 @@
                 @if (!ShowClassAverage && SelectedStudent != null)
                 {
                     <div class="alert alert-info mt-3">
-                        <h6><i class="bi bi-graph-up"></i> Sınıf Ortalaması ile Karşılaştırma:</h6>
+                        <h6 class="mb-3"><i class="bi bi-graph-up"></i> Sınıf Ortalaması ile Karşılaştırma:</h6>
                         <div class="row">
                             @for (int i = 0; i < SelectedStudent.Categories.Count; i++)
                             {
-                                var category = SelectedStudent.Categories[i];
-                                var studentValue = SelectedStudent.Values[i];
-                                var classValue = RadarData?.ClassAverageRadar.Values[i] ?? 0;
-                                var diff = studentValue - classValue;
-                                var diffColor = diff >= 0 ? "success" : "danger";
-                                var diffIcon = diff >= 0 ? "bi-arrow-up" : "bi-arrow-down";
+                                string category = SelectedStudent.Categories[i];
+                                double studentValue = SelectedStudent.Values[i];
+                                double classValue = RadarData?.ClassAverageRadar.Values[i] ?? 0;
+                                double diff = studentValue - classValue;
+                                string diffColor = diff >= 0 ? "success" : "danger";
+                                string diffIcon = diff >= 0 ? "bi-arrow-up" : "bi-arrow-down";
 
                                 <div class="col-md-4 mb-2">
                                     <small>

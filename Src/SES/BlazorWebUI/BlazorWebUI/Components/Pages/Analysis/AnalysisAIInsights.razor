@@ -1,15 +1,13 @@
 ﻿@using Application.Services.AIService.Models
 @using Application.Services.CalculatorFactory
 
-<div class="card p-4 shadow-sm">
 @if (aIAnalysisResponse != null)
 {
-    
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="text-primary mb-0">
-                    <i class="bi bi-robot"></i> Yapay Zeka Analizi
+                    <h4 class="text-primary mb-3">
+                        <i class="bi bi-robot"></i> Yapay Zeka Analizi
                 </h4>
                 <div class="badge bg-primary p-2">
                     <i class="bi bi-calendar3"></i> @aIAnalysisResponse.GeneratedAt.ToString("dd.MM.yyyy HH:mm")
@@ -51,14 +49,14 @@
             </div>
         </div>
         <div class="col-lg-4">
-            <div class="card bg-gradient text-white border-0 h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="card bg-gradient border-0 h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                 <div class="card-body text-center">
                     <div class="mb-3">
                         <i class="bi bi-robot" style="font-size: 3.5rem;"></i>
                     </div>
                     <h5 class="mb-3">AI Model Bilgisi</h5>
                     <p class="mb-2"><strong>Model:</strong> @aIAnalysisResponse.ModelVersion</p>
-                    <div class="mt-4">
+                        <div class="mt-4">
                         <div class="progress mb-2" style="height: 10px; background-color: rgba(255,255,255,0.3);">
                             <div class="progress-bar bg-light"
                                  role="progressbar"
@@ -405,7 +403,7 @@ else
         </div>
     </div>
 }
-</div>
+
 @code
 {
     [Parameter]

@@ -1,80 +1,88 @@
 @using Application.Services.CalculatorFactory
 
+
 @if (DetailTableData != null && DetailTableData.Any())
 {
     <div class="row mb-4">
         <div class="col-12">
-            <h4 class="mb-3 text-primary">
-                <i class="bi bi-table"></i> Öğrenci Detay Tablosu
-            </h4>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 pb-3">
+                    <h5 class="text-primary mb-0">
+                        <i class="bi bi-table"></i> Öğrenci Detay Tablosu
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+
+                    @foreach (AnalysisDetailTableDto examData in DetailTableData)
+                    {
+                        <div class="mb-4">
+                            <div class="bg-light border-bottom p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <i class="bi bi-file-earmark-text"></i> Sınav Kodu: @examData.ExamCode
+                                        </h6>
+                                        <small class="text-muted">
+                                            <i class="bi bi-question-circle"></i> Toplam Soru Sayısı: @examData.QuestionCount
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover table-sm mb-0">
+                                        <thead class="table-dark sticky-top">
+                                            <tr>
+                                                <th class="text-center align-middle" style="min-width: 5rem;">Ö. No</th>
+                                                <th class="align-middle" style="min-width: 12.5rem;">Ad + Soyad</th>
+                                                @for (int i = 1; i <= examData.QuestionCount; i++)
+                                                {
+                                                    <th class="text-center align-middle" style="min-width: 3.125rem;">S@(i)</th>
+                                                }
+                                                <th class="text-center align-middle bg-warning text-dark" style="min-width: 6.25rem;">Toplam</th>
+                                                <th class="text-center align-middle bg-info text-dark" style="min-width: 7.5rem;">Durum</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (StudentTableDto student in examData.Students)
+                                            {
+                                                int totalScore = student.StudentAnswerScores.Sum(s => s.GivenScore);
+                                                (bool IsPassed, string Status) passFail = GetPassFailStatus(totalScore);
+
+                                                <tr class="align-middle @GetRowClass(totalScore)">
+                                                    <td class="text-center fw-semibold">@student.SchoolNumber</td>
+                                                    <td class="fw-medium">@student.Name @student.Surname</td>
+                                                    @foreach (int score in student.StudentAnswerScores.Select(sas => sas.GivenScore))
+                                                    {
+                                                        <td class="text-center">
+                                                            <span class="badge @GetScoreBadgeClass(score) fs-6 px-2 py-1">
+                                                                @score
+                                                            </span>
+                                                        </td>
+                                                    }
+                                                    <td class="text-center">
+                                                        <span class="badge bg-warning text-dark fs-5 px-3 py-2 fw-bold">
+                                                            @totalScore
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="badge @GetStatusBadgeClass(passFail.Status) fs-5 px-3 py-2">
+                                                            @passFail.Status
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
     </div>
-
-    @foreach (AnalysisDetailTableDto examData in DetailTableData)
-    {
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-info text-black-50">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="mb-0">
-                            <i class="bi bi-file-earmark-text"></i> Sınav Kodu: @examData.ExamCode
-                        </h4>
-                        <small>
-                            <i class="bi bi-question-circle"></i> Toplam Soru Sayısı: @examData.QuestionCount
-                        </small>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover table-sm mb-0">
-                        <thead class="table-dark sticky-top">
-                            <tr>
-                                <th class="text-center align-middle" style="min-width: 5rem;">Ö. No</th>
-                                <th class="align-middle" style="min-width: 12.5rem;">Ad + Soyad</th>
-                                @for (int i = 1; i <= examData.QuestionCount; i++)
-                                {
-                                    <th class="text-center align-middle" style="min-width: 3.125rem;">S@(i)</th>
-                                }
-                                <th class="text-center align-middle bg-warning text-dark" style="min-width: 6.25rem;">Toplam</th>
-                                <th class="text-center align-middle bg-info text-dark" style="min-width: 7.5rem;">Durum</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (StudentTableDto student in examData.Students)
-                            {
-                                int totalScore = student.StudentAnswerScores.Sum(s => s.GivenScore);
-                                (bool IsPassed, string Status) passFail = GetPassFailStatus(totalScore);
-
-                                <tr class="align-middle @GetRowClass(totalScore)">
-                                    <td class="text-center fw-semibold">@student.SchoolNumber</td>
-                                    <td class="fw-medium">@student.Name @student.Surname</td>
-                                    @foreach (int score in student.StudentAnswerScores.Select(sas => sas.GivenScore))
-                                    {
-                                        <td class="text-center">
-                                            <span class="badge @GetScoreBadgeClass(score) fs-6 px-2 py-1">
-                                                @score
-                                            </span>
-                                        </td>
-                                    }
-                                    <td class="text-center">
-                                        <span class="badge bg-warning text-dark fs-5 px-3 py-2 fw-bold">
-                                            @totalScore
-                                        </span>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge @GetStatusBadgeClass(passFail.Status) fs-5 px-3 py-2">
-                                            @passFail.Status
-                                        </span>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    }
 }
 
 @code {

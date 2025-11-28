@@ -12,37 +12,45 @@
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             <BoxPlotChart StudentScores="@AdvancedData.StudentScores" />
         </div>
+    </div>
 
-        <div class="col-lg-6">
+    <div class="row g-4 mb-4">
+        <div class="col-lg-12">
             <QuestionHeatmap QuestionAverages="@AdvancedData.QuestionAverages"
                              MaxScore="10" />
         </div>
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             <StackedBarChart QuestionStats="@AdvancedData.QuestionStats" />
         </div>
-        <div class="col-lg-6">
+    </div>
+
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-12">
             <StudentClusteringChart ClusteredData="@ClusteredStudents" />
         </div>
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             <PerformanceScatterPlot Students="@AdvancedData.PerformanceData" />
         </div>
+    </div>
 
-        <div class="col-lg-6">
+    <div class="row g-4 mb-4">
+        <div class="col-lg-12">
             <ParallelCoordinatesChart StudentProfiles="@AdvancedData.ParallelData" />
         </div>
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             <AnalysisBenefitRadarChart RadarData="RadarData" />
         </div>
     </div>

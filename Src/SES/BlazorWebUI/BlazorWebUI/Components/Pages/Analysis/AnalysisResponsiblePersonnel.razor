@@ -3,81 +3,85 @@
 {
     <div class="row mb-4">
         <div class="col-12">
-            <h4 class="mb-3 text-primary">
-                <i class="bi bi-people-fill"></i> İlgili Kişiler
-            </h4>
             <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="card bg-light border-0 h-100">
-                                <div class="card-body">
-                                    <h6 class="text-muted mb-3">
-                                        <i class="bi bi-person-check"></i> Sınavı Yapan Öğretmen(ler)
-                                    </h6>
-                                    @if (ResponsiblePersonnel.ExamAuthorTeacher != null && !string.IsNullOrEmpty(ResponsiblePersonnel.ExamAuthorTeacher))
-                                    {
-                                            <p class="mb-2">
-                                                <strong>
-                                                    <i class="bi bi-person-badge"></i> @ResponsiblePersonnel.ExamAuthorTeacher
-                                                </strong>
-                                            </p>
-                                    }
-                                    else
-                                    {
-                                        <p class="text-muted mb-0">
-                                            <em>Bilgi yok</em>
-                                        </p>
-                                    }
+                <div class="card-header bg-white border-0 pt-4 pb-3">
+                    <h5 class="text-primary mb-3">
+                        <i class="bi bi-people-fill"></i> İlgili Kişiler
+                    </h5>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="card bg-light border-0 h-100">
+                                        <div class="card-body p-3">
+                                            <h6 class="text-muted mb-3">
+                                                <i class="bi bi-person-check"></i> Sınavı Yapan Öğretmen(ler)
+                                            </h6>
+                                            @if (ResponsiblePersonnel.ExamAuthorTeacher != null && !string.IsNullOrEmpty(ResponsiblePersonnel.ExamAuthorTeacher))
+                                            {
+                                                <p class="mb-2">
+                                                    <strong>
+                                                        <i class="bi bi-person-badge"></i> @ResponsiblePersonnel.ExamAuthorTeacher
+                                                    </strong>
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <p class="text-muted mb-0">
+                                                    <em>Bilgi yok</em>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <div class="col-md-4 mb-3">
-                            <div class="card bg-light border-0 h-100">
-                                <div class="card-body">
-                                    <h6 class="text-muted mb-3">
-                                        <i class="bi bi-people"></i> Okuyan Öğretmenler
-                                    </h6>
-                                    @if (ResponsiblePersonnel.ReviewingTeachersNames != null && ResponsiblePersonnel.ReviewingTeachersNames.Any())
-                                    {
-                                        @foreach (string teacher in ResponsiblePersonnel.ReviewingTeachersNames)
-                                        {
-                                            <p class="mb-2">
-                                                <i class="bi bi-person"></i> @teacher
-                                            </p>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <p class="text-muted mb-0">
-                                            <em>Bilgi yok</em>
-                                        </p>
-                                    }
+                                <div class="col-md-4 mb-3">
+                                    <div class="card bg-light border-0 h-100">
+                                        <div class="card-body p-3">
+                                            <h6 class="text-muted mb-3">
+                                                <i class="bi bi-people"></i> Okuyan Öğretmenler
+                                            </h6>
+                                            @if (ResponsiblePersonnel.ReviewingTeachersNames != null && ResponsiblePersonnel.ReviewingTeachersNames.Any())
+                                            {
+                                                @foreach (string teacher in ResponsiblePersonnel.ReviewingTeachersNames)
+                                                {
+                                                    <p class="mb-2">
+                                                        <i class="bi bi-person"></i> @teacher
+                                                    </p>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <p class="text-muted mb-0">
+                                                    <em>Bilgi yok</em>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <div class="col-md-4 mb-3">
-                            <div class="card bg-light border-0 h-100">
-                                <div class="card-body">
-                                    <h6 class="text-muted mb-3">
-                                        <i class="bi bi-award"></i> Müdür
-                                    </h6>
-                                    @if (!string.IsNullOrEmpty(ResponsiblePersonnel.Principal))
-                                    {
-                                        <p class="mb-0">
-                                            <strong>
-                                                <i class="bi bi-star-fill text-warning"></i> @ResponsiblePersonnel.Principal
-                                            </strong>
-                                        </p>
-                                    }
-                                    else
-                                    {
-                                        <p class="text-muted mb-0">
-                                            <em>Bilgi yok</em>
-                                        </p>
-                                    }
+                                <div class="col-md-4 mb-3">
+                                    <div class="card bg-light border-0 h-100">
+                                        <div class="card-body p-3">
+                                            <h6 class="text-muted mb-3">
+                                                <i class="bi bi-award"></i> Müdür
+                                            </h6>
+                                            @if (!string.IsNullOrEmpty(ResponsiblePersonnel.Principal))
+                                            {
+                                                <p class="mb-0">
+                                                    <strong>
+                                                        <i class="bi bi-star-fill text-warning"></i> @ResponsiblePersonnel.Principal
+                                                    </strong>
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <p class="text-muted mb-0">
+                                                    <em>Bilgi yok</em>
+                                                </p>
+                                            }
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
