@@ -4,7 +4,7 @@ public class AIAnalysisResponse
 {
     public string AnalysisId { get; set; } = string.Empty;
     public DateTime GeneratedAt { get; set; } = DateTime.UtcNow;
-    public string ModelVersion { get; set; } = string.Empty; 
+    public string AIModelVersion { get; set; } = string.Empty; 
     public GeneralAssessment GeneralEvaluation { get; set; } = new();
     public List<QuestionInsight> QuestionInsights { get; set; } = [];
     public List<BenefitInsight> BenefitInsights { get; set; } = [];
