@@ -40,7 +40,7 @@ public class UpdateAIRequestAnalysisCommand : IRequest
             if (!string.IsNullOrEmpty(analysis!.AIResponse))
                 return;
 
-
+            _ = Task.Run(async () =>
             {
                 AnalysisGeneralExamStatisticsCounters ge = await _analysisEngine.GeneralStatsCalculator.CalculateAsync(request.Id, cancellationToken);
                 IList<AnalysisDetailTableDto> de = await _analysisEngine.DetailTableCalculator.CalculateAsync(request.Id, cancellationToken);
@@ -67,7 +67,8 @@ public class UpdateAIRequestAnalysisCommand : IRequest
                 analysis.AIResponse = responseToJson;
 
                 await _analysisRepository.UpdateAsync(analysis, cancellationToken);
-            }
+
+            }, cancellationToken);
         }
     }
 }
