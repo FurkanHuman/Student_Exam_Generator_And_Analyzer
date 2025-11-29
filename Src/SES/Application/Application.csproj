@@ -32,6 +32,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Update="Services\AIService\Resources\analysis_prompt.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Services\AIService\Resources\QuestionSystemPromptNew.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
