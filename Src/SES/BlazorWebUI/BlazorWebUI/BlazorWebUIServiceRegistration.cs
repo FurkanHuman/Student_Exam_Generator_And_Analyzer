@@ -14,6 +14,7 @@ public static class BlazorWebUIServiceRegistration
 
         services.AddAutoMapper(cfg => { }, Assembly.GetExecutingAssembly());
         services.AddApexCharts();
+        services.AddScoped<IdentityUserAccessor>();
         services.AddScoped<IdentityRedirectManager>();
         services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
         services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
