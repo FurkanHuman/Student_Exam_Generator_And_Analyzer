@@ -1,0 +1,779 @@
+﻿@using Application.Services.Personels
+@using BlazorWebUI.Client.Pages.Styles
+@using Domain.Entities
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@attribute [Authorize(Roles = "admin,director")]
+@page "/Admin/Panel"
+@rendermode InteractiveServer
+
+<PageTitle>Admin Paneli</PageTitle>
+
+<div class="container-fluid py-4">
+    <!-- Dashboard Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">Toplam Kullanıcı</h6>
+                            <h2 class="mb-0">@_users.Count()</h2>
+                        </div>
+                        <i class="bi bi-people-fill" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">Aktif Personel</h6>
+                            <h2 class="mb-0">@_personels.Count(p => p.DeletedDate == null)</h2>
+                        </div>
+                        <i class="bi bi-person-check-fill" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">Atanmamış Personel</h6>
+                            <h2 class="mb-0">@_discardPersonels.Count()</h2>
+                        </div>
+                        <i class="bi bi-person-x-fill" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">Toplam Rol</h6>
+                            <h2 class="mb-0">@_availableRoles.Count()</h2>
+                        </div>
+                        <i class="bi bi-shield-fill" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Panel -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="bi bi-shield-lock-fill me-2"></i>Kullanıcı Yönetim Paneli
+                </h3>
+                <button class="btn btn-light btn-sm" @onclick="RefreshData">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Yenile
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>DİKKAT!</strong> Bu panelde yapacağınız değişiklikler kullanıcıların sistem erişimini etkileyecektir. 
+                Lütfen dikkatli olun.
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" 
+                               placeholder="Ad, soyad veya email ile ara..." 
+                               @bind="_searchText"
+                               @bind:event="oninput" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" @bind="_filterRole">
+                        <option value="">Tüm Roller</option>
+                        @foreach (var role in _availableRoles)
+                        {
+                            <option value="@role.Name">@role.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" @bind="_filterStatus">
+                        <option value="all">Tüm Kullanıcılar</option>
+                        <option value="active">Aktif Personel</option>
+                        <option value="inactive">Atanmamış Personel</option>
+                    </select>
+                </div>
+            </div>
+
+            @if (_isLoading)
+            {
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Personel Bilgileri</th>
+                                <th>Email</th>
+                                <th>Roller</th>
+                                <th>Durum</th>
+                                <th style="width: 400px;">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in GetFilteredUsers())
+                            {
+                                var personel = _personels.FirstOrDefault(p => p.UserId == user.Id);
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>@personel?.Name @personel?.SurName</strong>
+                                            @if (personel?.BirthDate != null)
+                                            {
+                                                <br />
+                                                <small class="text-muted">
+                                                    <i class="bi bi-calendar3"></i> @personel.BirthDate.ToString("dd/MM/yyyy")
+                                                </small>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="text-break">@user?.Email</span>
+                                        @if (user.EmailConfirmed)
+                                        {
+                                            <i class="bi bi-check-circle-fill text-success ms-1" title="Email onaylı"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-x-circle-fill text-danger ms-1" title="Email onaylı değil"></i>
+                                        }
+                                    </td>
+                                    <td>
+                                        @foreach (var role in _userRoles.GetValueOrDefault(user!.Id, new List<string>()))
+                                        {
+                                            <span class="badge bg-warning text-dark me-1 mb-1">
+                                                <i class="bi bi-shield-fill-check me-1"></i>@role
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTimeOffset.Now)
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-lock-fill"></i> Kilitli
+                                            </span>
+                                        }
+                                        else if (personel?.DeletedDate == null)
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Aktif
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-dash-circle"></i> Pasif
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="btn-group-vertical btn-group-sm w-100" role="group">
+                                            <button class="btn btn-outline-primary" 
+                                                    @onclick="() => OpenRoleModal(user)">
+                                                <i class="bi bi-shield-fill-check"></i> Rolleri Düzenle
+                                            </button>
+                                            <button class="btn btn-outline-success" 
+                                                    @onclick="() => OpenTeacherModal(personel)">
+                                                <i class="bi bi-person-plus"></i> Öğretmen Ekle
+                                            </button>
+                                            <button class="btn btn-outline-warning" 
+                                                    @onclick="() => OpenPasswordResetModal(user)">
+                                                <i class="bi bi-key"></i> Şifre Sıfırla
+                                            </button>
+                                            <button class="btn btn-outline-info" 
+                                                    @onclick="() => OpenEmailConfirmModal(user)">
+                                                <i class="bi bi-envelope-check"></i> Email Durumu
+                                            </button>
+                                            <button class="btn btn-outline-secondary" 
+                                                    @onclick="() => OpenPersonelChangeModal(user, personel!)">
+                                                <i class="bi bi-person-fill-gear"></i> Personel Değiştir
+                                            </button>
+                                            <button class="btn btn-outline-danger" 
+                                                    @onclick="() => OpenDeleteModal(user, personel!)">
+                                                <i class="bi bi-trash"></i> Kullanıcı Sil
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    
+                    @if (!GetFilteredUsers().Any())
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox" style="font-size: 4rem;"></i>
+                            <p class="mt-3">Arama kriterlerine uygun kullanıcı bulunamadı</p>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Rol Atama -->
+<ModalDialog @ref="_modalDialogRoleAssign" Title="Rol Yönetimi">
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>DİKKAT!</strong> Rol ataması kullanıcının sistem yetkilerini değiştirecektir.
+    </div>
+    <div class="mb-3">
+        <strong>Kullanıcı:</strong> @_selectedUser.Email
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm">
+            <thead class="table-light">
+                <tr>
+                    <th>Rol</th>
+                    <th>Durum</th>
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var role in _availableRoles)
+                {
+                    var hasRole = IsUserInRole(_selectedUser, role.Name!);
+                    <tr>
+                        <td>
+                            <i class="bi bi-shield-fill-check me-1"></i>@role.Name
+                        </td>
+                        <td>
+                            @if (hasRole)
+                            {
+                                <span class="badge bg-success">Atanmış</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Atanmamış</span>
+                            }
+                        </td>
+                        <td>
+                            @if (hasRole)
+                            {
+                                <button class="btn btn-danger btn-sm" 
+                                        @onclick="() => RemoveRoleAsync(_selectedUser, role)">
+                                    <i class="bi bi-dash-circle"></i> Kaldır
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-success btn-sm" 
+                                        @onclick="() => AddRoleAsync(_selectedUser, role)">
+                                    <i class="bi bi-plus-circle"></i> Ekle
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="d-flex justify-content-end">
+        <button class="btn btn-secondary" @onclick="() => _modalDialogRoleAssign.Close()">
+            <i class="bi bi-x-circle"></i> Kapat
+        </button>
+    </div>
+</ModalDialog>
+
+<!-- Modal: Öğretmen Ekle -->
+<ModalDialog @ref="_modalDialogTeacherAdd" Title="Öğretmen Olarak Ekle">
+    <TeacherAdd PersonelId="@_selectedPersonel?.Id" TriggerEvent="CloseTeacherModal" />
+</ModalDialog>
+
+<!-- Modal: Şifre Sıfırla -->
+<ModalDialog @ref="_modalDialogPasswordReset" Title="Şifre Sıfırlama">
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>DİKKAT!</strong> Bu işlem kullanıcının şifresini sıfırlayacaktır.
+    </div>
+    <div class="mb-3">
+        <p><strong>Kullanıcı:</strong> @_selectedUser.Email</p>
+        <p><strong>Personel:</strong> @_selectedPersonel?.Name @_selectedPersonel?.SurName</p>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Yeni Şifre</label>
+        <input type="password" class="form-control" @bind="_newPassword" 
+               placeholder="Yeni şifre giriniz (min 6 karakter)" />
+        <div class="form-text">
+            <i class="bi bi-info-circle me-1"></i>
+            Şifre en az 6 karakter olmalıdır
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Şifre Tekrar</label>
+        <input type="password" class="form-control" @bind="_newPasswordConfirm" 
+               placeholder="Şifreyi tekrar giriniz" />
+    </div>
+    @if (!string.IsNullOrEmpty(_passwordResetError))
+    {
+        <div class="alert alert-danger">
+            <i class="bi bi-x-circle me-2"></i>@_passwordResetError
+        </div>
+    }
+    @if (_passwordResetSuccess)
+    {
+        <div class="alert alert-success">
+            <i class="bi bi-check-circle me-2"></i>Şifre başarıyla sıfırlandı!
+        </div>
+    }
+    <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-secondary" @onclick="ClosePasswordResetModal">
+            <i class="bi bi-x-circle"></i> İptal
+        </button>
+        <button class="btn btn-warning" @onclick="ResetPasswordAsync" 
+                disabled="@(string.IsNullOrWhiteSpace(_newPassword))">
+            <i class="bi bi-key"></i> Şifre Sıfırla
+        </button>
+    </div>
+</ModalDialog>
+
+<!-- Modal: Email Onaylama -->
+<ModalDialog @ref="_modalDialogEmailConfirm" Title="Email Durumu Yönetimi">
+    <div class="mb-3">
+        <p><strong>Kullanıcı:</strong> @_selectedUser.Email</p>
+        <p>
+            <strong>Email Durumu:</strong> 
+            @if (_selectedUser.EmailConfirmed)
+            {
+                <span class="badge bg-success">
+                    <i class="bi bi-check-circle"></i> Onaylı
+                </span>
+            }
+            else
+            {
+                <span class="badge bg-danger">
+                    <i class="bi bi-x-circle"></i> Onaylanmamış
+                </span>
+            }
+        </p>
+    </div>
+    <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-secondary" @onclick="() => _modalDialogEmailConfirm.Close()">
+            <i class="bi bi-x-circle"></i> Kapat
+        </button>
+        @if (_selectedUser.EmailConfirmed)
+        {
+            <button class="btn btn-danger" @onclick="UnconfirmEmailAsync">
+                <i class="bi bi-x-circle"></i> Onayı Kaldır
+            </button>
+        }
+        else
+        {
+            <button class="btn btn-success" @onclick="ConfirmEmailAsync">
+                <i class="bi bi-check-circle"></i> Email Onayla
+            </button>
+        }
+    </div>
+</ModalDialog>
+
+<!-- Modal: Personel Değiştir -->
+<ModalDialog @ref="_modalDialogPersonelChange" Title="Personel Değiştirme">
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>DİKKAT!</strong> Bu işlem kullanıcının personel bilgilerini değiştirecektir.
+    </div>
+    <div class="mb-3">
+        <p><strong>Mevcut Kullanıcı:</strong> @_selectedUser.Email</p>
+        <p><strong>Mevcut Personel:</strong> @_selectedPersonel?.Name @_selectedPersonel?.SurName</p>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Yeni Personel Seç</label>
+        <select class="form-select" @bind="_selectedPersonelGuid">
+            <option value="@Guid.Empty">Personel seçiniz...</option>
+            @foreach (var personel in _discardPersonels)
+            {
+                <option value="@personel.Id">
+                    @personel.Name @personel.SurName (@personel.BirthDate.ToString("dd/MM/yyyy"))
+                </option>
+            }
+        </select>
+        <div class="form-text">
+            <i class="bi bi-info-circle me-1"></i>
+            Sadece atanmamış personeller listelenmektedir
+        </div>
+    </div>
+    <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-secondary" @onclick="() => _modalDialogPersonelChange.Close()">
+            <i class="bi bi-x-circle"></i> İptal
+        </button>
+        <button class="btn btn-warning" @onclick="() => ChangeUserAndPersonelAsync(_selectedUser, _selectedPersonelGuid, _selectedPersonel!)"
+                disabled="@(_selectedPersonelGuid == Guid.Empty)">
+            <i class="bi bi-arrow-repeat"></i> Değiştir
+        </button>
+    </div>
+</ModalDialog>
+
+<!-- Modal: Kullanıcı Sil -->
+<ModalDialog @ref="_modalDialogDeleteUser" Title="Kullanıcı Silme Onayı">
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>DİKKAT!</strong> Bu işlem geri alınamaz!
+    </div>
+    <div class="mb-3">
+        <p><strong>Silinecek Kullanıcı:</strong> @_selectedUser.Email</p>
+        <p><strong>Personel:</strong> @_selectedPersonel?.Name @_selectedPersonel?.SurName</p>
+    </div>
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        Kullanıcı silinecek ancak personel bilgileri sistemde saklanacaktır.
+    </div>
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" @bind="_deleteConfirmation" id="deleteCheck">
+        <label class="form-check-label" for="deleteCheck">
+            Bu kullanıcıyı silmek istediğimi onaylıyorum
+        </label>
+    </div>
+    <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-secondary" @onclick="CloseDeleteModal">
+            <i class="bi bi-x-circle"></i> İptal
+        </button>
+        <button class="btn btn-danger" @onclick="() => DeleteUserAsync(_selectedUser, _selectedPersonel!)"
+                disabled="@(!_deleteConfirmation)">
+            <i class="bi bi-trash"></i> Kullanıcıyı Sil
+        </button>
+    </div>
+</ModalDialog>
+
+@inject UserManager<ApplicationUser> _userManager
+@inject RoleManager<IdentityRole<Guid>> _roleManager
+@inject IPersonelService _personelService
+
+@code {
+    private IEnumerable<ApplicationUser> _users = [];
+    private IEnumerable<Personel> _personels = [];
+    private IEnumerable<Personel> _discardPersonels = [];
+    private IEnumerable<IdentityRole<Guid>> _availableRoles = [];
+    private readonly Dictionary<Guid, IList<string>> _userRoles = new();
+
+    private ApplicationUser _selectedUser { get; set; } = new();
+    private Personel? _selectedPersonel { get; set; } = new();
+    private Guid _selectedPersonelGuid { get; set; } = Guid.Empty;
+
+    private string _searchText = string.Empty;
+    private string _filterRole = string.Empty;
+    private string _filterStatus = "all";
+    private bool _isLoading = false;
+
+    // Password Reset
+    private string _newPassword = string.Empty;
+    private string _newPasswordConfirm = string.Empty;
+    private string _passwordResetError = string.Empty;
+    private bool _passwordResetSuccess = false;
+
+    // Delete Confirmation
+    private bool _deleteConfirmation = false;
+
+    // Modals
+    private ModalDialog _modalDialogRoleAssign { get; set; } = new();
+    private ModalDialog _modalDialogDeleteUser { get; set; } = new();
+    private ModalDialog _modalDialogTeacherAdd { get; set; } = new();
+    private ModalDialog _modalDialogPersonelChange { get; set; } = new();
+    private ModalDialog _modalDialogPasswordReset { get; set; } = new();
+    private ModalDialog _modalDialogEmailConfirm { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshData();
+    }
+
+    private async Task RefreshData()
+    {
+        try
+        {
+            _isLoading = true;
+
+            _users = _userManager.Users.ToList();
+            _availableRoles = RemoveAdmin(_roleManager.Roles.ToList());
+
+            var personelList = await _personelService.GetListAsync(withDeleted: true);
+            _personels = personelList!.Items;
+            _discardPersonels = _personels.Where(p => p.UserId == Guid.Empty).ToList();
+
+            _userRoles.Clear();
+            foreach (var user in _users)
+            {
+                _userRoles.Add(user.Id, await _userManager.GetRolesAsync(user));
+            }
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private IEnumerable<ApplicationUser> GetFilteredUsers()
+    {
+        var filtered = _users.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(_searchText))
+        {
+            filtered = filtered.Where(u =>
+            {
+                var personel = _personels.FirstOrDefault(p => p.UserId == u.Id);
+                return (personel?.Name?.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                       (personel?.SurName?.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                       (u.Email?.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ?? false);
+            });
+        }
+
+        if (!string.IsNullOrWhiteSpace(_filterRole))
+        {
+            filtered = filtered.Where(u => _userRoles.GetValueOrDefault(u.Id, new List<string>()).Contains(_filterRole));
+        }
+
+        if (_filterStatus == "active")
+        {
+            filtered = filtered.Where(u =>
+            {
+                var personel = _personels.FirstOrDefault(p => p.UserId == u.Id);
+                return personel?.DeletedDate == null;
+            });
+        }
+        else if (_filterStatus == "inactive")
+        {
+            filtered = filtered.Where(u =>
+            {
+                var personel = _personels.FirstOrDefault(p => p.UserId == u.Id);
+                return personel?.DeletedDate != null;
+            });
+        }
+
+        return filtered;
+    }
+
+    private IEnumerable<IdentityRole<Guid>> RemoveAdmin(IEnumerable<IdentityRole<Guid>> roles)
+    {
+        return roles.Where(r => r.Name != "admin");
+    }
+
+    private bool IsUserInRole(ApplicationUser user, string roleName)
+    {
+        return _userRoles.GetValueOrDefault(user.Id, new List<string>()).Contains(roleName);
+    }
+
+    // Modal Açma Metodları
+    private void OpenRoleModal(ApplicationUser user)
+    {
+        _selectedUser = user;
+        _modalDialogRoleAssign.Open();
+    }
+
+    private void OpenTeacherModal(Personel? personel)
+    {
+        _selectedPersonel = personel;
+        _modalDialogTeacherAdd.Open();
+    }
+
+    private void OpenPasswordResetModal(ApplicationUser user)
+    {
+        _selectedUser = user;
+        _newPassword = string.Empty;
+        _newPasswordConfirm = string.Empty;
+        _passwordResetError = string.Empty;
+        _passwordResetSuccess = false;
+        _modalDialogPasswordReset.Open();
+    }
+
+    private void OpenEmailConfirmModal(ApplicationUser user)
+    {
+        _selectedUser = user;
+        _modalDialogEmailConfirm.Open();
+    }
+
+    private void OpenPersonelChangeModal(ApplicationUser user, Personel personel)
+    {
+        _selectedUser = user;
+        _selectedPersonel = personel;
+        _selectedPersonelGuid = Guid.Empty;
+        _modalDialogPersonelChange.Open();
+    }
+
+    private void OpenDeleteModal(ApplicationUser user, Personel personel)
+    {
+        _selectedUser = user;
+        _selectedPersonel = personel;
+        _deleteConfirmation = false;
+        _modalDialogDeleteUser.Open();
+    }
+
+    // Rol İşlemleri
+    private async Task AddRoleAsync(ApplicationUser user, IdentityRole<Guid> role)
+    {
+        if (!await _roleManager.RoleExistsAsync(role.Name!))
+            await _roleManager.CreateAsync(new IdentityRole<Guid>(role.Name!));
+
+        await _userManager.AddToRoleAsync(user, role.Name!);
+        _userRoles[user.Id] = await _userManager.GetRolesAsync(user);
+        StateHasChanged();
+    }
+
+    private async Task RemoveRoleAsync(ApplicationUser user, IdentityRole<Guid> role)
+    {
+        await _userManager.RemoveFromRoleAsync(user, role.Name!);
+        _userRoles[user.Id] = await _userManager.GetRolesAsync(user);
+        StateHasChanged();
+    }
+
+    // Şifre Sıfırlama
+    private async Task ResetPasswordAsync()
+    {
+        _passwordResetError = string.Empty;
+        _passwordResetSuccess = false;
+
+        if (string.IsNullOrWhiteSpace(_newPassword))
+        {
+            _passwordResetError = "Şifre boş olamaz";
+            return;
+        }
+
+        if (_newPassword.Length < 6)
+        {
+            _passwordResetError = "Şifre en az 6 karakter olmalıdır";
+            return;
+        }
+
+        if (_newPassword != _newPasswordConfirm)
+        {
+            _passwordResetError = "Şifreler eşleşmiyor";
+            return;
+        }
+
+        try
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(_selectedUser);
+            var result = await _userManager.ResetPasswordAsync(_selectedUser, token, _newPassword);
+
+            if (result.Succeeded)
+            {
+                _passwordResetSuccess = true;
+                await Task.Delay(1500);
+                ClosePasswordResetModal();
+            }
+            else
+            {
+                _passwordResetError = string.Join(", ", result.Errors.Select(e => e.Description));
+            }
+        }
+        catch (Exception ex)
+        {
+            _passwordResetError = $"Hata: {ex.Message}";
+        }
+    }
+
+    private void ClosePasswordResetModal()
+    {
+        _newPassword = string.Empty;
+        _newPasswordConfirm = string.Empty;
+        _passwordResetError = string.Empty;
+        _passwordResetSuccess = false;
+        _modalDialogPasswordReset.Close();
+    }
+
+    // Email Onaylama
+    private async Task ConfirmEmailAsync()
+    {
+        _selectedUser.EmailConfirmed = true;
+        await _userManager.UpdateAsync(_selectedUser);
+        _modalDialogEmailConfirm.Close();
+        StateHasChanged();
+    }
+
+    private async Task UnconfirmEmailAsync()
+    {
+        _selectedUser.EmailConfirmed = false;
+        await _userManager.UpdateAsync(_selectedUser);
+        _modalDialogEmailConfirm.Close();
+        StateHasChanged();
+    }
+
+    // Personel Değiştirme
+    private async Task ChangeUserAndPersonelAsync(ApplicationUser user, Guid pId, Personel personel)
+    {
+        var inactivePersonel = _discardPersonels.FirstOrDefault(p => p.Id == pId);
+        if (inactivePersonel == null)
+        {
+            _modalDialogPersonelChange.Close();
+            StateHasChanged();
+            return;
+        }
+
+        inactivePersonel.DeletedDate = null;
+        inactivePersonel.UserId = user.Id;
+
+        personel.UserId = Guid.Empty;
+
+        user.PersonelId = inactivePersonel.Id;
+
+        await _personelService.UpdateAsync(inactivePersonel);
+        await _personelService.DeleteAsync(personel);
+        await _userManager.UpdateAsync(user);
+        await _userManager.AddToRoleAsync(user, "unauthorized");
+
+        await RefreshData();
+        _modalDialogPersonelChange.Close();
+    }
+
+    // Kullanıcı Silme
+    private async Task DeleteUserAsync(ApplicationUser user, Personel personel)
+    {
+        if (!_deleteConfirmation)
+            return;
+
+        personel.UserId = Guid.Empty;
+        personel.User = null;
+
+        if (_userRoles[user.Id].Contains("admin"))
+        {
+            _modalDialogDeleteUser.Close();
+            StateHasChanged();
+            return;
+        }
+
+        await _personelService.DeleteAsync(personel);
+        await _userManager.DeleteAsync(user);
+
+        await RefreshData();
+        CloseDeleteModal();
+    }
+
+    private void CloseDeleteModal()
+    {
+        _deleteConfirmation = false;
+        _modalDialogDeleteUser.Close();
+    }
+
+    private async Task CloseTeacherModal()
+    {
+        _modalDialogTeacherAdd.Close();
+        await RefreshData();
+    }
+}

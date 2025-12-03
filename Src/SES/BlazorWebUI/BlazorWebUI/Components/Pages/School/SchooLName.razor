@@ -10,68 +10,179 @@
 @using NArchitecture.Core.Application.Requests
 @using NArchitecture.Core.Application.Responses
 
+<PageTitle>Okul Yönetimi</PageTitle>
 
-<PageTitle>Okul Ekle</PageTitle>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-building me-2"></i>Okul Yönetimi
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Bilgilendirme:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Bu sayfa sadece yeni okul eklemek içindir</li>
+                            <li>Mevcut okul adları güncellenemez, sadece yeni ad eklenebilir</li>
+                            <li>Okul adları otomatik olarak büyük harfe çevrilir</li>
+                        </ul>
+                    </div>
 
-<h2>Okul Adı</h2>
-<h6>burası sadece okul adını düzenlemek için vardır</h6>
-<h6>okul adını güncelleyemez, sadece yeni okul adı eklenebilir</h6>
-<p></p>
+                    @if (_isSuccess)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle me-2"></i>
+                            <strong>Başarılı!</strong> Okul adı güncellendi: <strong class="text-uppercase">@_schoolNameForm.SchoolName</strong>
+                            <button type="button" class="btn-close" @onclick="() => _isSuccess = false"></button>
+                        </div>
+                    }
 
-<br />
+                    @if (_isLoading)
+                    {
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-info" role="status">
+                                <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                        </div>
+                    }
 
-<div class="input-group mb-3">
-    <EditForm method="post" OnValidSubmit="Submit" Model="_schoolNameForm" FormName="SchoolNameForm">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <AntiforgeryToken />
+                    <EditForm method="post" OnValidSubmit="Submit" Model="_schoolNameForm" FormName="SchoolNameForm">
+                        <DataAnnotationsValidator />
+                        <AntiforgeryToken />
 
-        <div class="input-group mb-3" style="width:35rem;">
-            <label class="input-group-text">Okul Adı: </label>
-            <InputText type="Text" class="form-control conversion" id="name" style="text-transform:uppercase" @bind-Value="_schoolNameForm.SchoolName" />
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-building me-1"></i>Okul Adı
+                                </label>
+                                <InputText type="text" class="form-control text-uppercase"
+                                           @bind-Value="_schoolNameForm.SchoolName"
+                                           placeholder="Okul adını giriniz..." />
+                                <div class="form-text">
+                                    <i class="bi bi-lightbulb me-1"></i>
+                                    Okul adı otomatik olarak büyük harfe çevrilecektir
+                                </div>
+                                <ValidationMessage For="@(() => _schoolNameForm.SchoolName)" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-person-badge me-1"></i>Müdür
+                                </label>
+                                <InputSelect class="form-select" @bind-Value="_schoolNameForm.PrincipalId">
+                                    <option value="0">Müdür seçiniz...</option>
+                                    @foreach (var principal in _principals.Items)
+                                    {
+                                        <option value="@principal.Id">
+                                            @principal.Name @principal.SurName
+                                        </option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => _schoolNameForm.PrincipalId)" />
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(_schoolNameForm.SchoolName))
+                            {
+                                <div class="col-12">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h6 class="card-title mb-2">
+                                                <i class="bi bi-eye me-1"></i>Önizleme
+                                            </h6>
+                                            <p class="mb-0 fs-5">
+                                                <strong class="text-uppercase">@_schoolNameForm.SchoolName</strong>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-secondary" @onclick="ResetForm">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>Sıfırla
+                            </button>
+                            <button type="submit" class="btn btn-info text-white" disabled="@(!CanSubmit())">
+                                <i class="bi bi-save me-1"></i>Kaydet
+                            </button>
+                        </div>
+
+                        <ValidationSummary class="mt-3" />
+                    </EditForm>
+                </div>
+            </div>
         </div>
 
-        <div class="input-group mb-3" style="width:35rem;">
-            <label class="input-group-text">Müdür: </label>
-            <InputSelect class="form-select" @bind-Value=_schoolNameForm.PrincipalId>
-                <option selected>Seçiniz...</option>
-                @foreach (GetListPrincipalListItemDto pricipal in _principals.Items)
-                {
-                    <option value="@pricipal.Id">@pricipal.Name @pricipal.SurName</option>
-                }
-            </InputSelect>
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history me-2"></i>Okul Geçmişi
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (!_previousSchoolNames.Items.Any())
+                    {
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                            <p class="mt-2">Henüz okul kaydı bulunmuyor</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group">
+                            @foreach (var school in _previousSchoolNames.Items)
+                            {
+                                var isLatest = school.Id == _previousSchoolNames.Items.Max(s => s.Id);
+                                <div class="list-group-item @(isLatest ? "active" : "")">
+                                    <div class="d-flex w-100 justify-content-between align-items-center">
+                                        <h6 class="mb-0 text-uppercase">@school.Name</h6>
+                                        @if (isLatest)
+                                        {
+                                            <span class="badge bg-light text-dark">
+                                                <i class="bi bi-star-fill"></i> Güncel
+                                            </span>
+                                        }
+                                    </div>
+                                    <small class="@(isLatest ? "text-white-50" : "text-muted")">
+                                        ID: @school.Id
+                                    </small>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
-
-        <div class="input-group-append">
-            <button type="submit" class="btn btn-primary">Kaydet</button>
-        </div>
-
-
-    </EditForm>
+    </div>
 </div>
 
-
-<h6>Okulun Önceki adları</h6>
-<ul class="list-group" style="width:35rem;">
-    @foreach (GetListSchoolListItemDto getListSchoolListItemDto in _previousSchoolNames.Items)
-    {
-        <li class="list-group-item list-group-item-action  @(_previousSchoolNames.Items.Select(psn=>psn.Id).Max() == getListSchoolListItemDto.Id ? "active" : "")">@getListSchoolListItemDto.Name</li>
-    }
-</ul>
-
-<ModalDialog @ref="_modalStatus" Title="Eklendi">
-    <div style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 0.25rem;">
-        <p>Okulun adı başarıyla güncellendi</p>
-        <p>Okulun şimdiki adı: <strong style="text-transform:uppercase">@_schoolNameForm.SchoolName.ToUpper()</strong> olarak güncellenmiştir.</p>
-
-        <button class="btn btn-primary" @onclick="() => _modalStatus.Close()">Kapat</button>
+<ModalDialog @ref="_modalStatus" Title="İşlem Başarılı">
+    <div class="text-center py-3">
+        <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+        <h5 class="mt-3">Okul Adı Güncellendi</h5>
+        <p class="text-muted">Okulun şimdiki adı:</p>
+        <p class="fs-4 mb-0">
+            <strong class="text-uppercase text-primary">@_schoolNameForm.SchoolName</strong>
+        </p>
+    </div>
+    <div class="d-flex justify-content-center gap-2 mt-3">
+        <button class="btn btn-primary" @onclick="CloseModalAndReset">
+            <i class="bi bi-plus-circle me-1"></i>Yeni Okul Ekle
+        </button>
+        <button class="btn btn-outline-primary" @onclick="() => _modalStatus.Close()">
+            Kapat
+        </button>
     </div>
 </ModalDialog>
 
 @inject IMediator _IMediator
 
 @code {
-
     [SupplyParameterFromForm]
     private SchoolNameForm _schoolNameForm { get; set; } = new();
 
@@ -79,20 +190,37 @@
     private GetListResponse<GetListPrincipalListItemDto> _principals = new();
 
     private ModalDialog _modalStatus { get; set; } = new();
+    private bool _isSuccess = false;
+    private bool _isLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
-        GetListSchoolQuery getListSchoolQuery = new();
-        getListSchoolQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
+        try
+        {
+            _isLoading = true;
 
-        var previousSchoolNamesRequest = await _IMediator.Send(getListSchoolQuery);
-        _previousSchoolNames = previousSchoolNamesRequest;
-        _previousSchoolNames.Items = _previousSchoolNames.Items.OrderByDescending(v => v.Id).ToList();
+            var schoolTask = _IMediator.Send(new GetListSchoolQuery
+            {
+                PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
+            });
 
+            var principalTask = _IMediator.Send(new GetListPrincipalQuery
+            {
+                PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
+            });
 
-        GetListPrincipalQuery getListPrincipalQuery = new();
-        getListPrincipalQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
-        _principals = await _IMediator.Send(getListPrincipalQuery);
+            await Task.WhenAll(schoolTask, principalTask);
+
+            _previousSchoolNames = await schoolTask;
+            _previousSchoolNames.Items = _previousSchoolNames.Items.OrderByDescending(v => v.Id).ToList();
+
+            _principals = await principalTask;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+
         await base.OnInitializedAsync();
     }
 
@@ -100,13 +228,62 @@
     {
         if (string.IsNullOrWhiteSpace(_schoolNameForm.SchoolName))
             return;
-        if (_previousSchoolNames.Items.Any(p => p.Name.Contains(_schoolNameForm.SchoolName)))
-            return;
 
-        CreateSchoolCommand command = new() { Name = _schoolNameForm.SchoolName.ToUpper(), PrincipalId = _schoolNameForm.PrincipalId };
-        CreatedSchoolResponse response = await _IMediator.Send(command);
-        _previousSchoolNames.Items.Add(new() { Id = response.Id, Name = response.Name });
-        _modalStatus.Open();
+        var upperSchoolName = _schoolNameForm.SchoolName.ToUpper();
+
+        if (_previousSchoolNames.Items.Any(p => p.Name.Equals(upperSchoolName, StringComparison.OrdinalIgnoreCase)))
+        {
+            Console.WriteLine("Bu okul adı zaten mevcut");
+            return;
+        }
+
+        try
+        {
+            _isLoading = true;
+
+            var command = new CreateSchoolCommand
+            {
+                Name = upperSchoolName,
+                PrincipalId = _schoolNameForm.PrincipalId
+            };
+
+            var response = await _IMediator.Send(command);
+
+            _previousSchoolNames.Items = _previousSchoolNames.Items.Prepend(new GetListSchoolListItemDto
+            {
+                Id = response.Id,
+                Name = response.Name
+            }).ToList();
+
+            _isSuccess = true;
+            _modalStatus.Open();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Okul ekleme hatası: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void ResetForm()
+    {
+        _schoolNameForm = new();
+    }
+
+    private void CloseModalAndReset()
+    {
+        _modalStatus.Close();
+        ResetForm();
+    }
+
+    private bool CanSubmit()
+    {
+        return !string.IsNullOrWhiteSpace(_schoolNameForm.SchoolName) &&
+               _schoolNameForm.PrincipalId > 0 &&
+               !_isLoading;
     }
 
     private class SchoolNameForm
@@ -114,5 +291,4 @@
         public string SchoolName { get; set; } = string.Empty;
         public int PrincipalId { get; set; }
     }
-
 }

@@ -1,8 +1,4 @@
-﻿@*
-    todo: CreateMultiStudentCommand needs reafator with PdfReaderService.GetAllClassesAndStudents method and this page working style.
-    Now working style is not good. All students and classes are displayed after being added to the database, and the deletion process is carried out.
-*@
-@page "/Auto/MSAdd"
+﻿@page "/Auto/MSAdd"
 @using Application.Features.Schools.Queries.GetList
 @using Application.Features.Semesters.Queries.GetList
 @using Application.Features.StudentClasses.Queries.GetList
@@ -16,191 +12,392 @@
 
 <PageTitle>Otomatik Öğrenci Ekle</PageTitle>
 
-<h1>Otomatik öğrenci ekleme</h1>
-<div class="mb-5" />
-<div class="input-group mb-3">
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-people-fill me-2"></i>Otomatik Öğrenci Ekleme
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Bilgilendirme:</strong> PDF dosyasından toplu öğrenci ekleme işlemi yapabilirsiniz.
+                        Eklenen öğrenciler tabloda gösterilecek ve gerekirse silebilirsiniz.
+                    </div>
 
-    <EditForm OnValidSubmit="AddAutoStudent" method="post" enctype="multipart/form-data" Model="_multiStudentDto" FormName="StudentMultiAdd">
+                    @if (_isSuccess)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle me-2"></i>
+                            <strong>Başarılı!</strong> @_createdMultiStudents.Count öğrenci başarıyla eklendi.
+                            <button type="button" class="btn-close" @onclick="() => _isSuccess = false"></button>
+                        </div>
+                    }
 
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <AntiforgeryToken />
+                    @if (_isLoading)
+                    {
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                                <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                            <p class="mt-3 text-muted">PDF işleniyor ve öğrenciler ekleniyor...</p>
+                        </div>
+                    }
 
-        <div class="input-group mb-3" style="width:15rem;">
-            <label class="input-group-text">Okul :</label>
-            <InputSelect class="form-select" id="schoolDD" @bind-Value="_multiStudentDto.SchoolId">
-                @foreach (GetListSchoolListItemDto school in _schoolListResponse.Items)
-                {
-                    <option value="@school.Id">@school.Name</option>
-                }
-            </InputSelect>
+                    <EditForm OnValidSubmit="AddAutoStudent" method="post" Model="_multiStudentDto" FormName="StudentMultiAdd">
+                        <DataAnnotationsValidator />
+                        <AntiforgeryToken />
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-building me-1"></i>Okul
+                                </label>
+                                <InputSelect class="form-select" @bind-Value="_multiStudentDto.SchoolId">
+                                    <option value="0">Okul seçiniz...</option>
+                                    @foreach (var school in _schoolListResponse.Items)
+                                    {
+                                        <option value="@school.Id">@school.Name</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => _multiStudentDto.SchoolId)" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-calendar-range me-1"></i>Dönem
+                                </label>
+                                <InputSelect class="form-select" @bind-Value="_multiStudentDto.SemesterId">
+                                    <option value="0">Dönem seçiniz...</option>
+                                    @foreach (var semester in _semesterResponse.Items)
+                                    {
+                                        <option value="@semester.Id">
+                                            @semester.Name (@semester.BeginSemesterDate.Year - @semester.EndSemesterDate.Year)
+                                        </option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => _multiStudentDto.SemesterId)" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-person me-1"></i>Öğretmen
+                                </label>
+                                <InputSelect class="form-select" @bind-Value="_multiStudentDto.TeacherId">
+                                    <option value="0">Öğretmen seçiniz...</option>
+                                    @foreach (var teacher in _teacherResponse.Items)
+                                    {
+                                        <option value="@teacher.Id">@teacher.Name @teacher.SurName</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => _multiStudentDto.TeacherId)" />
+                            </div>
+
+                            <div class="col-12">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <label class="form-label fw-semibold">
+                                            <i class="bi bi-file-pdf me-1"></i>Öğrenci Listesi (PDF)
+                                        </label>
+                                        <InputFile type="file" class="form-control" accept=".pdf" OnChange="FileToMemoryAsync" />
+                                        <div class="form-text">
+                                            <i class="bi bi-lightbulb me-1"></i>
+                                            Sadece PDF formatında dosya yükleyebilirsiniz. Dosya öğrenci bilgilerini içermelidir.
+                                        </div>
+                                        @if (_fileSize > 0)
+                                        {
+                                            <div class="mt-2">
+                                                <span class="badge bg-info">
+                                                    <i class="bi bi-file-earmark-check me-1"></i>
+                                                    Dosya yüklendi: @FormatFileSize(_fileSize)
+                                                </span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-secondary" @onclick="ResetForm">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>Sıfırla
+                            </button>
+                            <button type="submit" class="btn btn-primary" disabled="@(!CanSubmit())">
+                                <i class="bi bi-cloud-upload me-1"></i>Öğrencileri Yükle
+                            </button>
+                        </div>
+
+                        <ValidationSummary class="mt-3" />
+                    </EditForm>
+                </div>
+            </div>
+
+            @if (_createdMultiStudents.Count > 0)
+            {
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-success text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="bi bi-table me-2"></i>Eklenen Öğrenciler (@_createdMultiStudents.Count)
+                            </h5>
+                            <span class="badge bg-light text-dark">
+                                Toplam: @_createdMultiStudents.Count öğrenci
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Dikkat!</strong> Silme işlemi geri alınamaz. Silinen öğrenciler kalıcı olarak sistemden kaldırılır.
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 10%">
+                                            <i class="bi bi-hash"></i> No
+                                        </th>
+                                        <th style="width: 25%">
+                                            <i class="bi bi-person"></i> Ad
+                                        </th>
+                                        <th style="width: 25%">
+                                            <i class="bi bi-person"></i> Soyad
+                                        </th>
+                                        <th style="width: 15%">
+                                            <i class="bi bi-door-open"></i> Sınıf
+                                        </th>
+                                        <th style="width: 15%">
+                                            <i class="bi bi-gender-ambiguous"></i> Cinsiyet
+                                        </th>
+                                        <th style="width: 10%" class="text-center">
+                                            <i class="bi bi-gear"></i> İşlem
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var student in _createdMultiStudents)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <span class="badge bg-secondary">@student.SchoolNumber</span>
+                                            </td>
+                                            <td>@student.Name</td>
+                                            <td>@student.SurName</td>
+                                            <td>
+                                                <span class="badge bg-info">@student.ClassAge/@student.ClassBranch</span>
+                                            </td>
+                                            <td>
+                                                @if (student.Gender.Equals("Kız"))
+                                                {
+                                                    <span class="badge bg-pink">
+                                                        <i class="bi bi-gender-female"></i> Kız
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-primary">
+                                                        <i class="bi bi-gender-male"></i> Erkek
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-danger btn-sm"
+                                                        @onclick="() => DeleteStudent(student.Id)"
+                                                        title="Öğrenciyi sil">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                <small class="text-muted">
+                                    Toplam <strong>@_createdMultiStudents.Count</strong> öğrenci görüntüleniyor
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
-
-        <div class="input-group mb-3" style="width:15rem;">
-            <label class="input-group-text">Dönem :</label>
-            <InputSelect class="form-select" id="schoolSemester" @bind-Value="_multiStudentDto.SemesterId">
-                @foreach (GetListSemesterListItemDto semester in _semesterResponse.Items)
-                {
-                    <option value="@semester.Id">@semester.BeginSemesterDate @semester.EndSemesterDate @semester.Name</option>
-                }
-            </InputSelect>
-        </div>
-
-        <div class="input-group mb-3" style="width:15rem;">
-            <label class="input-group-text">Öğretmen :</label>
-            <InputSelect class="form-select" id="teacher" @bind-Value="_multiStudentDto.TeacherId">
-                @foreach (GetListTeacherListItemDto teacher in _teacherResponse.Items)
-                {
-                    <option value="@teacher.Id">@teacher.Name @teacher.SurName</option>
-                }
-            </InputSelect>
-        </div>
-
-        <div class="input-group mb-3" style="width:20rem;">
-            <label class="input-group-text">Öğrenci Dosyası :</label>
-            <InputFile type="file" name="FileFromPdf" class="form-control" accept=".pdf" OnChange="FileToMemoryAsync" />
-
-        </div>
-
-        <div class="mb-3">
-            <button type="submit" class="btn btn-primary text-lg-end">Kaydet</button>
-        </div>
-
-    </EditForm>
-
+    </div>
 </div>
 
-@if (_createdMultiStudents.Count > 0)
-{
-    <div class="container mt-4">
-
-        <h2> Eklenen Öğrenci Bilgileri Tablosu</h2>
-        <table class="table table-bordered table-striped">
-            <thead class="table-light">
-                <tr>
-                    <th>Öğrenci No</th>
-                    <th>Ad</th>
-                    <th>Soyad</th>
-                    <th>Sınıf</th>
-                    <th>Işlem</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (CreatedMultiStudentResponse st in _createdMultiStudents)
-                {
-                    <tr>
-                        <td>@st.SchoolNumber</td>
-                        <td>@st.Name</td>
-                        <td>@st.SurName</td>
-                        <td>@st.ClassAge/@st.ClassBranch</td>
-                        <td>
-                            <button class="btn btn-danger" @onclick="() => DeleteStudent(st.Id)">Sil</button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+<ModalDialog @ref="_modalStatus" Title="Öğrenciler Eklendi">
+    <div class="text-center py-3">
+        <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+        <h5 class="mt-3">Toplu Öğrenci Ekleme Başarılı</h5>
+        <p class="text-muted">Toplam <strong class="text-primary">@_createdMultiStudents.Count</strong> öğrenci sisteme eklendi.</p>
+        <div class="alert alert-warning mt-3" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Silinen öğrenciler sistemden geri döndürülemeyecek şekilde kalıcı olarak silinir.
+        </div>
     </div>
-}
-
-<ModalDialog @ref="_modalStatus" Title="Eklendi">
-    <div style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 0.25rem;">
-        <p>Öğrenciler başarıyla eklendi</p>
-        <p>Dikkat: Silinen öğrenciler sistemden geri döndürülemeyecek şekilde kalıcı olarak silinir.</p>
-        <button class="btn btn-primary" @onclick="() => _modalStatus.Close()">Kapat</button>
+    <div class="d-flex justify-content-center mt-3">
+        <button class="btn btn-primary" @onclick="() => _modalStatus.Close()">
+            <i class="bi bi-check-lg me-1"></i>Tamam
+        </button>
     </div>
 </ModalDialog>
-
 
 @inject IMediator _mediator
 
 @code {
     [SupplyParameterFromForm]
-    private MultiStudentDto _multiStudentDto { get; set; } = new()
-    { TeacherId = 0, SchoolId = 0, SemesterId = 0 };
+    private MultiStudentDto _multiStudentDto { get; set; } = new() { TeacherId = 0, SchoolId = 0, SemesterId = 0 };
 
     private byte[] _fileContent = Array.Empty<byte>();
+    private long _fileSize = 0;
 
-    GetListResponse<GetListSchoolListItemDto> _schoolListResponse = new();
-    GetListResponse<GetListSemesterListItemDto> _semesterResponse = new();
-    GetListResponse<GetListTeacherListItemDto> _teacherResponse = new();
-    GetListResponse<GetListStudentClassListItemDto> _studentClassResponse = new();
-    ICollection<CreatedMultiStudentResponse> _createdMultiStudents = [];
+    private GetListResponse<GetListSchoolListItemDto> _schoolListResponse = new();
+    private GetListResponse<GetListSemesterListItemDto> _semesterResponse = new();
+    private GetListResponse<GetListTeacherListItemDto> _teacherResponse = new();
+    private ICollection<CreatedMultiStudentResponse> _createdMultiStudents = new List<CreatedMultiStudentResponse>();
 
     private ModalDialog _modalStatus { get; set; } = new();
+    private bool _isSuccess = false;
+    private bool _isLoading = false;
 
-    private async Task DeleteStudent(int studentId)
-    {
-        await _mediator.Send(new DeleteStudentCommand { Id = studentId, PermanentDelete = true });
-
-        _createdMultiStudents = _createdMultiStudents.Where(st => st.Id != studentId).ToList();
-    }
     protected override async Task OnInitializedAsync()
     {
-        _schoolListResponse = await _mediator.Send(new GetListSchoolQuery()
+        try
         {
-            PageRequest = new()
-            {
-                PageIndex = 0,
-                PageSize = int.MaxValue
-            }
-        });
+            _isLoading = true;
 
-        _semesterResponse = await _mediator.Send(new GetListSemesterQuery()
-        {
-            PageRequest = new()
+            var schoolTask = _mediator.Send(new GetListSchoolQuery
             {
-                PageIndex = 0,
-                PageSize = int.MaxValue
-            }
-        });
+                PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
+            });
 
-        _teacherResponse = await _mediator.Send(new GetListTeacherQuery()
-        {
-            PageRequest = new()
+            var semesterTask = _mediator.Send(new GetListSemesterQuery
             {
-                PageIndex = 0,
-                PageSize = int.MaxValue
-            }
-        });
+                PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
+            });
 
-        _studentClassResponse = await _mediator.Send(new GetListStudentClassQuery()
-        {
-            PageRequest = new()
+            var teacherTask = _mediator.Send(new GetListTeacherQuery
             {
-                PageIndex = 0,
-                PageSize = int.MaxValue
-            }
-        });
+                PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
+            });
+
+            await Task.WhenAll(schoolTask, semesterTask, teacherTask);
+
+            _schoolListResponse = await schoolTask;
+            _semesterResponse = await semesterTask;
+            _teacherResponse = await teacherTask;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
 
         await base.OnInitializedAsync();
     }
 
-
     private async Task FileToMemoryAsync(InputFileChangeEventArgs e)
     {
-        IBrowserFile fileFromPdf = e.File;
+        var fileFromPdf = e.File;
         if (fileFromPdf.Size == 0)
             return;
 
-        using MemoryStream memoryStream = new();
-        await fileFromPdf.OpenReadStream().CopyToAsync(memoryStream);
-        _fileContent = memoryStream.ToArray();
+        try
+        {
+            const long maxFileSize = 10 * 1024 * 1024; // 10MB
+
+            if (fileFromPdf.Size > maxFileSize)
+            {
+                Console.WriteLine("Dosya çok büyük");
+                return;
+            }
+
+            using var memoryStream = new MemoryStream();
+            await fileFromPdf.OpenReadStream(maxFileSize).CopyToAsync(memoryStream);
+            _fileContent = memoryStream.ToArray();
+            _fileSize = fileFromPdf.Size;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Dosya yükleme hatası: {ex.Message}");
+        }
     }
 
     private async Task AddAutoStudent()
     {
-        CreateMultiStudentCommand createMultiStudentCommand = new()
+        try
         {
-            PdfFile = _fileContent,
-            RefTeacherId = _multiStudentDto.TeacherId,
-            SchoolId = _multiStudentDto.SchoolId,
-            SemesterId = _multiStudentDto.SemesterId,
-        };
+            _isLoading = true;
 
-        _createdMultiStudents = await _mediator.Send(createMultiStudentCommand);
+            var createMultiStudentCommand = new CreateMultiStudentCommand
+            {
+                PdfFile = _fileContent,
+                RefTeacherId = _multiStudentDto.TeacherId,
+                SchoolId = _multiStudentDto.SchoolId,
+                SemesterId = _multiStudentDto.SemesterId,
+            };
 
-        _modalStatus.Open();
+            _createdMultiStudents = await _mediator.Send(createMultiStudentCommand);
+            _isSuccess = true;
+            _modalStatus.Open();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Öğrenci ekleme hatası: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task DeleteStudent(int studentId)
+    {
+        try
+        {
+            await _mediator.Send(new DeleteStudentCommand { Id = studentId, PermanentDelete = true });
+            _createdMultiStudents = _createdMultiStudents.Where(st => st.Id != studentId).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Öğrenci silme hatası: {ex.Message}");
+        }
+    }
+
+    private void ResetForm()
+    {
+        _multiStudentDto = new() { TeacherId = 0, SchoolId = 0, SemesterId = 0 };
+        _fileContent = Array.Empty<byte>();
+        _fileSize = 0;
+        _createdMultiStudents.Clear();
+        _isSuccess = false;
+    }
+
+    private bool CanSubmit()
+    {
+        return _multiStudentDto.SchoolId > 0 &&
+               _multiStudentDto.SemesterId > 0 &&
+               _multiStudentDto.TeacherId > 0 &&
+               _fileContent.Length > 0 &&
+               !_isLoading;
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB" };
+        double len = bytes;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len = len / 1024;
+        }
+        return $"{len:0.##} {sizes[order]}";
     }
 
     private record MultiStudentDto

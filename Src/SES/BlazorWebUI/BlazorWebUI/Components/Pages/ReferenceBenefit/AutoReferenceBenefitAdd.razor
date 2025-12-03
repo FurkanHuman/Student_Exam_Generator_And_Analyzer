@@ -11,135 +11,306 @@
 @using static BlazorWebUI.Client.Pages.Styles.EditContentList
 @rendermode InteractiveServer
 
-<h3>Otomatik Kazanım Ekleyici</h3>
+<PageTitle>Otomatik Kazanım Ekleyici</PageTitle>
 
-<ModalDialog @ref="_modalDialog" Title="Başarılı bir şekilde eklendi">
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-file-earmark-plus me-2"></i>Otomatik Kazanım Ekleyici
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (_isSuccess)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle me-2"></i>
+                            <strong>Başarılı!</strong> Kazanımlar başarıyla eklendi.
+                            <button type="button" class="btn-close" @onclick="() => _isSuccess = false"></button>
+                        </div>
+                    }
 
-    <button class="btn btn-primary" @onclick="() => _modalDialog.Close()">Tamam</button>
-</ModalDialog>
+                    @if (_isLoading)
+                    {
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                            <p class="mt-3 text-muted">PDF işleniyor...</p>
+                        </div>
+                    }
 
-@if (_isSuccess)
-{
-    <br />
-    <div class="alert alert-success" role="alert">
-        Başarıyla eklendi!
-    </div>
-}
+                    <EditForm OnValidSubmit="AddAutoBenefit" Model="_autoBenefitDto">
+                        <DataAnnotationsValidator />
+                        <AntiforgeryToken />
 
-<EditForm OnValidSubmit="AddAutoBenefit" Model="_autoBenefitDto">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <AntiforgeryToken />
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-pencil me-1"></i>Yıllık Plan Adı
+                                </label>
+                                <InputText class="form-control" @bind-Value="_autoBenefitDto.Name"
+                                           placeholder="Yıllık plan adını giriniz" />
+                                <ValidationMessage For="@(() => _autoBenefitDto.Name)" />
+                            </div>
 
-    <div class="input-group mb-3" style="width:30rem;">
-        <label class="input-group-text">Yıllık Adı :</label>
-        <InputText type="text" class="form-control" @bind-Value="_autoBenefitDto.Name" />
-    </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-building me-1"></i>Okul
+                                </label>
+                                <InputSelect class="form-select" @bind-Value="_autoBenefitDto.SchoolId">
+                                    <option value="0">Okul seçiniz...</option>
+                                    @foreach (var school in _schoolResponse.Items)
+                                    {
+                                        <option value="@school.Id">@school.Name</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => _autoBenefitDto.SchoolId)" />
+                            </div>
 
-    <div class="input-group mb-3" style="width:30rem;">
-        <label class="input-group-text">Okul :</label>
-        <InputSelect class="form-select" @bind-Value="_autoBenefitDto.SchoolId">
-            @foreach (GetListSchoolListItemDto school in _schoolResponse.Items)
-            {
-                <option value="@school.Id">@school.Name</option>
-            }
-        </InputSelect>
-    </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-calendar-range me-1"></i>Dönem
+                                </label>
+                                <InputSelect class="form-select" @bind-Value="_autoBenefitDto.SemesterId">
+                                    <option value="0">Dönem seçiniz...</option>
+                                    @foreach (var semester in _semesterResponse.Items)
+                                    {
+                                        <option value="@semester.Id">
+                                            @semester.Name (@semester.BeginSemesterDate.Year - @semester.EndSemesterDate.Year)
+                                        </option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => _autoBenefitDto.SemesterId)" />
+                            </div>
 
-    <div class="input-group mb-3" style="width:30rem;">
-        <label class="input-group-text">Yıllık Dönemi :</label>
-        <InputSelect class="form-select" @bind-Value="_autoBenefitDto.SemesterId">
-            @foreach (GetListSemesterListItemDto semester in _semesterResponse.Items)
-            {
-                <option value="@semester.Id">@semester.BeginSemesterDate @semester.EndSemesterDate @semester.Name</option>
-            }
-        </InputSelect>
-    </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-book me-1"></i>Ders
+                                </label>
+                                <InputSelect class="form-select" @bind-Value="_autoBenefitDto.LessonId">
+                                    <option value="0">Ders seçiniz...</option>
+                                    @foreach (var lesson in _lessonResponse.Items)
+                                    {
+                                        <option value="@lesson.Id">
+                                            @lesson.LessonName - @GetSemesterByIdToString(lesson.SemesterId)
+                                        </option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => _autoBenefitDto.LessonId)" />
+                            </div>
 
-    <div class="input-group mb-3" style="width:30rem;">
-        <label class="input-group-text">Yıllık Dönem Dersi :</label>
-        <InputSelect class="form-select" @bind-Value="_autoBenefitDto.LessonId">
-            @foreach (GetListLessonListItemDto lesson in _lessonResponse.Items)
-            {
-                <option value="@lesson.Id">  @lesson.LessonName @GetSemesterByIdTosString(lesson.SemesterId) </option>
-            }
-        </InputSelect>
-    </div>
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <label class="form-label fw-semibold mb-0">
+                                                <i class="bi bi-file-pdf me-1"></i>Yıllık Plan Dosyası
+                                            </label>
+                                            <div class="form-check form-switch">
+                                                <InputCheckbox class="form-check-input" @bind-Value="_isManualEntry" id="manualEntrySwitch" />
+                                                <label class="form-check-label" for="manualEntrySwitch">Elle Giriş</label>
+                                            </div>
+                                        </div>
 
-    <div class="input-group mb-3" style="width:30rem;">
-        <label class="input-group-text">Yıllık plan Dosyası :</label>
-        <InputFile type="file" name="FileFromPdf" class="form-control" accept=".pdf" OnChange="HandleFileSelected" disabled="@_isChecked" />
+                                        @if (!_isManualEntry)
+                                        {
+                                            <InputFile class="form-control" accept=".pdf" OnChange="HandleFileSelected" />
+                                            <div class="form-text">
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                Sadece PDF formatında dosya yükleyebilirsiniz.
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="card border-primary">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">
+                                                        <i class="bi bi-keyboard me-2"></i>Manuel Veri Girişi
+                                                    </h6>
+                                                    <p class="card-text text-muted small mb-3">
+                                                        Her satıra bir öğe gelecek şekilde, her kategori için verileri aşağıya yapıştırın veya yazın.
+                                                    </p>
 
-        <InputCheckbox class="form-check" @bind-Value="_isChecked" style="width:5rem;" />
-        <label class="form-check-label">Elle Giriş</label>
-    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-semibold">
+                                                            <i class="bi bi-folder me-1"></i>Öğrenme Alanları
+                                                        </label>
+                                                        <textarea class="form-control font-monospace"
+                                                                  rows="6"
+                                                                  @bind="_manualLearningAreasText"
+                                                                  placeholder="Her satıra bir öğrenme alanı yazın (Kod ve açıklama)"></textarea>
+                                                        <div class="form-text">
+                                                            <i class="bi bi-lightbulb me-1"></i>
+                                                            <strong>Format:</strong> MAT.1.01. MATEMATİK |
+                                                            <strong>Enter</strong> ile yeni satır ekleyin
+                                                        </div>
+                                                    </div>
 
-    <div class="mb-3">
-        <button type="submit" class="btn btn-primary text-lg-end" disabled="@(!(_isBenefitsOk && _isSubLearningOk && _isLearningOk))">Kaydet</button>
-    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-semibold">
+                                                            <i class="bi bi-folder2-open me-1"></i>Alt Öğrenme Alanları
+                                                        </label>
+                                                        <textarea class="form-control font-monospace"
+                                                                  rows="6"
+                                                                  @bind="_manualSubLearningAreasText"
+                                                                  placeholder="Her satıra bir alt öğrenme alanı yazın (Kod - Açıklama)"></textarea>
+                                                        <div class="form-text">
+                                                            <i class="bi bi-lightbulb me-1"></i>
+                                                            <strong>Format:</strong> MAT.1.01.001 - Sayılar ve İşlemler |
+                                                            <strong>Enter</strong> ile yeni satır ekleyin
+                                                        </div>
+                                                    </div>
 
-</EditForm>
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-semibold">
+                                                            <i class="bi bi-star me-1"></i>Kazanımlar
+                                                        </label>
+                                                        <textarea class="form-control font-monospace"
+                                                                  rows="8"
+                                                                  @bind="_manualBenefitsText"
+                                                                  placeholder="Her satıra bir kazanım yazın (Kod. Açıklama.)"></textarea>
+                                                        <div class="form-text">
+                                                            <i class="bi bi-lightbulb me-1"></i>
+                                                            <strong>Format:</strong> MAT.1.01.001.0001. Sayıları okur ve yazar. |
+                                                            <strong>Enter</strong> ile yeni satır ekleyin
+                                                        </div>
+                                                    </div>
 
-<br />
+                                                    <button type="button" class="btn btn-primary w-100" @onclick="ProcessManualEntry">
+                                                        <i class="bi bi-check-circle me-2"></i>Manuel Verileri İşle
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
+                        @if (HasExtractedData())
+                        {
+                            <div class="mt-4">
+                                <div class="card border-info">
+                                    <div class="card-header bg-info bg-opacity-10">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0">
+                                                <i class="bi bi-eye me-2"></i>Çıkarılan Veriler
+                                            </h5>
+                                            <button type="button" class="btn btn-sm btn-outline-info" @onclick="TogglePreview">
+                                                @(_showPreview ? "Gizle" : "Göster")
+                                                <i class="bi @(_showPreview ? "bi-chevron-up" : "bi-chevron-down") ms-1"></i>
+                                            </button>
+                                        </div>
+                                    </div>
 
-<div>
-    <div class="btn btn-outline-info" @onclick="Toggle">
-        @(_isOpen ? "Kapat" : "Aç")
-    </div>
-    @*
-        Todo: üç farklı gösterriş biçimi. düz metin yapıştırma ve düzenleme yapılacak. textboxarea ile yapılması uygundur bu olması gerekir kesin. 
-        ağaç tasarım da olacak: konu, alt konu, kazanım. kendi kod kategorilerinde olamsı planlanmıştır.
-    *@
+                                    @if (_showPreview)
+                                    {
+                                        <div class="card-body">
+                                            <ul class="nav nav-tabs mb-3" role="tablist">
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link @(_activeTab == "learning" ? "active" : "")"
+                                                            @onclick="@(() => SetActiveTab("learning"))" type="button">
+                                                        <i class="bi bi-folder me-1"></i>
+                                                        Öğrenme Alanları (@_editContentLearning.Count)
+                                                    </button>
+                                                </li>
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link @(_activeTab == "sublearning" ? "active" : "")"
+                                                            @onclick="@(() => SetActiveTab("sublearning"))" type="button">
+                                                        <i class="bi bi-folder2-open me-1"></i>
+                                                        Alt Öğrenme Alanları (@_editContentSubLearning.Count)
+                                                    </button>
+                                                </li>
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link @(_activeTab == "benefits" ? "active" : "")"
+                                                            @onclick="@(() => SetActiveTab("benefits"))" type="button">
+                                                        <i class="bi bi-star me-1"></i>
+                                                        Kazanımlar (@_editContentBenefits.Count)
+                                                    </button>
+                                                </li>
+                                            </ul>
 
-    <div>
-        @if (_isOpen)
-        {
-            <h4>Başlıklar</h4>
-            <hr />
-            <EditContentList EditContents="_editContentLearning" />
-            <hr />
+                                            <div class="tab-content">
+                                                @if (_activeTab == "learning")
+                                                {
+                                                    <div class="mb-3">
+                                                        <EditContentList EditContents="_editContentLearning" />
+                                                        <div class="form-check mt-3">
+                                                            <InputCheckbox class="form-check-input" @bind-Value="_isLearningOk" id="learningCheck" />
+                                                            <label class="form-check-label" for="learningCheck">
+                                                                Öğrenme alanlarının doğruluğunu onaylıyorum
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                }
 
-            <div class="input-group mb-3" style="width:30rem;">
-                <label class="form-check-label">Başlıkların Doğru Olduğunu Onaylıyorum</label>
-                <InputCheckbox class="form-check" @bind-Value="_isLearningOk" style="width:5rem;" />
+                                                @if (_activeTab == "sublearning")
+                                                {
+                                                    <div class="mb-3">
+                                                        <EditContentList EditContents="_editContentSubLearning" />
+                                                        <div class="form-check mt-3">
+                                                            <InputCheckbox class="form-check-input" @bind-Value="_isSubLearningOk" id="sublearningCheck" />
+                                                            <label class="form-check-label" for="sublearningCheck">
+                                                                Alt öğrenme alanlarının doğruluğunu onaylıyorum
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                                @if (_activeTab == "benefits")
+                                                {
+                                                    <div class="mb-3">
+                                                        <EditContentList EditContents="_editContentBenefits" />
+                                                        <div class="form-check mt-3">
+                                                            <InputCheckbox class="form-check-input" @bind-Value="_isBenefitsOk" id="benefitsCheck" />
+                                                            <label class="form-check-label" for="benefitsCheck">
+                                                                Kazanımların doğruluğunu onaylıyorum
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <div class="alert alert-warning" role="alert">
+                                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                                Tüm sekmelerdeki verileri kontrol edip onayladığınızdan emin olun.
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-secondary" @onclick="ResetForm">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>Sıfırla
+                            </button>
+                            <button type="submit" class="btn btn-primary" disabled="@(!CanSubmit())">
+                                <i class="bi bi-save me-1"></i>Kaydet
+                            </button>
+                        </div>
+
+                        <ValidationSummary class="mt-3" />
+                    </EditForm>
+                </div>
             </div>
-
-            <h4>Alt Başlıklar</h4>
-            <hr />
-            <EditContentList EditContents="_editContentSubLearning" />
-            <hr>
-
-            <div class="input-group mb-3" style="width:30rem;">
-                <label class="form-check-label">Alt Başlıkların Doğru Olduğunu Onaylıyorum</label>
-                <InputCheckbox class="form-check" @bind-Value="_isSubLearningOk" style="width:5rem;" />
-            </div>
-
-
-            <h4>Kazanımlar</h4>
-            <hr />
-            <EditContentList EditContents="_editContentBenefits" />
-            <hr>
-
-            <div class="input-group mb-3" style="width:30rem;">
-                <label class="form-check-label"> Kazanımların Doğru Olduğunu Onaylıyorum</label>
-                <InputCheckbox class="form-check" @bind-Value="_isBenefitsOk" style="width:5rem;" />
-            </div>
-
-        }
-        else
-        {
-            <span>Açmak için Dokunun</span>
-        }
+        </div>
     </div>
-
-    @*
-    <div>
-        <InputTextArea />
-    </div>
-*@
-
 </div>
+
+<ModalDialog @ref="_modalDialog" Title="İşlem Başarılı">
+    <div class="text-center py-3">
+        <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+        <p class="mt-3 mb-0">Kazanımlar başarıyla eklendi!</p>
+    </div>
+    <div class="d-flex justify-content-center gap-2 mt-3">
+        <button class="btn btn-primary" @onclick="() => _modalDialog.Close()">Tamam</button>
+        <button class="btn btn-outline-primary" @onclick="ResetAndClose">Yeni Ekleme Yap</button>
+    </div>
+</ModalDialog>
 
 @inject IPdfReaderService _pdfReaderService
 @inject IMediator _mediator
@@ -149,150 +320,277 @@
     [SupplyParameterFromForm]
     private RefBenDto _autoBenefitDto { get; set; } = new();
 
-    GetListResponse<GetListLessonListItemDto> _lessonResponse = new();
-    GetListResponse<GetListSchoolListItemDto> _schoolResponse = new();
-    GetListResponse<GetListSemesterListItemDto> _semesterResponse = new();
-    private string _editContentPlainText { get; set; } = string.Empty;
+    private GetListResponse<GetListLessonListItemDto> _lessonResponse = new();
+    private GetListResponse<GetListSchoolListItemDto> _schoolResponse = new();
+    private GetListResponse<GetListSemesterListItemDto> _semesterResponse = new();
 
-    ModalDialog _modalDialog { get; set; } = new();
+    private ModalDialog _modalDialog = new();
 
-    private List<EditContent> GetAllEditContents()
-    {
-        List<EditContent> allEditContents = [];
-        allEditContents.AddRange(_editContentBenefits);
-        allEditContents.AddRange(_editContentSubLearning);
-        allEditContents.AddRange(_editContentLearning);
-        return allEditContents;
-    }
+    private List<EditContent> _editContentBenefits = new();
+    private List<EditContent> _editContentSubLearning = new();
+    private List<EditContent> _editContentLearning = new();
 
-    List<EditContent> _editContentBenefits = new();
-    List<EditContent> _editContentSubLearning = new();
-    List<EditContent> _editContentLearning = new();
+    private string _manualLearningAreasText = string.Empty;
+    private string _manualSubLearningAreasText = string.Empty;
+    private string _manualBenefitsText = string.Empty;
 
     private byte[] _fileContent = Array.Empty<byte>();
 
     private bool _isSuccess = false;
-
-    private bool _isOpen = false;
-
+    private bool _isLoading = false;
+    private bool _showPreview = false;
     private bool _isBenefitsOk = false;
     private bool _isSubLearningOk = false;
     private bool _isLearningOk = false;
-
-    private bool _isChecked { get; set; } = false;
+    private bool _isManualEntry = false;
+    private string _activeTab = "learning";
 
     protected override async Task OnInitializedAsync()
     {
-        _lessonResponse = await _mediator.Send(new GetListLessonQuery()
+        try
+        {
+            _isLoading = true;
+
+            var lessonTask = _mediator.Send(new GetListLessonQuery
             {
-                PageRequest = new()
-                {
-                    PageIndex = 0,
-                    PageSize = int.MaxValue
-                }
+                PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
             });
 
-        _schoolResponse = await _mediator.Send(new GetListSchoolQuery()
+            var schoolTask = _mediator.Send(new GetListSchoolQuery
             {
-                PageRequest = new()
-                {
-                    PageIndex = 0,
-                    PageSize = int.MaxValue
-                }
+                PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
             });
 
-        _semesterResponse = await _mediator.Send(new GetListSemesterQuery()
+            var semesterTask = _mediator.Send(new GetListSemesterQuery
             {
-                PageRequest = new()
-                {
-                    PageIndex = 0,
-                    PageSize = int.MaxValue
-                }
+                PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
             });
+
+            await Task.WhenAll(lessonTask, schoolTask, semesterTask);
+
+            _lessonResponse = await lessonTask;
+            _schoolResponse = await schoolTask;
+            _semesterResponse = await semesterTask;
+        }
+        catch (Exception ex)
+        {
+            // Log error
+            Console.WriteLine($"Initialization error: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+
         await base.OnInitializedAsync();
     }
 
     private async Task AddAutoBenefit()
     {
-        List<string> lines = [];
+        try
+        {
+            _isLoading = true;
 
-        lines.AddRange(_editContentBenefits.Select(benefit => benefit.Current).Distinct());
-        lines.AddRange(_editContentSubLearning.Select(subLearning => subLearning.Current).Distinct());
-        lines.AddRange(_editContentLearning.Select(learning => learning.Current).Distinct());
+            var lines = new List<string>();
+            lines.AddRange(_editContentLearning.Select(l => l.Current).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct());
+            lines.AddRange(_editContentSubLearning.Select(sl => sl.Current).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct());
+            lines.AddRange(_editContentBenefits.Select(b => b.Current).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct());
 
-        ReferenceBenefitDto referenceBenefitDto = _pdfReaderService.ProcessReferenceBenefit(lines);
+            var referenceBenefitDto = _pdfReaderService.ProcessReferenceBenefit(lines);
+            referenceBenefitDto.RBName = _autoBenefitDto.Name;
+            referenceBenefitDto.LessonId = _autoBenefitDto.LessonId;
+            referenceBenefitDto.SemesterId = _autoBenefitDto.SemesterId;
+            referenceBenefitDto.SchoolId = _autoBenefitDto.SchoolId;
 
-        referenceBenefitDto.RBName = _autoBenefitDto.Name;
-        referenceBenefitDto.LessonId = _autoBenefitDto.LessonId;
-        referenceBenefitDto.SemesterId = _autoBenefitDto.SemesterId;
-        referenceBenefitDto.SchoolId = _autoBenefitDto.SchoolId;
-
-        await _mediator.Send(new CreateReferenceBenefitCommand
+            await _mediator.Send(new CreateReferenceBenefitCommand
             {
                 ReferenceBenefitDto = referenceBenefitDto
             });
 
-        DisplaySuccessMessage();
-        lines.Clear();
-        _autoBenefitDto.Name = string.Empty;
+            _isSuccess = true;
+            _modalDialog.Open();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Add benefit error: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
     }
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
-        IBrowserFile file = e.File;
-        if (file == null)
-            return;
+        var file = e.File;
+        if (file == null) return;
 
-        using MemoryStream memoryStream = new();
-
-        await file.OpenReadStream().CopyToAsync(memoryStream);
-        _fileContent = memoryStream.ToArray();
-        ICollection<RawBenefitReferenceDto> rawRefBenefits = await _pdfReaderService.GetAllReferenceBenefitsWithAltersDtos(_fileContent);
-        foreach (RawBenefitReferenceDto rawBenefit in rawRefBenefits)
+        try
         {
-            if (rawBenefit.Benefits != null)
-                _editContentBenefits.AddRange(rawBenefit.Benefits.Select(benefit => new EditContent { Current = benefit }));
+            _isLoading = true;
+            const long maxFileSize = 10 * 1024 * 1024; // 10MB
 
-            if (rawBenefit.SubLearningAreas != null)
-                _editContentSubLearning.AddRange(rawBenefit.SubLearningAreas.Select(subLearning => new EditContent { Current = subLearning }));
+            if (file.Size > maxFileSize)
+            {
+                Console.WriteLine("File too large");
+                return;
+            }
 
-            if (rawBenefit.LearningAreas != null)
-                _editContentLearning.AddRange(rawBenefit.LearningAreas.Select(learning => new EditContent { Current = learning }));
+            using var memoryStream = new MemoryStream();
+            await file.OpenReadStream(maxFileSize).CopyToAsync(memoryStream);
+            _fileContent = memoryStream.ToArray();
+
+            var rawRefBenefits = await _pdfReaderService.GetAllReferenceBenefitsWithAltersDtos(_fileContent);
+
+            ClearExtractedData();
+
+            foreach (var rawBenefit in rawRefBenefits)
+            {
+                if (rawBenefit.Benefits != null)
+                    _editContentBenefits.AddRange(rawBenefit.Benefits.Select(b => new EditContent { Current = b }));
+
+                if (rawBenefit.SubLearningAreas != null)
+                    _editContentSubLearning.AddRange(rawBenefit.SubLearningAreas.Select(sl => new EditContent { Current = sl }));
+
+                if (rawBenefit.LearningAreas != null)
+                    _editContentLearning.AddRange(rawBenefit.LearningAreas.Select(l => new EditContent { Current = l }));
+            }
+
+            _showPreview = true;
         }
-        _isOpen = true;
+        catch (Exception ex)
+        {
+            Console.WriteLine($"File processing error: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
     }
 
-    private void DisplaySuccessMessage()
+    private void OpenManualEntry()
     {
-        _modalDialog.Open();
+        _showPreview = true;
+    }
+
+    private void ProcessManualEntry()
+    {
+        try
+        {
+            ClearExtractedData();
+
+            // Öğrenme Alanlarını işle
+            if (!string.IsNullOrWhiteSpace(_manualLearningAreasText))
+            {
+                var learningLines = _manualLearningAreasText
+                    .Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(line => line.Trim())
+                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                    .Distinct();
+
+                _editContentLearning.AddRange(learningLines.Select(line => new EditContent { Current = line }));
+            }
+
+            // Alt Öğrenme Alanlarını işle
+            if (!string.IsNullOrWhiteSpace(_manualSubLearningAreasText))
+            {
+                var subLearningLines = _manualSubLearningAreasText
+                    .Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(line => line.Trim())
+                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                    .Distinct();
+
+                _editContentSubLearning.AddRange(subLearningLines.Select(line => new EditContent { Current = line }));
+            }
+
+            // Kazanımları işle
+            if (!string.IsNullOrWhiteSpace(_manualBenefitsText))
+            {
+                var benefitLines = _manualBenefitsText
+                    .Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(line => line.Trim())
+                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                    .Distinct();
+
+                _editContentBenefits.AddRange(benefitLines.Select(line => new EditContent { Current = line }));
+            }
+
+            if (HasExtractedData())
+            {
+                _showPreview = true;
+                // Başarı mesajı için state güncelle
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Manual entry processing error: {ex.Message}");
+        }
+    }
+
+    private void TogglePreview()
+    {
+        _showPreview = !_showPreview;
+    }
+
+    private bool HasExtractedData()
+    {
+        return _editContentBenefits.Count > 0 ||
+               _editContentSubLearning.Count > 0 ||
+               _editContentLearning.Count > 0;
+    }
+
+    private bool CanSubmit()
+    {
+        return !string.IsNullOrWhiteSpace(_autoBenefitDto.Name) &&
+               _autoBenefitDto.SchoolId > 0 &&
+               _autoBenefitDto.SemesterId > 0 &&
+               _autoBenefitDto.LessonId > 0 &&
+               _isBenefitsOk &&
+               _isSubLearningOk &&
+               _isLearningOk &&
+               HasExtractedData();
+    }
+
+    private void ResetForm()
+    {
+        _autoBenefitDto = new();
+        ClearExtractedData();
+        _isSuccess = false;
+        _showPreview = false;
+        _isBenefitsOk = false;
+        _isSubLearningOk = false;
+        _isLearningOk = false;
+        _fileContent = Array.Empty<byte>();
+        _manualLearningAreasText = string.Empty;
+        _manualSubLearningAreasText = string.Empty;
+        _manualBenefitsText = string.Empty;
+    }
+
+    private void ClearExtractedData()
+    {
         _editContentBenefits.Clear();
         _editContentSubLearning.Clear();
         _editContentLearning.Clear();
     }
 
-    private void Toggle(MouseEventArgs e)
+    private void ResetAndClose()
     {
-        _isOpen = !_isOpen;
+        _modalDialog.Close();
+        ResetForm();
     }
 
-    private void OnCheckboxChanged(ChangeEventArgs e)
+    private void SetActiveTab(string tabName)
     {
-        if (e.Value == null)
-            return;
-
-        _isChecked = (bool)e.Value;
+        _activeTab = tabName;
     }
 
-    private string GetSemesterByIdTosString(int id)
+    private string GetSemesterByIdToString(int id)
     {
-        GetListSemesterListItemDto s = _semesterResponse.Items.First(x => x.Id == id);
-        return $"{s.BeginSemesterDate.Year} - {s.EndSemesterDate.Year} {s.Name}";
-    }
-
-    private void OnEditContentChanged(ChangeEventArgs e)
-    {
-
-
+        var semester = _semesterResponse.Items.FirstOrDefault(x => x.Id == id);
+        return semester != null
+            ? $"{semester.BeginSemesterDate.Year} - {semester.EndSemesterDate.Year} {semester.Name}"
+            : string.Empty;
     }
 
     private class RefBenDto

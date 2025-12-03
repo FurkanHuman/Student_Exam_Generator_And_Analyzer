@@ -10,54 +10,161 @@
 @using Domain.Entities
 @using Domain.Enums
 
-<PageTitle> Müdür ayarla </PageTitle>
+<PageTitle>Müdür Ata</PageTitle>
 
 <AuthorizeView Context="RegisterContext">
     <Authorized>
-        <PageTitle> Müdür ayarla </PageTitle>
+        <div class="container-fluid py-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h3 class="mb-0">
+                                <i class="bi bi-person-badge me-2"></i>Müdür Atama
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning" role="alert">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <strong>Dikkat!</strong> Bu işlem personele müdür yetkisi verecektir.
+                            </div>
 
-        <h3>Müdür Ayarla</h3>
-        <h1>Dikkat</h1>
-        <br />
+                            @if (_isSuccess)
+                            {
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    <strong>Başarılı!</strong> Müdür başarıyla atandı.
+                                    <button type="button" class="btn-close" @onclick="() => _isSuccess = false"></button>
+                                </div>
+                            }
 
-        <div class="mb-3" style="width:25rem;">
+                            @if (_isLoading)
+                            {
+                                <div class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Yükleniyor...</span>
+                                    </div>
+                                    <p class="mt-3 text-muted">İşlem devam ediyor...</p>
+                                </div>
+                            }
 
-            <EditForm method="post" OnValidSubmit="Submit" Model="_PrincipalSetDto" FormName="PrincipalSetForm">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <AntiforgeryToken />
+                            <EditForm method="post" OnValidSubmit="Submit" Model="_PrincipalSetDto" FormName="PrincipalSetForm">
+                                <DataAnnotationsValidator />
+                                <AntiforgeryToken />
 
-                <div class="input-group mb-3" style="width:15rem;">
-                    <label class="input-group-text">Dönem Seçiniz:</label>
-                    <InputSelect class="form-select" id="principalSG" @bind-Value="_PrincipalSetDto.SemesterId">
-                        <option selected>Seçiniz...</option>
-                        @foreach (GetListSemesterListItemDto? semester in _semesterList.Items)
-                        {
-                            <option value="@semester.Id">@semester.BeginSemesterDate @semester.EndSemesterDate @semester.Name </option>
-                        }
-                    </InputSelect>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+                                            <i class="bi bi-calendar-range me-1"></i>Dönem
+                                        </label>
+                                        <InputSelect class="form-select" @bind-Value="_PrincipalSetDto.SemesterId">
+                                            <option value="0">Dönem seçiniz...</option>
+                                            @foreach (var semester in _semesterList.Items)
+                                            {
+                                                <option value="@semester.Id">
+                                                    @semester.Name (@semester.BeginSemesterDate.Year - @semester.EndSemesterDate.Year)
+                                                </option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => _PrincipalSetDto.SemesterId)" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+                                            <i class="bi bi-person me-1"></i>Müdür
+                                        </label>
+                                        <InputSelect class="form-select" @bind-Value="_PrincipalSetDto.PersonelId">
+                                            <option value="@Guid.Empty">Personel seçiniz...</option>
+                                            @foreach (var personel in _personelList.Items)
+                                            {
+                                                <option value="@personel.Id">
+                                                    @personel.Name @personel.SurName (@personel.BirthDate.ToString("dd/MM/yyyy"))
+                                                </option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => _PrincipalSetDto.PersonelId)" />
+                                    </div>
+
+                                    @if (_selectedPersonel != null)
+                                    {
+                                        <div class="col-12">
+                                            <div class="card bg-light">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">
+                                                        <i class="bi bi-info-circle me-1"></i>Seçilen Personel Bilgileri
+                                                    </h6>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <p class="mb-1"><strong>Ad Soyad:</strong> @_selectedPersonel.Name @_selectedPersonel.SurName</p>
+                                                            <p class="mb-0"><strong>Doğum Tarihi:</strong> @_selectedPersonel.BirthDate.ToString("dd/MM/yyyy")</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="d-flex justify-content-end gap-2 mt-4">
+                                    <button type="button" class="btn btn-secondary" @onclick="ResetForm">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i>Sıfırla
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" disabled="@(!CanSubmit())">
+                                        <i class="bi bi-person-check me-1"></i>Müdür Ata
+                                    </button>
+                                </div>
+
+                                <ValidationSummary class="mt-3" />
+                            </EditForm>
+                        </div>
+                    </div>
+
+                    @if (_recentPrincipals.Any())
+                    {
+                        <div class="card shadow-sm mt-4">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-clock-history me-2"></i>Son Atanan Müdürler
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Dönem</th>
+                                                <th>Ad Soyad</th>
+                                                <th>Atama Tarihi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var principal in _recentPrincipals.Take(5))
+                                            {
+                                                <tr>
+                                                    <td>@principal.SemesterName</td>
+                                                    <td>@principal.PersonelName</td>
+                                                    <td>@principal.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
-
-                <div class="input-group mb-3" style="width:15rem;">
-                    <label class="input-group-text">Müdür Seçiniz:</label>
-                    <InputSelect class="form-select" id="principalSG" @bind-Value="_PrincipalSetDto.PersonelId">
-                        <option selected>Seçiniz...</option>
-                        @foreach (GetListPersonelListItemDto? personel in _personelList.Items)
-                        {
-                            <option value="@personel.Id">@personel.Name @personel.SurName @personel.BirthDate</option>
-                        }
-                    </InputSelect>
-                </div>
-
-                <div class="mb-3">
-                    <button type="submit" class="btn btn-primary text-lg-end">Ayarla</button>
-                </div>
-            </EditForm>
-
+            </div>
         </div>
     </Authorized>
+    <NotAuthorized>
+        <div class="container py-5">
+            <div class="alert alert-danger" role="alert">
+                <i class="bi bi-shield-exclamation me-2"></i>
+                Bu sayfaya erişim yetkiniz bulunmamaktadır.
+            </div>
+        </div>
+    </NotAuthorized>
 </AuthorizeView>
-
 
 @inject IMediator _IMediatr
 @inject IPersonelService _PersonelService
@@ -69,47 +176,130 @@
 
     private GetListResponse<GetListSemesterListItemDto> _semesterList = new();
     private GetListResponse<GetListPersonelListItemDto> _personelList = new();
+    private List<RecentPrincipalDto> _recentPrincipals = new();
+
+    private GetListPersonelListItemDto? _selectedPersonel;
+    private bool _isSuccess = false;
+    private bool _isLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
-        GetListSemesterQuery getListSemesterQuery = new();
-        getListSemesterQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
-        _semesterList = await _IMediatr.Send(getListSemesterQuery);
+        try
+        {
+            _isLoading = true;
 
-        GetListPersonelQuery getListPersonelQuery = new();
-        getListPersonelQuery.PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue };
-        _personelList = await _IMediatr.Send(getListPersonelQuery);
+            var semesterTask = _IMediatr.Send(new GetListSemesterQuery
+            {
+                PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
+            });
+
+            var personelTask = _IMediatr.Send(new GetListPersonelQuery
+            {
+                PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
+            });
+
+            await Task.WhenAll(semesterTask, personelTask);
+
+            _semesterList = await semesterTask;
+            _personelList = await personelTask;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
 
         await base.OnInitializedAsync();
     }
 
+    protected override void OnParametersSet()
+    {
+        if (_PrincipalSetDto.PersonelId != Guid.Empty)
+        {
+            _selectedPersonel = _personelList.Items.FirstOrDefault(p => p.Id == _PrincipalSetDto.PersonelId);
+        }
+        else
+        {
+            _selectedPersonel = null;
+        }
+    }
+
     private async Task Submit()
     {
-        CreatePrincipalCommand createPrincipal = new()
+        try
+        {
+            _isLoading = true;
+
+            var personel = await _PersonelService.GetByIdAsync(_PrincipalSetDto.PersonelId);
+
+            if (personel == null || personel.UserId == Guid.Empty)
+            {
+                Console.WriteLine("Personel bulunamadı veya kullanıcı ID'si geçersiz");
+                return;
+            }
+
+            var user = await _userManager.FindByIdAsync(personel.UserId.ToString());
+            if (user == null)
+            {
+                Console.WriteLine("Kullanıcı bulunamadı");
+                return;
+            }
+
+            await _userManager.AddToRolesAsync(user, new[] { "director", "authorized" });
+            await _userManager.RemoveFromRoleAsync(user, "unauthorized");
+
+            var createPrincipal = new CreatePrincipalCommand
             {
                 SemesterId = _PrincipalSetDto.SemesterId,
                 PersonelId = _PrincipalSetDto.PersonelId
             };
 
-        Personel? personel = await _PersonelService.GetByIdAsync(_PrincipalSetDto.PersonelId);
+            var result = await _IMediatr.Send(createPrincipal);
 
-        if (personel == null || personel.UserId == Guid.Empty)
-            return;
+            // Son atanan müdürleri güncelle
+            var semester = _semesterList.Items.FirstOrDefault(s => s.Id == _PrincipalSetDto.SemesterId);
+            _recentPrincipals.Insert(0, new RecentPrincipalDto
+            {
+                SemesterName = semester?.Name ?? "",
+                PersonelName = $"{personel.Name} {personel.SurName}",
+                CreatedDate = DateTime.Now
+            });
 
-        ApplicationUser? user = await _userManager.FindByIdAsync(personel.UserId.ToString());
-        if (user == null)
-            return;
+            _isSuccess = true;
+            ResetForm();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Müdür atama hatası: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
 
-        await _userManager.AddToRolesAsync(user, ["director", "authorized"]);
-        await _userManager.RemoveFromRoleAsync(user, "unauthorized");
+    private void ResetForm()
+    {
+        _PrincipalSetDto = new();
+        _selectedPersonel = null;
+    }
 
-        CreatedPrincipalResponse result = await _IMediatr.Send(createPrincipal);
+    private bool CanSubmit()
+    {
+        return _PrincipalSetDto.SemesterId > 0 &&
+               _PrincipalSetDto.PersonelId != Guid.Empty &&
+               !_isLoading;
     }
 
     private class PrincipalDto
     {
         public int SemesterId { get; set; }
-
         public Guid PersonelId { get; set; }
+    }
+
+    private class RecentPrincipalDto
+    {
+        public string SemesterName { get; set; } = string.Empty;
+        public string PersonelName { get; set; } = string.Empty;
+        public DateTime CreatedDate { get; set; }
     }
 }
