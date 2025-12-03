@@ -1,5 +1,4 @@
-﻿@*Thanks ChatGPT.Code Copilot*@
-@using Application.Features.ReferenceBenefits.Queries.GetList
+﻿@using Application.Features.ReferenceBenefits.Queries.GetList
 @using Application.Features.ReferenceBenefits.Queries.GetListByIdReferenceBenefitBenefit
 @using NArchitecture.Core.Application.Requests
 @using NArchitecture.Core.Application.Responses
@@ -8,83 +7,190 @@
 
 @if (IsVisible)
 {
-    <h3>Kazanım Yükleyici</h3>
-
-    <div class="form-control">
-
-        @if (IsExtraSettings)
-        {
-
-            <div class="btn-group m-2">
-                <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    @(_selectedSchoolId.HasValue ? _referenceBenefitSchools.FirstOrDefault(s => s.SchoolId == _selectedSchoolId)?.SchoolName : "Okul Seç")
-                </button>
-                <ul class="dropdown-menu">
-                    @foreach (var school in _referenceBenefitSchools)
-                    {
-                        <li @onclick="() => _selectBenefitSchool(school.SchoolId)" class="dropdown-item">@school.SchoolName</li>
-                    }
-                </ul>
+    <div class="benefit-loader-container mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-funnel me-2"></i>Kazanım Filtrele
+                </h5>
             </div>
 
-            @if (_selectedSchoolId.HasValue)
-            {
-                <div class="btn-group m-2">
-                    <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        @(_selectedSemesterId.HasValue ? _referenceBenefitSemesters.FirstOrDefault(s => s.SemesterId == _selectedSemesterId)?.SemesterName : "Dönem Seç")
-                    </button>
-                    <ul class="dropdown-menu">
-                        @foreach (var semester in _referenceBenefitSemesters)
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    @if (IsExtraSettings)
+                    {
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-building me-2"></i>Okul
+                            </label>
+                            <div class="dropdown w-100">
+                                <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
+                                        type="button" data-bs-toggle="dropdown">
+                                    @(_selectedSchoolId.HasValue
+                                                                ? _referenceBenefitSchools.FirstOrDefault(s => s.SchoolId == _selectedSchoolId)?.SchoolName
+                                                                : "Okul Seç")
+                                </button>
+                                <ul class="dropdown-menu w-100">
+                                    @foreach (var school in _referenceBenefitSchools)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" @onclick="() => _selectBenefitSchool(school.SchoolId)">
+                                                <i class="bi bi-building me-2"></i>@school.SchoolName
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+
+                        @if (_selectedSchoolId.HasValue)
                         {
-                            <li @onclick="() => _selectBenefitSemester(semester.SemesterId)" class="dropdown-item">
-                                @($"{semester.BeginSemesterDate} - {semester.EndSemesterDate} {semester.SemesterName}")
-                            </li>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-calendar-range me-2"></i>Dönem
+                                </label>
+                                <div class="dropdown w-100">
+                                    <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
+                                            type="button" data-bs-toggle="dropdown">
+                                        @(_selectedSemesterId.HasValue
+                                                                    ? _referenceBenefitSemesters.FirstOrDefault(s => s.SemesterId == _selectedSemesterId)?.SemesterName
+                                                                    : "Dönem Seç")
+                                    </button>
+                                    <ul class="dropdown-menu w-100">
+                                        @foreach (var semester in _referenceBenefitSemesters)
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" @onclick="() => _selectBenefitSemester(semester.SemesterId)">
+                                                    <i class="bi bi-calendar3 me-2"></i>
+                                                    @($"{semester.BeginSemesterDate:yyyy} - {semester.EndSemesterDate:yyyy} {semester.SemesterName}")
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
                         }
-                    </ul>
+                    }
+
+                    @if (_selectedSemesterId.HasValue)
+                    {
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-book me-2"></i>Ders
+                            </label>
+                            <div class="dropdown w-100">
+                                <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
+                                        type="button" data-bs-toggle="dropdown">
+                                    @(_selectedLessonId.HasValue
+                                                                ? _referenceBenefitLessons.FirstOrDefault(l => l.LessonId == _selectedLessonId)?.LessonName
+                                                                : "Ders Seç")
+                                </button>
+                                <ul class="dropdown-menu w-100">
+                                    @foreach (var lesson in _referenceBenefitLessons)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" @onclick="() => _selectBenefitLesson(lesson.LessonId)">
+                                                <i class="bi bi-journal-text me-2"></i>@lesson.LessonName
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+
+                    @if (_selectedLessonId.HasValue)
+                    {
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-clipboard-check me-2"></i>Yıllık Plan
+                            </label>
+                            <div class="dropdown w-100">
+                                <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
+                                        type="button" data-bs-toggle="dropdown">
+                                    @(_selectedBenefitId.HasValue
+                                                                ? _getListReferenceBenefits.Items.FirstOrDefault(b => b.Id == _selectedBenefitId)?.Name
+                                                                : "Yıllık Plan Seç")
+                                </button>
+                                <ul class="dropdown-menu w-100">
+                                    @foreach (var benefit in _getListReferenceBenefits.Items)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" @onclick="() => _selectBenefit(benefit.Id)">
+                                                <i class="bi bi-file-text me-2"></i>@benefit.Name
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
                 </div>
-            }
-        }
 
-        @if (_selectedSemesterId.HasValue)
-        {
-            <div class="btn-group m-2">
-                <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    @(_selectedLessonId.HasValue ? _referenceBenefitLessons.FirstOrDefault(l => l.LessonId == _selectedLessonId)?.LessonName : "Ders Seç")
-                </button>
-                <ul class="dropdown-menu">
-                    @foreach (var lesson in _referenceBenefitLessons)
+                <hr class="my-4" />
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox"
+                               id="flexSwitchExtraSettings" @bind="IsExtraSettings">
+                        <label class="form-check-label" for="flexSwitchExtraSettings">
+                            <i class="bi bi-sliders me-1"></i>Gelişmiş Ayarlar
+                        </label>
+                    </div>
+
+                    @if (_selectedBenefitId.HasValue)
                     {
-                        <li @onclick="() => _selectBenefitLesson(lesson.LessonId)" class="dropdown-item">@lesson.LessonName</li>
+                        <button class="btn btn-success" @onclick="Load_selectedBenefits">
+                            <i class="bi bi-check-circle me-2"></i>Yükle ve Devam Et
+                        </button>
                     }
-                </ul>
+                </div>
             </div>
-        }
-
-        @if (_selectedLessonId.HasValue)
-        {
-            <div class="btn-group m-2">
-                <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    @(_selectedBenefitId.HasValue ? _getListReferenceBenefits.Items.FirstOrDefault(b => b.Id == _selectedBenefitId)?.Name : "Yıllık Plan Seç")
-                </button>
-                <ul class="dropdown-menu">
-                    @foreach (var benefit in _getListReferenceBenefits.Items)
-                    {
-                        <li @onclick="() => _selectBenefit(benefit.Id)" class="dropdown-item">@benefit.Name</li>
-                    }
-                </ul>
-            </div>
-        }
-
-
-        <div class="form-check form-switch m-2">
-            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" @bind="IsExtraSettings">
-            <label class="form-check-label" for="flexSwitchCheckDefault">Farklı Ayarlar</label>
         </div>
+
+        @if (!_selectedSemesterId.HasValue || !_selectedLessonId.HasValue)
+        {
+            <div class="alert alert-info mt-3 d-flex align-items-center" role="alert">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <div>
+                    Lütfen devam etmek için gerekli tüm alanları seçin.
+                </div>
+            </div>
+        }
     </div>
 }
 
-@code {
+<style>
+    .benefit-loader-container .dropdown-menu {
+        max-height: 300px;
+        overflow-y: auto;
+    }
 
+    .benefit-loader-container .dropdown-item {
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        .benefit-loader-container .dropdown-item:hover {
+            background-color: #e9ecef;
+        }
+
+    .benefit-loader-container .btn-outline-secondary {
+        border: 2px solid #dee2e6;
+    }
+
+        .benefit-loader-container .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            border-color: #adb5bd;
+        }
+
+    .form-check-input:checked {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+    }
+</style>
+
+@code {
     [Parameter]
     public EventCallback<int> OnSelectedBenefitId { get; set; }
 
@@ -125,10 +231,10 @@
             _selectedSemesterId = _fullReferenceBenefits.Last()?.SemesterId;
 
             _referenceBenefitLessons = _fullReferenceBenefits
-            .Where(x => x.SchoolId == _selectedSchoolId && x.SemesterId == _selectedSemesterId)
-            .Select(rb => new ReferenceBenefitLesson { LessonId = rb.LessonId, LessonName = rb.LessonName })
-            .DistinctBy(x => x.LessonId)
-            .ToList();
+                .Where(x => x.SchoolId == _selectedSchoolId && x.SemesterId == _selectedSemesterId)
+                .Select(rb => new ReferenceBenefitLesson { LessonId = rb.LessonId, LessonName = rb.LessonName })
+                .DistinctBy(x => x.LessonId)
+                .ToList();
         }
 
         await base.OnInitializedAsync();
@@ -144,12 +250,12 @@
         _referenceBenefitSemesters = _fullReferenceBenefits
             .Where(x => x.SchoolId == schoolId)
             .Select(rb => new ReferenceBenefitSemester
-                {
-                    SemesterId = rb.SemesterId,
-                    SemesterName = rb.SemesterName,
-                    BeginSemesterDate = rb.BeginSemesterDate,
-                    EndSemesterDate = rb.EndSemesterDate
-                })
+            {
+                SemesterId = rb.SemesterId,
+                SemesterName = rb.SemesterName,
+                BeginSemesterDate = rb.BeginSemesterDate,
+                EndSemesterDate = rb.EndSemesterDate
+            })
             .DistinctBy(x => x.SemesterId)
             .ToList();
     }
@@ -191,7 +297,6 @@
             await OnLessonId.InvokeAsync(_selectedLessonId.Value);
         IsVisible = false;
     }
-
 
     private class ReferenceBenefitSchool
     {

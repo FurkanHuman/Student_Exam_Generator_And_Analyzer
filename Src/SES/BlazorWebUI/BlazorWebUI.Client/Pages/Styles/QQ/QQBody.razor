@@ -1,87 +1,202 @@
 ﻿@using BlazorWebUI.Client.Pages.Styles.Form
-<div class="input-form">
 
-    @if (CheckboxItems.Count > 0)
-    {
+<div class="qq-body-container">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-question-circle me-2"></i>Soru Oluştur</h5>
+        </div>
 
-        <div class="d-flex flex-column align-items-center">
-            <QQBenefitAdd OnSelectedBenefits="HandleBenefits" CheckboxItems="CheckboxItems" />
-            <div class="mt-3">
-                <ul>
-                    @foreach (KeyValuePair<int, string> benefit in QQBodyData.SelectedBenefits)
+        <div class="card-body p-4">
+            @if (CheckboxItems.Count > 0)
+            {
+                <div class="mb-4 p-3 bg-light rounded">
+                    <h6 class="text-primary mb-3"><i class="bi bi-bookmark-star me-2"></i>Kazanımlar</h6>
+                    <QQBenefitAdd OnSelectedBenefits="HandleBenefits" CheckboxItems="CheckboxItems" />
+
+                    @if (QQBodyData.SelectedBenefits.Any())
                     {
-                        <li>@benefit.Value</li>
+                        <div class="mt-3">
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (KeyValuePair<int, string> benefit in QQBodyData.SelectedBenefits)
+                                {
+                                    <span class="badge bg-primary-subtle text-primary px-3 py-2">
+                                        <i class="bi bi-check-circle me-1"></i>@benefit.Value
+                                    </span>
+                                }
+                            </div>
+                        </div>
                     }
-                </ul>
+                </div>
+            }
+
+            <div class="row g-3">
+                @if (IsBody)
+                {
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-file-text me-2"></i>Bilgi / Ana Metin
+                        </label>
+                        <InputTextArea class="form-control" rows="4" @bind-Value="Question"
+                                       placeholder="Soruyla ilgili ek bilgi veya ana metni buraya yazın..." />
+                    </div>
+                }
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold required">
+                        <i class="bi bi-pencil me-2"></i>Soru Kökü
+                    </label>
+                    <InputTextArea class="form-control" rows="3" @bind-Value="QuestionBody"
+                                   placeholder="Soru metnini buraya yazın..." />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold required">
+                        <i class="bi bi-star me-2"></i>Puan
+                    </label>
+                    <InputText class="form-control" type="number" min="0"
+                               placeholder="Örn: 5" @bind-Value="Score" />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold required">
+                        <i class="bi bi-star-fill me-2"></i>Maksimum Puan
+                    </label>
+                    <InputText class="form-control" type="number" min="0"
+                               placeholder="Örn: 10" @bind-Value="MaxScore" />
+                </div>
+
+                <div class="col-12">
+                    <div class="card bg-light border-0">
+                        <div class="card-body">
+                            <label class="form-label fw-semibold mb-3">
+                                <i class="bi bi-list-check me-2"></i>Soru Türü ve Seçenekler
+                            </label>
+                            <QQOptionBody @ref="QQOptionBody"
+                                          OnSelectedOptions="OnSelectedOptionHandler"
+                                          OnSelectedQType="OnSelectedQTypeHandler" />
+                        </div>
+                    </div>
+                </div>
+
+                @if (IsImage)
+                {
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-image me-2"></i>Görsel Ekle
+                        </label>
+                        <InputFile class="form-control" OnChange="HandleFileSelected"
+                                   accept="image/*" />
+                        <small class="form-text text-muted">
+                            Desteklenen formatlar: JPG, PNG, GIF (Max 5MB)
+                        </small>
+                    </div>
+                }
             </div>
+
+            <hr class="my-4" />
+
+            <div class="row g-3">
+                <div class="col-12">
+                    <h6 class="text-secondary mb-3">
+                        <i class="bi bi-gear me-2"></i>Ek Ayarlar
+                    </h6>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-check form-switch">
+                        <InputCheckbox class="form-check-input" @bind-Value="IsBody" id="flexCheckBody" />
+                        <label class="form-check-label" for="flexCheckBody">
+                            <i class="bi bi-file-earmark-text me-1"></i>Bilgi/Ana Metin İçerir
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-check form-switch">
+                        <InputCheckbox class="form-check-input" @bind-Value="IsImage" id="flexCheckImage" />
+                        <label class="form-check-label" for="flexCheckImage">
+                            <i class="bi bi-card-image me-1"></i>Görsel İçerir
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-check form-switch">
+                        <InputCheckbox class="form-check-input" @bind-Value="IsQQBenefitLoader"
+                                       id="flexCheckLoader" @onclick="Exp" />
+                        <label class="form-check-label" for="flexCheckLoader">
+                            <i class="bi bi-shuffle me-1"></i>Çapraz Kazanım
+                            <span class="badge bg-warning text-dark ms-1">DENEYSEL</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+                <button class="btn btn-primary btn-lg" type="button" @onclick="ExecuteQQHandle">
+                    <i class="bi bi-plus-circle me-2"></i>Soruyu Ekle
+                </button>
+            </div>
+
+            @if (showSuccessMessage.HasValue)
+            {
+                <div class="alert @(showSuccessMessage.Value ? "alert-success" : "alert-danger") alert-dismissible fade show mt-3" role="alert">
+                    <i class="bi @(showSuccessMessage.Value ? "bi-check-circle" : "bi-exclamation-triangle") me-2"></i>
+                    @if (showSuccessMessage.Value)
+                    {
+                        <strong>Başarılı!</strong>
+                        <text> Soru başarıyla eklendi.</text>
+                    }
+                    else
+                    {
+                        <strong>Hata!</strong>
+                        <text>Lütfen tüm zorunlu alanları doldurun ve en az bir kazanım seçin.</text>
+                    }
+                    <button type="button" class="btn-close" @onclick="() => showSuccessMessage = null"></button>
+                </div>
+            }
         </div>
-    }
-
-    <div class="input-group">
-        @if (IsBody)
-        {
-            <InputTextArea class="form-control" @bind-Value="Question" placeholder="Bilgi / Ana Metin" />
-        }
     </div>
-    <br />
-    <div class="input-group">
-        <InputTextArea class="form-control" placeholder="Soru Kökü" @bind-Value="QuestionBody" />
-    </div>
-    <br />
-    <div style="max-width: 15rem;" class="input-group align-items-center">
-        <InputText class="form-control" type="number" min="0" placeholder="Puan" @bind-Value="Score" />
-        <InputText class="form-control" type="number" min="0" placeholder="Max Puan" @bind-Value="MaxScore" />
-    </div>
-    <br />
-    <QQOptionBody @ref="QQOptionBody" OnSelectedOptions="OnSelectedOptionHandler" OnSelectedQType="OnSelectedQTypeHandler" />
-    <br />
-
-    @if (IsImage)
-    {
-        <div class="input-group">
-            <label class="input-group-text" for="inputGroupFile02">Resim - Fotoğraf Yükle: </label>
-            <InputFile type="file" class="form-control" id="inputGroupFile02" OnChange="HandleFileSelected" accept="image/*" />
-        </div>
-    }
-
-    <div class="form-check form-switch form-check-reverse">
-        <InputCheckbox class="form-check-input checkbox-large" type="checkbox" @bind-Value="IsBody" id="flexCheckBody" />
-        <label class="form-check-label" for="flexCheckBody">Bilgi / Ana Metin İçeriyor</label>
-    </div>
-
-    <div class="form-check form-switch form-check-reverse">
-        <InputCheckbox class="form-check-input checkbox-large" type="checkbox" @bind-Value="IsImage" id="flexCheckImage" />
-        <label class="form-check-label" for="flexCheckImage">Resim - Fotoğraf İçeriyor</label>
-    </div>
-
-    <div class="form-check form-switch form-check-reverse">
-        <InputCheckbox class="form-check-input checkbox-large" type="checkbox" @bind-Value="IsQQBenefitLoader" id="flexCheckLoader" @onclick="Exp" />
-        <label class="form-check-label" for="flexCheckLoader">Çapraz Kazanım (DENEYSEL)</label>
-    </div>
-
-    <button class="btn btn-primary form-check-reverse" type="button" @onclick="ExecuteQQHandle">Soruyu Ekle</button>
-
-    @if (showSuccessMessage.HasValue)
-    {
-        @if (showSuccessMessage.Value)
-        {
-            <div class="alert alert-success mt-3" role="alert">
-                Başarıyla eklendi!
-            </div>
-        }
-
-        else
-        {
-            <div class="alert alert-danger mt-3" role="alert">
-                Lütfen Tüm Alanları Kontrol Ediniz!
-            </div>
-        }
-    }
 </div>
 
-@code {
-    // todo: devam... qo yu yap yeni komponent 6 farklı seçenek var. resim foto var ve db kayıt var
+<style>
+    .qq-body-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
 
+    .required::after {
+        content: " *";
+        color: #dc3545;
+    }
+
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    .badge.bg-primary-subtle {
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .card-header {
+        border-bottom: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+</style>
+
+@code {
     [Parameter]
     public ICollection<CheckboxItem<int>> CheckboxItems { get; set; } = [];
 
@@ -92,7 +207,6 @@
     public EventCallback<QQBodyDto> OnQQBodyData { get; set; }
 
     private QQOptionBody QQOptionBody { get; set; } = new();
-
     private QQBodyDto QQBodyData { get; set; } = new();
 
     private string QuestionBody { get; set; } = string.Empty;
@@ -107,13 +221,17 @@
     protected override void OnInitialized()
     {
         QQOptionBody = new();
-        QQBodyData=new();
+        QQBodyData = new();
         base.OnInitialized();
     }
 
     private async Task ExecuteQQHandle()
     {
-        if ((string.IsNullOrEmpty(Score) && string.IsNullOrEmpty(MaxScore)) || string.IsNullOrWhiteSpace(QuestionBody) || QQBodyData.SelectedBenefits.Count == 0)
+        // Validation
+        if (string.IsNullOrWhiteSpace(QuestionBody) ||
+            string.IsNullOrEmpty(Score) ||
+            string.IsNullOrEmpty(MaxScore) ||
+            QQBodyData.SelectedBenefits.Count == 0)
         {
             showSuccessMessage = false;
             return;
@@ -127,46 +245,45 @@
         QQBodyData.MaxScore = int.Parse(MaxScore!);
 
         await OnQQBodyData.InvokeAsync(QQBodyData);
+
+        // Reset form
         QQBodyData = new();
         showSuccessMessage = true;
-
         QuestionBody = string.Empty;
         Question = string.Empty;
         Score = string.Empty;
         MaxScore = string.Empty;
+
         StateHasChanged();
     }
 
     private async Task Exp() => await OnQQBenefitLoader.InvokeAsync(IsQQBenefitLoader);
 
     private void OnSelectedOptionHandler(ICollection<QuestionOptionDto> questionOptions)
-    => QQBodyData.QuestionOptions = questionOptions;
+        => QQBodyData.QuestionOptions = questionOptions;
 
     private void OnSelectedQTypeHandler(byte qType) => QQBodyData.SelectedQType = qType;
 
-    private void HandleBenefits(ICollection<CheckboxItem<int>> SelectedCheckboxItems) => QQBodyData.SelectedBenefits = SelectedCheckboxItems.ToDictionary(item => item.Key, item => item.DisplayValue);
+    private void HandleBenefits(ICollection<CheckboxItem<int>> SelectedCheckboxItems)
+        => QQBodyData.SelectedBenefits = SelectedCheckboxItems.ToDictionary(item => item.Key, item => item.DisplayValue);
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
-        if (!IsImage)
-            return;
-
-        IBrowserFile file = e.File;
-        if (file == null)
+        if (!IsImage || e.File == null)
             return;
 
         using MemoryStream memoryStream = new();
-
-        await file.OpenReadStream().CopyToAsync(memoryStream);
+        await e.File.OpenReadStream().CopyToAsync(memoryStream);
 
         FileData fileData = new()
-            {
-                FileName = file.Name,
-                MemoryStream = memoryStream,
-                ContentType = file.ContentType,
-                FileExtension = Path.GetExtension(file.Name),
-                FileSize = file.Size
-            };
+        {
+            FileName = e.File.Name,
+            MemoryStream = memoryStream,
+            ContentType = e.File.ContentType,
+            FileExtension = Path.GetExtension(e.File.Name),
+            FileSize = e.File.Size
+        };
+
         QQBodyData.FileData = fileData;
     }
 }
