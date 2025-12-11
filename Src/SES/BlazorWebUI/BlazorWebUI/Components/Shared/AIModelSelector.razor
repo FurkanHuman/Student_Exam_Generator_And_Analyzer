@@ -1,0 +1,94 @@
+﻿@rendermode InteractiveServer
+@using Application.Services.AIService
+
+<div class="ai-model-selector">
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">
+                <i class="bi bi-building text-primary me-1"></i>AI Sağlayıcı
+            </label>
+            <select class="form-select"
+                    @bind="SelectedProvider"
+                    @bind:after="OnProviderChanged"
+                    disabled="@IsDisabled">
+                <option value="">Seçiniz...</option>
+                @foreach (KeyValuePair<string, string> provider in _aiProviders)
+                {
+                    <option value="@provider.Key">@provider.Value</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">
+                <i class="bi bi-cpu text-success me-1"></i>AI Model
+            </label>
+            <select class="form-select"
+                    @bind="SelectedModel"
+                    @bind:after="OnModelChanged"
+                    disabled="@IsModelSelectorDisabled">
+                <option value="">Seçiniz...</option>
+                @if (!string.IsNullOrEmpty(SelectedProvider) && _providerModels.ContainsKey(SelectedProvider))
+                {
+                    @foreach (KeyValuePair<string, string> model in _providerModels[SelectedProvider])
+                    {
+                        <option value="@model.Key">@model.Value</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? SelectedProvider { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> SelectedProviderChanged { get; set; }
+
+    [Parameter]
+    public string? SelectedModel { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> SelectedModelChanged { get; set; }
+
+    [Parameter]
+    public bool IsDisabled { get; set; }
+
+    [Parameter]
+    public EventCallback OnSelectionChanged { get; set; }
+
+    private Dictionary<string, string> _aiProviders = new();
+    private Dictionary<string, Dictionary<string, string>> _providerModels = new();
+
+    protected override void OnInitialized()
+    {
+        LoadAIModels();
+        base.OnInitialized();
+    }
+
+    private void LoadAIModels()
+    {
+        _aiProviders = AIModelsLoader.GetAIProviders();
+        _providerModels = AIModelsLoader.GetProviderModels();
+
+    }
+
+    private async Task OnProviderChanged()
+    {
+        SelectedModel = string.Empty;
+        await SelectedModelChanged.InvokeAsync(SelectedModel);
+        await SelectedProviderChanged.InvokeAsync(SelectedProvider);
+        await OnSelectionChanged.InvokeAsync();
+    }
+
+    private async Task OnModelChanged()
+    {
+        await SelectedModelChanged.InvokeAsync(SelectedModel);
+        await OnSelectionChanged.InvokeAsync();
+    }
+
+    private bool IsModelSelectorDisabled() => IsDisabled || string.IsNullOrEmpty(SelectedProvider);
+
+}
