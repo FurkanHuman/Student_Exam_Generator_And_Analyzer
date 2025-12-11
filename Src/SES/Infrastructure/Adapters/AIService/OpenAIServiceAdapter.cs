@@ -12,73 +12,63 @@ namespace Infrastructure.Adapters.AIService;
 public class OpenAIServiceAdapter : IAIService
 {
     private readonly OpenAIClient _aIClient;
-
     private static readonly JsonSerializerOptions DefaultJsonOptions = new()
     {
         DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
         WriteIndented = false
     };
 
     public OpenAIServiceAdapter(IConfiguration configuration)
     {
-
         _aIClient = new(configuration.GetSection("OpenAiApiKey").Get<string>());
     }
 
-    public async Task<ICollection<QuestionAIInComingModel>?> GenerateQuestionsFromAIAsync(QuestionAIOutgoingModel outgoingModel, string aiModel, CancellationToken cancellationToken)
+    public async Task<List<AIQuestionGenerationResponse>> GenerateQuestionsFromAIAsync(AIQuestionGenerationRequest generationRequest, string aiModel, CancellationToken cancellationToken)
     {
-        string promptPath = Path.Combine(AppContext.BaseDirectory, "Application", "Services", "AIService", "Resources", "QuestionSystemPromptNew");
-
-        string basePrompt = await File.ReadAllTextAsync(promptPath, cancellationToken);
-
-
-        string outgoingModeljJsonStr = JsonSerializer.Serialize(outgoingModel);
-        List<ChatMessage> chatMessages =
-            [
-                new SystemChatMessage($"{basePrompt}\n{outgoingModeljJsonStr}")
-            ];
+        List<ChatMessage> chatMessages = await GetChatMessages(generationRequest, "QuestionPrompt.txt");
 
         ChatClient chatClient = _aIClient.GetChatClient(aiModel);
 
-        JSchemaGenerator generator = new();                                                       // .NET 9.0 and above, use the Microsoft "System.Text.Json;" library
-        string jsonSchema = generator.Generate(typeof(List<QuestionAIInComingModel>)).ToString(); // use "System.Text.Json.Schema", "System.Text.Json" library
+        JSchemaGenerator schemaGenerator = new();
 
+        string jsonSchema = schemaGenerator.Generate(typeof(AIQuestionGenerationResponseList)).ToString();
+
+        int tokenLimit = Math.Min(generationRequest.QuestionCount * 150 + 500, 4096);
 
         ChatCompletionOptions completionOptions = new()
         {
             Temperature = 1f,
-            MaxOutputTokenCount = 1500,
+            MaxOutputTokenCount = tokenLimit,
             TopP = 1,
             FrequencyPenalty = 0,
             PresencePenalty = 0,
-            ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(jsonSchemaFormatName: "QuizQuestion", jsonSchema: BinaryData.FromString(jsonSchema), jsonSchemaIsStrict: true)
+            ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(jsonSchemaFormatName: "QuizQuestion",
+                                                                       jsonSchema: BinaryData.FromString(jsonSchema),
+                                                                       jsonSchemaIsStrict: true)
         };
 
-        List<QuestionAIInComingModel>? questions;
+        ChatCompletion? chat = await chatClient.CompleteChatAsync(messages: chatMessages,
+                                                                  options: completionOptions,
+                                                                  cancellationToken: cancellationToken);
+        RecordAsync(generationRequest, aiModel, chat);
 
-        ChatCompletion chatCompletion = await chatClient.CompleteChatAsync(messages: chatMessages, completionOptions, cancellationToken: cancellationToken);
+        if (string.IsNullOrWhiteSpace(chat.Content[0].Text))
+            throw new InvalidOperationException("AI returned empty response");
 
-        string response = chatCompletion.Content[0].Text;
+        AIQuestionGenerationResponseList questions = JsonSerializer.Deserialize<AIQuestionGenerationResponseList>(chat.Content[0].Text, DefaultJsonOptions)!;
 
-        questions = JsonSerializer.Deserialize<List<QuestionAIInComingModel>>(response);
+        if (questions == null || questions.Questions == null || questions.Questions.Count == 0)
+            throw new InvalidOperationException(
+                "AI returned no questions or invalid JSON");
 
-        await RequestRecorder.RecordAsync(request: outgoingModeljJsonStr, response: response, modelName: aiModel, cancellationToken: cancellationToken);
-
-        return questions;
+        return questions.Questions;
     }
-    public async Task<AIAnalysisResponse> GenerateAnalysisFromAIAsync(AIAnalysisRequest analysisRequest, string provider, string aiModel, CancellationToken cancellationToken)
+
+    public async Task<AIAnalysisResponse> GenerateAnalysisFromAIAsync(AIAnalysisRequest analysisRequest, string aiModel, CancellationToken cancellationToken)
     {
-        string promptData = JsonSerializer.Serialize(analysisRequest, DefaultJsonOptions);
-
-        string promptPath = Path.Combine(AppContext.BaseDirectory, "Application", "Services", "AIService", "Resources", "analysis_prompt.txt");
-
-        string basePrompt = await File.ReadAllTextAsync(promptPath, cancellationToken);
-
-        List<ChatMessage> chatMessages =
-        [
-            new SystemChatMessage($"{basePrompt}\n{promptData}")
-        ];
+        List<ChatMessage> chatMessages = await GetChatMessages(analysisRequest, "AnalysisPrompt.txt");
 
         ChatClient chatClient = _aIClient.GetChatClient(aiModel);
 
@@ -101,15 +91,7 @@ public class OpenAIServiceAdapter : IAIService
                                                                  options: completionOptions,
                                                                  cancellationToken: cancellationToken);
 
-        _ = Task.Run(async () =>
-        {
-            string storageJson = JsonSerializer.Serialize(chat, DefaultJsonOptions);
-
-            await RequestRecorder.RecordAsync(request: JsonSerializer.Serialize(analysisRequest),
-                                              response: storageJson,
-                                              modelName: aiModel,
-                                              cancellationToken: cancellationToken);
-        }, cancellationToken);
+        RecordAsync(analysisRequest, aiModel, chat);
 
         AIAnalysisResponse response =
             JsonSerializer.Deserialize<AIAnalysisResponse>(chat.Content[0].Text)!;
@@ -118,6 +100,39 @@ public class OpenAIServiceAdapter : IAIService
         response.GeneratedAt = chat.CreatedAt.DateTime;
 
         return response;
+
     }
 
+    private static void RecordAsync(object objectOfRequest, string aiModel, ChatCompletion chat)
+    {
+        _ = Task.Run(async () =>
+        {
+            string storageJson = JsonSerializer.Serialize(chat, DefaultJsonOptions);
+
+            await RequestRecorder.RecordAsync(request: JsonSerializer.Serialize(objectOfRequest),
+                                              response: storageJson,
+                                              modelName: aiModel,
+                                              cancellationToken: CancellationToken.None);
+        }, CancellationToken.None);
+    }
+
+    private static async Task<string> GetPromptFileContentAsync(string promptFile)
+    {
+        string promptPath = Path.Combine(AppContext.BaseDirectory,
+                                         "Services",
+                                         "AIService",
+                                         "Resources",
+                                         promptFile);
+
+        if (!File.Exists(promptPath))
+            throw new FileNotFoundException($"AI prompt template not found at: {promptPath}", promptPath);
+        return await File.ReadAllTextAsync(promptPath);
+    }
+
+    private static async Task<List<ChatMessage>> GetChatMessages(object generationRequest, string fileName)
+    {
+        string promptData = JsonSerializer.Serialize(generationRequest, DefaultJsonOptions);
+        string basePrompt = await GetPromptFileContentAsync(fileName);
+        return [new SystemChatMessage($"{basePrompt}\n{promptData}")];
+    }
 }
