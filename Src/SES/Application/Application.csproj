@@ -32,13 +32,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="Services\AIService\Resources\analysis_prompt.txt">
+    <None Update="Services\AIService\Resources\AIModels.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Services\AIService\Resources\QuestionSystemPromptNew.txt">
+    <None Update="Services\AIService\Resources\AnalysisPrompt.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Services\AIService\Resources\QuestionSystemPrompt.txt">
+    <None Update="Services\AIService\Resources\QuestionPrompt.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
