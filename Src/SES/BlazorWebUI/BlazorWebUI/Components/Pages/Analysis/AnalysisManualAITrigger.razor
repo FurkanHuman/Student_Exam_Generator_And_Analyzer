@@ -2,6 +2,8 @@
 @rendermode InteractiveServer
 @using Application.Features.Analyses.Commands.UpdateAIRequest
 @using Application.Features.Analyses.Queries.GetList
+@using Application.Services.AIService
+@using BlazorWebUI.Components.Shared
 @using NArchitecture.Core.Application.Requests
 @using NArchitecture.Core.Application.Responses
 
@@ -48,32 +50,10 @@
                                     @analysis.SemesterStartDate.ToString("dd.MM.yyyy") - @analysis.SemesterEndDate.ToString("dd.MM.yyyy")
                                 </p>
                             </div>
-                            <div class="col-lg-3">
-                                <label class="form-label small fw-bold">AI Sağlayıcı</label>
-                                <select class="form-select"
-                                        @bind="_selectedProviders[analysis.Id]"
-                                        @bind:after="() => OnProviderChanged(analysis.Id)">
-                                    <option value="">Seçiniz...</option>
-                                    @foreach (var provider in _aiProviders)
-                                    {
-                                        <option value="@provider.Key">@provider.Value</option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-lg-3">
-                                <label class="form-label small fw-bold">AI Model</label>
-                                <select class="form-select"
-                                        @bind="_selectedModels[analysis.Id]"
-                                        disabled="@IsModelDropdownDisabled(analysis.Id)">
-                                    <option value="">Seçiniz...</option>
-                                    @if (_selectedProviders.ContainsKey(analysis.Id) && !string.IsNullOrEmpty(_selectedProviders[analysis.Id]))
-                                    {
-                                        @foreach (var model in GetModelsForProvider(_selectedProviders[analysis.Id]))
-                                        {
-                                            <option value="@model.Key">@model.Value</option>
-                                        }
-                                    }
-                                </select>
+                            <div class="col-lg-6">
+                                <AIModelSelector IsDisabled="false"
+                                                 @bind-SelectedProvider="_selectedProviders[analysis.Id]"
+                                                 @bind-SelectedModel="_selectedModels[analysis.Id]" />
                             </div>
                             <div class="col-lg-2 text-end">
                                 <button class="btn btn-primary w-100"
@@ -95,72 +75,34 @@
     private IMediator _mediator { get; set; } = default!;
 
     private GetListResponse<GetListAnalysisListItemDto> _analysisList { get; set; } = new();
+
+    private Dictionary<string, string> _aiProviders = new();
+    private Dictionary<string, Dictionary<string, string>> _providerModels = new();
     private Dictionary<int, string> _selectedProviders { get; set; } = new();
     private Dictionary<int, string> _selectedModels { get; set; } = new();
-
-    /*
-     * AI Providers and Models,
-     * and i know not the best practice to hardcode them here
-     */
-
-    private readonly Dictionary<string, string> _aiProviders = new()
-    {
-        { "OpenAI", "OpenAI" },
-        { "Anthropic", "Anthropic (Claude)" },
-        { "Google", "Google (Gemini)" },
-        { "Azure", "Azure OpenAI" }
-    };
-
-    private readonly Dictionary<string, Dictionary<string, string>> _providerModels = new()
-    {
-        {
-            "OpenAI", new Dictionary<string, string>
-            {
-                { "gpt-5-mini-2025-08-07", "GPT-5 Mini" },
-                { "gpt-4o", "GPT-4 Omni" },
-                { "gpt-4o-mini", "GPT-4 Omni Mini" },
-                { "gpt-4-turbo", "GPT-4 Turbo" },
-                { "gpt-3.5-turbo", "GPT-3.5 Turbo" }
-            }
-        },
-        {
-            "Anthropic", new Dictionary<string, string>
-            {
-                { "claude-3-5-sonnet-20241022", "Claude 3.5 Sonnet" },
-                { "claude-3-opus-20240229", "Claude 3 Opus" },
-                { "claude-3-sonnet-20240229", "Claude 3 Sonnet" },
-                { "claude-3-haiku-20240307", "Claude 3 Haiku" }
-            }
-        },
-        {
-            "Google", new Dictionary<string, string>
-            {
-                { "gemini-2.0-flash-exp", "Gemini 2.0 Flash" },
-                { "gemini-1.5-pro", "Gemini 1.5 Pro" },
-                { "gemini-1.5-flash", "Gemini 1.5 Flash" }
-            }
-        },
-        {
-            "Azure", new Dictionary<string, string>
-            {
-                { "gpt-4o", "GPT-4 Omni (Azure)" },
-                { "gpt-4-turbo", "GPT-4 Turbo (Azure)" },
-                { "gpt-35-turbo", "GPT-3.5 Turbo (Azure)" }
-            }
-        }
-    };
+    private string _selectedAIProvider { get; set; } = string.Empty;
+    private string _selectedAIModel { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        LoadAIModels();
+
         PageRequest pg = new() { PageIndex = 0, PageSize = int.MaxValue };
         _analysisList = await _mediator.Send(new GetListAnalysisQuery { PageRequest = pg });
         _analysisList.Items = _analysisList.Items.Where(a => !a.HasAiResponse).ToList();
 
         foreach (int id in _analysisList.Items.Select(a => a.Id))
         {
-            _selectedProviders[id] = "OpenAI";
-            _selectedModels[id] = "GPT-5 Mini";
+            _selectedProviders[id] = string.Empty;
+            _selectedModels[id] = string.Empty;
         }
+    }
+
+    private void LoadAIModels()
+    {
+        _aiProviders = AIModelsLoader.GetAIProviders();
+        _providerModels = AIModelsLoader.GetProviderModels();
+
     }
 
     private void OnProviderChanged(int analysisId)
