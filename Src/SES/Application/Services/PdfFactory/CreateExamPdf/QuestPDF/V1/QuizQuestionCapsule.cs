@@ -23,16 +23,14 @@ internal static class QuizQuestionCapsule
         {
             col.Item().Row(row =>
             {
-                row.RelativeItem().Column(innerCol =>
+                row.RelativeItem().Column(async innerCol =>
                 {
                     innerCol.Spacing(5);
 
                     if (!string.IsNullOrEmpty(question.QuestionImageURL))
                     {
-                        // todo: is here difrent methology is aplicatipable for async image download?
-
                         (byte[] FileBytes, Dictionary<string, object> Meta) =
-                            imageServices.DownloadFileAsync(question.QuestionImageURL, CancellationToken.None).GetAwaiter().GetResult();
+                           await imageServices.DownloadFileAsync(question.QuestionImageURL, CancellationToken.None);
 
                         if (Meta != null && Meta.Count > 0)
                             innerCol.Item().AlignCenter().Image(FileBytes).FitArea().WithCompressionQuality(ImageCompressionQuality.VeryLow);
