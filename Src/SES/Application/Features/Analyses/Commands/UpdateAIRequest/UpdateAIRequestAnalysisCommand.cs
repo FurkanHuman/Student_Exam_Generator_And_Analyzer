@@ -60,7 +60,7 @@ public class UpdateAIRequestAnalysisCommand : IRequest
 
                 IAIService aIService = _aiServiceFactory.GetService(request.Provider);
 
-                AIAnalysisResponse aiResponse = await aIService.GenerateAnalysisFromAIAsync(requestModel, request.Provider, request.Model, cancellationToken);
+                AIAnalysisResponse aiResponse = await aIService.GenerateAnalysisFromAIAsync(requestModel, request.Model, cancellationToken);
 
                 string responseToJson = JsonSerializer.Serialize(aiResponse);
 
