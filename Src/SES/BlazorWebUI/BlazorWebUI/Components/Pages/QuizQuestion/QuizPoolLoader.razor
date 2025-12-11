@@ -2,12 +2,264 @@
 @using Application.Features.Lessons.Queries.GetListLessonQueryBySemesterId
 @using Application.Features.QuizQuestions.Queries.GetByLessonId
 @using Application.Features.Semesters.Queries.GetList
-@using Application.Features.QuizQuestions.Queries.GetList
 @using NArchitecture.Core.Application.Requests
 @using NArchitecture.Core.Application.Responses
-
 @rendermode InteractiveServer
 @inject IMediator _mediatr
+
+<div class="quiz-pool-loader">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 text-primary">
+                    <i class="bi bi-funnel-fill me-2"></i>Filtreler
+                </h6>
+                @if (_selectedLessonId.HasValue)
+                {
+                    <button class="btn btn-sm btn-outline-danger" @onclick="ClearAllFilters">
+                        <i class="bi bi-x-circle me-1"></i>Temizle
+                    </button>
+                }
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            @if (_isInitialLoading)
+            {
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                    <p class="text-muted mt-3 mb-0">Filtreler yükleniyor...</p>
+                </div>
+            }
+            else if (_hasError)
+            {
+                <div class="alert alert-danger mb-0" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Filtreler yüklenirken bir hata oluştu.
+                    <button class="btn btn-sm btn-outline-danger ms-2" @onclick="LoadInitialData">
+                        Tekrar Dene
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="row g-3">
+                    <!-- Semester Filter -->
+                    @if (_includePreviousSemesters)
+                    {
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-calendar-range text-primary me-2"></i>Dönem
+                            </label>
+                            <div class="input-group">
+                                <select class="form-select"
+                                        value="@_selectedSemesterId"
+                                        @onchange="OnSemesterChanged"
+                                        disabled="@_isLoadingLessons">
+                                    <option value="">Dönem Seçin</option>
+                                    @foreach (var semester in GetListSemesters.Items)
+                                    {
+                                        <option value="@semester.Id">
+                                            @($"{semester.BeginSemesterDate.Year}-{semester.EndSemesterDate.Year} {semester.Name}")
+                                        </option>
+                                    }
+                                </select>
+                                @if (_selectedSemesterId.HasValue)
+                                {
+                                    <button class="btn btn-outline-secondary"
+                                            type="button"
+                                            @onclick="ClearSemester">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                }
+                            </div>
+                            @if (GetListSemesters.Items.Count == 0)
+                            {
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>Dönem bulunamadı
+                                </small>
+                            }
+                        </div>
+                    }
+
+                    <!-- Lesson Filter -->
+                    @if (_selectedSemesterId.HasValue)
+                    {
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-book text-success me-2"></i>Ders
+                            </label>
+                            <div class="input-group">
+                                @if (_isLoadingLessons)
+                                {
+                                    <span class="form-control">
+                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                        Dersler yükleniyor...
+                                    </span>
+                                }
+                                else
+                                {
+                                    <select class="form-select"
+                                            value="@_selectedLessonId"
+                                            @onchange="OnLessonChanged"
+                                            disabled="@_isLoadingQuestions">
+                                        <option value="">Ders Seçin</option>
+                                        @foreach (var lesson in GetListLessons.Items)
+                                        {
+                                            <option value="@lesson.Id">
+                                                @lesson.StudentClassAge. Sınıf - @lesson.LessonName
+                                            </option>
+                                        }
+                                    </select>
+                                    @if (_selectedLessonId.HasValue)
+                                    {
+                                        <button class="btn btn-outline-secondary"
+                                                type="button"
+                                                @onclick="ClearLesson">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    }
+                                }
+                            </div>
+                            @if (!_isLoadingLessons && GetListLessons.Items.Count == 0)
+                            {
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>Bu dönem için ders bulunamadı
+                                </small>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Settings -->
+                <hr class="my-4" />
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               id="includePreviousSwitch"
+                               checked="@_includePreviousSemesters"
+                               @onchange="OnIncludePreviousChanged">
+                        <label class="form-check-label" for="includePreviousSwitch">
+                            <i class="bi bi-archive me-1"></i>Önceki Dönemleri Dahil Et
+                        </label>
+                    </div>
+
+                    @if (_selectedLessonId.HasValue && !_isLoadingQuestions)
+                    {
+                        <button class="btn btn-primary" @onclick="LoadQuestions">
+                            <i class="bi bi-search me-2"></i>Soruları Getir
+                            @if (_questionCount.HasValue)
+                            {
+                                <span class="badge bg-white text-primary ms-2">@_questionCount</span>
+                            }
+                        </button>
+                    }
+                </div>
+
+                <!-- Loading Questions Indicator -->
+                @if (_isLoadingQuestions)
+                {
+                    <div class="alert alert-info mt-3 mb-0 d-flex align-items-center">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        <span>Sorular yükleniyor, lütfen bekleyin...</span>
+                    </div>
+                }
+
+                <!-- Selection Summary -->
+                @if (_selectedSemesterId.HasValue || _selectedLessonId.HasValue)
+                {
+                    <div class="selection-summary mt-3 p-3 bg-light rounded">
+                        <small class="text-muted d-block mb-2">
+                            <i class="bi bi-info-circle me-1"></i>Seçili Filtreler:
+                        </small>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (_selectedSemesterId.HasValue)
+                            {
+                                var semester = GetListSemesters.Items.FirstOrDefault(s => s.Id == _selectedSemesterId);
+                                if (semester != null)
+                                {
+                                    <span class="badge bg-primary">
+                                        <i class="bi bi-calendar3 me-1"></i>
+                                        @($"{semester.BeginSemesterDate.Year}-{semester.EndSemesterDate.Year} {semester.Name}")
+                                    </span>
+                                }
+                            }
+                            @if (_selectedLessonId.HasValue)
+                            {
+                                var lesson = GetListLessons.Items.FirstOrDefault(l => l.Id == _selectedLessonId);
+                                if (lesson != null)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-book me-1"></i>
+                                        @lesson.LessonName
+                                    </span>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .quiz-pool-loader {
+        animation: slideIn 0.3s ease-out;
+    }
+
+        .quiz-pool-loader .form-select:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        .quiz-pool-loader .input-group {
+            transition: all 0.2s;
+        }
+
+            .quiz-pool-loader .input-group:focus-within {
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+                border-radius: 0.375rem;
+            }
+
+    .selection-summary {
+        border-left: 4px solid #0d6efd;
+        transition: all 0.3s;
+    }
+
+        .selection-summary .badge {
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    @@media (max-width: 768px) {
+        .quiz-pool-loader .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+</style>
 
 @code
 {
@@ -20,104 +272,194 @@
     [Parameter]
     public EventCallback<int> OnLessonId { get; set; }
 
-
     private bool _includePreviousSemesters { get; set; } = false;
+    private bool _isInitialLoading { get; set; } = true;
+    private bool _isLoadingLessons { get; set; } = false;
+    private bool _isLoadingQuestions { get; set; } = false;
+    private bool _hasError { get; set; } = false;
 
     private int? _selectedSemesterId { get; set; }
     private int? _selectedLessonId { get; set; }
-    private bool _dataLoaded = false;
+    private int? _questionCount { get; set; }
 
     private GetListResponse<GetListSemesterListItemDto> GetListSemesters { get; set; } = new();
     private GetListResponse<GetListLessonQueryBySemesterIdDto> GetListLessons { get; set; } = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && !_dataLoaded)
+        if (firstRender)
         {
-            _dataLoaded = true;
-            try
-            {
-                PageRequest pR = new() { PageIndex = 0, PageSize = int.MaxValue };
-                GetListSemesters = await _mediatr.Send(new GetListSemesterQuery() { PageRequest = pR });
+            await LoadInitialData();
+        }
+    }
 
-                if (!_includePreviousSemesters)
+    private async Task LoadInitialData()
+    {
+        try
+        {
+            _isInitialLoading = true;
+            _hasError = false;
+            StateHasChanged();
+
+            PageRequest pR = new() { PageIndex = 0, PageSize = int.MaxValue };
+            GetListSemesters = await _mediatr.Send(new GetListSemesterQuery() { PageRequest = pR });
+
+            if (!_includePreviousSemesters && GetListSemesters.Items.Count > 0)
+            {
+                _selectedSemesterId = GetListSemesters.Items[GetListSemesters.Items.Count - 1]?.Id;
+                await LoadLessons();
+            }
+        }
+        catch (Exception ex)
+        {
+            _hasError = true;
+            Console.WriteLine($"Error loading initial data: {ex.Message}");
+        }
+        finally
+        {
+            _isInitialLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadLessons()
+    {
+        if (!_selectedSemesterId.HasValue) return;
+
+        try
+        {
+            _isLoadingLessons = true;
+            StateHasChanged();
+
+            GetListLessons = await _mediatr.Send(new GetListLessonQueryBySemesterIdQuery()
+            {
+                SemesterId = _selectedSemesterId.Value
+            });
+
+            await OnSemesterId.InvokeAsync(_selectedSemesterId.Value);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading lessons: {ex.Message}");
+            GetListLessons = new();
+        }
+        finally
+        {
+            _isLoadingLessons = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadQuestions()
+    {
+        if (!_selectedLessonId.HasValue) return;
+
+        try
+        {
+            _isLoadingQuestions = true;
+            StateHasChanged();
+
+            GetListResponse<GetByLessonIdQuizQuestionListItemDto> response =
+                await _mediatr.Send(new GetByLessonIdQuizQuestionQuery()
                 {
-                    _selectedSemesterId = GetListSemesters.Items.Last()?.Id;
-                    GetListLessons = await _mediatr.Send(new GetListLessonQueryBySemesterIdQuery() { SemesterId = _selectedSemesterId!.Value });
-                }
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
+                    LessonId = _selectedLessonId.Value
+                });
+
+            _questionCount = response.Items.Count;
+            await OnQQList.InvokeAsync(response.Items.ToList());
+            await OnLessonId.InvokeAsync(_selectedLessonId.Value);
         }
-    }
-
-    private async Task SelectSemester(int semesterId)
-    {
-        _selectedSemesterId = semesterId;
-        _selectedLessonId = null;
-        GetListLessons = await _mediatr.Send(new GetListLessonQueryBySemesterIdQuery() { SemesterId = semesterId });
-    }
-
-    private async Task SelectLesson(int lessonId)
-    {
-        _selectedLessonId = lessonId;
-        await LoadSelectedQuestion();
-    }
-
-    private async Task LoadSelectedQuestion()
-    {
-        List<GetByLessonIdQuizQuestionListItemDto> _qqList = new();
-        if (_selectedLessonId != null)
+        catch (Exception ex)
         {
-            GetListResponse<GetByLessonIdQuizQuestionListItemDto> GetListQuizQuestion = await _mediatr.Send(new GetByLessonIdQuizQuestionQuery() { LessonId = _selectedLessonId.Value });
+            Console.WriteLine($"Error loading questions: {ex.Message}");
+            _questionCount = 0;
+            await OnQQList.InvokeAsync(new List<GetByLessonIdQuizQuestionListItemDto>());
+        }
+        finally
+        {
+            _isLoadingQuestions = false;
+            StateHasChanged();
+        }
+    }
 
-            _qqList.AddRange(GetListQuizQuestion.Items);
+    private async Task OnSemesterChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int semesterId))
+        {
+            _selectedSemesterId = semesterId;
+        }
+        else
+        {
+            _selectedSemesterId = null;
         }
 
-        _qqList = _qqList.Distinct().ToList();
+        _selectedLessonId = null;
+        _questionCount = null;
+        GetListLessons = new();
 
-        await OnQQList.InvokeAsync(_qqList);
-        await OnLessonId.InvokeAsync(_selectedLessonId!.Value);
-        await OnSemesterId.InvokeAsync(_selectedSemesterId!.Value);
+        if (_selectedSemesterId.HasValue)
+        {
+            await LoadLessons();
+        }
+    }
+
+    private async Task OnLessonChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int lessonId))
+        {
+            _selectedLessonId = lessonId;
+        }
+        else
+        {
+            _selectedLessonId = null;
+        }
+
+        _questionCount = null;
+
+        if (_selectedLessonId.HasValue)
+        {
+            await LoadQuestions();
+        }
+    }
+
+    private async Task OnIncludePreviousChanged(ChangeEventArgs e)
+    {
+        _includePreviousSemesters = (bool)(e.Value ?? false);
+
+        _selectedSemesterId = null;
+        _selectedLessonId = null;
+        _questionCount = null;
+        GetListLessons = new();
+
+        if (!_includePreviousSemesters && GetListSemesters.Items.Count > 0)
+        {
+            _selectedSemesterId = GetListSemesters.Items[GetListSemesters.Items.Count - 1]?.Id;
+            await LoadLessons();
+        }
+    }
+
+    private void ClearSemester()
+    {
+        _selectedSemesterId = null;
+        _selectedLessonId = null;
+        _questionCount = null;
+        GetListLessons = new();
+    }
+
+    private void ClearLesson()
+    {
+        _selectedLessonId = null;
+        _questionCount = null;
+    }
+
+    private async Task ClearAllFilters()
+    {
+        _selectedSemesterId = null;
+        _selectedLessonId = null;
+        _questionCount = null;
+        _includePreviousSemesters = false;
+        GetListLessons = new();
+
+        await OnQQList.InvokeAsync(new List<GetByLessonIdQuizQuestionListItemDto>());
     }
 }
-<div class="form-control">
-
-    @if (_includePreviousSemesters)
-    {
-        <div class="btn-group m-2">
-            <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                @(_selectedSemesterId.HasValue ? GetListSemesters.Items.FirstOrDefault(s => s.Id == _selectedSemesterId)?.Name : "Dönem Seç")
-            </button>
-            <ul class="dropdown-menu">
-                @foreach (var semester in GetListSemesters.Items)
-                {
-                    <li @onclick="() => SelectSemester(semester.Id)" class="dropdown-item">@($"{semester.BeginSemesterDate.Year} - {semester.EndSemesterDate.Year} {semester.Name}")</li>
-                }
-            </ul>
-        </div>
-    }
-
-    @if (_selectedSemesterId.HasValue)
-    {
-        <div class="btn-group m-2">
-            <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                @(_selectedLessonId.HasValue ? GetListLessons.Items.FirstOrDefault(l => l.Id == _selectedLessonId)?.LessonName : "Ders Seç")
-            </button>
-            <ul class="dropdown-menu">
-                @foreach (var lesson in GetListLessons.Items)
-                {
-                    <li @onclick="() => SelectLesson(lesson.Id)" class="dropdown-item">@lesson.StudentClassAge. Sınıf @lesson.LessonName</li>
-                }
-            </ul>
-        </div>
-    }
-
-    <div class="form-check form-switch m-2">
-        <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" @bind="_includePreviousSemesters">
-        <label class="form-check-label" for="flexSwitchCheckDefault">Önceki Dönemleri Dahil Et</label>
-    </div>
-</div>

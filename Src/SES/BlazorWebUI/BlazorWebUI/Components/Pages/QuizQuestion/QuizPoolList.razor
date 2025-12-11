@@ -1,34 +1,455 @@
-﻿@*
-    todo: A new question will be brought from the question root here. A button will be added to transfer the old question to the new period.
-*@
-
-@page "/PoolList"
+﻿@page "/PoolList"
 @using Application.Features.QuizQuestions.Queries.GetByLessonId
 @using AutoMapper
 @using BlazorWebUI.Client.Pages.Styles.QQ
 @rendermode InteractiveServer
+
 <PageTitle>Soru Havuzu</PageTitle>
+
+<div class="pool-list-container">
+    <!-- Header Section -->
+    <div class=" mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="bi bi-collection me-2"></i>Soru Havuzu
+                </h2>
+                <p class="text-muted mb-0">
+                    Sistemdeki tüm soruları görüntüleyin ve yönetin
+                </p>
+            </div>
+            @if (_listOfQQBodyDto.Count > 0)
+            {
+                <div class="d-flex gap-2 align-items-center">
+                    <span class="badge bg-primary fs-6 px-3 py-2">
+                        <i class="bi bi-file-text me-1"></i>
+                        @_listOfQQBodyDto.Count Soru
+                    </span>
+                    <button class="btn btn-outline-primary" @onclick="RefreshPool">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Yenile
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section mb-4">
+        <QuizPoolLoader OnQQList="LoadQuestionPool"
+                        OnSemesterId="HandleSemesterId"
+                        OnLessonId="HandleLessonId" />
+    </div>
+
+    <!-- Content Section -->
+    @if (_isLoading)
+    {
+        <div class="loading-container">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center py-5">
+                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                    <h5 class="text-muted">Sorular yükleniyor...</h5>
+                    <p class="text-muted mb-0">Lütfen bekleyin</p>
+                </div>
+            </div>
+        </div>
+    }
+    else if (_hasError)
+    {
+        <div class="alert alert-danger d-flex align-items-center shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+            <div>
+                <h5 class="alert-heading mb-1">Bir hata oluştu</h5>
+                <p class="mb-0">@_errorMessage</p>
+                <button class="btn btn-sm btn-outline-danger mt-2" @onclick="RefreshPool">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Tekrar Dene
+                </button>
+            </div>
+        </div>
+    }
+    else if (_listOfQQBodyDto.Count == 0 && !_isInitialState)
+    {
+        <div class="empty-state">
+            <div class="card shadow-sm border-0 text-center py-5">
+                <div class="card-body">
+                    <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                    <h4 class="mt-4 mb-2">Soru Bulunamadı</h4>
+                    <p class="text-muted mb-4">
+                        @if (_selectedSemesterId.HasValue && _selectedLessonId.HasValue)
+                        {
+                            <span>Seçilen kriterlere uygun soru bulunmuyor.</span>
+                        }
+                        else
+                        {
+                            <span>Başlamak için yukarıdan dönem ve ders seçin.</span>
+                        }
+                    </p>
+                    @if (_selectedSemesterId.HasValue && _selectedLessonId.HasValue)
+                    {
+                        <a href="/QuizPoolAdd" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Yeni Soru Ekle
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else if (_listOfQQBodyDto.Count > 0)
+    {
+        <!-- Question List with Stats -->
+        <div class="questions-container">
+            <!-- Stats Bar -->
+            <div class="stats-bar card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <i class="bi bi-collection text-primary"></i>
+                                <div>
+                                    <small class="text-muted d-block">Toplam Soru</small>
+                                    <strong>@_listOfQQBodyDto.Count</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <i class="bi bi-star text-warning"></i>
+                                <div>
+                                    <small class="text-muted d-block">Toplam Puan</small>
+                                    <strong>@_listOfQQBodyDto.Sum(q => q.MaxScore)</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <i class="bi bi-bookmarks text-success"></i>
+                                <div>
+                                    <small class="text-muted d-block">Kazanım Sayısı</small>
+                                    <strong>@_listOfQQBodyDto.SelectMany(q => q.SelectedBenefits).Distinct().Count()</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <i class="bi bi-image text-info"></i>
+                                <div>
+                                    <small class="text-muted d-block">Görselli Soru</small>
+                                    <strong>@_listOfQQBodyDto.Count(q => !string.IsNullOrEmpty(q.FileData!.Id))</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter and Sort Controls -->
+            <div class="controls-bar card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text"
+                                       class="form-control"
+                                       placeholder="Soru ara..."
+                                       value="@_searchQuery"
+                                       @oninput="OnSearchChanged" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" value="@_filterByType" @onchange="OnFilterTypeChanged">
+                                <option value="0">Tüm Soru Türleri</option>
+                                @foreach (var type in QQStatic.SelectTypeOptionsTUR)
+                                {
+                                    <option value="@type.Key">@type.Value</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" value="@_sortBy" @onchange="OnSortChanged">
+                                <option value="default">Varsayılan Sıralama</option>
+                                <option value="score-asc">Puan (Düşük → Yüksek)</option>
+                                <option value="score-desc">Puan (Yüksek → Düşük)</option>
+                                <option value="type">Soru Türü</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-secondary w-100" @onclick="ResetFilters">
+                                <i class="bi bi-x-circle me-1"></i>Temizle
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questions Grid -->
+            <div class="questions-grid">
+                @{
+                    int questionIndex = 0;
+                }
+                @foreach (var question in _filteredQuestions)
+                {
+                    var currentIndex = ++questionIndex;
+                    <div class="question-item">
+                        <div class="question-number">
+                            <span class="badge bg-secondary">@currentIndex</span>
+                        </div>
+                        <QQView QQBody="question" />
+                    </div>
+                }
+            </div>
+
+            @if (_filteredQuestions.Count == 0 && !string.IsNullOrEmpty(_searchQuery))
+            {
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-search me-2"></i>
+                    "<strong>@_searchQuery</strong>" araması için sonuç bulunamadı.
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .pool-list-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+@* 
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+ *@
+    .filter-section {
+        animation: slideDown 0.3s ease-out;
+    }
+
+    .stats-bar .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+        .stats-bar .stat-item i {
+            font-size: 2rem;
+        }
+
+        .stats-bar .stat-item strong {
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+
+    .controls-bar {
+        background: #f8f9fa;
+    }
+
+    .questions-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .question-item {
+        position: relative;
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    .question-number {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        z-index: 10;
+    }
+
+        .question-number .badge {
+            font-size: 1rem;
+            padding: 0.5rem 0.75rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+    .loading-container,
+    .empty-state {
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: 1rem;
+        }
+
+        .stats-bar .row {
+            text-align: center;
+        }
+
+        .stats-bar .stat-item {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
 
 @inject IMapper _mapper
 
 @code {
-    private IList<QQBodyDto> _listOfQQBodyDto { get; set; } = [];
+    private IList<QQBodyDto> _listOfQQBodyDto { get; set; } = new List<QQBodyDto>();
+    private IList<QQBodyDto> _filteredQuestions { get; set; } = new List<QQBodyDto>();
 
-    private void LoadAPool(IList<GetByLessonIdQuizQuestionListItemDto> getByQuizzes)
+    private bool _isLoading { get; set; } = false;
+    private bool _hasError { get; set; } = false;
+    private bool _isInitialState { get; set; } = true;
+    private string _errorMessage { get; set; } = string.Empty;
+
+    private string _searchQuery { get; set; } = string.Empty;
+    private byte _filterByType { get; set; } = 0;
+    private string _sortBy { get; set; } = "default";
+
+    private int? _selectedSemesterId { get; set; }
+    private int? _selectedLessonId { get; set; }
+
+    private async Task LoadQuestionPool(IList<GetByLessonIdQuizQuestionListItemDto> questions)
     {
-        _listOfQQBodyDto = _mapper.Map<IList<QQBodyDto>>(getByQuizzes);
-    }
-}
-
-<QuizPoolLoader OnQQList="LoadAPool"></QuizPoolLoader>
-
-
-@if (_listOfQQBodyDto.Count != 0)
-{
-    <div class="form-control">
-        @foreach (QQBodyDto quest in _listOfQQBodyDto)
+        try
         {
-            <QQView QQBody="quest" />
+            _isLoading = true;
+            _hasError = false;
+            _isInitialState = false;
+            StateHasChanged();
+
+            await Task.Delay(100);
+
+            _listOfQQBodyDto = _mapper.Map<IList<QQBodyDto>>(questions);
+            _filteredQuestions = _listOfQQBodyDto.ToList();
+
+            ApplyFiltersAndSort();
         }
-    </div>
+        catch (Exception ex)
+        {
+            _hasError = true;
+            _errorMessage = "Sorular yüklenirken bir hata oluştu: " + ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void HandleSemesterId(int semesterId)
+    {
+        _selectedSemesterId = semesterId;
+    }
+
+    private void HandleLessonId(int lessonId)
+    {
+        _selectedLessonId = lessonId;
+    }
+
+    private void OnSearchChanged(ChangeEventArgs e)
+    {
+        _searchQuery = e.Value?.ToString() ?? string.Empty;
+        ApplyFiltersAndSort();
+    }
+
+    private void OnFilterTypeChanged(ChangeEventArgs e)
+    {
+        if (byte.TryParse(e.Value?.ToString(), out byte value))
+        {
+            _filterByType = value;
+        }
+        else
+        {
+            _filterByType = 0;
+        }
+        ApplyFiltersAndSort();
+    }
+
+    private void OnSortChanged(ChangeEventArgs e)
+    {
+        _sortBy = e.Value?.ToString() ?? "default";
+        ApplyFiltersAndSort();
+    }
+
+    private void ApplyFiltersAndSort()
+    {
+        var filtered = _listOfQQBodyDto.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(_searchQuery))
+        {
+            filtered = filtered.Where(q =>
+                (q.QuestionBody?.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (q.Question?.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                q.SelectedBenefits.Values.Any(b => b.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase))
+            );
+        }
+
+        if (_filterByType > 0)
+        {
+            filtered = filtered.Where(q => q.SelectedQType == _filterByType);
+        }
+
+        filtered = _sortBy switch
+        {
+            "score-asc" => filtered.OrderBy(q => q.Score),
+            "score-desc" => filtered.OrderByDescending(q => q.Score),
+            "type" => filtered.OrderBy(q => q.SelectedQType),
+            _ => filtered
+        };
+
+        _filteredQuestions = filtered.ToList();
+        StateHasChanged();
+    }
+
+    private void ResetFilters()
+    {
+        _searchQuery = string.Empty;
+        _filterByType = 0;
+        _sortBy = "default";
+        ApplyFiltersAndSort();
+    }
+
+    private async Task RefreshPool()
+    {
+        _isLoading = true;
+        StateHasChanged();
+
+        await Task.Delay(500);
+
+        _isLoading = false;
+        StateHasChanged();
+    }
 }

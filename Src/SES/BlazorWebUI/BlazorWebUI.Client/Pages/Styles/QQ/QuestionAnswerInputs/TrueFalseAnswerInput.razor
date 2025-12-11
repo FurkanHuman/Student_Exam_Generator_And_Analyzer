@@ -126,34 +126,148 @@
     }
 }
 
-@foreach (Guid optionId in QuestionOptions.Select(o => o.Id))
-{
-    int hashCode = optionId.GetHashCode();
+<div class="tf-answer-section card border-0 shadow-sm">
+    <div class="card-header bg-info text-white">
+        <i class="bi bi-check2-square me-2"></i>Doğru / Yanlış İfadeleri
+    </div>
+    <div class="card-body">
+        <div class="statements-list">
+            @foreach (var (option, index) in QuestionOptions.Select((o, i) => (o, i)))
+            {
+                int hashCode = option.Id.GetHashCode();
+                byte currentAnswer = GetAnswer(option.Id);
 
-    <div style="display: block; width: 100%;">
-        <div class="d-block w-50 m-0 border p-2 ps-5">
-            <InputRadioGroup TValue="byte"
-                             Value="@GetAnswer(optionId)"
-                             ValueChanged="val => SetAnswer(optionId, val)"
-                             ValueExpression="()=>_selectedTFRadio"
-                             Name="@($"RadioG_TF_{hashCode}")"
-                             class="d-flex gap-2">
+                <div class="statement-card @(currentAnswer != 2 ? "answered" : "")">
+                    <div class="statement-header">
+                        <span class="badge bg-secondary">İfade @(index + 1)</span>
+                    </div>
+                    <p class="statement-text">@option.OptionText</p>
 
-                <div class="form-check form-check-inline">
-                    <InputRadio class="form-check-input" id="@($"opt_{hashCode}_E")" Value="(byte)2" />
-                    <label class="form-check-label" for="@($"opt_{hashCode}_E")">Boş</label>
+                    <InputRadioGroup TValue="byte"
+                                     Value="@currentAnswer"
+                                     ValueChanged="val => SetAnswer(option.Id, val)"
+                                     ValueExpression="() => _selectedTFRadio"
+                                     Name="@($"TF_{hashCode}")"
+                                     class="answer-options">
+
+                        <div class="option-group">
+                            <label class="option-btn empty @(currentAnswer == 2 ? "selected" : "")"
+                                   for="@($"tf_{hashCode}_E")">
+                                <InputRadio class="form-check-input" id="@($"tf_{hashCode}_E")" Value="(byte)2" />
+                                <span><i class="bi bi-dash-circle"></i> Boş</span>
+                            </label>
+
+                            <label class="option-btn true @(currentAnswer == 1 ? "selected" : "")"
+                                   for="@($"tf_{hashCode}_T")">
+                                <InputRadio class="form-check-input" id="@($"tf_{hashCode}_T")" Value="(byte)1" />
+                                <span><i class="bi bi-check-circle"></i> Doğru</span>
+                            </label>
+
+                            <label class="option-btn false @(currentAnswer == 0 ? "selected" : "")"
+                                   for="@($"tf_{hashCode}_F")">
+                                <InputRadio class="form-check-input" id="@($"tf_{hashCode}_F")" Value="(byte)0" />
+                                <span><i class="bi bi-x-circle"></i> Yanlış</span>
+                            </label>
+                        </div>
+                    </InputRadioGroup>
                 </div>
-
-                <div class="form-check form-check-inline">
-                    <InputRadio class="form-check-input" id="@($"opt_{hashCode}_T")" Value="(byte)1" />
-                    <label class="form-check-label" for="@($"opt_{hashCode}_T")">Doğru</label>
-                </div>
-
-                <div class="form-check form-check-inline">
-                    <InputRadio class="form-check-input" id="@($"opt_{hashCode}_F")" Value="(byte)0" />
-                    <label class="form-check-label" for="@($"opt_{hashCode}_F")">Yanlış</label>
-                </div>
-            </InputRadioGroup>
+            }
         </div>
     </div>
-}
+</div>
+
+<style>
+    .tf-answer-section {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .statements-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .statement-card {
+        padding: 1rem;
+        border: 2px solid #dee2e6;
+        border-radius: 0.5rem;
+        background: white;
+        transition: all 0.3s;
+    }
+
+        .statement-card.answered {
+            border-color: #17a2b8;
+            background: #f0f8ff;
+        }
+
+    .statement-header {
+        margin-bottom: 0.75rem;
+    }
+
+    .statement-text {
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    .option-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .option-btn {
+        flex: 1;
+        min-width: 100px;
+        padding: 0.75rem 1rem;
+        border: 2px solid #dee2e6;
+        border-radius: 0.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: white;
+    }
+
+        .option-btn:hover {
+            border-color: #17a2b8;
+            box-shadow: 0 2px 8px rgba(23, 162, 184, 0.2);
+        }
+
+        .option-btn.selected {
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+        }
+
+        .option-btn.empty.selected {
+            border-color: #6c757d;
+            background: #f8f9fa;
+        }
+
+        .option-btn.true.selected {
+            border-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .option-btn.false.selected {
+            border-color: #dc3545;
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .option-btn .form-check-input {
+            display: none;
+        }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

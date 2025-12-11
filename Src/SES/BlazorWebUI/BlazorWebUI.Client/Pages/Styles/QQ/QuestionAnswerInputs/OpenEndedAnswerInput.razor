@@ -1,5 +1,4 @@
 ﻿@code {
-
     private IDictionary<string, bool> _keywordCheckedStatusDict { get; set; } = new Dictionary<string, bool>();
     private string _keywordList { get; set; } = string.Empty;
     private double _perKeywordScore { get; set; }
@@ -29,13 +28,6 @@
         if (_keywordCheckedStatusDict.Count == 0)
             foreach (string str in GetOpenEndedKeywords())
                 _keywordCheckedStatusDict[str] = false;
-
-        LoadExistingAnswer();
-    }
-
-    private void LoadExistingAnswer()
-    {
-
     }
 
     private IEnumerable<string> GetOpenEndedKeywords()
@@ -101,7 +93,6 @@
         if (byte.TryParse(raw, out byte value))
         {
             _selectedEvaluationStatus = value;
-
             OnEvaluationStatus.InvokeAsync(_selectedEvaluationStatus);
         }
         else
@@ -142,38 +133,113 @@
     }
 }
 
-<div class="d-flex align-items-center flex-wrap border rounded">
-    <label class="input-group-text me-3">Anahtar kelimeler:</label>
-
-    @foreach (string keyword in _keywordCheckedStatusDict.Keys.ToList())
-    {
-        <div class="form-check form-check-inline">
-            <InputCheckbox class="form-check-input" id="@("inlineCheckbox" + keyword)"
-                           Value="@_keywordCheckedStatusDict[keyword]"
-                           ValueChanged="(newValue) => ToggleOpenEndedAnswerCheck(newValue, keyword)"
-                           ValueExpression="@(() => _keywordCheckedStatusDict[keyword])" />
-
-            <label class="form-check-label" for="@("inlineCheckbox" + keyword)">
-                @keyword
-            </label>
+<div class="answer-input-section">
+    <div class="keyword-selector card border-0 shadow-sm mb-3">
+        <div class="card-header bg-success text-white">
+            <i class="bi bi-key me-2"></i>Anahtar Kelimeler
         </div>
+        <div class="card-body">
+            <div class="keywords-grid">
+                @foreach (string keyword in _keywordCheckedStatusDict.Keys.ToList())
+                {
+                    <div class="form-check keyword-item">
+                        <InputCheckbox class="form-check-input"
+                                       id="@("keyword_" + keyword.GetHashCode())"
+                                       Value="@_keywordCheckedStatusDict[keyword]"
+                                       ValueChanged="(newValue) => ToggleOpenEndedAnswerCheck(newValue, keyword)"
+                                       ValueExpression="@(() => _keywordCheckedStatusDict[keyword])" />
+                        <label class="form-check-label" for="@("keyword_" + keyword.GetHashCode())">
+                            @keyword
+                        </label>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="score-input card border-0 shadow-sm">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <i class="bi bi-star-fill text-warning fs-4"></i>
+                    <div class="flex-grow-1">
+                        <label class="form-label mb-1 small text-muted">Puan</label>
+                        <InputNumber type="number"
+                                     class="form-control"
+                                     min="0"
+                                     max="@ScoreMax"
+                                     TValue="int"
+                                     @oninput="OnScoreInputChanged"
+                                     @bind-Value="_score" />
+                    </div>
+                    <span class="text-muted">/ @ScoreMax</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="status-selector card border-0 shadow-sm">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <i class="bi bi-clipboard-check text-primary fs-4"></i>
+                    <div class="flex-grow-1">
+                        <label class="form-label mb-1 small text-muted">Değerlendirme Durumu</label>
+                        <InputSelect class="form-select"
+                                     TValue="byte"
+                                     @oninput="EvaluationStatusChanged"
+                                     @bind-Value="_selectedEvaluationStatus">
+                            @foreach (KeyValuePair<byte, string> status in QQStatic.EvaluationStatusTUR)
+                            {
+                                <option value="@status.Key">@status.Value</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .answer-input-section {
+        animation: fadeIn 0.3s ease-out;
     }
-</div>
 
-<div class="input-group rounded border" style="width:12rem;">
-    <label class="input-group-text">Puanı:</label>
-    <InputNumber type="number" class="form-control conversion" id="ScoreInput" min="0" max="@ScoreMax" TValue="int"
-                 @oninput="OnScoreInputChanged" @bind-Value="_score" />
-</div>
+    .keywords-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.75rem;
+    }
 
-<div class="d-flex align-items-center gap-2 flex-wrap bg-light text-dark border rounded">
-    <label class="input-group-text">Durum:</label>
-    <InputSelect class="form-select w-auto" TValue="byte" @oninput="EvaluationStatusChanged"
-                 @bind-Value="_selectedEvaluationStatus">
+    .keyword-item {
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        transition: all 0.2s;
+        background: #f8f9fa;
+    }
 
-        @foreach (KeyValuePair<byte, string> status in QQStatic.EvaluationStatusTUR)
-        {
-            <option value="@status.Key">@status.Value</option>
+        .keyword-item:hover {
+            background: #e9ecef;
         }
-    </InputSelect>
-</div>
+
+        .keyword-item .form-check-input:checked ~ label {
+            font-weight: 600;
+            color: #198754;
+        }
+
+    .form-check-input {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

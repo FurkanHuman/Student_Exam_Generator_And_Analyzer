@@ -1,5 +1,4 @@
-﻿@*Thanks ChatGpt-code Copilot, Cloude Sonnet 4,Gemini 2.5 Pro *@
-@code {
+﻿@code {
     private int _questionOptionCount { get; set; }
     private string[] _firstParts { get; set; } = Array.Empty<string>();
     private string[] _secondParts { get; set; } = Array.Empty<string>();
@@ -52,9 +51,9 @@
 
         for (int i = 0; i < _questionOptionCount; i++)
         {
-            string[] parts = shuffledOptions[i].OptionText!.Split(',');
-            tempF[i] = parts[0].Trim();
-            tempS[i] = parts[1].Trim();
+            string[] splitedString = (shuffledOptions[i].OptionText ?? string.Empty).Split(',');
+            tempF[i] = splitedString.Length > 0 ? splitedString[0].Trim() : string.Empty;
+            tempS[i] = splitedString.Length > 1 ? splitedString[1].Trim() : string.Empty;
         }
 
         QQStatic.ShuffleStringArray(ref tempF, _rnd.Next());
@@ -75,7 +74,6 @@
         if (selectedLeftValue == null)
             return;
 
-        string previousSelection = _matchSelections[rightKey];
         _matchSelections[rightKey] = selectedLeftValue;
 
         int newScore = CalculateScore();
@@ -136,7 +134,6 @@
         {
             if (score == ScoreMax)
                 return 9;
-
             else
                 return 7;
         }
@@ -152,32 +149,157 @@
     }
 }
 
-<div class="row">
-    <div class="col-12">
-        @for (byte i = 0; i < _questionOptionCount; i++)
-        {
-            string rightKey = _secondParts[i];
-            <div class="row mb-3 align-items-center gx-2">
-                <div class="col-md-4 col-sm-12 mb-2 mb-md-0">
-                    <strong>@QQStatic.Alphabet[i])</strong> @_firstParts[i]
+<div class="matching-section card border-0 shadow-sm">
+    <div class="card-header bg-purple text-white">
+        <i class="bi bi-arrows-collapse me-2"></i>Eşleştirme
+    </div>
+    <div class="card-body">
+        <div class="matching-instruction alert alert-info mb-3">
+            <i class="bi bi-info-circle me-2"></i>
+            Sol sütundaki her öğe için sağ sütundan eşleştiğini seçin
+        </div>
+
+        <div class="matching-grid">
+            @for (byte i = 0; i < _questionOptionCount; i++)
+            {
+                string rightKey = _secondParts[i];
+                bool isMatched = !string.IsNullOrEmpty(_matchSelections[rightKey]);
+
+                <div class="match-row @(isMatched ? "matched" : "")">
+                    <div class="left-item">
+                        <span class="item-marker bg-primary">@QQStatic.Alphabet[i]</span>
+                        <span class="item-text">@_firstParts[i]</span>
+                    </div>
+
+                    <div class="match-selector">
+                        <InputSelect class="form-select"
+                                     TValue="string"
+                                     value="@_matchSelections[rightKey]"
+                                     @onchange="(args) => HandleMatchSelectionInput(args, rightKey)">
+                            <option value="">Seç...</option>
+                            @for (byte j = 0; j < _firstParts.Length; j++)
+                            {
+                                <option value="@_firstParts[j]">@QQStatic.Alphabet[j]</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="right-item">
+                        <span class="item-marker bg-success">@(i + 1)</span>
+                        <span class="item-text">@_secondParts[i]</span>
+                    </div>
                 </div>
-                <div class="col-md-4 col-sm-12 mb-2 mb-md-0 d-flex align-items-center gap-2">
-                    <strong>@(i + 1))</strong>
-                    <InputSelect class="form-select form-select-sm flex-grow-1"
-                                 TValue="string"
-                                 @oninput="(args) => HandleMatchSelectionInput(args, rightKey)"
-                                 @bind-Value="_matchSelections[rightKey]">
-                        <option value="">-</option>
-                        @for (byte j = 0; j < _firstParts.Length; j++)
-                        {
-                            <option value="@_firstParts[j]">@QQStatic.Alphabet[j]</option>
-                        }
-                    </InputSelect>
-                </div>
-                <div class="col-md-4 col-sm-12 d-flex align-items-center">
-                    <span class="ms-2">@_secondParts[i]</span>
-                </div>
+            }
+        </div>
+
+        <div class="score-indicator mt-3 p-3 bg-light rounded">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-muted">
+                    <i class="bi bi-check2-all me-1"></i>
+                    Doğru Eşleşme: <strong>@(_currentScore > 0 ? $"{_currentScore}/{ScoreMax}" : "Henüz yok")</strong>
+                </span>
+                <span class="badge bg-primary">
+                    @_matchSelections.Count(x => !string.IsNullOrEmpty(x.Value)) / @_questionOptionCount Tamamlandı
+                </span>
             </div>
-        }
+        </div>
     </div>
 </div>
+
+<style>
+    .matching-section {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .bg-purple {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .matching-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .match-row {
+        display: grid;
+        grid-template-columns: 2fr auto 2fr;
+        gap: 1rem;
+        align-items: center;
+        padding: 1rem;
+        border: 2px solid #dee2e6;
+        border-radius: 0.5rem;
+        background: white;
+        transition: all 0.3s;
+    }
+
+        .match-row:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+        }
+
+        .match-row.matched {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+
+    .left-item, .right-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .item-marker {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        color: white;
+        border-radius: 50%;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+
+    .item-text {
+        flex: 1;
+        font-size: 1rem;
+    }
+
+    .match-selector {
+        min-width: 100px;
+    }
+
+        .match-selector select {
+            font-weight: 600;
+            text-align: center;
+            border: 2px solid #667eea;
+        }
+
+    .score-indicator {
+        border-left: 4px solid #667eea;
+    }
+
+    @@media (max-width: 768px) {
+        .match-row {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .match-selector {
+            width: 100%;
+        }
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

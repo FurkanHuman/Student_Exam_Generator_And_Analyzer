@@ -1,115 +1,977 @@
-﻿@*
-    todo: return here. style, logic, and component all code is review and rework
-*@
-
-@page "/Auto/AiQuizPoolAdd"
+﻿@page "/Auto/AiQuizPoolAdd"
 @rendermode InteractiveServer
 
+@using Application.Features.Lessons.Queries.GetById
 @using Application.Features.ReferenceBenefits.Queries.GetListByIdReferenceBenefitBenefit
 @using Application.Services.AIService
+@using Application.Features.QuizQuestions.Commands.Create
 @using Application.Services.AIService.Models
-@using Application.Services.Lessons
+@using BlazorWebUI.Components.Shared
+@using Domain.Enums
 @using BlazorWebUI.Client.Pages.Styles.QQ
+@using BlazorWebUI.Client.Pages.Styles.Form
 @using NArchitecture.Core.Application.Responses
 
-<PageTitle>Yapay Zeka Destekli Soru Oluşturma</PageTitle>
+<PageTitle>AI Destekli Soru Oluşturma</PageTitle>
 
-<h2>Yapay zeka destekli soru oluşturma</h2>
+<div class="ai-quiz-container">
+    <!-- Header -->
+    <div class="page-header mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="ai-icon">
+                <i class="bi bi-robot"></i>
+            </div>
+            <div>
+                <h2 class="mb-1">
+                    <i class="bi bi-stars me-2"></i>Yapay Zeka Destekli Soru Oluşturma
+                </h2>
+                <p class="text-muted mb-0">
+                    AI ile hızlı ve kaliteli sorular oluşturun
+                </p>
+            </div>
+        </div>
+    </div>
 
+    <!-- Benefit Loader and Selector -->
+    @if (_isQQBenefitLoaderVisible)
+    {
+        <div class="benefit-section mb-4">
+            <QQBenefitLoader IsVisible="_isQQBenefitLoaderVisible"
+                             OnSelectedBenefitId="HandleBenefitId"
+                             OnLessonId="HandleLessonId" />
+        </div>
+    }
 
-<QQBenefitLoader IsVisible="_isQQBenefitLoaderVisible"  OnSelectedBenefitId="HandleBenefitId" OnLessonId="HandleLessonId"/>
+    @if (!_isQQBenefitLoaderVisible && CheckboxItems.Count > 0)
+    {
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-bookmark-star me-2"></i>Kazanım Seçimi
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-warning mb-3">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Önemli:</strong> AI'ın soru oluşturması için en az bir kazanım seçmelisiniz.
+                </div>
 
-<InputTextArea @bind-Value="_userPrompt" />
+                <QQBenefitAdd OnSelectedBenefits="HandleSelectedBenefits"
+                              CheckboxItems="CheckboxItems" />
 
-<InputText class="form-control" type="number" min="0" max="100" placeholder="Kaç soru" @bind-Value="_howMuchQuestion" />
+                @if (_selectedBenefits.Count > 0)
+                {
+                    <div class="mt-3">
+                        <p class="text-muted mb-2">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Seçili Kazanımlar (@_selectedBenefits.Count):
+                        </p>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var benefit in _selectedBenefits)
+                            {
+                                <span class="badge bg-info px-3 py-2">
+                                    @benefit.Value
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
 
-<div class="btn-group m-2">
-    <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-        @(!string.IsNullOrEmpty(_selectedLanguage.Value) ? _selectedLanguage.Value : "Dil Seç")
-    </button>
-    <ul class="dropdown-menu">
-        @foreach (var language in _languagePairs)
-        {
-            <li @onclick="() => SelectLanguage(language)" class="dropdown-item">@language.Value</li>
+    <!-- Main Form -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-gradient-ai text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-gear-fill me-2"></i>Soru Üretim Ayarları
+            </h5>
+        </div>
+
+        <div class="card-body p-4">
+            @if (_hasError)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Hata!</strong> @_errorMessage
+                    <button type="button" class="btn-close" @onclick="() => _hasError = false"></button>
+                </div>
+            }
+
+            @if (_isSuccess)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <strong>Başarılı!</strong> Sorular başarıyla oluşturuldu.
+                    <button type="button" class="btn-close" @onclick="() => _isSuccess = false"></button>
+                </div>
+            }
+
+            <div class="row g-4">
+                <!-- AI Prompt -->
+                <div class="col-12">
+                    <label class="form-label fw-semibold required">
+                        <i class="bi bi-chat-left-text text-primary me-2"></i>AI Prompt
+                    </label>
+                    <InputTextArea class="form-control"
+                                   rows="6"
+                                   @bind-Value="_userPrompt"
+                                   placeholder="AI'ya soru oluşturması için talimat verin. Örn: 'Osmanlı İmparatorluğu'nun kuruluş dönemi hakkında orta seviye sorular oluştur...'" />
+                    <small class="form-text text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Ne kadar detaylı yazarsanız, AI o kadar iyi sorular üretir.
+                    </small>
+                </div>
+
+                <!-- Question Count -->
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold required">
+                        <i class="bi bi-hash text-success me-2"></i>Soru Sayısı
+                    </label>
+                    <InputText class="form-control"
+                               type="number"
+                               min="1"
+                               max="50"
+                               @bind-Value="_howMuchQuestion"
+                               placeholder="Örn: 10" />
+                    <small class="form-text text-muted">Maksimum: 50</small>
+                </div>
+
+                <!-- Language Selection -->
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold required">
+                        <i class="bi bi-translate text-info me-2"></i>Dil
+                    </label>
+                    <div class="dropdown w-100">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                disabled="@_isGenerating">
+                            @(!string.IsNullOrEmpty(_selectedLanguage.Value) ? _selectedLanguage.Value : "Dil Seçin")
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            @foreach (var language in _languagePairs)
+                            {
+                                <li>
+                                    <a class="dropdown-item" @onclick="() => SelectLanguage(language)">
+                                        <i class="bi bi-globe me-2"></i>@language.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Question Type -->
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold required">
+                        <i class="bi bi-list-check text-warning me-2"></i>Soru Türü
+                    </label>
+                    <div class="dropdown w-100">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                disabled="@_isGenerating">
+                            @(_selectedQuestionType.HasValue && QQStatic.SelectTypeOptionsTUR.ContainsKey(_selectedQuestionType.Value)
+                                                        ? QQStatic.SelectTypeOptionsTUR[_selectedQuestionType.Value]
+                                                        : "Soru Türü Seçin")
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            @foreach (var type in QQStatic.SelectTypeOptionsTUR)
+                            {
+                                <li>
+                                    <a class="dropdown-item" @onclick="() => SelectQuestionType(type.Key)">
+                                        @type.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Difficulty Level -->
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold required">
+                        <i class="bi bi-speedometer2 text-danger me-2"></i>Zorluk Seviyesi
+                    </label>
+                    <select class="form-select" @bind="_difficultyLevel" disabled="@_isGenerating">
+                        <option value="0">Seviye Seçin</option>
+                        <option value="1">Kolay</option>
+                        <option value="2">Orta</option>
+                        <option value="3">Zor</option>
+                    </select>
+                </div>
+
+                <!-- AI Model Selector Component -->
+                <div class="col-md-4">
+                    <AIModelSelector @bind-SelectedProvider="_selectedAIProvider"
+                                     @bind-SelectedModel="_selectedAIModel"
+                                     IsDisabled="@_isGenerating" />
+                </div>
+
+                <!-- Cross Benefits Toggle -->
+                <div class="col-md-4">
+                    <div class="form-check form-switch mt-4">
+                        <InputCheckbox class="form-check-input"
+                                       @bind-Value="_isQQBenefitLoaderVisible"
+                                       id="flexCheckLoader"
+                                       disabled="@_isGenerating"
+                                       @onclick="ToggleBenefitLoader" />
+                        <label class="form-check-label" for="flexCheckLoader">
+                            <i class="bi bi-shuffle me-1"></i>Kazanım Filtresini Değiştir
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <hr class="my-4" />
+
+            <div class="d-grid gap-2">
+                <button class="btn btn-lg btn-primary"
+                        @onclick="GenerateQuestionsAsync"
+                        disabled="@GenerateButtonIsDisabled">
+                    @if (_isGenerating)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        <span>AI Soruları Oluşturuyor...</span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-magic me-2"></i>
+                        <span>Soruları Oluştur</span>
+                    }
+                </button>
+            </div>
+
+            @if (_isGenerating)
+            {
+                <div class="progress mt-3" style="height: 25px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                         role="progressbar"
+                         style="width: @_progress%">
+                        %@_progress
+                    </div>
+                </div>
+                <p class="text-center text-muted mt-2 mb-0">
+                    <small>@_progressMessage</small>
+                </p>
+            }
+        </div>
+    </div>
+
+    <!-- Generated Questions Preview -->
+    @if (_generatedAIQuestions.Count > 0)
+    {
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-success text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-check-circle me-2"></i>Oluşturulan Sorular
+                    </h5>
+                    <span class="badge bg-white text-success">
+                        @_selectedQuestionIndices.Count / @_generatedAIQuestions.Count Seçili
+                    </span>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info mb-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-info-circle me-2"></i>
+                        Kaydetmek istediğiniz soruları seçin ve onaylayın.
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary" @onclick="SelectAllQuestions">
+                        <i class="bi bi-check-all me-1"></i>
+                        @(_selectedQuestionIndices.Count == _generatedAIQuestions.Count ? "Hiçbirini Seçme" : "Tümünü Seç")
+                    </button>
+                </div>
+
+                @foreach (var (question, index) in _generatedAIQuestions.Select((q, i) => (q, i)))
+                {
+                    <div class="generated-question-item mb-4 @(IsQuestionSelected(index) ? "selected" : "")">
+                        <div class="question-selector">
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       id="question_@index"
+                                       checked="@IsQuestionSelected(index)"
+                                       @onchange="() => ToggleQuestionSelection(index)">
+                                <label class="form-check-label fw-bold" for="question_@index">
+                                    Soru @(index + 1)
+                                </label>
+                            </div>
+                            <span class="badge bg-primary">
+                                @GetQuestionTypeName(question.QuestionType)
+                            </span>
+                        </div>
+
+                        <div class="question-preview-card card border-0 shadow-sm">
+                            <div class="card-body">
+                                <!-- Question Info -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-star me-1"></i>@question.MinimumScore / @question.MaximumScore Puan
+                                        </span>
+                                    </div>
+
+                                    @if (!string.IsNullOrEmpty(question.QuestionBody))
+                                    {
+                                        <div class="question-context p-3 bg-light rounded mb-3">
+                                            <small class="text-muted d-block mb-1">
+                                                <i class="bi bi-info-circle me-1"></i>Bilgi/Ana Metin
+                                            </small>
+                                            <p class="mb-0">@question.QuestionBody</p>
+                                        </div>
+                                    }
+
+                                    <p class="fs-5 fw-semibold mb-3">@question.Question</p>
+
+                                    @if (question.BenefitCodes.Any())
+                                    {
+                                        <div class="mb-3">
+                                            <small class="text-muted d-block mb-2">
+                                                <i class="bi bi-bookmark me-1"></i>Kazanımlar:
+                                            </small>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @foreach (var benefitCode in question.BenefitCodes)
+                                                {
+                                                    <span class="badge bg-info">@benefitCode</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if (question.Options != null && question.Options.Any())
+                                    {
+                                        <div>
+                                            <small class="text-muted d-block mb-2">
+                                                <i class="bi bi-list-check me-1"></i>Seçenekler:
+                                            </small>
+                                            <div class="options-list">
+                                                @{
+                                                    int optionIndex = 0;
+                                                }
+                                                @foreach (var option in question.Options!)
+                                                {
+                                                    <div class="option-item @(option.Value ? "correct" : "")">
+                                                        <span class="option-letter">@GetOptionLetter(optionIndex++)</span>
+                                                        <span class="option-text">@option.Key</span>
+                                                        @if (option.Value)
+                                                        {
+                                                            <span class="badge bg-success ms-2">Doğru</span>
+                                                        }
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <hr class="my-4" />
+
+                <div class="d-flex gap-2 justify-content-between align-items-center flex-wrap">
+                    <div>
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle me-1"></i>
+                            @_selectedQuestionIndices.Count soru kaydedilecek
+                        </small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-danger" @onclick="ClearGeneratedQuestions">
+                            <i class="bi bi-trash me-2"></i>Temizle
+                        </button>
+                        <button class="btn btn-success"
+                                @onclick="SaveSelectedQuestionsAsync"
+                                disabled="@SaveSelectedQuestionButtonIsDisabled">
+                            @if (_isSaving)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                <span>Kaydediliyor...</span>
+                            }
+                            else
+                            {
+                                <i class="bi bi-save me-2"></i>
+                                <span>Seçilenleri Kaydet (@_selectedQuestionIndices.Count)</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+
+                @if (_isSaving)
+                {
+                    <div class="progress mt-3" style="height: 25px;">
+                        <div class="progress-bar bg-success"
+                             role="progressbar"
+                             style="width: @_saveProgress%">
+                            @_savedCount / @_selectedQuestionIndices.Count
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+
+    .ai-quiz-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .ai-icon {
+        font-size: 3rem;
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            opacity: 1;
         }
-    </ul>
-</div>
 
-<div class="form-check form-switch form-check-reverse">
-    <InputCheckbox class="form-check-input checkbox-large" type="checkbox" @bind-Value="_isQQBenefitLoaderVisible" id="flexCheckLoader" />
-    <label class="form-check-label" for="flexCheckLoader">Çapraz Kazanım (DENEYSEL)</label>
-</div>
+        50% {
+            opacity: 0.7;
+        }
+    }
 
-<QQBenefitAdd />
+    .bg-gradient-ai {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
 
-<button @onclick="CallAIAsync" class="btn btn-group btn-primary btn-lg m-2">Test</button>
+    .required::after {
+        content: " *";
+        color: #dc3545;
+    }
+
+    .generated-question-item {
+        padding: 1rem;
+        border-radius: 0.5rem;
+        border: 2px solid transparent;
+        transition: all 0.3s;
+    }
+
+        .generated-question-item.selected {
+            border-color: #198754;
+            background-color: #f0fdf4;
+        }
+
+    .question-selector {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+        .question-selector .form-check-input {
+            width: 1.5rem;
+            height: 1.5rem;
+            cursor: pointer;
+        }
+
+    .question-preview-card {
+        background: white;
+    }
+
+    .question-context {
+        border-left: 4px solid #0d6efd;
+    }
+
+    .options-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .option-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 0.375rem;
+        border: 2px solid transparent;
+    }
+
+        .option-item.correct {
+            background: #d1f4e0;
+            border-color: #198754;
+        }
+
+    .option-letter {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        background: #6c757d;
+        color: white;
+        border-radius: 50%;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+
+    .option-item.correct .option-letter {
+        background: #198754;
+    }
+
+    .option-text {
+        flex: 1;
+    }
+
+    .dropdown-menu {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .dropdown-item {
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+    .progress {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .benefit-section {
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: 1rem;
+        }
+
+        .ai-icon {
+            font-size: 2rem;
+        }
+    }
+
+</style>
+
 
 @inject IServiceProvider _ServiceProvider
 @inject IMediator _mediator
 
 @code {
     private IAIService? _aIServiceOpenAi;
-    private Dictionary<string, string> _languagePairs { get; set; } = [];
+    private Dictionary<string, string> _languagePairs { get; set; } = new();
     private KeyValuePair<string, string> _selectedLanguage;
 
-    private string? _userPrompt { get; set; }
+    private string _userPrompt { get; set; } = string.Empty;
     private string _howMuchQuestion { get; set; } = string.Empty;
-    private bool _isSucces { get; set; } = false;
+    private byte? _selectedQuestionType { get; set; }
+    private byte _difficultyLevel { get; set; } = 0;
+    private string? _selectedAIProvider { get; set; }
+    private string? _selectedAIModel { get; set; }
     private bool _isQQBenefitLoaderVisible { get; set; } = true;
+    private bool _isGenerating { get; set; } = false;
+    private bool _isSaving { get; set; } = false;
+    private bool _isSuccess { get; set; } = false;
+    private bool _hasError { get; set; } = false;
+    private string _errorMessage { get; set; } = string.Empty;
 
+    private int _progress { get; set; } = 0;
+    private string _progressMessage { get; set; } = string.Empty;
+    private int _saveProgress { get; set; } = 0;
+    private int _savedCount { get; set; } = 0;
 
+    private int _selectedBenefitId { get; set; }
+    private int _selectedLessonId { get; set; }
+    private Dictionary<string, string> _benefits { get; set; } = new();  // Code → Description (all benefits)
+    private Dictionary<string, string> _filteredBenefitsForAI { get; set; } = new();  // Code → Description (selected only, for AI)
+    private Dictionary<string, int> _benefitCodeToId { get; set; } = new();  // Code → ID (for saving)
+    private Dictionary<int, string> _selectedBenefits { get; set; } = new();  // Selected benefits for AI
+
+    private ICollection<CheckboxItem<int>> CheckboxItems { get; set; } = new List<CheckboxItem<int>>();
+
+    private List<AIQuestionGenerationResponse> _generatedAIQuestions { get; set; } = new();
+    private HashSet<int> _selectedQuestionIndices { get; set; } = new();
 
     protected override Task OnInitializedAsync()
     {
-        LoadLanguage();
-
+        LoadLanguages();
         _aIServiceOpenAi = _ServiceProvider.GetKeyedService<IAIService>("OpenAI");
-
         return base.OnInitializedAsync();
     }
 
-    private async Task HandleBenefitId(int benefiId)
+    private void LoadLanguages()
     {
-        GetListResponse<GetListByIdReferenceBenefitBenefitDto> response = await _mediator.Send(new GetListByIdReferenceBenefitBenefitQuery { Id = benefiId});
-
+        _languagePairs.Add("TUR", "Türkçe");
+        _languagePairs.Add("ENG", "İngilizce");
+        _languagePairs.Add("DEU", "Almanca");
+        _languagePairs.Add("FRA", "Fransızca");
     }
 
-    private Task HandleLessonId(int lessonId)
-    {
-        throw new NotImplementedException();
-    }
+    private bool GenerateButtonIsDisabled() => !CanGenerate() || _isGenerating;
+
+    private bool SaveSelectedQuestionButtonIsDisabled() => _selectedQuestionIndices.Count == 0 || _isSaving;
 
     private void SelectLanguage(KeyValuePair<string, string> langPair)
     {
         _selectedLanguage = langPair;
     }
 
-    private async Task CallAIAsync()
+    private void SelectQuestionType(byte typeKey)
     {
-        using CancellationTokenSource cts = new();
-        QuestionAIOutgoingModel aIOutgoingModel = new()
-            {
-                TeacherPrompt = _userPrompt,
-                Language = _selectedLanguage.Key,
-                HowMuchQuestion = uint.Parse(_howMuchQuestion),
-                HardLevel = 2,
-                LessonName = "Bilişim Teknolojileri",
-                QuestionType = Domain.Enums.QuestionType.TrueFalse,
-                Benefits = new Dictionary<string, string>()
-                {    {"BT.6.5.2.13.", "Bir algoritmayı uyarlamak için en uygun karar yapılarını seçer." },
-                     {"BT.6.5.2.14.", "Farklı programlama yapılarını kullanarak karmaşık problemlere çözüm üretir." },
-                     {"BT.6.5.2.15.", "Tüm programlama yapılarını içeren özgün bir proje oluşturur." }
-                }
-            };
-
-        await _aIServiceOpenAi.GenerateQuestionsFromAIAsync(outgoingModel: aIOutgoingModel, aiModel: "gpt-4o-mini", cancellationToken: cts.Token);
-        _isSucces = true;
+        _selectedQuestionType = typeKey;
     }
 
-
-    private void LoadLanguage()
+    private async Task HandleBenefitId(int benefitId)
     {
-        _languagePairs.Add("TUR", "Türkçe");
-        _languagePairs.Add("ENG", "Ingilizce");
+        try
+        {
+            _selectedBenefitId = benefitId;
+            GetListResponse<GetListByIdReferenceBenefitBenefitDto> response =
+                await _mediator.Send(new GetListByIdReferenceBenefitBenefitQuery { Id = benefitId });
+
+            _benefits.Clear();
+            _benefitCodeToId.Clear();
+            CheckboxItems.Clear();
+
+            foreach (var benefit in response.Items)
+            {
+                _benefits.Add(benefit.BenefitCode, benefit.Description);
+                _benefitCodeToId.Add(benefit.BenefitCode, benefit.Id);
+
+                CheckboxItems.Add(new CheckboxItem<int>
+                {
+                    Key = benefit.Id,
+                    DisplayValue = $"{benefit.BenefitCode} - {benefit.Description}"
+                });
+            }
+
+            // Close loader after loading benefits
+            _isQQBenefitLoaderVisible = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _hasError = true;
+            _errorMessage = "Kazanımlar yüklenirken hata oluştu: " + ex.Message;
+        }
+    }
+
+    private Task HandleLessonId(int lessonId)
+    {
+        _selectedLessonId = lessonId;
+        return Task.CompletedTask;
+    }
+
+    private void HandleSelectedBenefits(ICollection<CheckboxItem<int>> selectedItems)
+    {
+        _selectedBenefits = selectedItems.ToDictionary(item => item.Key, item => item.DisplayValue);
+
+        // Update _benefits dictionary for AI with selected benefits only
+        var selectedCodes = selectedItems
+            .Select(item => _benefitCodeToId.FirstOrDefault(x => x.Value == item.Key).Key)
+            .Where(code => !string.IsNullOrEmpty(code))
+            .ToList();
+
+        // Rebuild benefits dictionary with only selected ones
+        var tempBenefits = new Dictionary<string, string>();
+        foreach (var code in selectedCodes)
+        {
+            if (_benefits.ContainsKey(code))
+            {
+                tempBenefits[code] = _benefits[code];
+            }
+        }
+
+        // Keep original _benefits for reference, create filtered for AI
+        _filteredBenefitsForAI = tempBenefits;
+    }
+
+    private void ToggleBenefitLoader()
+    {
+        if (!_isQQBenefitLoaderVisible)
+        {
+            // Resetting when showing loader again
+            CheckboxItems.Clear();
+            _selectedBenefits.Clear();
+            _benefits.Clear();
+            _benefitCodeToId.Clear();
+        }
+    }
+
+    private bool CanGenerate()
+    {
+        return !string.IsNullOrWhiteSpace(_userPrompt) &&
+               !string.IsNullOrWhiteSpace(_howMuchQuestion) &&
+               !string.IsNullOrEmpty(_selectedLanguage.Key) &&
+               !string.IsNullOrEmpty(_selectedAIProvider) &&
+               !string.IsNullOrEmpty(_selectedAIModel) &&
+               _selectedQuestionType.HasValue &&
+               _difficultyLevel > 0 &&
+               _selectedBenefits.Count > 0;  // At least one benefit must be selected
+    }
+
+    private async Task GenerateQuestionsAsync()
+    {
+        if (!CanGenerate()) return;
+
+        try
+        {
+            _isGenerating = true;
+            _hasError = false;
+            _isSuccess = false;
+            _progress = 0;
+            _progressMessage = "AI bağlantısı kuruluyor...";
+            StateHasChanged();
+
+            await Task.Delay(500);
+            _progress = 20;
+            _progressMessage = "Soru parametreleri hazırlanıyor...";
+            StateHasChanged();
+
+            using CancellationTokenSource cts = new();
+
+            _progress = 50;
+            _progressMessage = "AI sorular oluşturuyor... Bu birkaç dakika sürebilir.";
+            StateHasChanged();
+
+            GetByIdLessonResponse lessonResponse = await _mediator.Send(new GetByIdLessonQuery { Id = _selectedLessonId });
+
+            AIQuestionGenerationRequest request = new()
+            {
+                TeacherPrompt = _userPrompt,
+                LanguageCode = _selectedLanguage.Key,
+                QuestionCount = int.Parse(_howMuchQuestion),
+                DifficultyLevel = _difficultyLevel,
+                LessonName = lessonResponse.LessonName,
+                QuestionType = (QuestionType)_selectedQuestionType!.Value,
+                LearningObjectives = _filteredBenefitsForAI  // Only selected benefits
+            };
+            ICollection<AIQuestionGenerationResponse>? result = await _aIServiceOpenAi!.GenerateQuestionsFromAIAsync(
+                generationRequest: request,
+                aiModel: _selectedAIModel!,
+                cancellationToken: cts.Token
+            );
+
+            _progress = 80;
+            _progressMessage = "Sorular işleniyor...";
+            StateHasChanged();
+
+            await Task.Delay(1000);
+
+            if (result != null && result.Count > 0)
+            {
+                _generatedAIQuestions = result.ToList();
+                // Auto-select all questions
+                _selectedQuestionIndices = Enumerable.Range(0, _generatedAIQuestions.Count).ToHashSet();
+            }
+            else
+            {
+                _hasError = true;
+                _errorMessage = "AI hiç soru üretemedi. Lütfen prompt'u değiştirip tekrar deneyin.";
+                return;
+            }
+
+            _progress = 100;
+            _progressMessage = "Tamamlandı!";
+            _isSuccess = true;
+            StateHasChanged();
+
+            await Task.Delay(1000);
+        }
+        catch (Exception ex)
+        {
+            _hasError = true;
+            _errorMessage = $"Sorular oluşturulurken hata oluştu: {ex.Message}";
+        }
+        finally
+        {
+            _isGenerating = false;
+            _progress = 0;
+            _progressMessage = string.Empty;
+            StateHasChanged();
+        }
+    }
+
+    private void ClearGeneratedQuestions()
+    {
+        _generatedAIQuestions.Clear();
+        _selectedQuestionIndices.Clear();
+        _isSuccess = false;
+    }
+
+    private bool IsQuestionSelected(int index)
+    {
+        return _selectedQuestionIndices.Contains(index);
+    }
+
+    private void ToggleQuestionSelection(int index)
+    {
+        if (_selectedQuestionIndices.Contains(index))
+        {
+            _selectedQuestionIndices.Remove(index);
+        }
+        else
+        {
+            _selectedQuestionIndices.Add(index);
+        }
+    }
+
+    private void SelectAllQuestions()
+    {
+        if (_selectedQuestionIndices.Count == _generatedAIQuestions.Count)
+        {
+            _selectedQuestionIndices.Clear();
+        }
+        else
+        {
+            _selectedQuestionIndices = Enumerable.Range(0, _generatedAIQuestions.Count).ToHashSet();
+        }
+    }
+
+    private string GetQuestionTypeName(QuestionType type)
+    {
+        return type switch
+        {
+            QuestionType.OpenEnded => "Açık Uçlu",
+            QuestionType.MultipleChoice => "Çoktan Seçmeli",
+            QuestionType.TrueFalse => "Doğru/Yanlış",
+            QuestionType.FillInTheBlank => "Boşluk Doldurma",
+            QuestionType.Matching => "Eşleştirme",
+            _ => "Bilinmeyen"
+        };
+    }
+
+    private string GetOptionLetter(int index)
+    {
+        Console.WriteLine();
+        return ((char)('A' + index)).ToString();
+    }
+
+    private async Task SaveSelectedQuestionsAsync()
+    {
+        if (_selectedQuestionIndices.Count == 0) return;
+
+        try
+        {
+            _isSaving = true;
+            _savedCount = 0;
+            _saveProgress = 0;
+            _hasError = false;
+            StateHasChanged();
+
+            var selectedQuestions = _selectedQuestionIndices
+                .OrderBy(i => i)
+                .Select(i => _generatedAIQuestions[i])
+                .ToList();
+
+            foreach (var question in selectedQuestions)
+            {
+                try
+                {
+                    // Convert QuestionOption to QuestionOptionAppDto
+                    ICollection<QuestionOptionAppDto?> optionAppDtos = [];
+
+                    if (question.Options != null && question.Options.Any())
+                    {
+                        foreach (var option in question.Options)
+                        {
+                            optionAppDtos.Add(new QuestionOptionAppDto
+                            {
+                                IsCorrect = option.Value,
+                                OptionText = option.Key
+                            });
+                        }
+                    }
+
+                    // Get benefit IDs from codes
+                    var benefitIds = question.BenefitCodes
+                        .Where(code => _benefitCodeToId.ContainsKey(code))
+                        .Select(code => _benefitCodeToId[code])
+                        .ToList();
+
+                    if (benefitIds.Count == 0)
+                    {
+                        _hasError = true;
+                        _errorMessage = $"Soru için geçerli kazanım bulunamadı. Benefit Codes: {string.Join(", ", question.BenefitCodes)}";
+                        break;
+                    }
+
+                    // Create command
+                    var command = new CreateQuizQuestionCommand
+                    {
+                        IsAIGenerated = true,
+                        RefBenefitId = _selectedBenefitId,
+                        LessonId = _selectedLessonId,
+                        BenefitIds = benefitIds,
+                        QuestionType = question.QuestionType,
+                        MaxScore = question.MaximumScore,
+                        Score = question.MaximumScore,
+                        QuestionBody = question.QuestionBody,
+                        Question = question.Question,
+                        QuestionImage = null,
+                        QQOptions = optionAppDtos
+                    };
+
+                    await _mediator.Send(command);
+
+                    _savedCount++;
+                    _saveProgress = (int)((_savedCount / (double)selectedQuestions.Count) * 100);
+                    StateHasChanged();
+
+                    await Task.Delay(100); // Small delay for UI update
+                }
+                catch (Exception ex)
+                {
+                    _hasError = true;
+                    _errorMessage = $"Soru kaydedilirken hata: {ex.Message}";
+                    break;
+                }
+            }
+
+            if (!_hasError)
+            {
+                _isSuccess = true;
+                _generatedAIQuestions.Clear();
+                _selectedQuestionIndices.Clear();
+            }
+        }
+        catch (Exception ex)
+        {
+            _hasError = true;
+            _errorMessage = $"Kayıt işlemi sırasında hata: {ex.Message}";
+        }
+        finally
+        {
+            _isSaving = false;
+            _saveProgress = 0;
+            _savedCount = 0;
+            StateHasChanged();
+        }
     }
 }

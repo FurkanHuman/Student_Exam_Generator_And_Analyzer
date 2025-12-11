@@ -1,8 +1,143 @@
 ﻿@using BlazorWebUI.Client.Pages.Styles.QQ.QuestionAnswerInputs
 @rendermode InteractiveAuto
+
+<div class="question-answer-container card border-0 shadow-sm mb-3">
+    <div class="card-header bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+                <span class="badge bg-primary me-2">@QuestionOrder</span>
+                <i class="bi bi-pencil-square me-2"></i>Cevap Girişi
+            </h6>
+            <span class="badge bg-info">
+                @QQStatic.SelectTypeOptionsTUR[QuestionData.SelectedQType]
+            </span>
+        </div>
+    </div>
+
+    <div class="card-body p-4">
+        @switch (QuestionData.SelectedQType)
+        {
+            case 1: // Open-ended
+                {
+                    <OpenEndedAnswerInput QuestionOptions="QuestionOptions"
+                                          ScoreMax="GetMaxScoreLimit()"
+                                          OnScore="(s) => OnScoreChanged(s)"
+                                          OnOpenEndedKeywords="(k) => OnAnswerText(k)"
+                                          OnEvaluationStatus="(e) => OnEvaluationStatus(e)" />
+                    break;
+                }
+
+            case 3: // Multiple choice
+                {
+                    <MultipleChoiceAnswerInput QuestionOptions="QuestionOptions"
+                                               ScoreMax="GetMaxScoreLimit()"
+                                               OnScore="(s) => OnScoreChanged(s)"
+                                               OnOptionId="(OId) => OnOptionId(OId)"
+                                               OnEvaluationStatus="(e) => OnEvaluationStatus(e)" />
+                    break;
+                }
+
+            case 4: // True/False
+                {
+                    <TrueFalseAnswerInput QuestionOptions="QuestionOptions"
+                                          ScoreMax="GetMaxScoreLimit()"
+                                          OnScore="(s) => OnScoreChanged(s)"
+                                          OnEncodedOptionAnswers="(k) => OnAnswerText(k)"
+                                          OnEvaluationStatus="(e) => OnEvaluationStatus(e)" />
+                    break;
+                }
+
+            case 5: // Fill in the blank
+                {
+                    <FillInTheBlankAnswerInput QuestionOptions="QuestionOptions"
+                                               ScoreMax="GetMaxScoreLimit()"
+                                               OnScore="(s) => OnScoreChanged(s)"
+                                               OnFillInTheBlankKeywords="(k) => OnAnswerText(k)"
+                                               OnEvaluationStatus="(e) => OnEvaluationStatus(e)" />
+                    break;
+                }
+
+            case 6: // Matching
+                {
+                    <MatchingAnswerInput QuestionOptions="QuestionOptions"
+                                         ScoreMax="GetMaxScoreLimit()"
+                                         OnScore="(s) => OnScoreChanged(s)"
+                                         OnEncodedOptionAnswers="(k) => OnAnswerText(k)"
+                                         OnEvaluationStatus="(e) => OnEvaluationStatus(e)"
+                                         Seed="Seed" />
+                    break;
+                }
+
+            case 7: // Ordering
+                {
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Sıralama Sorusu:</strong> Bu özellik henüz geliştirilme aşamasındadır.
+                    </div>
+                    break;
+                }
+
+            default:
+                {
+                    <div class="alert alert-danger">
+                        <i class="bi bi-x-circle me-2"></i>
+                        Geçersiz soru tipi.
+                    </div>
+                    break;
+                }
+        }
+    </div>
+
+    @if (QuestionAnswer.GivenScore.HasValue)
+    {
+        <div class="card-footer bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>Durum:
+                    <strong>@QQStatic.EvaluationStatusTUR[QuestionAnswer.EvaluationStatus]</strong>
+                </span>
+                <span class="badge bg-success fs-6">
+                    <i class="bi bi-star-fill me-1"></i>
+                    @QuestionAnswer.GivenScore / @GetMaxScoreLimit()
+                </span>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .question-answer-container {
+        animation: fadeIn 0.3s ease-out;
+        transition: all 0.3s;
+    }
+
+        .question-answer-container:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+        }
+
+    .card-header {
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .card-footer {
+        border-top: 2px solid #e9ecef;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
 @code {
     private QuestionAnswerDto QuestionAnswer { get; set; } = new();
-
     private IEnumerable<QuestionOptionDto> QuestionOptions { get; set; } = [];
 
     [Parameter]
@@ -26,6 +161,7 @@
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
+
         if (QuestionData != null)
             QuestionOptions = QuestionData.QuestionOptions ?? new List<QuestionOptionDto>();
 
@@ -44,7 +180,6 @@
         {
             QuestionAnswer = new QuestionAnswerDto();
         }
-
     }
 
     private int GetMaxScoreLimit()
@@ -78,80 +213,3 @@
         await OnQAnswer.InvokeAsync(QuestionAnswer);
     }
 }
-
-
-<div class="form-control mb-3">
-    <div class="d-flex align-items-center justify-content-between">
-
-        <span class="fw-bold me-3">@QuestionOrder. soru</span>
-
-        <div class="flex-grow-1 mx-3">
-            <div class="d-flex flex-column flex-md-row align-items-center flex-wrap gap-5 m-2">
-
-                @switch (QuestionData.SelectedQType)
-                {
-                    case 1: // Open-ended
-                        {
-                            <OpenEndedAnswerInput QuestionOptions="QuestionOptions"
-                                                  ScoreMax="GetMaxScoreLimit()"
-                                                  OnScore="(s) => OnScoreChanged(s)"
-                                                  OnOpenEndedKeywords="(k) => OnAnswerText(k)"
-                                                  OnEvaluationStatus="(e) => OnEvaluationStatus(e)" />
-
-                            break;
-                        }
-                    case 3: // Multiple choice
-                        {
-                            <MultipleChoiceAnswerInput QuestionOptions="QuestionOptions"
-                                                       ScoreMax="GetMaxScoreLimit()"
-                                                       OnScore="(s) => OnScoreChanged(s)"
-                                                       OnOptionId="(OId) => OnOptionId(OId)"
-                                                       OnEvaluationStatus="(e) => OnEvaluationStatus(e)" />
-                            break;
-                        }
-
-                    case 4: // True/False
-                        {
-                            <TrueFalseAnswerInput QuestionOptions="QuestionOptions"
-                                                  ScoreMax="GetMaxScoreLimit()"
-                                                  OnScore="(s) => OnScoreChanged(s)"
-                                                  OnEncodedOptionAnswers="(k) => OnAnswerText(k)"
-                                                  OnEvaluationStatus="(e) => OnEvaluationStatus(e)" />
-                            break;
-                        }
-                    case 5: // Fill in the blank
-                        {
-                            <FillInTheBlankAnswerInput QuestionOptions="QuestionOptions"
-                                                       ScoreMax="GetMaxScoreLimit()"
-                                                       OnScore="(s) => OnScoreChanged(s)"
-                                                       OnFillInTheBlankKeywords="(k) => OnAnswerText(k)"
-                                                       OnEvaluationStatus="(e) => OnEvaluationStatus(e)" />
-                            break;
-                        }
-                    case 6: // Matching
-                        {
-                            <MatchingAnswerInput QuestionOptions="QuestionOptions"
-                                                 ScoreMax="GetMaxScoreLimit()"
-                                                 OnScore="(s) => OnScoreChanged(s)"
-                                                 OnEncodedOptionAnswers="(k) => OnAnswerText(k)"
-                                                 OnEvaluationStatus="(e) => OnEvaluationStatus(e)"
-                                                 Seed="Seed" />
-                            break;
-                        }
-                    case 7: // Ordering
-                        {
-                            <p>Planlanan Komponent</p>
-                            <p>Geçersiz soru tipi.</p>
-                            break;
-                        }
-
-                    default:
-                        {
-                            <p>Geçersiz soru tipi.</p>
-                            break;
-                        }
-                }
-            </div>
-        </div>
-    </div>
-</div>
