@@ -14,6 +14,7 @@ namespace Application.Features.QuizQuestions.Commands.Create;
 
 public class CreateQuizQuestionCommand : IRequest<CreatedQuizQuestionResponse>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
+    public bool IsAIGenerated { get; set; } = false;
     public int LessonId { get; set; }
     public ICollection<int> BenefitIds { get; set; } = [];
     public required int Score { get; set; }
@@ -68,10 +69,10 @@ public class CreateQuizQuestionCommand : IRequest<CreatedQuizQuestionResponse>, 
 
             quizQuestion.Options = [.. questionOptions];
             quizQuestion.QuestionScore = questionScore;
-            quizQuestion.Lessons = lessons.ToArray();
-            quizQuestion.Benefits = benefits.ToArray();
+            quizQuestion.Lessons = [.. lessons];
+            quizQuestion.Benefits = [.. benefits];
 
-            await _quizQuestionRepository.AddAsync(quizQuestion);
+            await _quizQuestionRepository.AddAsync(quizQuestion, cancellationToken);
 
             CreatedQuizQuestionResponse response = _mapper.Map<CreatedQuizQuestionResponse>(quizQuestion);
             return response;
