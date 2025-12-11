@@ -1,0 +1,16 @@
+Model,ShortName,Provider,ProviderDisplayName
+gpt-5-mini-2025-08-07,GPT-5 Mini,OpenAI,OpenAI
+gpt-4o,GPT-4 Omni,OpenAI,OpenAI
+gpt-4o-mini,GPT-4 Omni Mini,OpenAI,OpenAI
+gpt-4-turbo,GPT-4 Turbo,OpenAI,OpenAI
+gpt-3.5-turbo,GPT-3.5 Turbo,OpenAI,OpenAI
+claude-3-5-sonnet-20241022,Claude 3.5 Sonnet,Anthropic,Anthropic (Claude)
+claude-3-opus-20240229,Claude 3 Opus,Anthropic,Anthropic (Claude)
+claude-3-sonnet-20240229,Claude 3 Sonnet,Anthropic,Anthropic (Claude)
+claude-3-haiku-20240307,Claude 3 Haiku,Anthropic,Anthropic (Claude)
+gemini-2.0-flash-exp,Gemini 2.0 Flash,Google,Google (Gemini)
+gemini-1.5-pro,Gemini 1.5 Pro,Google,Google (Gemini)
+gemini-1.5-flash,Gemini 1.5 Flash,Google,Google (Gemini)
+gpt-4o,GPT-4 Omni (Azure),Azure,Azure OpenAI
+gpt-4-turbo,GPT-4 Turbo (Azure),Azure,Azure OpenAI
+gpt-35-turbo,GPT-3.5 Turbo (Azure),Azure,Azure OpenAI
