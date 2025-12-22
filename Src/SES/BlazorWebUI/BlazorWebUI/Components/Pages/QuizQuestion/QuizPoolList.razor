@@ -80,6 +80,7 @@
                         {
                             <span>Seçilen kriterlere uygun soru bulunmuyor.</span>
                         }
+
                         else
                         {
                             <span>Başlamak için yukarıdan dönem ve ders seçin.</span>
@@ -95,6 +96,7 @@
             </div>
         </div>
     }
+
     else if (_listOfQQBodyDto.Count > 0)
     {
         <!-- Question List with Stats -->
@@ -162,7 +164,7 @@
                         <div class="col-md-3">
                             <select class="form-select" value="@_filterByType" @onchange="OnFilterTypeChanged">
                                 <option value="0">Tüm Soru Türleri</option>
-                                @foreach (var type in QQStatic.SelectTypeOptionsTUR)
+                                @foreach (KeyValuePair<byte, string> type in QQStatic.SelectTypeOptionsTUR)
                                 {
                                     <option value="@type.Key">@type.Value</option>
                                 }
@@ -190,9 +192,10 @@
                 @{
                     int questionIndex = 0;
                 }
-                @foreach (var question in _filteredQuestions)
+
+                @foreach (QQBodyDto question in _filteredQuestions)
                 {
-                    var currentIndex = ++questionIndex;
+                    int currentIndex = ++questionIndex;
                     <div class="question-item">
                         <div class="question-number">
                             <span class="badge bg-secondary">@currentIndex</span>
@@ -219,15 +222,7 @@
         margin: 0 auto;
         padding: 1rem;
     }
-@* 
-    .page-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 1rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
- *@
+
     .filter-section {
         animation: slideDown 0.3s ease-out;
     }
@@ -357,11 +352,13 @@
 
             ApplyFiltersAndSort();
         }
+
         catch (Exception ex)
         {
             _hasError = true;
             _errorMessage = "Sorular yüklenirken bir hata oluştu: " + ex.Message;
         }
+
         finally
         {
             _isLoading = false;
@@ -388,13 +385,11 @@
     private void OnFilterTypeChanged(ChangeEventArgs e)
     {
         if (byte.TryParse(e.Value?.ToString(), out byte value))
-        {
             _filterByType = value;
-        }
+
         else
-        {
             _filterByType = 0;
-        }
+
         ApplyFiltersAndSort();
     }
 
@@ -406,21 +401,17 @@
 
     private void ApplyFiltersAndSort()
     {
-        var filtered = _listOfQQBodyDto.AsEnumerable();
+        IEnumerable<QQBodyDto> filtered = _listOfQQBodyDto.AsEnumerable();
 
         if (!string.IsNullOrWhiteSpace(_searchQuery))
-        {
             filtered = filtered.Where(q =>
                 (q.QuestionBody?.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
                 (q.Question?.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
                 q.SelectedBenefits.Values.Any(b => b.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase))
             );
-        }
 
         if (_filterByType > 0)
-        {
             filtered = filtered.Where(q => q.SelectedQType == _filterByType);
-        }
 
         filtered = _sortBy switch
         {

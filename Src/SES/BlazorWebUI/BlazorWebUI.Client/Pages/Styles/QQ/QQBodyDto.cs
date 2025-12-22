@@ -8,6 +8,7 @@ public class QQBodyDto
     public byte SelectedQType { get; set; }
     public int Score { get; set; }
     public int MaxScore { get; set; }
+    public bool IsAIGenerated { get; set; } = false;
     public FileData? FileData { get; set; }
     public IDictionary<int, string> SelectedBenefits { get; set; } = new Dictionary<int, string>();
     public ICollection<QuestionOptionDto> QuestionOptions { get; set; } = [];

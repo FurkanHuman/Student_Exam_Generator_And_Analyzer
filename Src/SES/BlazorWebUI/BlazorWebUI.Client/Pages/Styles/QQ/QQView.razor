@@ -1,18 +1,27 @@
 ﻿@if (QQBody != null)
 {
     <div class="card p-4 mb-3 shadow-lg">
-        <p><strong>Soru Türü:</strong> @selectedQtype(QQBody.SelectedQType)</p>
+        <p class="mb-3"><strong>Soru Türü:</strong> @selectedQtype(QQBody.SelectedQType)</p>
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 class="mb-0"><strong>Soru Detayları</strong></h3>
             <div class="d-flex gap-2 align-items-center">
                 <button class="btn btn-primary" @onclick="() => ModalDialog.Open()">
+                    <i class="bi bi-eye me-1"></i>
                     Kazanımları görüntüle
                 </button>
-                <span class="badge bg-primary fs-5">@QQBody.Score / @QQBody.MaxScore</span>
+                <span class="badge bg-primary fs-5 px-3 py-2">
+                    @QQBody.Score / @QQBody.MaxScore
+                </span>
+
+                @if (QQBody.IsAIGenerated)
+                {
+                    <span class="badge bg-info text-white fs-6 px-3 py-2 d-flex align-items-center gap-1">
+                        <i class="bi bi-robot"></i>
+                    </span>
+                }
             </div>
         </div>
-
         <hr />
 
         @if (QQBody.FileData != null && !string.IsNullOrWhiteSpace(QQBody.FileData.Id))
