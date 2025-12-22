@@ -27,6 +27,6 @@ internal class StudentExamAnswerConfiguration : IEntityTypeConfiguration<Student
         builder.Property(sea => sea.UpdatedDate);
         builder.Property(sea => sea.DeletedDate);
 
-        builder.HasQueryFilter(sea => !sea.DeletedDate.HasValue);
+        builder.HasQueryFilter(sea => !sea.DeletedDate.HasValue && sea.DeletedDate.HasValue);
     }
 }
