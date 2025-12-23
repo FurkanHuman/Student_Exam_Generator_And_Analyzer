@@ -6,6 +6,7 @@ using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NArchitecture.Core.Application.Responses;
@@ -15,25 +16,18 @@ namespace Application.BackroundServices;
 
 internal class AnalysisAutomationService : BackgroundService
 {
-    private readonly IMediator _mediatr;
-    private readonly IExamService _examService;
-    private readonly IPrincipalService _principalService;
-    private readonly IAnalysisRepository _analysisRepository;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<AnalysisAutomationService> _logger;
     private readonly IConfiguration _configuration;
 
-    public AnalysisAutomationService(
-        IMediator mediatr,
-        IExamService examService,
-        IPrincipalService principalService,
-        IAnalysisRepository analysisRepository,
-        ILogger<AnalysisAutomationService> logger,
-        IConfiguration configuration)
+    private IMediator _mediatr;
+    private IExamService _examService;
+    private IPrincipalService _principalService;
+    private IAnalysisRepository _analysisRepository;
+    
+    public AnalysisAutomationService(IServiceScopeFactory serviceScopeFactory, ILogger<AnalysisAutomationService> logger, IConfiguration configuration)
     {
-        _mediatr = mediatr;
-        _examService = examService;
-        _principalService = principalService;
-        _analysisRepository = analysisRepository;
+        _serviceScopeFactory = serviceScopeFactory;
         _logger = logger;
         _configuration = configuration;
     }
@@ -47,6 +41,12 @@ internal class AnalysisAutomationService : BackgroundService
             _logger.LogInformation("Analysis automation service is disabled");
             return;
         }
+
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        _mediatr = scope.ServiceProvider.GetRequiredService<IMediator>();
+        _examService = scope.ServiceProvider.GetRequiredService<IExamService>();
+        _principalService = scope.ServiceProvider.GetRequiredService<IPrincipalService>();
+        _analysisRepository = scope.ServiceProvider.GetRequiredService<IAnalysisRepository>();
 
         _logger.LogInformation("Analysis automation service started");
 

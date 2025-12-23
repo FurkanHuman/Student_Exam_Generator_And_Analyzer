@@ -25,6 +25,7 @@ using Application.Services.Teachers;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
@@ -108,8 +109,11 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IAnalysisCalculatorFactory<BenefitRadarResultDto>, BenefitRadarDataCalculator>();
         services.AddScoped<AnalysisComputationEngine>();
 
-        services.AddScoped<AnalysisAutomationService>();
-        services.AddScoped<AnalysisAIAutomationService>();
+        services.AddHostedService<AnalysisAutomationService>();
+        services.AddSingleton<IHostedService, AnalysisAutomationService>();
+
+        services.AddHostedService<AnalysisAIAutomationService>();
+        services.AddSingleton<IHostedService, AnalysisAIAutomationService>();
 
         services.AddScoped<PdfReaderStudentManager>();
         services.AddScoped<IExamPageGenerator, ExamPageRenderer>();

@@ -3,9 +3,11 @@ using Application.Services.AIService;
 using Application.Services.AIService.Models;
 using Application.Services.Analyses;
 using Application.Services.CalculatorFactory;
+using Application.Services.Exams;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NArchitecture.Core.Persistence.Paging;
@@ -15,22 +17,20 @@ namespace Application.BackroundServices;
 
 internal class AnalysisAIAutomationService : BackgroundService
 {
-    private readonly IAnalysisService _analysisService;
-    private readonly AnalysisComputationEngine _analysisEngine;
-    private readonly IAIServiceFactory _aiServiceFactory;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<AnalysisAIAutomationService> _logger;
     private readonly IConfiguration _configuration;
 
+    private IAnalysisService _analysisService;
+    private AnalysisComputationEngine _analysisEngine;
+    private IAIServiceFactory _aiServiceFactory;
+
     public AnalysisAIAutomationService(
-        IAnalysisService analysisService,
-        AnalysisComputationEngine analysisEngine,
-        IAIServiceFactory aiServiceFactory,
+        IServiceScopeFactory serviceScopeFactory,
         ILogger<AnalysisAIAutomationService> logger,
         IConfiguration configuration)
     {
-        _analysisService = analysisService;
-        _analysisEngine = analysisEngine;
-        _aiServiceFactory = aiServiceFactory;
+        _serviceScopeFactory = serviceScopeFactory;
         _logger = logger;
         _configuration = configuration;
     }
@@ -39,11 +39,17 @@ internal class AnalysisAIAutomationService : BackgroundService
     {
         bool enabled = _configuration.GetValue<bool>("BackgroundServices:AIAnalysisAutomation:Enabled");
 
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+
         if (!enabled)
         {
             _logger.LogInformation("AI analysis automation service is disabled");
             return;
         }
+
+        _analysisService = scope.ServiceProvider.GetRequiredService<IAnalysisService>();
+        _analysisEngine = scope.ServiceProvider.GetRequiredService<AnalysisComputationEngine>();
+        _aiServiceFactory = scope.ServiceProvider.GetRequiredService<IAIServiceFactory>();
 
         _logger.LogInformation("AI analysis automation service started\n\tBatch processes may take up to 24 hours.");
 
