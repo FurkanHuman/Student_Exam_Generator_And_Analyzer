@@ -37,7 +37,7 @@ internal class AnalysisAIAutomationService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        bool enabled = _configuration.GetValue<bool>("BackgroundServices:AIAnalysisAutomation:Enabled", true);
+        bool enabled = _configuration.GetValue<bool>("BackgroundServices:AIAnalysisAutomation:Enabled");
 
         if (!enabled)
         {

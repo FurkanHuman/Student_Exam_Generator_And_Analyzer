@@ -40,7 +40,7 @@ internal class AnalysisAutomationService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        bool enabled = _configuration.GetValue<bool>("BackgroundServices:AnalysisAutomation:Enabled", true);
+        bool enabled = _configuration.GetValue<bool>("BackgroundServices:AnalysisAutomation:Enabled");
 
         if (!enabled)
         {
@@ -52,7 +52,7 @@ internal class AnalysisAutomationService : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            int intervalMinutes = _configuration.GetValue<int>("BackgroundServices:AnalysisAutomation:IntervalMinutes", 60);
+            int intervalMinutes = _configuration.GetValue<int>("BackgroundServices:AnalysisAutomation:IntervalMinutes");
 
             await ProcessAnalysisAutomation(stoppingToken);
             await Task.Delay(TimeSpan.FromMinutes(intervalMinutes), stoppingToken);
