@@ -7,7 +7,7 @@ using OpenAI;
 using OpenAI.Chat;
 using System.Text.Json;
 
-namespace Infrastructure.Adapters.AIService;
+namespace Infrastructure.Adapters.AIService.OpenAI;
 
 public class OpenAIServiceAdapter : IAIService
 {
