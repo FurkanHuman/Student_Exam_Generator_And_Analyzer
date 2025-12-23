@@ -150,7 +150,7 @@
                             @(!string.IsNullOrEmpty(_selectedLanguage.Value) ? _selectedLanguage.Value : "Dil Seçin")
                         </button>
                         <ul class="dropdown-menu w-100">
-                            @foreach (var language in _languagePairs)
+                            @foreach (KeyValuePair<string, string> language in QQStatic.LanguagePairsTUR)
                             {
                                 <li>
                                     <a class="dropdown-item" @onclick="() => SelectLanguage(language)">
@@ -177,7 +177,7 @@
                                                         : "Soru Türü Seçin")
                         </button>
                         <ul class="dropdown-menu w-100">
-                            @foreach (var type in QQStatic.SelectTypeOptionsTUR)
+                            @foreach (KeyValuePair<byte, string> type in QQStatic.SelectTypeOptionsTUR)
                             {
                                 <li>
                                     <a class="dropdown-item" @onclick="() => SelectQuestionType(type.Key)">
@@ -334,7 +334,7 @@
                                                 <i class="bi bi-bookmark me-1"></i>Kazanımlar:
                                             </small>
                                             <div class="d-flex flex-wrap gap-2">
-                                                @foreach (var benefitCode in question.BenefitCodes)
+                                                @foreach (string? benefitCode in question.BenefitCodes)
                                                 {
                                                     <span class="badge bg-info">@benefitCode</span>
                                                 }
@@ -352,7 +352,7 @@
                                                 @{
                                                     int optionIndex = 0;
                                                 }
-                                                @foreach (var option in question.Options!)
+                                                @foreach (KeyValuePair<string, bool> option in question.Options!)
                                                 {
                                                     <div class="option-item @(option.Value ? "correct" : "")">
                                                         <span class="option-letter">@GetOptionLetter(optionIndex++)</span>
@@ -580,20 +580,18 @@
 </style>
 
 
-@inject IServiceProvider _ServiceProvider
+@inject IAIServiceFactory _ServiceProvider
 @inject IMediator _mediator
 
 @code {
-    private IAIService? _aIServiceOpenAi;
-    private Dictionary<string, string> _languagePairs { get; set; } = new();
     private KeyValuePair<string, string> _selectedLanguage;
 
     private string _userPrompt { get; set; } = string.Empty;
     private string _howMuchQuestion { get; set; } = string.Empty;
     private byte? _selectedQuestionType { get; set; }
     private byte _difficultyLevel { get; set; } = 0;
-    private string? _selectedAIProvider { get; set; }
-    private string? _selectedAIModel { get; set; }
+    private string _selectedAIProvider { get; set; } = string.Empty;
+    private string _selectedAIModel { get; set; } = string.Empty;
     private bool _isQQBenefitLoaderVisible { get; set; } = true;
     private bool _isGenerating { get; set; } = false;
     private bool _isSaving { get; set; } = false;
@@ -617,21 +615,6 @@
 
     private List<AIQuestionGenerationResponse> _generatedAIQuestions { get; set; } = new();
     private HashSet<int> _selectedQuestionIndices { get; set; } = new();
-
-    protected override Task OnInitializedAsync()
-    {
-        LoadLanguages();
-        _aIServiceOpenAi = _ServiceProvider.GetKeyedService<IAIService>("OpenAI");
-        return base.OnInitializedAsync();
-    }
-
-    private void LoadLanguages()
-    {
-        _languagePairs.Add("TUR", "Türkçe");
-        _languagePairs.Add("ENG", "İngilizce");
-        _languagePairs.Add("DEU", "Almanca");
-        _languagePairs.Add("FRA", "Fransızca");
-    }
 
     private bool GenerateButtonIsDisabled() => !CanGenerate() || _isGenerating;
 
@@ -659,7 +642,7 @@
             _benefitCodeToId.Clear();
             CheckboxItems.Clear();
 
-            foreach (var benefit in response.Items)
+            foreach (GetListByIdReferenceBenefitBenefitDto benefit in response.Items)
             {
                 _benefits.Add(benefit.BenefitCode, benefit.Description);
                 _benefitCodeToId.Add(benefit.BenefitCode, benefit.Id);
@@ -675,6 +658,7 @@
             _isQQBenefitLoaderVisible = false;
             StateHasChanged();
         }
+
         catch (Exception ex)
         {
             _hasError = true;
@@ -693,20 +677,16 @@
         _selectedBenefits = selectedItems.ToDictionary(item => item.Key, item => item.DisplayValue);
 
         // Update _benefits dictionary for AI with selected benefits only
-        var selectedCodes = selectedItems
+        IList<string> selectedCodes = selectedItems
             .Select(item => _benefitCodeToId.FirstOrDefault(x => x.Value == item.Key).Key)
             .Where(code => !string.IsNullOrEmpty(code))
             .ToList();
 
         // Rebuild benefits dictionary with only selected ones
-        var tempBenefits = new Dictionary<string, string>();
-        foreach (var code in selectedCodes)
-        {
+        Dictionary<string, string> tempBenefits = new Dictionary<string, string>();
+        foreach (string? code in selectedCodes)
             if (_benefits.ContainsKey(code))
-            {
                 tempBenefits[code] = _benefits[code];
-            }
-        }
 
         // Keep original _benefits for reference, create filtered for AI
         _filteredBenefitsForAI = tempBenefits;
@@ -726,6 +706,7 @@
 
     private bool CanGenerate()
     {
+        // simple validation
         return !string.IsNullOrWhiteSpace(_userPrompt) &&
                !string.IsNullOrWhiteSpace(_howMuchQuestion) &&
                !string.IsNullOrEmpty(_selectedLanguage.Key) &&
@@ -739,6 +720,8 @@
     private async Task GenerateQuestionsAsync()
     {
         if (!CanGenerate()) return;
+
+        IAIService _aIService = _ServiceProvider.GetService(_selectedAIProvider);
 
         try
         {
@@ -772,7 +755,9 @@
                 QuestionType = (QuestionType)_selectedQuestionType!.Value,
                 LearningObjectives = _filteredBenefitsForAI  // Only selected benefits
             };
-            ICollection<AIQuestionGenerationResponse>? result = await _aIServiceOpenAi!.GenerateQuestionsFromAIAsync(
+
+
+            ICollection<AIQuestionGenerationResponse>? result = await _aIService.GenerateQuestionsFromAIAsync(
                 generationRequest: request,
                 aiModel: _selectedAIModel!,
                 cancellationToken: cts.Token
@@ -790,6 +775,7 @@
                 // Auto-select all questions
                 _selectedQuestionIndices = Enumerable.Range(0, _generatedAIQuestions.Count).ToHashSet();
             }
+
             else
             {
                 _hasError = true;
@@ -804,11 +790,13 @@
 
             await Task.Delay(1000);
         }
+
         catch (Exception ex)
         {
             _hasError = true;
             _errorMessage = $"Sorular oluşturulurken hata oluştu: {ex.Message}";
         }
+
         finally
         {
             _isGenerating = false;
@@ -833,25 +821,19 @@
     private void ToggleQuestionSelection(int index)
     {
         if (_selectedQuestionIndices.Contains(index))
-        {
             _selectedQuestionIndices.Remove(index);
-        }
+
         else
-        {
             _selectedQuestionIndices.Add(index);
-        }
     }
 
     private void SelectAllQuestions()
     {
         if (_selectedQuestionIndices.Count == _generatedAIQuestions.Count)
-        {
             _selectedQuestionIndices.Clear();
-        }
+
         else
-        {
             _selectedQuestionIndices = Enumerable.Range(0, _generatedAIQuestions.Count).ToHashSet();
-        }
     }
 
     private string GetQuestionTypeName(QuestionType type)
@@ -885,12 +867,12 @@
             _hasError = false;
             StateHasChanged();
 
-            var selectedQuestions = _selectedQuestionIndices
+            IList<AIQuestionGenerationResponse> selectedQuestions = _selectedQuestionIndices
                 .OrderBy(i => i)
                 .Select(i => _generatedAIQuestions[i])
                 .ToList();
 
-            foreach (var question in selectedQuestions)
+            foreach (AIQuestionGenerationResponse question in selectedQuestions)
             {
                 try
                 {
@@ -898,19 +880,15 @@
                     ICollection<QuestionOptionAppDto?> optionAppDtos = [];
 
                     if (question.Options != null && question.Options.Any())
-                    {
-                        foreach (var option in question.Options)
-                        {
+                        foreach (KeyValuePair<string, bool> option in question.Options)
                             optionAppDtos.Add(new QuestionOptionAppDto
                             {
                                 IsCorrect = option.Value,
                                 OptionText = option.Key
                             });
-                        }
-                    }
 
                     // Get benefit IDs from codes
-                    var benefitIds = question.BenefitCodes
+                    IList<int> benefitIds = question.BenefitCodes
                         .Where(code => _benefitCodeToId.ContainsKey(code))
                         .Select(code => _benefitCodeToId[code])
                         .ToList();
@@ -923,7 +901,7 @@
                     }
 
                     // Create command
-                    var command = new CreateQuizQuestionCommand
+                    CreateQuizQuestionCommand command = new()
                     {
                         IsAIGenerated = true,
                         RefBenefitId = _selectedBenefitId,
