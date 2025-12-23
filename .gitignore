@@ -412,3 +412,4 @@ Src/SES/WebAPI/*
 # Local configuration file
 /Src/SES/BlazorWebUI/BlazorWebUI/appsettings.Development.json
 /ZeroFileTester
+/StudentExamGeneratorAndAnalyzer.Development.slnx
