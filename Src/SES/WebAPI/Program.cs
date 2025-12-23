@@ -19,18 +19,7 @@ using WebAPI;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddApplicationServices(
-    mailSettings: builder.Configuration.GetSection("MailSettings").Get<MailSettings>()
-        ?? throw new InvalidOperationException("MailSettings section cannot found in configuration."),
-    fileLogConfiguration: builder
-        .Configuration.GetSection("SeriLogConfigurations:FileLogConfiguration")
-        .Get<FileLogConfiguration>()
-        ?? throw new InvalidOperationException("FileLogConfiguration section cannot found in configuration."),
-    elasticSearchConfig: builder.Configuration.GetSection("ElasticSearchConfig").Get<ElasticSearchConfig>()
-        ?? throw new InvalidOperationException("ElasticSearchConfig section cannot found in configuration.")
-//,tokenOptions: builder.Configuration.GetSection("TokenOptions").Get<TokenOptions>()
-//?? throw new InvalidOperationException("TokenOptions section cannot found in configuration.")
-);
+builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddInfrastructureServices();
 builder.Services.AddHttpContextAccessor();
@@ -114,4 +103,4 @@ app.UseCors(opt => opt.WithOrigins(webApiConfiguration.AllowedOrigins).AllowAnyH
 
 app.UseResponseLocalization();
 
-app.Run();
+await app.RunAsync();

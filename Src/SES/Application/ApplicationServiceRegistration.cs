@@ -23,6 +23,7 @@ using Application.Services.Students;
 using Application.Services.SubLearningAreas;
 using Application.Services.Teachers;
 using FluentValidation;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
@@ -43,16 +44,19 @@ namespace Application;
 
 public static class ApplicationServiceRegistration
 {
-    public static IServiceCollection AddApplicationServices(
-        this IServiceCollection services,
-        MailSettings mailSettings,
-        FileLogConfiguration fileLogConfiguration,
-        ElasticSearchConfig elasticSearchConfig
-    )
-
-
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
+        MailSettings mailSettings = configuration.GetSection("MailSettings").Get<MailSettings>()
+            ?? throw new InvalidOperationException("MailSettings configuration is missing");
+
+        FileLogConfiguration fileLogConfiguration = configuration.GetSection("SeriLogConfigurations:FileLogConfiguration").Get<FileLogConfiguration>()
+            ?? throw new InvalidOperationException("FileLogConfiguration configuration is missing");
+
+        ElasticSearchConfig elasticSearchConfig = configuration.GetSection("ElasticSearchConfig").Get<ElasticSearchConfig>()
+            ?? throw new InvalidOperationException("ElasticSearchConfig configuration is missing");
+
         services.AddAutoMapper(cfg => { }, Assembly.GetExecutingAssembly());
+
         services.AddMediatR(configuration =>
         {
             configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
@@ -77,23 +81,21 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IBenefitService, BenefitManager>();
         services.AddScoped<IExamService, ExamManager>();
         services.AddScoped<ILearningAreaService, LearningAreaManager>();
-        services.AddScoped<ILearningAreaService, LearningAreaManager>();
+        services.AddScoped<ILessonService, LessonManager>();
+        services.AddScoped<IPersonelService, PersonelManager>();
         services.AddScoped<IPrincipalService, PrincipalManager>();
         services.AddScoped<IQuestionOptionService, QuestionOptionManager>();
         services.AddScoped<IQuestionScoreService, QuestionScoreManager>();
+        services.AddScoped<IQuizQuestionService, QuizQuestionManager>();
         services.AddScoped<IReferenceBenefitService, ReferenceBenefitManager>();
         services.AddScoped<ISchoolService, SchoolManager>();
         services.AddScoped<ISemesterService, SemesterManager>();
         services.AddScoped<IStudentService, StudentManager>();
         services.AddScoped<IStudentAnswerService, StudentAnswerManager>();
+        services.AddScoped<IStudentClassService, StudentClassManager>();
         services.AddScoped<IStudentExamAnswerService, StudentExamAnswerManager>();
         services.AddScoped<ISubLearningAreaService, SubLearningAreaManager>();
         services.AddScoped<ITeacherService, TeacherManager>();
-        services.AddScoped<IStudentClassService, StudentClassManager>();
-        services.AddScoped<IQuizQuestionService, QuizQuestionManager>();
-        services.AddScoped<IPersonelService, PersonelManager>();
-        services.AddScoped<ILessonService, LessonManager>();
-        services.AddScoped<IPersonelService, PersonelManager>();
         services.AddScoped<IPdfReaderService, PdfReaderManager>();
 
         services.AddScoped<IAnalysisCalculatorFactory<IList<AnalysisDetailTableDto>>, AnalysisDetailTableCalculator>();
@@ -103,7 +105,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IAnalysisCalculatorFactory<AdvancedStatisticsData>, AnalysisAdvancedStatisticsCalculator>();
         services.AddScoped<IAnalysisCalculatorFactory<List<List<StudentPerformanceDto>>>, AnalysisClusteringFactory>();
         services.AddScoped<IAnalysisCalculatorFactory<BenefitAnalysisResultDto>, AnalysisBenefitCalculator>();
-        services.AddScoped<IAnalysisCalculatorFactory<BenefitRadarResultDto>,BenefitRadarDataCalculator>();
+        services.AddScoped<IAnalysisCalculatorFactory<BenefitRadarResultDto>, BenefitRadarDataCalculator>();
         services.AddScoped<AnalysisComputationEngine>();
 
         services.AddScoped<AnalysisAutomationService>();
