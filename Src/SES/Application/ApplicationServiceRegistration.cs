@@ -109,6 +109,8 @@ public static class ApplicationServiceRegistration
         services.AddScoped<AnalysisComputationEngine>();
 
         services.AddScoped<AnalysisAutomationService>();
+        services.AddScoped<AnalysisAIAutomationService>();
+
         services.AddScoped<PdfReaderStudentManager>();
         services.AddScoped<IExamPageGenerator, ExamPageRenderer>();
 
