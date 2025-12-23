@@ -5,83 +5,156 @@ using Application.Services.Repositories;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using NArchitecture.Core.Application.Responses;
 using NArchitecture.Core.Persistence.Paging;
 
 namespace Application.BackroundServices;
-internal class AnalysisAutomationService(IMediator mediatr, IExamService examService, IPrincipalService principalService, IAnalysisRepository analysisRepository) : BackgroundService
+
+internal class AnalysisAutomationService : BackgroundService
 {
-    private const int DelayInDays = 15;
+    private readonly IMediator _mediatr;
+    private readonly IExamService _examService;
+    private readonly IPrincipalService _principalService;
+    private readonly IAnalysisRepository _analysisRepository;
+    private readonly ILogger<AnalysisAutomationService> _logger;
+    private readonly IConfiguration _configuration;
+
+    public AnalysisAutomationService(
+        IMediator mediatr,
+        IExamService examService,
+        IPrincipalService principalService,
+        IAnalysisRepository analysisRepository,
+        ILogger<AnalysisAutomationService> logger,
+        IConfiguration configuration)
+    {
+        _mediatr = mediatr;
+        _examService = examService;
+        _principalService = principalService;
+        _analysisRepository = analysisRepository;
+        _logger = logger;
+        _configuration = configuration;
+    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        int? activeSemesterIdTask = await IsWithinSemesterDateRange();
+        bool enabled = _configuration.GetValue<bool>("BackgroundServices:AnalysisAutomation:Enabled", true);
 
-        if (!activeSemesterIdTask.HasValue)
+        if (!enabled)
+        {
+            _logger.LogInformation("Analysis automation service is disabled");
             return;
+        }
 
-        int activeSemesterId = activeSemesterIdTask.Value;
+        _logger.LogInformation("Analysis automation service started");
+
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            int intervalMinutes = _configuration.GetValue<int>("BackgroundServices:AnalysisAutomation:IntervalMinutes", 60);
+
+            await ProcessAnalysisAutomation(stoppingToken);
+            await Task.Delay(TimeSpan.FromMinutes(intervalMinutes), stoppingToken);
+        }
+
+        _logger.LogInformation("Analysis automation service stopped");
+    }
+
+    private async Task ProcessAnalysisAutomation(CancellationToken stoppingToken)
+    {
+        int? activeSemesterId = await GetActiveSemesterId();
+
+        if (!activeSemesterId.HasValue)
+        {
+            _logger.LogInformation("No active semester found");
+            return;
+        }
+
         DateOnly today = DateOnly.FromDateTime(DateTime.Now);
-
-        IPaginate<Exam>? eligibleExams = await GetExamsReadyForAnalysis(activeSemesterId, today, stoppingToken);
+        IPaginate<Exam>? eligibleExams = await GetExamsReadyForAnalysis(activeSemesterId.Value, today, stoppingToken);
 
         if (eligibleExams == null || eligibleExams.Count == 0)
+        {
+            _logger.LogInformation("No eligible exams found for analysis");
             return;
+        }
 
-        IList<Analysis> semesterAnalyses = [];
-        IEnumerable<IGrouping<(int LessonId, int StudentClassId, int hashCode), Exam>> groupedByLessonAndClassWithHashCode = GroupEligibleExamsByLessonAndStudentClassAndConfigHash(eligibleExams);
-        IPaginate<Principal>? principalList = await GetLatestPrincipalForSemester(activeSemesterId, stoppingToken);
+        _logger.LogInformation("Found {Count} eligible exams for analysis", eligibleExams.Count);
+
+        IPaginate<Principal>? principalList = await GetLatestPrincipalForSemester(activeSemesterId.Value, stoppingToken);
 
         if (principalList == null || principalList.Count == 0)
+        {
+            _logger.LogWarning("No principal found for active semester");
             return;
+        }
 
         Principal lastPrincipal = principalList.Items[0];
-
         School school = lastPrincipal.School;
 
-        foreach (IGrouping<(int LessonId, int StudentClassId, int hashCode), Exam> examGroup in groupedByLessonAndClassWithHashCode)
+        IEnumerable<IGrouping<(int LessonId, int StudentClassId, int hashCode), Exam>> groupedExams =
+            GroupEligibleExamsByLessonAndStudentClassAndConfigHash(eligibleExams);
+
+        List<Analysis> semesterAnalyses = CreateAnalysesFromGroupedExams(
+            groupedExams,
+            activeSemesterId.Value,
+            lastPrincipal,
+            school);
+
+        if (semesterAnalyses.Count == 0)
         {
-            IList<StudentExamAnswer> studentExamAnswers = [.. examGroup.Select(e => e.StudentExamAnswer)];
+            _logger.LogInformation("No analyses to create");
+            return;
+        }
 
-            IList<Teacher> teachers = [.. examGroup.SelectMany(e => e.Teachers)
-                                                   .DistinctBy(t => t.Id)];
+        await _analysisRepository.AddRangeAsync(semesterAnalyses, stoppingToken);
+        _logger.LogInformation("Successfully created {Count} analyses", semesterAnalyses.Count);
+    }
 
+    private List<Analysis> CreateAnalysesFromGroupedExams(
+        IEnumerable<IGrouping<(int LessonId, int StudentClassId, int hashCode), Exam>> groupedExams,
+        int semesterId,
+        Principal principal,
+        School school)
+    {
+        List<Analysis> analyses = [];
+
+        foreach (IGrouping<(int LessonId, int StudentClassId, int hashCode), Exam> examGroup in groupedExams)
+        {
+            IList<StudentExamAnswer> studentExamAnswers = examGroup.Select(e => e.StudentExamAnswer).ToList();
+            IList<Teacher> teachers = [.. examGroup.SelectMany(e => e.Teachers).DistinctBy(t => t.Id)];
             ReferenceBenefit refBenefit = examGroup.First().ReferenceBenefit;
 
             string studentClassName = $"{examGroup.First().Student.StudentClass.ClassAge}/{examGroup.First().Student.StudentClass.ClassBranch}";
-            string analysisName = $"Auto - {examGroup.First().Lesson.LessonName} - {studentClassName} - {refBenefit.ReferenceBenefitName} Anlasis"; // note: name is changable
+            string analysisName = $"Auto - {examGroup.First().Lesson.LessonName} - {studentClassName} - {refBenefit.ReferenceBenefitName} Analysis";
 
             Analysis analysis = new()
             {
                 Name = analysisName,
                 LessonId = examGroup.Key.LessonId,
                 ReferenceBenefitId = refBenefit.Id,
-                PrincipalId = lastPrincipal.Id,
-                SemesterId = activeSemesterId,
+                PrincipalId = principal.Id,
+                SemesterId = semesterId,
                 SchoolId = school.Id,
-
                 School = school,
                 ReferenceBenefit = refBenefit,
-                Principal = lastPrincipal,
+                Principal = principal,
                 AIResponse = string.Empty,
                 Exams = [.. examGroup],
                 StudentExamAnswers = studentExamAnswers,
                 Teachers = teachers,
             };
 
-            semesterAnalyses.Add(analysis);
+            analyses.Add(analysis);
         }
 
-        if (semesterAnalyses.Count == 0)
-            return;
-
-        await analysisRepository.AddRangeAsync(semesterAnalyses, stoppingToken);
+        return analyses;
     }
 
     private async Task<IPaginate<Principal>?> GetLatestPrincipalForSemester(int activeSemesterId, CancellationToken stoppingToken)
     {
-        return await principalService.GetListAsync(
+        return await _principalService.GetListAsync(
             predicate: p => p.SemesterId == activeSemesterId,
             include: p => p.Include(pr => pr.School),
             orderBy: p => p.OrderByDescending(pr => pr.CreatedDate),
@@ -90,31 +163,36 @@ internal class AnalysisAutomationService(IMediator mediatr, IExamService examSer
             cancellationToken: stoppingToken);
     }
 
-    private static IEnumerable<IGrouping<(int LessonId, int StudentClassId, int hashCode), Exam>> GroupEligibleExamsByLessonAndStudentClassAndConfigHash(IPaginate<Exam> eligibleExams)
-    {
-        return eligibleExams.Items.GroupBy(e => (e.LessonId, e.Student.StudentClassId, e.ExamConfigurationStr.GetHashCode()));
-    }
+    private static IEnumerable<IGrouping<(int LessonId, int StudentClassId, int hashCode), Exam>> GroupEligibleExamsByLessonAndStudentClassAndConfigHash(IPaginate<Exam> eligibleExams) => eligibleExams.Items.GroupBy(e => (e.LessonId, e.Student.StudentClassId, e.ExamConfigurationStr.GetHashCode()));
+
 
     private async Task<IPaginate<Exam>?> GetExamsReadyForAnalysis(int activeSemesterId, DateOnly today, CancellationToken stoppingToken)
     {
-        return await examService.GetListAsync(e => e.SemesterId == activeSemesterId
-                                                && e.ExamDate.AddDays(DelayInDays) == today,
-                                                include: e => e.Include(e => e.StudentExamAnswer)
-                                                               .Include(e => e.Student)
-                                                                    .ThenInclude(s => s.StudentClass)
-                                                               .Include(e => e.StudentClasses)
-                                                               .Include(e => e.Teachers)
-                                                               .Include(e => e.ReferenceBenefit)
-                                                               .Include(e => e.Lesson),
-                                                index: 0,
-                                                size: int.MaxValue,
-                                                cancellationToken: stoppingToken);
+        int examDelayDays = _configuration.GetValue<int>("BackgroundServices:AnalysisAutomation:ExamDelayDays", 15);
+
+        return await _examService.GetListAsync(
+            predicate: e => e.SemesterId == activeSemesterId && e.ExamDate.AddDays(examDelayDays) == today,
+            include: e => e.Include(e => e.StudentExamAnswer)
+                           .Include(e => e.Student).ThenInclude(s => s.StudentClass)
+                           .Include(e => e.StudentClasses)
+                           .Include(e => e.Teachers)
+                           .Include(e => e.ReferenceBenefit)
+                           .Include(e => e.Lesson),
+            index: 0,
+            size: int.MaxValue,
+            cancellationToken: stoppingToken);
     }
 
-    private async Task<int?> IsWithinSemesterDateRange()
+    private async Task<int?> GetActiveSemesterId()
     {
-        DateOnly _todayDate = DateOnly.FromDateTime(DateTime.Now);
-        GetListResponse<GetListSemesterListItemDto> _GetListSemesters = await mediatr.Send(new GetListSemesterQuery() { PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue } });
-        return _GetListSemesters.Items.LastOrDefault(s => s.BeginSemesterDate <= _todayDate && s.EndSemesterDate >= _todayDate)?.Id;
+        DateOnly todayDate = DateOnly.FromDateTime(DateTime.Now);
+        GetListResponse<GetListSemesterListItemDto> getListSemesters = await _mediatr.Send(
+            new GetListSemesterQuery()
+            {
+                PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
+            });
+
+        return getListSemesters.Items
+            .LastOrDefault(s => s.BeginSemesterDate <= todayDate && s.EndSemesterDate >= todayDate)?.Id;
     }
 }
