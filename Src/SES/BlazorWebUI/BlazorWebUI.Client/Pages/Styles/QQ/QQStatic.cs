@@ -35,6 +35,14 @@ public static class QQStatic
         // { 7, "Sıralama"  }
     };
 
+    public static readonly IDictionary<string,string> LanguagePairsTUR= new Dictionary<string, string>
+    {
+        { "TUR", "Türkçe" },
+        { "ENG", "İngilizce" },
+        { "DEU", "Almanca" },
+        { "FRA", "Fransızca" },
+    };
+
     // Shuffles a string array using the Fisher-Yates algorithm
     internal static void ShuffleStringArray(ref string[] array, int seed)
     {
@@ -52,6 +60,4 @@ public static class QQStatic
     public static readonly int DefaultTrueFalseOptions = 2;
     public static readonly int DefaultFillInTheBlankOptions = 1;
     public static readonly int DefaultMachingOptions = 2;
-
-
-}
+    }
