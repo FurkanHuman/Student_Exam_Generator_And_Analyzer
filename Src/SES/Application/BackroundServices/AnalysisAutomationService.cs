@@ -163,12 +163,14 @@ internal class AnalysisAutomationService : BackgroundService
             cancellationToken: stoppingToken);
     }
 
-    private static IEnumerable<IGrouping<(int LessonId, int StudentClassId, int hashCode), Exam>> GroupEligibleExamsByLessonAndStudentClassAndConfigHash(IPaginate<Exam> eligibleExams) => eligibleExams.Items.GroupBy(e => (e.LessonId, e.Student.StudentClassId, e.ExamConfigurationStr.GetHashCode()));
-
+    private static IEnumerable<IGrouping<(int LessonId, int StudentClassId, int hashCode), Exam>> GroupEligibleExamsByLessonAndStudentClassAndConfigHash(IPaginate<Exam> eligibleExams)
+    {
+        return eligibleExams.Items.GroupBy(e => (e.LessonId, e.Student.StudentClassId, e.ExamConfigurationStr.GetHashCode()));
+    }
 
     private async Task<IPaginate<Exam>?> GetExamsReadyForAnalysis(int activeSemesterId, DateOnly today, CancellationToken stoppingToken)
     {
-        int examDelayDays = _configuration.GetValue<int>("BackgroundServices:AnalysisAutomation:ExamDelayDays", 15);
+        int examDelayDays = _configuration.GetValue<int>("BackgroundServices:AnalysisAutomation:ExamDelayDays");
 
         return await _examService.GetListAsync(
             predicate: e => e.SemesterId == activeSemesterId && e.ExamDate.AddDays(examDelayDays) == today,
