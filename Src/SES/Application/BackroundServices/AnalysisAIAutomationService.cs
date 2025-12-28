@@ -21,9 +21,9 @@ internal class AnalysisAIAutomationService : BackgroundService
     private readonly ILogger<AnalysisAIAutomationService> _logger;
     private readonly IConfiguration _configuration;
 
-    private IAnalysisService _analysisService;
-    private AnalysisComputationEngine _analysisEngine;
-    private IAIServiceFactory _aiServiceFactory;
+    private IAnalysisService _analysisService = default!;
+    private AnalysisComputationEngine _analysisEngine = default!;
+    private IAIServiceFactory _aiServiceFactory = default!;
 
     public AnalysisAIAutomationService(
         IServiceScopeFactory serviceScopeFactory,
