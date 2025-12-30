@@ -1,9 +1,12 @@
 ﻿using Application.Services.AIService;
 using Application.Services.AIService.Models;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Packaging;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Schema.Generation;
 using OpenAI;
 using OpenAI.Chat;
+using System.Text;
 using System.Text.Json;
 
 namespace Infrastructure.Adapters.AIService.OpenAI;
@@ -100,6 +103,154 @@ public class OpenAIServiceAdapter : IAIService
 
         return response;
 
+    }
+
+    public async Task<List<AIQuestionGenerationResponse>> ExtractQuestionsFromDocumentAsync(
+    AIQuestionExtractionRequest extractionRequest,
+    string aiModel,
+    CancellationToken cancellationToken)
+    {
+        string documentText = await ExtractTextFromDocument(extractionRequest);
+
+        List<ChatMessage> chatMessages = await GetChatMessagesForExtraction(extractionRequest, documentText);
+
+        ChatClient chatClient = _aIClient.GetChatClient(aiModel);
+
+        JSchemaGenerator schemaGenerator = new();
+        string jsonSchema = schemaGenerator.Generate(typeof(AIQuestionGenerationResponseList)).ToString();
+
+        int tokenLimit = extractionRequest.MaxQuestions > 0
+            ? Math.Min(extractionRequest.MaxQuestions * 150 + 1000, 20000)
+            : 20000;
+
+        ChatCompletionOptions completionOptions = new()
+        {
+            Temperature = 0.7f,
+            MaxOutputTokenCount = tokenLimit,
+            TopP = 0.95f,
+            FrequencyPenalty = 0,
+            PresencePenalty = 0,
+            ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
+                jsonSchemaFormatName: "QuestionExtraction",
+                jsonSchema: BinaryData.FromString(jsonSchema),
+                jsonSchemaIsStrict: true)
+        };
+
+        ChatCompletion chat = await chatClient.CompleteChatAsync(
+            messages: chatMessages,
+            options: completionOptions,
+            cancellationToken: cancellationToken);
+
+        RecordAsync(extractionRequest, aiModel, chat);
+
+        if (string.IsNullOrWhiteSpace(chat.Content[0].Text))
+            throw new InvalidOperationException("AI returned empty response");
+
+        AIQuestionGenerationResponseList questions = JsonSerializer.Deserialize<AIQuestionGenerationResponseList>(
+            chat.Content[0].Text,
+            DefaultJsonOptions)!;
+
+        if (questions == null || questions.Questions == null || questions.Questions.Count == 0)
+            throw new InvalidOperationException("AI could not extract any questions from the document");
+
+        if (extractionRequest.MaxQuestions > 0 && questions.Questions.Count > extractionRequest.MaxQuestions)
+            return [.. questions.Questions.Take(extractionRequest.MaxQuestions)];
+
+        return questions.Questions;
+    }
+
+    private static async Task<string> ExtractTextFromDocument(AIQuestionExtractionRequest request)
+    {
+        byte[] documentBytes = Convert.FromBase64String(request.DocumentContent);
+
+        return request.MimeType switch
+        {
+            "application/pdf" => await ExtractTextFromPdf(documentBytes),
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => await ExtractTextFromDocx(documentBytes),
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" or "application/vnd.ms-excel" => await ExtractTextFromExcel(documentBytes),
+            "text/plain" => System.Text.Encoding.UTF8.GetString(documentBytes),
+            _ => throw new NotSupportedException($"Document type {request.MimeType} is not supported"),
+        };
+    }
+
+    private static async Task<string> ExtractTextFromPdf(byte[] documentBytes)
+    {
+        using MemoryStream stream = new(documentBytes);
+        using var document = UglyToad.PdfPig.PdfDocument.Open(stream);
+
+        StringBuilder text = new();
+
+        foreach (var page in document.GetPages())
+        {
+            text.AppendLine(page.Text);
+            text.AppendLine();
+        }
+
+        return text.ToString();
+    }
+
+    private static async Task<string> ExtractTextFromDocx(byte[] documentBytes)
+    {
+        using MemoryStream stream = new(documentBytes);
+        using WordprocessingDocument doc = WordprocessingDocument.Open(stream, false);
+
+        if (doc.MainDocumentPart == null)
+            return string.Empty;
+
+        return doc.MainDocumentPart.Document.Body?.InnerText ?? string.Empty;
+    }
+
+    private static async Task<string> ExtractTextFromExcel(byte[] documentBytes)
+    {
+        using MemoryStream stream = new(documentBytes);
+        using var workbook = new XLWorkbook(stream);
+
+        StringBuilder content = new();
+
+        foreach (var worksheet in workbook.Worksheets)
+        {
+            content.AppendLine($"=== Sheet: {worksheet.Name} ===");
+            content.AppendLine();
+
+            var usedRange = worksheet.RangeUsed();
+            if (usedRange != null)
+            {
+                foreach (var row in usedRange.Rows())
+                {
+                    var rowValues = row.Cells().Select(c => c.GetValue<string>());
+                    content.AppendLine(string.Join("\t", rowValues));
+                }
+            }
+
+            content.AppendLine();
+        }
+
+        return content.ToString();
+    }
+
+    private static async Task<List<ChatMessage>> GetChatMessagesForExtraction(
+        AIQuestionExtractionRequest extractionRequest,
+        string documentText)
+    {
+        string basePrompt = await GetPromptFileContentAsync("ExtractionPrompt.txt");
+
+        var requestData = new
+        {
+            extractionRequest.FileName,
+            extractionRequest.LanguageCode,
+            extractionRequest.LessonName,
+            extractionRequest.DifficultyLevel,
+            extractionRequest.ExpectedQuestionType,
+            extractionRequest.LearningObjectives,
+            extractionRequest.MaxQuestions,
+            extractionRequest.ExtractionPrompt
+        };
+
+        string requestJson = JsonSerializer.Serialize(requestData, DefaultJsonOptions);
+
+        string fullPrompt = $@"{basePrompt}Request Parameters:{requestJson}Document Content:{documentText}";
+
+        return [new SystemChatMessage(fullPrompt)];
     }
 
     private static void RecordAsync(object objectOfRequest, string aiModel, ChatCompletion chat)
