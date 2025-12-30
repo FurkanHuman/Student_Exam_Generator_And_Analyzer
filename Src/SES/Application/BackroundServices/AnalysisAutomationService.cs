@@ -24,7 +24,7 @@ internal class AnalysisAutomationService : BackgroundService
     private IExamService _examService;
     private IPrincipalService _principalService;
     private IAnalysisRepository _analysisRepository;
-    
+
     public AnalysisAutomationService(IServiceScopeFactory serviceScopeFactory, ILogger<AnalysisAutomationService> logger, IConfiguration configuration)
     {
         _serviceScopeFactory = serviceScopeFactory;
@@ -93,8 +93,8 @@ internal class AnalysisAutomationService : BackgroundService
         Principal lastPrincipal = principalList.Items[0];
         School school = lastPrincipal.School;
 
-        IEnumerable<IGrouping<(int LessonId, int StudentClassId, int hashCode), Exam>> groupedExams =
-            GroupEligibleExamsByLessonAndStudentClassAndConfigHash(eligibleExams);
+        IEnumerable<IGrouping<(int LessonId, int StudentClassId, int confId), Exam>> groupedExams =
+            GroupEligibleExamsByLessonAndStudentClassAndExamConfiguration(eligibleExams);
 
         List<Analysis> semesterAnalyses = CreateAnalysesFromGroupedExams(
             groupedExams,
@@ -163,10 +163,7 @@ internal class AnalysisAutomationService : BackgroundService
             cancellationToken: stoppingToken);
     }
 
-    private static IEnumerable<IGrouping<(int LessonId, int StudentClassId, int hashCode), Exam>> GroupEligibleExamsByLessonAndStudentClassAndConfigHash(IPaginate<Exam> eligibleExams)
-    {
-        return eligibleExams.Items.GroupBy(e => (e.LessonId, e.Student.StudentClassId, e.ExamConfigurationStr.GetHashCode()));
-    }
+    private static IEnumerable<IGrouping<(int LessonId, int StudentClassId, int confId), Exam>> GroupEligibleExamsByLessonAndStudentClassAndExamConfiguration(IPaginate<Exam> eligibleExams) => eligibleExams.Items.GroupBy(e => (e.LessonId, e.Student.StudentClassId, e.ExamConfigurationId));
 
     private async Task<IPaginate<Exam>?> GetExamsReadyForAnalysis(int activeSemesterId, DateOnly today, CancellationToken stoppingToken)
     {
