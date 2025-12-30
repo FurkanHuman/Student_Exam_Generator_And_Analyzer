@@ -1,0 +1,565 @@
+﻿@page "/Ghost/StudentAdd"
+@using Application.Features.Schools.Queries.GetList
+@using Application.Features.Semesters.Queries.GetList
+@using Application.Features.Teachers.Queries.GetList
+@using Application.Features.Students.Commands.GhostCreate
+@using Application.Features.Students.Commands.Delete
+@using NArchitecture.Core.Application.Responses
+@using MediatR
+@using System.Text
+@rendermode InteractiveServer
+
+<PageTitle>Hayalet Öğrenci Ekle</PageTitle>
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-incognito me-2"></i>Hayalet Öğrenci Ekleme Sistemi
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Gizlilik Amaçlı:</strong> Bu sistem, analiz ve istatistik çalışmaları için anonim öğrenci verileri oluşturur.
+                        Tüm okul numaraları gizlilik amacıyla maskelenir ve veritabanına şifreli olarak kaydedilir.
+                    </div>
+
+                    @if (_isSuccess && _ghostStudentResponse != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle me-2"></i>
+                            <strong>Başarılı!</strong> @_ghostStudentResponse.TotalStudents hayalet öğrenci başarıyla eklendi.
+                            <button type="button" class="btn-close" @onclick="() => _isSuccess = false"></button>
+                        </div>
+                    }
+
+                    @if (_isLoading)
+                    {
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-dark" role="status" style="width: 3rem; height: 3rem;">
+                                <span class="visually-hidden">İşleniyor...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Hayalet öğrenciler oluşturuluyor ve maskeleniyor...</p>
+                        </div>
+                    }
+
+                    <EditForm OnValidSubmit="AddGhostStudents" method="post" Model="_ghostStudentDto" FormName="GhostStudentAdd">
+                        <DataAnnotationsValidator />
+                        <AntiforgeryToken />
+
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-building me-1"></i>Okul *
+                                </label>
+                                <InputSelect class="form-select" @bind-Value="_ghostStudentDto.SchoolId">
+                                    <option value="0">Okul seçiniz...</option>
+                                    @foreach (var school in _schoolListResponse.Items)
+                                    {
+                                        <option value="@school.Id">@school.Name</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => _ghostStudentDto.SchoolId)" />
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-calendar-range me-1"></i>Dönem *
+                                </label>
+                                <InputSelect class="form-select" @bind-Value="_ghostStudentDto.SemesterId">
+                                    <option value="0">Dönem seçiniz...</option>
+                                    @foreach (var semester in _semesterResponse.Items)
+                                    {
+                                        <option value="@semester.Id">
+                                            @semester.Name (@semester.BeginSemesterDate.Year - @semester.EndSemesterDate.Year)
+                                        </option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => _ghostStudentDto.SemesterId)" />
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-person me-1"></i>Öğretmen *
+                                </label>
+                                <InputSelect class="form-select" @bind-Value="_ghostStudentDto.TeacherId">
+                                    <option value="0">Öğretmen seçiniz...</option>
+                                    @foreach (var teacher in _teacherResponse.Items)
+                                    {
+                                        <option value="@teacher.Id">@teacher.Name @teacher.SurName</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => _ghostStudentDto.TeacherId)" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-door-open me-1"></i>Sınıf *
+                                </label>
+                                <div class="input-group">
+                                    <InputSelect class="form-control" @bind-Value="_ghostStudentDto.ClassAge" placeholder="Yaş">
+                                        <option disabled selected value="-1">Yaş</option>
+                                        @for (int age = 0; age <= 12; age++)
+                                        {
+                                            <option value="@(age)">@(age)</option>
+                                        }
+                                    </InputSelect>
+
+                                    <span class="input-group-text">/</span>
+
+                                    <InputSelect class="form-control" @bind-Value="_ghostStudentDto.ClassBranch">
+                                        <option disabled selected value=" ">Şube</option>
+                                        @for (char branch = 'A'; branch <= 'Z'; branch++)
+                                        {
+                                            <option value="@branch">@branch</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                                <ValidationMessage For="@(() => _ghostStudentDto.ClassAge)" />
+                            </div>
+                        </div>
+
+
+                        <hr class="my-4" />
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <h5 class="mb-3">
+                                    <i class="bi bi-123 me-2"></i>Okul Numaraları
+                                </h5>
+                                <div class="card border-secondary">
+                                    <div class="card-body">
+                                        <div class="form-check mb-3">
+                                            <InputCheckbox class="form-check-input" id="generateRandomCheck"
+                                                           @bind-Value="_ghostStudentDto.GenerateRandomNumbers" />
+                                            <label class="form-check-label" for="generateRandomCheck">
+                                                <strong>Rastgele Numara Üret</strong>
+                                                <small class="text-muted d-block">
+                                                    Otomatik olarak rastgele okul numaraları oluşturulsun
+                                                </small>
+                                            </label>
+                                        </div>
+
+                                        @if (!_ghostStudentDto.GenerateRandomNumbers)
+                                        {
+                                            <label class="form-label fw-semibold">
+                                                Okul Numaraları (virgülle ayırarak girin)
+                                            </label>
+                                            <InputTextArea class="form-control" rows="3"
+                                                           @bind-Value="_ghostStudentDto.SchoolNumbers"
+                                                           placeholder="Örnek: 12345, 67890, 11223, 44556..." />
+                                            <div class="form-text">
+                                                <i class="bi bi-lightbulb me-1"></i>
+                                                Numaraları virgül ile ayırarak girebilirsiniz. Yetersiz numara durumunda otomatik üretilecektir.
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="alert alert-warning mb-0">
+                                                <i class="bi bi-shuffle me-2"></i>
+                                                Rastgele numara üretimi aktif. Tüm öğrenciler için benzersiz numaralar otomatik oluşturulacak.
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <h5 class="mb-3">
+                                    <i class="bi bi-people me-2"></i>Sınıf Mevcudiyeti
+                                </h5>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="card border-danger h-100">
+                                    <div class="card-body">
+                                        <label class="form-label fw-semibold">
+                                            <i class="bi bi-gender-female text-danger me-1"></i>Kız Öğrenci Sayısı
+                                        </label>
+                                        <InputNumber class="form-control" @bind-Value="_ghostStudentDto.FemaleCount"
+                                                     min="0" placeholder="0" />
+                                        <small class="text-muted">Eklenecek kız öğrenci sayısı</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="card border-primary h-100">
+                                    <div class="card-body">
+                                        <label class="form-label fw-semibold">
+                                            <i class="bi bi-gender-male text-primary me-1"></i>Erkek Öğrenci Sayısı
+                                        </label>
+                                        <InputNumber class="form-control" @bind-Value="_ghostStudentDto.MaleCount"
+                                                     min="0" placeholder="0" />
+                                        <small class="text-muted">Eklenecek erkek öğrenci sayısı</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="alert alert-secondary">
+                                    <strong>Toplam:</strong> @GetTotalStudentCount() öğrenci eklenecek
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-secondary" @onclick="ResetForm">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>Sıfırla
+                            </button>
+                            <button type="submit" class="btn btn-dark" disabled="@CanSubmit()">
+                                <i class="bi bi-incognito me-1"></i>Hayalet Öğrencileri Oluştur
+                            </button>
+                        </div>
+
+                        <ValidationSummary class="mt-3" />
+                    </EditForm>
+                </div>
+            </div>
+
+            @if (_ghostStudentResponse != null && _ghostStudentResponse.NumberMappings.Count > 0)
+            {
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-warning text-dark">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="bi bi-shield-lock me-2"></i>Numara Eşleştirme Tablosu
+                            </h5>
+                            <span class="badge bg-dark">
+                                @_ghostStudentResponse.NumberMappings.Count kayıt
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Önemli!</strong> Bu tablo sadece bir kere gösterilmektedir.
+                            Orijinal numaraları not etmeniz önerilir. Veritabanında sadece maskeli numaralar saklanır.
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 30%">Orijinal Numara</th>
+                                        <th style="width: 30%">Maskeli Numara (DB)</th>
+                                        <th style="width: 20%">Cinsiyet</th>
+                                        <th style="width: 20%">Öğrenci Adı</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var mapping in _ghostStudentResponse.NumberMappings)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <code class="text-primary">@mapping.OriginalNumber</code>
+                                            </td>
+                                            <td>
+                                                <code class="text-danger">@mapping.MaskedNumber</code>
+                                            </td>
+                                            <td>
+                                                @if (mapping.Gender == "Kız")
+                                                {
+                                                    <span class="badge bg-danger">
+                                                        <i class="bi bi-gender-female"></i> Kız
+                                                    </span>
+                                                }
+                                                else if (mapping.Gender == "Erkek")
+                                                {
+                                                    <span class="badge bg-primary">
+                                                        <i class="bi bi-gender-male"></i> Erkek
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-info">
+                                                        <i class="bi bi-gender-ambiguous"></i> Diğer
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>@mapping.StudentName</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-3">
+                            <button class="btn btn-outline-primary" @onclick="ExportMappingTable">
+                                <i class="bi bi-download me-1"></i>CSV İndir
+                            </button>
+                            <button class="btn btn-outline-secondary" @onclick="PrintMappingTable">
+                                <i class="bi bi-printer me-1"></i>Yazdır
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-success text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="bi bi-table me-2"></i>Oluşturulan Hayalet Öğrenciler
+                            </h5>
+                            <div>
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="bi bi-gender-female"></i> @_ghostStudentResponse.FemaleCount Kız
+                                </span>
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="bi bi-gender-male"></i> @_ghostStudentResponse.MaleCount Erkek
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 25%">Maskeli Numara</th>
+                                        <th style="width: 25%">Ad</th>
+                                        <th style="width: 25%">Soyad</th>
+                                        <th style="width: 15%">Cinsiyet</th>
+                                        <th style="width: 10%" class="text-center">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var student in _ghostStudentResponse.Students)
+                                    {
+                                        <tr>
+                                            <td><code>@student.SchoolNumber</code></td>
+                                            <td>@student.Name</td>
+                                            <td>@student.SurName</td>
+                                            <td>
+                                                @if (student.Gender == "K")
+                                                {
+                                                    <span class="badge bg-danger">
+                                                        <i class="bi bi-gender-female"></i> Kız
+                                                    </span>
+                                                }
+                                                else if (student.Gender == "E")
+                                                {
+                                                    <span class="badge bg-primary">
+                                                        <i class="bi bi-gender-male"></i> Erkek
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-info">
+                                                        <i class="bi bi-gender-ambiguous"></i> Diğer
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-danger btn-sm"
+                                                        @onclick="() => DeleteGhostStudent(student.Id)"
+                                                        title="Öğrenciyi sil">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@inject IMediator _mediator
+@inject IJSRuntime JS
+
+@code {
+    [SupplyParameterFromForm]
+    private GhostStudentDto _ghostStudentDto { get; set; } = new()
+    {
+        TeacherId = 0,
+        SchoolId = 0,
+        SemesterId = 0,
+        ClassAge = -1,
+        ClassBranch = ' ',
+        FemaleCount = 0,
+        MaleCount = 0,
+        GenerateRandomNumbers = false,
+        SchoolNumbers = ""
+    };
+
+    private GetListResponse<GetListSchoolListItemDto> _schoolListResponse = new();
+    private GetListResponse<GetListSemesterListItemDto> _semesterResponse = new();
+    private GetListResponse<GetListTeacherListItemDto> _teacherResponse = new();
+    private CreatedGhostStudentResponse? _ghostStudentResponse = null;
+
+    private bool _isSuccess = false;
+    private bool _isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isLoading = true;
+
+            _schoolListResponse = await _mediator.Send(new GetListSchoolQuery
+            {
+                PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
+            });
+
+            _semesterResponse = await _mediator.Send(new GetListSemesterQuery
+            {
+                PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
+            });
+
+            _teacherResponse = await _mediator.Send(new GetListTeacherQuery
+            {
+                PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
+            });
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task AddGhostStudents()
+    {
+        try
+        {
+            _isLoading = true;
+
+            CreateGhostStudentCommand command = new()
+            {
+                SchoolId = _ghostStudentDto.SchoolId,
+                SemesterId = _ghostStudentDto.SemesterId,
+                RefTeacherId = _ghostStudentDto.TeacherId,
+                ClassAge = _ghostStudentDto.ClassAge,
+                ClassBranch = _ghostStudentDto.ClassBranch,
+                SchoolNumbers = _ghostStudentDto.SchoolNumbers,
+                FemaleCount = _ghostStudentDto.FemaleCount,
+                MaleCount = _ghostStudentDto.MaleCount,
+                GenerateRandomNumbers = _ghostStudentDto.GenerateRandomNumbers
+            };
+
+            _ghostStudentResponse = await _mediator.Send(command);
+            _isSuccess = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Hayalet öğrenci ekleme hatası: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task DeleteGhostStudent(int studentId)
+    {
+        try
+        {
+            await _mediator.Send(new DeleteStudentCommand { Id = studentId, PermanentDelete = true });
+
+            if (_ghostStudentResponse != null)
+            {
+                _ghostStudentResponse.Students = _ghostStudentResponse.Students
+                    .Where(s => s.Id != studentId).ToList();
+                _ghostStudentResponse.TotalStudents = _ghostStudentResponse.Students.Count;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Öğrenci silme hatası: {ex.Message}");
+        }
+    }
+
+    private void ResetForm()
+    {
+        _ghostStudentDto = new()
+        {
+            TeacherId = 0,
+            SchoolId = 0,
+            SemesterId = 0,
+            ClassAge = -1,
+            ClassBranch = ' ',
+            FemaleCount = 0,
+            MaleCount = 0,
+            GenerateRandomNumbers = false,
+            SchoolNumbers = ""
+        };
+        _ghostStudentResponse = null;
+        _isSuccess = false;
+    }
+
+    private bool CanSubmit()
+    {
+        int totalStudents = GetTotalStudentCount();
+
+        bool status = _ghostStudentDto.SchoolId > 0 &&
+               _ghostStudentDto.SemesterId > 0 &&
+               _ghostStudentDto.TeacherId > 0 &&
+               _ghostStudentDto.ClassAge > -1 &&
+               !char.IsWhiteSpace(_ghostStudentDto.ClassBranch) &&
+               totalStudents > 0 &&
+               !_isLoading;
+        return !status;
+    }
+
+    private int GetTotalStudentCount()
+    {
+        return _ghostStudentDto.FemaleCount + _ghostStudentDto.MaleCount;
+    }
+
+    private async Task ExportMappingTable()
+    {
+        if (_ghostStudentResponse == null) return;
+        StringBuilder bld = new();
+
+        bld.AppendLine("Orijinal Numara,Maskeli Numara,Cinsiyet,Öğrenci Adı");
+
+        foreach (NumberMapping mapping in _ghostStudentResponse.NumberMappings)
+            bld.AppendLine($@"{mapping.OriginalNumber},{mapping.MaskedNumber},{mapping.Gender},{mapping.StudentName}");
+
+        string csv = bld.ToString();
+
+        await JS.InvokeVoidAsync("downloadFile", "numara-eslestirme.csv", csv);
+    }
+
+    private async Task PrintMappingTable()
+    {
+        await JS.InvokeVoidAsync("window.print");
+    }
+
+    private sealed record GhostStudentDto
+    {
+        public required int SchoolId { get; set; }
+        public required int TeacherId { get; set; }
+        public required int SemesterId { get; set; }
+        public required int ClassAge { get; set; }
+        public required char ClassBranch { get; set; }
+        public required int FemaleCount { get; set; }
+        public required int MaleCount { get; set; }
+        public required bool GenerateRandomNumbers { get; set; }
+        public required string SchoolNumbers { get; set; }
+    }
+}
+
+<script>
+    window.downloadFile = function(filename, content) {
+        const blob = new Blob([content], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+</script>
