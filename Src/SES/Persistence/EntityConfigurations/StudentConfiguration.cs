@@ -15,6 +15,7 @@ internal class StudentConfiguration : IEntityTypeConfiguration<Student>, IMainCo
         builder.Property(s => s.SurName).IsRequired();
         builder.Property(s => s.SchoolNumber).IsRequired();
         builder.Property(s => s.Gender).IsRequired();
+        builder.Property(s => s.IsGhostStudent).IsRequired().HasDefaultValue(false);
         builder.Property(s => s.Description);
 
         builder.Property(s => s.SchoolId);
