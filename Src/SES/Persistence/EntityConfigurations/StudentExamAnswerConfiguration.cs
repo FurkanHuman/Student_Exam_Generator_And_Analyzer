@@ -1,10 +1,11 @@
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.EntityConfigurations.Interfaces;
 
 namespace Persistence.EntityConfigurations;
 
-internal class StudentExamAnswerConfiguration : IEntityTypeConfiguration<StudentExamAnswer>
+internal class StudentExamAnswerConfiguration : IEntityTypeConfiguration<StudentExamAnswer>, IMainConfiguration
 {
     public void Configure(EntityTypeBuilder<StudentExamAnswer> builder)
     {
@@ -27,6 +28,10 @@ internal class StudentExamAnswerConfiguration : IEntityTypeConfiguration<Student
         builder.Property(sea => sea.UpdatedDate);
         builder.Property(sea => sea.DeletedDate);
 
-        builder.HasQueryFilter(sea => !sea.DeletedDate.HasValue && sea.DeletedDate.HasValue);
+        builder.HasQueryFilter(sea =>
+            !sea.DeletedDate.HasValue &&
+            !sea.Exam.DeletedDate.HasValue &&
+            !sea.ReviewerTeacher.DeletedDate.HasValue &&
+            !sea.Student.DeletedDate.HasValue);
     }
 }

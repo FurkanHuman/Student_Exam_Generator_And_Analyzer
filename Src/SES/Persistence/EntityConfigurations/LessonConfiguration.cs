@@ -16,6 +16,7 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>, IMainConfig
         builder.Property(l => l.PassingScore).IsRequired();
         builder.Property(l => l.IsMandatory).IsRequired();
         builder.Property(l => l.Description).IsRequired();
+        builder.Property(l => l.ClassAge).IsRequired();
         builder.Property(l => l.SemesterId).IsRequired();
 
         builder.HasOne(l => l.Semester);
