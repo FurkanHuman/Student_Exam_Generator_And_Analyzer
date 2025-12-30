@@ -2,6 +2,7 @@ using Application.BackroundServices;
 using Application.Services.Analyses;
 using Application.Services.Benefits;
 using Application.Services.CalculatorFactory;
+using Application.Services.ExamConfigurations;
 using Application.Services.Exams;
 using Application.Services.LearningAreas;
 using Application.Services.Lessons;
@@ -25,7 +26,6 @@ using Application.Services.Teachers;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using NArchitecture.Core.Application.Pipelines.Caching;
 using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
@@ -81,6 +81,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IAnalysisService, AnalysisManager>();
         services.AddScoped<IBenefitService, BenefitManager>();
         services.AddScoped<IExamService, ExamManager>();
+        services.AddScoped<IExamConfigurationService, ExamConfigurationManager>();
         services.AddScoped<ILearningAreaService, LearningAreaManager>();
         services.AddScoped<ILessonService, LessonManager>();
         services.AddScoped<IPersonelService, PersonelManager>();
@@ -110,10 +111,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<AnalysisComputationEngine>();
 
         services.AddHostedService<AnalysisAutomationService>();
-        services.AddSingleton<IHostedService, AnalysisAutomationService>();
-
         services.AddHostedService<AnalysisAIAutomationService>();
-        services.AddSingleton<IHostedService, AnalysisAIAutomationService>();
 
         services.AddScoped<PdfReaderStudentManager>();
         services.AddScoped<IExamPageGenerator, ExamPageRenderer>();
