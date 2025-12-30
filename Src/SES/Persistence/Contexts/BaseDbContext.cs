@@ -11,6 +11,7 @@ public class BaseDbContext(DbContextOptions dbContextOptions, IConfiguration con
     public DbSet<Analysis> Analyses { get; set; }
     public DbSet<Benefit> Benefits { get; set; }
     public DbSet<Exam> Exams { get; set; }
+    public DbSet<ExamConfiguration> ExamConfigurations { get; set; }
     public DbSet<LearningArea> LearningAreas { get; set; }
     public DbSet<Principal> Principals { get; set; }
     public DbSet<QuestionScore> QuestionScores { get; set; }
