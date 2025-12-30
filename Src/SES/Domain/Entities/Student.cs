@@ -1,6 +1,7 @@
 ﻿using NArchitecture.Core.Persistence.Repositories;
 
 namespace Domain.Entities;
+
 public class Student : Entity<int>
 {
     public string Name { get; set; }
@@ -8,6 +9,7 @@ public class Student : Entity<int>
     public string SchoolNumber { get; set; }
     public char Gender { get; set; }
     public string? Description { get; set; }
+    public bool IsGhostStudent { get; set; }
     public int SchoolId { get; set; }
     public int StudentClassId { get; set; }
 

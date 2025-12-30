@@ -7,12 +7,13 @@ public class Exam : Entity<int>
 {
     public DateOnly ExamDate { get; set; }
     public string ExamLessonName { get; set; }
-    public string ExamCode { get; set; }
+    public string ExamTrackingCode { get; set; }
+    public byte[] ExamRandomizerSeed { get; set; }
     public string FooterNote { get; set; }
-    public string ExamConfigurationStr { get; set; }
     public string? TotalScoreForString { get; set; }
     public int? TotalScore { get; set; }
 
+    public int ExamConfigurationId { get; set; }
     public int LessonId { get; set; }
     public int SemesterId { get; set; }
     public int StudentId { get; set; }
@@ -20,6 +21,7 @@ public class Exam : Entity<int>
     public int ReferenceBenefitId { get; set; }
     public int ExamAuthorId { get; set; }
 
+    public ExamConfiguration ExamConfiguration { get; set; }
     public Lesson Lesson { get; set; }
     public Semester Semester { get; set; }
     public Student Student { get; set; }
@@ -29,7 +31,7 @@ public class Exam : Entity<int>
     public StudentExamAnswer StudentExamAnswer { get; set; }
 
     public EvaluationOrigin EvaluationOrigin { get; set; }
-    public IDictionary<int, int> QuestionOrderMap { get; set; } // key is question Id, value is exam question order
+    public Dictionary<int, int> QuestionOrderMap { get; set; } // key is question Id, value is exam question order
 
     public IList<Analysis> Analyses { get; set; }
     public IList<Teacher> Teachers { get; set; }

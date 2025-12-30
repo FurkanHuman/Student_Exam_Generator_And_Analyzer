@@ -8,6 +8,7 @@ public class Lesson : Entity<int>
     public string Description { get; set; }
     public int PassingScore { get; set; }
     public bool IsMandatory { get; set; } = false;
+    public int ClassAge { get; set; }
     public int SemesterId { get; set; }
     public Semester Semester { get; set; }
     public IList<StudentClass> StudentClasses { get; set; }

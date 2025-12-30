@@ -2,6 +2,7 @@
 using NArchitecture.Core.Persistence.Repositories;
 
 namespace Domain.Entities;
+
 public class QuizQuestion : Entity<int> // note: sorununn kendisi.
 {
     public string Question { get; set; } // soru girişi örnek: uzun hikaye yada sıralama sorusu girşi buraya yapılacak. ince fontlo sorular.
