@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace Application.Features.Analyses.Queries.GetByIdAnalysisAIResponse;
 
-public class GetByIdAnalysisAIResponseQuery:IRequest<AIAnalysisResponse>
+public class GetByIdAnalysisAIResponseQuery : IRequest<AIAnalysisResponse>
 {
     public int Id { get; set; }
 
@@ -28,7 +28,7 @@ public class GetByIdAnalysisAIResponseQuery:IRequest<AIAnalysisResponse>
             await _analysisBusinessRules.AnalysisIdShouldExistWhenSelected(request.Id, cancellationToken);
             Analysis? analysis = await _analysisRepository.GetAsync(
                                                             predicate: a => a.Id == request.Id
-                                                            ,cancellationToken: cancellationToken
+                                                            , cancellationToken: cancellationToken
                                                             );
             await _analysisBusinessRules.AnalysisShouldExistWhenSelected(analysis);
             if (string.IsNullOrEmpty(analysis!.AIResponse))

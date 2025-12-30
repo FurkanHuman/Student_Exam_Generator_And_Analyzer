@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 namespace Persistence;
+
 public static class ModelBuilderExtensions
 {
     public static void ApplyConfigurationsWithInterface<TInterface>(this ModelBuilder modelBuilder)

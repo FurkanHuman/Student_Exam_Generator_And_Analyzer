@@ -1,5 +1,6 @@
 ﻿
 namespace Infrastructure.Adapters.AIService;
+
 internal static class RequestRecorder
 {
     private const string LogPath = "Ailog";

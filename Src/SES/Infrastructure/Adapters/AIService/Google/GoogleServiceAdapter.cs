@@ -3,8 +3,8 @@ using Application.Services.AIService.Models;
 using Google.GenAI;
 using Google.GenAI.Types;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Schema.Generation;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema.Generation;
 using System.Text.Json;
 
 namespace Infrastructure.Adapters.AIService.Google;
@@ -133,13 +133,13 @@ internal class GoogleServiceAdapter : IAIService
 
             foreach (JProperty property in obj.Properties())
                 RemoveAdditionalProperties(property.Value);
-            
+
         }
 
         else if (token is JArray array)
-             foreach (JToken item in array)
-                 RemoveAdditionalProperties(item);
- 
+            foreach (JToken item in array)
+                RemoveAdditionalProperties(item);
+
     }
 
     private static void RecordAsync(object objectOfRequest, string aiModel, GenerateContentResponse response)

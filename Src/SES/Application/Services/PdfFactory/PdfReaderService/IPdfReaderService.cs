@@ -1,6 +1,7 @@
 ﻿using Application.Services.PdfFactory.PdfReaderService.Dtos;
 
 namespace Application.Services.PdfFactory.PdfReaderService;
+
 public interface IPdfReaderService
 {
     Task<ICollection<ClassWithStudentsDto>> GetAllClassesAndStudents(byte[] pdfBytes);

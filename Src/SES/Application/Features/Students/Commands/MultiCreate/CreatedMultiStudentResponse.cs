@@ -1,6 +1,7 @@
 ﻿using NArchitecture.Core.Application.Responses;
 
 namespace Application.Features.Students.Commands.MultiCreate;
+
 public class CreatedMultiStudentResponse : IResponse
 {
     public int Id { get; set; }

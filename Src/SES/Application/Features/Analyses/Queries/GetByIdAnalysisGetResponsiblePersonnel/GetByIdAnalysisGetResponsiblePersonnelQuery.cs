@@ -37,7 +37,7 @@ public class GetByIdAnalysisGetResponsiblePersonnelQuery : IRequest<GetByIdAnaly
             await _analysisBusinessRules.AnalysisShouldExistWhenSelected(analysis);
 
             Personel principalPersonel = analysis!.Principal.Personel;
-            string principalName =$"{principalPersonel.Name} {principalPersonel.SurName}";
+            string principalName = $"{principalPersonel.Name} {principalPersonel.SurName}";
 
             Personel examAuthor = analysis.Exams[0].ExamAuthor.Personel;
             string examAuthorName = $"{examAuthor.Name} {examAuthor.SurName}";
@@ -47,7 +47,7 @@ public class GetByIdAnalysisGetResponsiblePersonnelQuery : IRequest<GetByIdAnaly
                 .Distinct()
                 .Select(pt => $"{pt.Name} {pt.SurName}")];
 
-            return new ()
+            return new()
             {
                 Principal = principalName,
                 ExamAuthorTeacher = examAuthorName,

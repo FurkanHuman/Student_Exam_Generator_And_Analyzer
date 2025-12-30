@@ -4,6 +4,7 @@ using iText.Kernel.Pdf;
 using System.Collections.Concurrent;
 
 namespace Application.Services.PdfFactory.PdfReaderService;
+
 internal class PdfReaderManager(PdfReaderStudentManager pdfReadeRStudent) : IPdfReaderService
 {
     private readonly PdfReaderStudentManager _pdfReadeRStudent = pdfReadeRStudent;

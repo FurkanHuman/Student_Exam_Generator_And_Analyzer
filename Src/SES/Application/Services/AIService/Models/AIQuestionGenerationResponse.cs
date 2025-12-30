@@ -15,7 +15,7 @@ public sealed class AIQuestionGenerationResponse
     /// <summary>
     /// Main question text
     /// </summary>
-    public string Question{ get; set; } = string.Empty;
+    public string Question { get; set; } = string.Empty;
 
     /// <summary>
     /// Additional context or passage (optional)

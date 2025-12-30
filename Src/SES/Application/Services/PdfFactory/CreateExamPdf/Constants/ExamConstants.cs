@@ -1,4 +1,5 @@
 ﻿namespace Application.Services.PdfFactory.CreateExamPdf.Constants;
+
 internal static class ExamConstants
 {
     private static readonly IDictionary<string, IDictionary<string, string>> _examConstants = new Dictionary<string, IDictionary<string, string>>

@@ -11,6 +11,7 @@ using NArchitecture.Core.Application.Pipelines.Logging;
 using NArchitecture.Core.Application.Pipelines.Transaction;
 
 namespace Application.Features.Students.Commands.MultiCreate;
+
 public class CreateMultiStudentCommand : IRequest<ICollection<CreatedMultiStudentResponse>>, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public required int SchoolId { get; set; }

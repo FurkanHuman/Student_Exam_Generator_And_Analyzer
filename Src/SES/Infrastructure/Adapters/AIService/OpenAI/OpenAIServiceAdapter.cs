@@ -1,7 +1,6 @@
 ﻿using Application.Services.AIService;
 using Application.Services.AIService.Models;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Schema.Generation;
 using OpenAI;
 using OpenAI.Chat;

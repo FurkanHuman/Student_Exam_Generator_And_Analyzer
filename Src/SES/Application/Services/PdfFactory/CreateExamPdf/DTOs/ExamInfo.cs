@@ -1,5 +1,5 @@
 ﻿namespace Application.Services.PdfFactory.CreateExamPdf.DTOs;
-
+// this class application object, not a domain object. 
 public class ExamInfo
 {
     public IDictionary<int, int> QQOrder { get; set; } // key is question Id, value is exam question order
