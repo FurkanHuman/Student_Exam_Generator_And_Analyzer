@@ -72,7 +72,7 @@ public class AnalysisBenefitCalculator : AnalysisCalculatorFactory<BenefitAnalys
 
         if (studentAnalysis.BenefitScores.Count != 0)
             studentAnalysis.AverageBenefitScore = studentAnalysis.BenefitScores.Average(b => b.Score);
-        
+
         else
             studentAnalysis.AverageBenefitScore = 0;
 
@@ -107,7 +107,7 @@ public class AnalysisBenefitCalculator : AnalysisCalculatorFactory<BenefitAnalys
             double contribution = (1.0 / k) * questionScore;
 
             benefitScore.QuestionContributions[question.Id] = contribution;
-            
+
             totalBenefitScore += contribution;
         }
 

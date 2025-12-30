@@ -16,39 +16,27 @@ public class AnalysisDetailTableCalculator : AnalysisCalculatorFactory<IList<Ana
 
     public override async Task<IList<AnalysisDetailTableDto>> CalculateAsync(int analysisId, CancellationToken cancellationToken = default)
     {
-        Analysis? analysis = await GetAnalysisByIdAsync(analysisId, cancellationToken);
+        Analysis? analysis = await GetAnalysisByIdAsync(analysisId, cancellationToken)
+            ?? throw new InvalidOperationException($"Analysis with Id {analysisId} not found.");
 
-        if (analysis == null)
-            throw new InvalidOperationException($"Analysis with Id {analysisId} not found.");
-
-        List<AnalysisDetailTableDto> result =
-        [.. (analysis.Exams ?? Enumerable.Empty<Exam>())
-        .GroupBy(e => e.ExamCode)
-        .Select(group =>
-        {
-            string examCode = group.Key;
-
-            Exam exam = group.First();
-            uint seed = QuizQuestionHelpers.DecodeBase32String(examCode);
-            ExamInfo? examInfo = DeserializeExamInfo(exam);
-
-
-            List<StudentTableDto> studentDtos =
-            [
-                .. group.SelectMany(gExam =>
-                    GetStudentTableDtos(gExam, analysis, (int)seed, examInfo)
-                )
-            ];
-
-            int questionCount = GetQuestionCount(studentDtos);
-
-            return new AnalysisDetailTableDto
+        List<AnalysisDetailTableDto> result = [.. (analysis.Exams ?? Enumerable.Empty<Exam>())
+            .Select(exam =>
             {
-                ExamCode = examCode,
-                QuestionCount = questionCount,
-                Students = studentDtos
-            };
-        })
+                byte[] examRandomizerBytes = exam.ExamRandomizerSeed;
+
+                uint seed = QuizQuestionHelpers.ConvertSeedToUInt32(examRandomizerBytes);
+                ExamInfo? examInfo = DeserializeExamInfo(exam);
+
+                List<StudentTableDto> studentDtos = [.. GetStudentTableDtos(exam, analysis, (int)seed, examInfo)];
+
+                int questionCount = GetQuestionCount(studentDtos);
+
+                return new AnalysisDetailTableDto
+                {
+                    QuestionCount = questionCount,
+                    Students = studentDtos
+                };
+            })
         ];
         return result;
     }
@@ -57,8 +45,8 @@ public class AnalysisDetailTableCalculator : AnalysisCalculatorFactory<IList<Ana
     {
         try
         {
-            return !string.IsNullOrEmpty(exam.ExamConfigurationStr)
-                ? JsonSerializer.Deserialize<ExamInfo>(exam.ExamConfigurationStr)
+            return !string.IsNullOrEmpty(exam.ExamConfiguration.ConfigurationJsonStr)
+                ? JsonSerializer.Deserialize<ExamInfo>(exam.ExamConfiguration.ConfigurationJsonStr)
                 : new ExamInfo
                 {
                     QQOrder = new Dictionary<int, int>(),
@@ -185,6 +173,8 @@ public class AnalysisDetailTableCalculator : AnalysisCalculatorFactory<IList<Ana
             include: a => a
                 .Include(a => a.Exams)
                     .ThenInclude(e => e.QuizQuestions)
+                .Include(a => a.Exams)
+                    .ThenInclude(e => e.ExamConfiguration)
                 .Include(a => a.StudentExamAnswers)
                     .ThenInclude(sea => sea.Student)
                 .Include(a => a.StudentExamAnswers)
@@ -207,7 +197,6 @@ public record StudentTableDto
 
 public record AnalysisDetailTableDto
 {
-    public string ExamCode { get; init; } = string.Empty;
     public int QuestionCount { get; init; }
     public IList<StudentTableDto> Students { get; init; } = [];
 }

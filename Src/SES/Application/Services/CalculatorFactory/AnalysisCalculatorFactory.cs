@@ -7,7 +7,7 @@ namespace Application.Services.CalculatorFactory;
 public abstract class AnalysisCalculatorFactory<TResult>(IAnalysisService analysisService) : IAnalysisCalculatorFactory<TResult>
 {
     protected readonly IAnalysisService _analysisService = analysisService;
-    
+
     protected int PassingScore { get; private set; }
 
     public virtual async Task<TResult> CalculateAsync(int analysisId, CancellationToken cancellationToken = default)

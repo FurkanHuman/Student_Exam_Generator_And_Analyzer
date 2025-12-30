@@ -6,7 +6,7 @@ public class AnalysisSuccessDistribbutionMEBCalculator : AnalysisCalculatorFacto
 {
 
     private readonly IAnalysisCalculatorFactory<IList<AnalysisDetailTableDto>> _innerCalculator;
- 
+
     public AnalysisSuccessDistribbutionMEBCalculator(IAnalysisService analysisService, IAnalysisCalculatorFactory<IList<AnalysisDetailTableDto>> innerCalculator) : base(analysisService)
     {
         _innerCalculator = innerCalculator;
