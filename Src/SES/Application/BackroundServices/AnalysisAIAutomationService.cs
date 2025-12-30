@@ -3,7 +3,6 @@ using Application.Services.AIService;
 using Application.Services.AIService.Models;
 using Application.Services.Analyses;
 using Application.Services.CalculatorFactory;
-using Application.Services.Exams;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -41,7 +40,7 @@ internal class AnalysisAIAutomationService : BackgroundService
 
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
 
-        if (!enabled)
+        if (enabled)
         {
             _logger.LogInformation("AI analysis automation service is disabled");
             return;
