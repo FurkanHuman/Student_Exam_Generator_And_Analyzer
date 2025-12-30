@@ -55,7 +55,7 @@ internal static class ExamPageHeader
 
             headerRow.RelativeItem(1).AlignRight().AlignTop().Column(examSummary =>
             {
-                examSummary.Item().AlignCenter().Text(QuizQuestionHelpers.InsertDashInString(exam.ExamCode)).Bold();
+                examSummary.Item().AlignCenter().Text(QuizQuestionHelpers.InsertDashInString(exam.ExamTrackingCode)).Bold();
                 examSummary.Item().AlignCenter().Text(exam.ExamDate.ToShortDateString()).Bold();
                 examSummary.Item().AlignCenter().Text(ExamConstants.Get("score")).Bold();
                 examSummary.Item().AlignCenter().Width(2, Unit.Centimetre).Column(col =>

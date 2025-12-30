@@ -15,26 +15,20 @@ internal static class QuizQuestionHelpers
         Random random = new(seed);
 
         // Sort the QQOrder dictionary by key (order index)
-        IList<KeyValuePair<int, int>> orderedPairs = examInfo.QQOrder
-                                   .OrderBy(kvp => kvp.Key)
-                                   .ToList();
+        IList<KeyValuePair<int, int>> orderedPairs = [.. examInfo.QQOrder.OrderBy(kvp => kvp.Key)];
 
         // Extract the IDs of the ordered questions
-        var orderedIds = orderedPairs
-            .Select(x => x.Value)
-            .ToHashSet();
+        HashSet<int> orderedIds = [.. orderedPairs.Select(x => x.Value)];
 
         // Create a list of ordered questions based on QQOrder
-        IList<QuizQuestion?> ordered = orderedPairs
+        IList<QuizQuestion?> ordered = [.. orderedPairs
             .Select(p => quizQuestions.FirstOrDefault(q => q.Id == p.Value))
-            .Where(q => q != null)
-            .ToList();
+            .Where(q => q != null)];
 
         // Identify and shuffle the unordered questions
-        IList<QuizQuestion> unordered = quizQuestions
+        IList<QuizQuestion> unordered = [.. quizQuestions
             .Where(q => !orderedIds.Contains(q.Id))
-            .OrderBy(q => random.Next())
-            .ToList();
+            .OrderBy(q => random.Next())];
 
         // Insert unordered questions into random positions in the ordered list
         foreach (QuizQuestion q in unordered)
@@ -108,15 +102,7 @@ internal static class QuizQuestionHelpers
     // Generates a Base32 string with a random number
     internal static string GenerateBase32String()
     {
-        // Generate a random number between int.MinValue and int.MaxValue
-        uint randomNumber = (uint)new Random().Next(int.MinValue, int.MaxValue);
-
-        // Convert the random number to bytes
-        byte[] bytes = BitConverter.GetBytes(randomNumber);
-
-        // Reverse bytes if the system is little-endian
-        if (BitConverter.IsLittleEndian)
-            Array.Reverse(bytes);
+        byte[] bytes = GenerateRandomSeedBytes32();
 
         // Encode the bytes to Base32
         return Base32.Crockford.Encode(bytes);
@@ -153,4 +139,38 @@ internal static class QuizQuestionHelpers
             str = str.Replace("-", "");
     }
 
+    // Converts a byte array to a uint (uint 32-bit integer. for now, the system default)
+    internal static uint ConvertSeedToUInt32(byte[] byteArray)
+    {
+        // Reverse bytes if the system is little-endian
+        if (BitConverter.IsLittleEndian)
+            Array.Reverse(byteArray);
+        // Convert the bytes to a uint
+        return BitConverter.ToUInt32(byteArray);
+    }
+
+    // Convert a byte array to a string CrockFord
+    internal static string EncodeSeedToBase32(byte[] byteArray)
+    {
+        // Reverse bytes if the system is little-endian
+        if (BitConverter.IsLittleEndian)
+            Array.Reverse(byteArray);
+        // Encode the bytes to Base32
+        return Base32.Crockford.Encode(byteArray);
+    }
+
+    // Generates a random byte array representing a uint (32-bit unsigned integer)
+    internal static byte[] GenerateRandomSeedBytes32()
+    {
+        // Generate a random number between int.MinValue and int.MaxValue
+        uint randomNumber = (uint)new Random().Next(int.MinValue, int.MaxValue);
+
+        // Convert the random number to bytes
+        byte[] bytes = BitConverter.GetBytes(randomNumber);
+
+        // Reverse bytes if the system is little-endian
+        if (BitConverter.IsLittleEndian)
+            Array.Reverse(bytes);
+        return bytes;
+    }
 }

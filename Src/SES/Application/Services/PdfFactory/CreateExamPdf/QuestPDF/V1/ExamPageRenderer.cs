@@ -48,7 +48,7 @@ public class ExamPageRenderer : IExamPageGenerator
 
             catch (Exception ex)
             {
-                exam.ExamCode = QuizQuestionHelpers.GenerateBase32String();
+                exam.ExamTrackingCode = QuizQuestionHelpers.GenerateBase32String();
 
                 if (retryCount == MaxRetryCount - 1)
                     return HandleDocumentException($"Document Retry Failure after {MaxRetryCount} attempts. Last error: {ex.Message}");

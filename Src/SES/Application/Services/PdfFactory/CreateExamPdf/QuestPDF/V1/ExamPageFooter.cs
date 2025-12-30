@@ -14,7 +14,7 @@ internal static class ExamPageFooter
             string examAuthor = $"{exam.ExamAuthor.Personel.Name} {exam.ExamAuthor.Personel.SurName}";
             footerNotes.Item().AlignCenter().Text(examAuthor).FontSize(10);
             footerNotes.Item().AlignCenter().Text(exam.FooterNote).FontSize(10);
-            footerNotes.Item().AlignCenter().Text(QuizQuestionHelpers.InsertDashInString(exam.ExamCode)).FontSize(7);
+            footerNotes.Item().AlignCenter().Text(QuizQuestionHelpers.InsertDashInString(exam.ExamTrackingCode)).FontSize(7);
         });
     }
 }
