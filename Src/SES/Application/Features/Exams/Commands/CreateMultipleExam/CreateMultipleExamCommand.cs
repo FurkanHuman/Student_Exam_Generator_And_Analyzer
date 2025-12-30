@@ -1,5 +1,6 @@
 // todo: the code here will be heavily refactored and the 'single responsibility principle' will be applied
 using Application.Features.Exams.Rules;
+using Application.Services.ExamConfigurations;
 using Application.Services.Lessons;
 using Application.Services.PdfFactory.CreateExamPdf;
 using Application.Services.PdfFactory.CreateExamPdf.DTOs;
@@ -41,6 +42,7 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
     {
         private readonly IMapper _mapper;
         private readonly IExamRepository _examRepository;
+        private readonly IExamConfigurationService _examConfigurationService;
         private readonly IStudentService _studentService;
         private readonly ILessonService _lessonService;
         private readonly ISemesterService _semesterService;
@@ -51,10 +53,11 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
         private readonly IExamPageGenerator _examPageGenerator;
         private readonly ExamBusinessRules _examBusinessRules;
 
-        public CreateMultipleExamCommandHandler(IMapper mapper, IExamRepository examRepository, IStudentService studentService, ILessonService lessonService, ISemesterService semesterService, ISchoolService schoolService, IReferenceBenefitService referenceBenefitService, ITeacherService teacherService, IQuizQuestionService quizQuestionService, IExamPageGenerator examPageGenerator, ExamBusinessRules examBusinessRules)
+        public CreateMultipleExamCommandHandler(IMapper mapper, IExamRepository examRepository, IExamConfigurationService examConfigurationService, IStudentService studentService, ILessonService lessonService, ISemesterService semesterService, ISchoolService schoolService, IReferenceBenefitService referenceBenefitService, ITeacherService teacherService, IQuizQuestionService quizQuestionService, IExamPageGenerator examPageGenerator, ExamBusinessRules examBusinessRules)
         {
             _mapper = mapper;
             _examRepository = examRepository;
+            _examConfigurationService = examConfigurationService;
             _studentService = studentService;
             _lessonService = lessonService;
             _semesterService = semesterService;
@@ -70,12 +73,11 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
         {
             IList<Exam> exams = [];
             IList<byte[]> pdfBytes = [];
-
-            string examCode = QuizQuestionHelpers.GenerateBase32String();
+            byte[]? examRandomizerSeed = QuizQuestionHelpers.GenerateRandomSeedBytes32();
 
             Lesson? lesson = await _lessonService.GetAsync(
-                predicate: l => l.Id == request.LessonId,
-                cancellationToken: cancellationToken);
+            predicate: l => l.Id == request.LessonId,
+            cancellationToken: cancellationToken);
 
             Semester? semester = await _semesterService.GetAsync(
                 predicate: s => s.Id == request.SemesterId,
@@ -99,7 +101,7 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
                 include: s => s.Include(x => x.StudentClass),
                 cancellationToken: cancellationToken);
 
-            int[] qqIds = request.ExamInfo.QQOrder.Keys.ToArray();
+            int[] qqIds = [.. request.ExamInfo.QQOrder.Keys];
             IPaginate<QuizQuestion>? quizQuestions = await _quizQuestionService.GetListAsync(
                 predicate: q => qqIds.Contains(q.Id),
                 size: int.MaxValue,
@@ -109,18 +111,32 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
 
             _examBusinessRules.CheckStudentAvailability(students);
 
+            ExamConfiguration temp = new()
+            {
+                ConfigurationJsonStr = JsonSerializer.Serialize(request.ExamInfo),
+            };
+
+            ExamConfiguration? examConfiguration = await _examConfigurationService.GetAsync(
+             predicate: ec => ec.ConfigurationHash == temp.ConfigurationHash,
+             cancellationToken: cancellationToken);
+
+            examConfiguration ??= temp;
+
             foreach (Student student in students!.Items)
             {
+                string examTrackingCode = QuizQuestionHelpers.GenerateBase32String();
+
                 if (request.ExamInfo.IsRandomizeQuestions)
-                    examCode = QuizQuestionHelpers.GenerateBase32String();
+                    examRandomizerSeed = QuizQuestionHelpers.GenerateRandomSeedBytes32();
 
                 Exam exam = new()
                 {
                     ExamDate = request.ExamInfo.ExamScheduledDate,
                     ExamLessonName = request.ExamInfo.ExamName,
-                    ExamCode = examCode,
+                    ExamTrackingCode = examTrackingCode,
+                    ExamRandomizerSeed = examRandomizerSeed,
                     FooterNote = request.ExamInfo.FooterNote,
-                    ExamConfigurationStr = JsonSerializer.Serialize(request.ExamInfo, JsonSerializerOptions.Default),
+                    ExamConfiguration = examConfiguration,
                     TotalScoreForString = request.ExamInfo.ExamScoreStr,
                     TotalScore = request.ExamInfo.ExamScore,
 
@@ -131,7 +147,7 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
                     ReferenceBenefitId = referenceBenefit.Id,
                     ExamAuthorId = examAuthor!.Id,
                     EvaluationOrigin = 0,
-                    QuestionOrderMap = request.ExamInfo.QQOrder,
+                    QuestionOrderMap = request.ExamInfo.QQOrder.ToDictionary(),
 
                     Lesson = lesson!,
                     Semester = semester!,
@@ -158,10 +174,8 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
                     string pdfFileName = $"{exam.Student.SchoolNumber}_{exam.Student.StudentClass.ClassAge}-{exam.Student.StudentClass.ClassBranch}.pdf";
                     ZipArchiveEntry pdfEntry = archive.CreateEntry(pdfFileName);
 
-                    using (Stream entryStream = pdfEntry.Open())
-                    {
-                        await entryStream.WriteAsync(examPdf, 0, examPdf.Length, cancellationToken);
-                    }
+                    using Stream entryStream = pdfEntry.Open();
+                    await entryStream.WriteAsync(examPdf, cancellationToken);
                 }
             }
 
@@ -169,11 +183,13 @@ public class CreateMultipleExamCommand : IRequest<CreateMultipleExamResponse>, I
 
             byte[] zipFileBytes = memoryStream.ToArray();
 
-            await _examRepository.AddRangeAsync(exams);
+            _ = await _examRepository.AddRangeAsync(exams, cancellationToken);
 
-            CreateMultipleExamResponse response = new();
-            response.FileName = $"{lesson!.LessonName}-{examInfo.SelectedClass}-sınıflar-{examInfo.CurrentExamNumber}-yazılı.zip";
-            response.ZipFileMemStream = new MemoryStream(zipFileBytes);
+            CreateMultipleExamResponse response = new()
+            {
+                FileName = $"{lesson!.LessonName}-{examInfo.SelectedClass}-sınıflar-{examInfo.CurrentExamNumber}-yazılı.zip",
+                ZipFileMemStream = new MemoryStream(zipFileBytes)
+            };
             return response;
         }
     }
