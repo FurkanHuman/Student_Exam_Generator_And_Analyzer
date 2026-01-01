@@ -6,5 +6,5 @@ public class GhostStudentDto
     public string SchoolNumber { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string SurName { get; set; } = string.Empty;
-    public string Gender { get; set; } = string.Empty;
+    public char Gender { get; set; }
 }

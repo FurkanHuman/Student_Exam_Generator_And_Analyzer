@@ -337,13 +337,13 @@
                                             <td>@student.Name</td>
                                             <td>@student.SurName</td>
                                             <td>
-                                                @if (student.Gender == "K")
+                                                @if (student.Gender == 'K')
                                                 {
                                                     <span class="badge bg-danger">
                                                         <i class="bi bi-gender-female"></i> Kız
                                                     </span>
                                                 }
-                                                else if (student.Gender == "E")
+                                                else if (student.Gender == 'E')
                                                 {
                                                     <span class="badge bg-primary">
                                                         <i class="bi bi-gender-male"></i> Erkek
@@ -503,14 +503,13 @@
     {
         int totalStudents = GetTotalStudentCount();
 
-        bool status = _ghostStudentDto.SchoolId > 0 &&
+        return !(_ghostStudentDto.SchoolId > 0 &&
                _ghostStudentDto.SemesterId > 0 &&
                _ghostStudentDto.TeacherId > 0 &&
                _ghostStudentDto.ClassAge > -1 &&
                !char.IsWhiteSpace(_ghostStudentDto.ClassBranch) &&
                totalStudents > 0 &&
-               !_isLoading;
-        return !status;
+               !_isLoading);        
     }
 
     private int GetTotalStudentCount()
