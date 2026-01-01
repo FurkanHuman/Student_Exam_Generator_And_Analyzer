@@ -1,4 +1,5 @@
 @page "/TeacherAdd"
+@rendermode InteractiveServer
 @using Application.Features.Personels.Queries.GetList
 @using Application.Features.Schools.Queries.GetList
 @using Application.Features.Semesters.Queries.GetList
@@ -122,10 +123,7 @@
                                                     <div class="col-md-4">
                                                         <p class="mb-1"><small class="text-muted">Personel</small></p>
                                                         <p class="mb-0">
-                                                            @if (_selectedPersonel != null)
-                                                            {
-                                                                <strong>@_selectedPersonel.Name @_selectedPersonel.SurName</strong>
-                                                            }
+                                                                <strong>@GetPersonelName(_teacherDto.PersonelId)</strong>                                                            
                                                         </p>
                                                     </div>
                                                 }
@@ -158,7 +156,7 @@
                             <button type="button" class="btn btn-secondary" @onclick="ResetForm">
                                 <i class="bi bi-arrow-counterclockwise me-1"></i>Sıfırla
                             </button>
-                            <button type="submit" class="btn btn-success" disabled="@(!CanSubmit())">
+                            <button type="submit" class="btn btn-success" disabled="@CanSubmit()">
                                 <i class="bi bi-plus-circle me-1"></i>Ekle
                             </button>
                         </div>
@@ -197,30 +195,25 @@
         {
             _isLoading = true;
 
-            var tasks = new List<Task>();
-
             if (PersonelId == null)
             {
-                var personelTask = _Mediator.Send(new GetListPersonelQuery
+                _getListPersonel = await _Mediator.Send(new GetListPersonelQuery
                 {
                     PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
                 });
-                tasks.Add(personelTask.ContinueWith(t => _getListPersonel = t.Result));
             }
 
-            var schoolTask = _Mediator.Send(new GetListSchoolQuery
+            _getListSchool = await _Mediator.Send(new GetListSchoolQuery
             {
                 PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
             });
-            tasks.Add(schoolTask.ContinueWith(t => _getListSchool = t.Result));
 
-            var semesterTask = _Mediator.Send(new GetListSemesterQuery
+
+            _getListSemester = await _Mediator.Send(new GetListSemesterQuery
             {
                 PageRequest = new() { PageIndex = 0, PageSize = int.MaxValue }
             });
-            tasks.Add(semesterTask.ContinueWith(t => _getListSemester = t.Result));
 
-            await Task.WhenAll(tasks);
         }
         finally
         {
@@ -250,14 +243,14 @@
             if (PersonelId != null)
                 _teacherDto.PersonelId = PersonelId.Value;
 
-            var teacherCommand = new CreateTeacherCommand
+            CreateTeacherCommand teacherCommand = new()
             {
                 PersonelId = _teacherDto.PersonelId,
                 SchoolId = _teacherDto.SchoolId,
                 SemesterId = _teacherDto.SemesterId
             };
 
-            var teacherResponse = await _Mediator.Send(teacherCommand);
+            CreatedTeacherResponse? teacherResponse = await _Mediator.Send(teacherCommand);
 
             _isSuccess = true;
             await TriggerEvent.InvokeAsync();
@@ -286,10 +279,8 @@
 
     private bool CanSubmit()
     {
-        var hasPersonel = PersonelId != null || _teacherDto.PersonelId != Guid.Empty;
-        return hasPersonel &&
-               _teacherDto.SemesterId > 0 &&
-               !_isLoading;
+        bool hasPersonel = PersonelId != null || _teacherDto.PersonelId != Guid.Empty;
+        return !(hasPersonel && _teacherDto.SemesterId > 0 && !_isLoading);
     }
 
     private bool ShowSelectionSummary()
@@ -298,9 +289,17 @@
                (_teacherDto.SemesterId > 0 || _teacherDto.SchoolId >= 0);
     }
 
+    private string GetPersonelName(Guid id)
+    {
+        GetListPersonelListItemDto? personel = _getListPersonel.Items.FirstOrDefault(p=>p.Id==id);
+        return personel != null
+        ? $"{personel.Name} {personel.SurName}"
+        : "";
+    }
+
     private string GetSemesterName(int id)
     {
-        var semester = _getListSemester.Items.FirstOrDefault(s => s.Id == id);
+        GetListSemesterListItemDto? semester = _getListSemester.Items.FirstOrDefault(s => s.Id == id);
         return semester != null
             ? $"{semester.Name} ({semester.BeginSemesterDate.Year}-{semester.EndSemesterDate.Year})"
             : "";
@@ -309,11 +308,11 @@
     private string GetSchoolName(int id)
     {
         if (id == 0) return "Otomatik (Son eklenen okul)";
-        var school = _getListSchool.Items.FirstOrDefault(s => s.Id == id);
+        GetListSchoolListItemDto? school = _getListSchool.Items.FirstOrDefault(s => s.Id == id);
         return school?.Name ?? "";
     }
 
-    private class TeacherAddDto
+    private sealed class TeacherAddDto
     {
         public Guid PersonelId { get; set; }
         public int SchoolId { get; set; }
