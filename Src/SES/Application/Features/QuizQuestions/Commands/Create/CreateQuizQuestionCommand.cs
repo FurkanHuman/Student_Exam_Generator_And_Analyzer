@@ -25,6 +25,7 @@ public class CreateQuizQuestionCommand : IRequest<CreatedQuizQuestionResponse>, 
     public string? QuestionImage { get; set; }
     public required QuestionType QuestionType { get; set; }
     public ICollection<QuestionOptionAppDto?> QQOptions { get; set; }
+    public int? PreviousQuestionId { get; set; }
 
     public bool BypassCache { get; }
     public string? CacheKey { get; }

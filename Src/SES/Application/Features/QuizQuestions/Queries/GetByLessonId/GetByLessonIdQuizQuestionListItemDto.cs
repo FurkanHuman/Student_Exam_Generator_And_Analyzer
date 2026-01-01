@@ -14,6 +14,7 @@ public class GetByLessonIdQuizQuestionListItemDto : IResponse, IDto
     public string QuestionBody { get; set; }
     public string QuestionImage { get; set; }
     public bool IsAIGenerated { get; set; } = false;
+    public int? PreviousQuestionId { get; set; }
     public QuestionType QuestionType { get; set; }
     public ICollection<QuestionOption> Options { get; set; }
     public ICollection<Benefit> Benefits { get; set; }

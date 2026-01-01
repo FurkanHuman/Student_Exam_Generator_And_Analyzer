@@ -16,8 +16,10 @@ internal class QuizQuestionConfiguration : IEntityTypeConfiguration<QuizQuestion
         builder.Property(qq => qq.QuestionImageURL).IsRequired(false);
         builder.Property(qq => qq.QuestionType).IsRequired();
         builder.Property(qq => qq.IsAIGenerated).HasDefaultValue(false);
+        builder.Property(qq=>   qq.PreviousQuestionId).IsRequired(false);
 
         builder.HasOne(qq => qq.QuestionScore);
+        builder.HasOne(qq => qq.PreviousQuestion);
 
         builder.HasMany(qq => qq.Exams);
         builder.HasMany(qq => qq.Benefits);

@@ -10,7 +10,9 @@ public class QuizQuestion : Entity<int> // note: sorununn kendisi.
     public string QuestionImageURL { get; set; }
     public QuestionType QuestionType { get; set; }
     public bool IsAIGenerated { get; set; } = false;
+    public int? PreviousQuestionId { get; set; }
     public QuestionScore QuestionScore { get; set; }
+    public QuizQuestion? PreviousQuestion { get; set; }
     public IList<Exam> Exams { get; set; }
     public IList<Benefit> Benefits { get; set; }
     public IList<QuestionOption> Options { get; set; }

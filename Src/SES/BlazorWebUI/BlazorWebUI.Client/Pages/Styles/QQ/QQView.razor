@@ -1,4 +1,7 @@
-﻿@if (QQBody != null)
+﻿@using Microsoft.AspNetCore.Components
+@inject NavigationManager NavigationManager
+
+@if (QQBody != null)
 {
     <div class="card p-4 mb-3 shadow-lg">
         <p class="mb-3"><strong>Soru Türü:</strong> @selectedQtype(QQBody.SelectedQType)</p>
@@ -6,22 +9,40 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 class="mb-0"><strong>Soru Detayları</strong></h3>
             <div class="d-flex gap-2 align-items-center">
-                <button class="btn btn-primary" @onclick="() => ModalDialog.Open()">
+
+                <button class="btn btn-outline-primary" @onclick="() => ModalDialog.Open()">
                     <i class="bi bi-eye me-1"></i>
                     Kazanımları görüntüle
                 </button>
-                <span class="badge bg-primary fs-5 px-3 py-2">
+
+                <button class="btn btn-outline-success" @onclick="CreateVariant">
+                    <i class="bi bi-files me-2"></i>Soru Türet
+                </button>
+
+                <span class="badge bg-transparent text-primary border border-primary fs-5 px-3 py-2"
+                      title="Normal Puan / Maksimum Puan">
                     @QQBody.Score / @QQBody.MaxScore
                 </span>
 
                 @if (QQBody.IsAIGenerated)
                 {
-                    <span class="badge bg-info text-white fs-6 px-3 py-2 d-flex align-items-center gap-1">
+                    <span class="badge bg-info text-white fs-6 px- py-2 d-flex align-items-center gap-1"
+                          title="yapay zeka ile üretilmiştir">
                         <i class="bi bi-robot"></i>
                     </span>
                 }
+
+                @if (QQBody.PreviousQuestionId.HasValue)
+                {
+                    <span class="badge bg-info text-white fs-6 px-3 py-2 d-flex align-items-center gap-1"
+                          title="Bu soru önceki bir sorudan türetilmiştir">
+                        <i class="bi bi-link-45deg"></i>
+                    </span>
+                }
+
             </div>
         </div>
+
         <hr />
 
         @if (QQBody.FileData != null && !string.IsNullOrWhiteSpace(QQBody.FileData.Id))
@@ -84,5 +105,21 @@ else
     private ModalDialog ModalDialog { get; set; } = default!;
 
     private string selectedQtype(byte type)
-    => QQStatic.SelectTypeOptionsTUR.TryGetValue(key: type, value: out string? value) ? value : "Bilinmeyen Tür";
+        => QQStatic.SelectTypeOptionsTUR.TryGetValue(key: type, value: out string? value) ? value : "Bilinmeyen Tür";
+
+    private async Task CreateVariant()
+    {
+        if (QQBody != null)
+        {
+            // Serialize QQBody to query string for navigation
+            Dictionary<string, object?> queryParams = new()
+            {
+                ["variant"] = true,
+                ["previousQuestionId"] = QQBody.Id
+            };
+
+            NavigationManager.NavigateTo(
+                NavigationManager.GetUriWithQueryParameters("/QuizPoolAdd", queryParams));
+        }
+    }
 }
