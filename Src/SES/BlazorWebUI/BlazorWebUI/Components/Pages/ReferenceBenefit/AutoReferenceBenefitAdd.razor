@@ -288,7 +288,7 @@
                             <button type="button" class="btn btn-secondary" @onclick="ResetForm">
                                 <i class="bi bi-arrow-counterclockwise me-1"></i>Sıfırla
                             </button>
-                            <button type="submit" class="btn btn-primary" disabled="@(!CanSubmit())">
+                            <button type="submit" class="btn btn-primary" disabled="@CanSubmit()">
                                 <i class="bi bi-save me-1"></i>Kaydet
                             </button>
                         </div>
@@ -396,7 +396,7 @@
             lines.AddRange(_editContentSubLearning.Select(sl => sl.Current).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct());
             lines.AddRange(_editContentBenefits.Select(b => b.Current).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct());
 
-            var referenceBenefitDto = _pdfReaderService.ProcessReferenceBenefit(lines);
+            var referenceBenefitDto = _pdfReaderService.ProcessReferenceBenefit(lines.Distinct().ToList());
             referenceBenefitDto.RBName = _autoBenefitDto.Name;
             referenceBenefitDto.LessonId = _autoBenefitDto.LessonId;
             referenceBenefitDto.SemesterId = _autoBenefitDto.SemesterId;
@@ -479,7 +479,6 @@
         {
             ClearExtractedData();
 
-            // Öğrenme Alanlarını işle
             if (!string.IsNullOrWhiteSpace(_manualLearningAreasText))
             {
                 var learningLines = _manualLearningAreasText
@@ -491,7 +490,6 @@
                 _editContentLearning.AddRange(learningLines.Select(line => new EditContent { Current = line }));
             }
 
-            // Alt Öğrenme Alanlarını işle
             if (!string.IsNullOrWhiteSpace(_manualSubLearningAreasText))
             {
                 var subLearningLines = _manualSubLearningAreasText
@@ -503,7 +501,6 @@
                 _editContentSubLearning.AddRange(subLearningLines.Select(line => new EditContent { Current = line }));
             }
 
-            // Kazanımları işle
             if (!string.IsNullOrWhiteSpace(_manualBenefitsText))
             {
                 var benefitLines = _manualBenefitsText
@@ -518,7 +515,6 @@
             if (HasExtractedData())
             {
                 _showPreview = true;
-                // Başarı mesajı için state güncelle
                 StateHasChanged();
             }
         }
@@ -542,14 +538,14 @@
 
     private bool CanSubmit()
     {
-        return !string.IsNullOrWhiteSpace(_autoBenefitDto.Name) &&
+        return !(!string.IsNullOrWhiteSpace(_autoBenefitDto.Name) &&
                _autoBenefitDto.SchoolId > 0 &&
                _autoBenefitDto.SemesterId > 0 &&
                _autoBenefitDto.LessonId > 0 &&
                _isBenefitsOk &&
                _isSubLearningOk &&
                _isLearningOk &&
-               HasExtractedData();
+               HasExtractedData());
     }
 
     private void ResetForm()
@@ -593,7 +589,7 @@
             : string.Empty;
     }
 
-    private class RefBenDto
+    private sealed class RefBenDto
     {
         public string Name { get; set; } = string.Empty;
         public int LessonId { get; set; }
