@@ -12,7 +12,9 @@ public class Student : Entity<int>
     public bool IsGhostStudent { get; set; }
     public int SchoolId { get; set; }
     public int StudentClassId { get; set; }
+    public int? PreviousStudentId { get; set; }
 
+    public Student? PreviousStudent { get; set; }
     public School School { get; set; }
     public StudentClass StudentClass { get; set; }
 

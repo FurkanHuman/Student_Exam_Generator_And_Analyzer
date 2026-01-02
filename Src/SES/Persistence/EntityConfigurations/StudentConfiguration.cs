@@ -18,10 +18,12 @@ internal class StudentConfiguration : IEntityTypeConfiguration<Student>, IMainCo
         builder.Property(s => s.IsGhostStudent).IsRequired().HasDefaultValue(false);
         builder.Property(s => s.Description);
 
+        builder.Property(s => s.PreviousStudentId).IsRequired(false);
         builder.Property(s => s.SchoolId);
         builder.Property(s => s.StudentClassId);
 
 
+        builder.HasOne(s => s.PreviousStudent);
         builder.HasOne(s => s.School);
         builder.HasOne(s => s.StudentClass);
 
