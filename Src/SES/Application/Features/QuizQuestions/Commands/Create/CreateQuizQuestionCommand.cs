@@ -20,8 +20,8 @@ public class CreateQuizQuestionCommand : IRequest<CreatedQuizQuestionResponse>, 
     public required int Score { get; set; }
     public required int MaxScore { get; set; }
     public required int RefBenefitId { get; set; }
-    public required string Question { get; set; }
-    public string? QuestionBody { get; set; }
+    public required string Prompt { get; set; }
+    public string? Stem { get; set; }
     public string? QuestionImage { get; set; }
     public required QuestionType QuestionType { get; set; }
     public ICollection<QuestionOptionAppDto?> QQOptions { get; set; }

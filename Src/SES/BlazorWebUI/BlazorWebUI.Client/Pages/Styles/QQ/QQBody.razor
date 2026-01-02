@@ -30,13 +30,13 @@
             }
 
             <div class="row g-3">
-                @if (IsBody)
+                @if (IsStem)
                 {
                     <div class="col-12">
                         <label class="form-label fw-semibold">
                             <i class="bi bi-file-text me-2"></i>Bilgi / Ana Metin
                         </label>
-                        <InputTextArea class="form-control" rows="4" @bind-Value="Question"
+                        <InputTextArea class="form-control" rows="4" @bind-Value="Stem"
                                        placeholder="Soruyla ilgili ek bilgi veya ana metni buraya yazın..." />
                     </div>
                 }
@@ -45,7 +45,7 @@
                     <label class="form-label fw-semibold required">
                         <i class="bi bi-pencil me-2"></i>Soru Kökü
                     </label>
-                    <InputTextArea class="form-control" rows="3" @bind-Value="QuestionBody"
+                    <InputTextArea class="form-control" rows="3" @bind-Value="Prompt"
                                    placeholder="Soru metnini buraya yazın..." />
                 </div>
 
@@ -104,7 +104,7 @@
 
                 <div class="col-md-4">
                     <div class="form-check form-switch">
-                        <InputCheckbox class="form-check-input" @bind-Value="IsBody" id="flexCheckBody" />
+                        <InputCheckbox class="form-check-input" @bind-Value="IsStem" id="flexCheckBody" />
                         <label class="form-check-label" for="flexCheckBody">
                             <i class="bi bi-file-earmark-text me-1"></i>Bilgi/Ana Metin İçerir
                         </label>
@@ -209,11 +209,11 @@
     private QQOptionBody QQOptionBody { get; set; } = new();
     private QQBodyDto QQBodyData { get; set; } = new();
 
-    private string QuestionBody { get; set; } = string.Empty;
-    private string? Question { get; set; }
+    private string Prompt { get; set; } = string.Empty;
+    private string? Stem { get; set; }
     private string? Score { get; set; }
     private string? MaxScore { get; set; }
-    private bool IsBody;
+    private bool IsStem;
     private bool IsImage;
     private bool IsQQBenefitLoader;
     private bool? showSuccessMessage;
@@ -228,7 +228,7 @@
     private async Task ExecuteQQHandle()
     {
         // Validation
-        if (string.IsNullOrWhiteSpace(QuestionBody) ||
+        if (string.IsNullOrWhiteSpace(Prompt) ||
             string.IsNullOrEmpty(Score) ||
             string.IsNullOrEmpty(MaxScore) ||
             QQBodyData.SelectedBenefits.Count == 0)
@@ -239,8 +239,8 @@
 
         await QQOptionBody.QQOption.OnSelectedOptionHandler();
 
-        QQBodyData.QuestionBody = QuestionBody;
-        QQBodyData.Question = Question;
+        QQBodyData.Prompt = Prompt;
+        QQBodyData.Stem = Stem;
         QQBodyData.Score = int.Parse(Score!);
         QQBodyData.MaxScore = int.Parse(MaxScore!);
 
@@ -249,8 +249,8 @@
         // Reset form
         QQBodyData = new();
         showSuccessMessage = true;
-        QuestionBody = string.Empty;
-        Question = string.Empty;
+            Prompt = string.Empty;
+            Stem = string.Empty;
         Score = string.Empty;
         MaxScore = string.Empty;
 

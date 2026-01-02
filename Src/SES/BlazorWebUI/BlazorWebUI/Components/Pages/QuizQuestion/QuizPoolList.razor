@@ -405,8 +405,8 @@
 
         if (!string.IsNullOrWhiteSpace(_searchQuery))
             filtered = filtered.Where(q =>
-                (q.QuestionBody?.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                (q.Question?.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (q.Prompt?.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (q.Stem?.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
                 q.SelectedBenefits.Values.Any(b => b.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase))
             );
 

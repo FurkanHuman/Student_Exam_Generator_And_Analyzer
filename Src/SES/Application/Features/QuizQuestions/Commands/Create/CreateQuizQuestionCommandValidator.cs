@@ -9,7 +9,7 @@ public class CreateQuizQuestionCommandValidator : AbstractValidator<CreateQuizQu
         RuleFor(c => c.BenefitIds).NotEmpty();
         RuleFor(c => c.Score).NotEmpty();
         RuleFor(c => c.MaxScore).NotEmpty();
-        RuleFor(c => c.Question).NotEmpty();
+        RuleFor(c => c.Prompt).NotEmpty();
         RuleFor(c => c.QuestionType).NotEmpty();
     }
 }

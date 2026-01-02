@@ -16,8 +16,8 @@ public class UpdateQuizQuestionCommand : IRequest<UpdatedQuizQuestionResponse>, 
     public required int BenefitId { get; set; }
     public required int ExamId { get; set; }
     public required int Score { get; set; }
-    public required string Question { get; set; }
-    public required string QuestionBody { get; set; }
+    public required string Prompt { get; set; }
+    public string? Stem { get; set; }
     public required string QuestionImage { get; set; }
     public required QuestionType QuestionType { get; set; }
 

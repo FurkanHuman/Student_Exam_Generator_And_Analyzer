@@ -315,17 +315,17 @@
                                         </span>
                                     </div>
 
-                                    @if (!string.IsNullOrEmpty(question.QuestionBody))
+                                    @if (!string.IsNullOrEmpty(question.Stem))
                                     {
                                         <div class="question-context p-3 bg-light rounded mb-3">
                                             <small class="text-muted d-block mb-1">
                                                 <i class="bi bi-info-circle me-1"></i>Bilgi/Ana Metin
                                             </small>
-                                            <p class="mb-0">@question.QuestionBody</p>
+                                            <p class="mb-0">@question.Stem</p>
                                         </div>
                                     }
 
-                                    <p class="fs-5 fw-semibold mb-3">@question.Question</p>
+                                    <p class="fs-5 fw-semibold mb-3">@question.Prompt</p>
 
                                     @if (question.BenefitCodes.Any())
                                     {
@@ -910,8 +910,8 @@
                         QuestionType = question.QuestionType,
                         MaxScore = question.MaximumScore,
                         Score = question.MaximumScore,
-                        QuestionBody = question.QuestionBody,
-                        Question = question.Question,
+                        Stem = question.Stem,
+                        Prompt = question.Prompt,
                         QuestionImage = null,
                         QQOptions = optionAppDtos
                     };

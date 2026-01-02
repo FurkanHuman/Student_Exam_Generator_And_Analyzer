@@ -10,8 +10,7 @@ public class UpdateQuizQuestionCommandValidator : AbstractValidator<UpdateQuizQu
         RuleFor(c => c.BenefitId).NotEmpty();
         RuleFor(c => c.ExamId).NotEmpty();
         RuleFor(c => c.Score).NotEmpty();
-        RuleFor(c => c.Question).NotEmpty();
-        RuleFor(c => c.QuestionBody).NotEmpty();
+        RuleFor(c => c.Prompt).NotEmpty();
         RuleFor(c => c.QuestionImage).NotEmpty();
         RuleFor(c => c.QuestionType).NotEmpty();
     }

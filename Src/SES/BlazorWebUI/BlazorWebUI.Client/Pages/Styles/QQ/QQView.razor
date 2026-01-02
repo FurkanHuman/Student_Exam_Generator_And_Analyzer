@@ -55,12 +55,12 @@
             </div>
         }
 
-        @if (!string.IsNullOrEmpty(QQBody.QuestionBody))
+        @if (!string.IsNullOrEmpty(QQBody.Prompt))
         {
-            <p class="text-muted" style="white-space: pre-line;">@QQBody.QuestionBody</p>
+            <p class="text-muted" style="white-space: pre-line;">@QQBody.Stem</p>
         }
 
-        <p class="fs-5" style="white-space: pre-line;"><strong>@QQBody.Question</strong></p>
+        <p class="fs-5" style="white-space: pre-line;"><strong>@QQBody.Prompt</strong></p>
 
         <hr />
 
