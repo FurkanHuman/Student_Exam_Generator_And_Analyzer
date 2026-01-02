@@ -39,12 +39,12 @@ internal static class QuizQuestionCapsule
                             innerCol.Item().Text(ExamConstants.Get("ImageNotFound")).FontColor(Colors.Red.Medium);
                     }
 
-                    if (!string.IsNullOrEmpty(question.QuestionBody))
-                        innerCol.Item().Text(question.QuestionBody ?? string.Empty).FontSize(12).Italic();
+                    if (!string.IsNullOrEmpty(question.Stem))
+                        innerCol.Item().Text(question.Stem ?? string.Empty).FontSize(12).Italic();
 
                     string scoreText = ExamConstants.Get("score") ?? "puan";
                     string examScore = $"\n({question.QuestionScore.Score} {scoreText})";
-                    innerCol.Item().Text($"{question.Question ?? string.Empty}{examScore}").FontSize(12).Bold();
+                    innerCol.Item().Text($"{question.Prompt ?? string.Empty}{examScore}").FontSize(12).Bold();
 
 
                     switch (question.QuestionType)
@@ -121,7 +121,7 @@ internal static class QuizQuestionCapsule
     }
     private static void RenderFillInTheBlankMask(ref QuizQuestion question)
     {
-        if (question?.Options == null || string.IsNullOrEmpty(question.Question))
+        if (question?.Options == null || string.IsNullOrEmpty(question.Stem))
             return;
 
         HashSet<string> shadowStrings = [.. question.Options
@@ -135,7 +135,7 @@ internal static class QuizQuestionCapsule
         foreach (string str in shadowStrings)
         {
             string mask = new('.', Math.Min(str.Length + 3, 50));
-            question.Question = question.Question.Replace(str, mask);
+            question.Stem = question.Stem.Replace(str, mask);
         }
     }
 

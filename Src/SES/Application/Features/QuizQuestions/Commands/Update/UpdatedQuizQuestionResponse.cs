@@ -9,8 +9,8 @@ public class UpdatedQuizQuestionResponse : IResponse
     public int BenefitId { get; set; }
     public int ExamId { get; set; }
     public int Score { get; set; }
-    public string Question { get; set; }
-    public string QuestionBody { get; set; }
+    public string Prompt { get; set; }
+    public string? Stem { get; set; }
     public string QuestionImage { get; set; }
     public QuestionType QuestionType { get; set; }
 }

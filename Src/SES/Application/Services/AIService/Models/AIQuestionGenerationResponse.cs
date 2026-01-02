@@ -15,12 +15,12 @@ public sealed class AIQuestionGenerationResponse
     /// <summary>
     /// Main question text
     /// </summary>
-    public string Question { get; set; } = string.Empty;
+    public string Prompt { get; set; } = string.Empty;
 
     /// <summary>
     /// Additional context or passage (optional)
     /// </summary>
-    public string? QuestionBody { get; set; }
+    public string? Stem { get; set; }
 
     /// <summary>
     /// Related benefit/objective codes

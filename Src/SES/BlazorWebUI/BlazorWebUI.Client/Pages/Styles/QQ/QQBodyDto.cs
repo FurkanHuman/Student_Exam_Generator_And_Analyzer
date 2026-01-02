@@ -3,8 +3,8 @@
 public class QQBodyDto
 {
     public int Id { get; set; }
-    public string QuestionBody { get; set; } = string.Empty;
-    public string? Question { get; set; }
+    public string Prompt { get; set; } = string.Empty;
+    public string? Stem { get; set; }
     public byte SelectedQType { get; set; }
     public int Score { get; set; }
     public int MaxScore { get; set; }

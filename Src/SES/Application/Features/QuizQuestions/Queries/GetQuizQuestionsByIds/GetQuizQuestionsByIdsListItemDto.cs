@@ -10,8 +10,8 @@ public class GetQuizQuestionsByIdsListItemDto : IResponse, IDto
     public int Id { get; set; }
     public int Score { get; set; }
     public int MaxScore { get; set; }
-    public string Question { get; set; }
-    public string QuestionBody { get; set; }
+    public string Prompt { get; set; }
+    public string? Stem { get; set; }
     public string QuestionImage { get; set; }
     public QuestionType QuestionType { get; set; }
     public IDictionary<int, int> QuestionOrderMap { get; set; } // key is question Id, value is exam question order

@@ -11,12 +11,12 @@ internal class QuizQuestionConfiguration : IEntityTypeConfiguration<QuizQuestion
     {
         builder.HasKey(qq => qq.Id);
         builder.Property(qq => qq.Id).IsRequired();
-        builder.Property(qq => qq.Question).IsRequired();
-        builder.Property(qq => qq.QuestionBody).IsRequired(false);
+        builder.Property(qq => qq.Stem).IsRequired(false);
+        builder.Property(qq => qq.Prompt).IsRequired();
         builder.Property(qq => qq.QuestionImageURL).IsRequired(false);
         builder.Property(qq => qq.QuestionType).IsRequired();
         builder.Property(qq => qq.IsAIGenerated).HasDefaultValue(false);
-        builder.Property(qq=>   qq.PreviousQuestionId).IsRequired(false);
+        builder.Property(qq => qq.PreviousQuestionId).IsRequired(false);
 
         builder.HasOne(qq => qq.QuestionScore);
         builder.HasOne(qq => qq.PreviousQuestion);
@@ -34,5 +34,3 @@ internal class QuizQuestionConfiguration : IEntityTypeConfiguration<QuizQuestion
         builder.HasQueryFilter(qq => !qq.DeletedDate.HasValue);
     }
 }
-
-

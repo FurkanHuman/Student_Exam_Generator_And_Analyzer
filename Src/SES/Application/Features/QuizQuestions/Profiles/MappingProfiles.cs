@@ -17,8 +17,8 @@ public class MappingProfiles : Profile
     public MappingProfiles()
     {
         CreateMap<CreateQuizQuestionCommand, QuizQuestion>()
-            .ForMember(destinationMember: qq => qq.Question, memberOptions: opt => opt.MapFrom(qqc => qqc.Question))
-            .ForMember(destinationMember: qq => qq.QuestionBody, memberOptions: opt => opt.MapFrom(qqc => qqc.QuestionBody))
+            .ForMember(destinationMember: qq => qq.Stem, memberOptions: opt => opt.MapFrom(qqc => qqc.Stem))
+            .ForMember(destinationMember: qq => qq.Prompt, memberOptions: opt => opt.MapFrom(qqc => qqc.Prompt))
             .ForMember(destinationMember: qq => qq.QuestionImageURL, memberOptions: opt => opt.MapFrom(qqc => qqc.QuestionImage));
 
         CreateMap<CreateQuizQuestionCommand, QuestionScore>()

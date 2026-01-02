@@ -3,11 +3,11 @@ using NArchitecture.Core.Persistence.Repositories;
 
 namespace Domain.Entities;
 
-public class QuizQuestion : Entity<int> // note: sorununn kendisi.
+public class QuizQuestion : Entity<int>
 {
-    public string Question { get; set; } // soru girişi örnek: uzun hikaye yada sıralama sorusu girşi buraya yapılacak. ince fontlo sorular.
-    public string QuestionBody { get; set; } // ana soru.
-    public string QuestionImageURL { get; set; }
+    public string? Stem { get; set; } // context, story, instruction
+    public string Prompt { get; set; } // the actual question to be answered
+    public string? QuestionImageURL { get; set; }
     public QuestionType QuestionType { get; set; }
     public bool IsAIGenerated { get; set; } = false;
     public int? PreviousQuestionId { get; set; }
