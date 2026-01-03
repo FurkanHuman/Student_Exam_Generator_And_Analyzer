@@ -33,7 +33,19 @@ public class MappingProfiles : Profile
         CreateMap<DeleteQuizQuestionCommand, QuizQuestion>();
         CreateMap<QuizQuestion, DeletedQuizQuestionResponse>();
 
-        CreateMap<QuizQuestion, GetByIdQuizQuestionResponse>();
+        CreateMap<QuizQuestion, GetByIdQuizQuestionResponse>()
+            .ForMember(destinationMember: qqdto => qqdto.Score, memberOptions: opt => opt.MapFrom(qq => qq.QuestionScore.Score))
+            .ForMember(destinationMember: qqdto => qqdto.MaxScore, memberOptions: opt => opt.MapFrom(qq => qq.QuestionScore.MaxScore))
+            .ForMember(destinationMember: qqdto => qqdto.Options, memberOptions: opt => opt.MapFrom(qq => qq.Options.Select(opt => new QuestionOption
+            {
+                Id = opt.Id,
+                OptionText = opt.OptionText,
+                IsCorrect = opt.IsCorrect,
+                CreatedDate = opt.CreatedDate,
+                UpdatedDate = opt.UpdatedDate,
+                DeletedDate = opt.DeletedDate,
+                QuizQuestion = new()
+            })));
 
         CreateMap<QuizQuestion, GetListQuizQuestionListItemDto>()
             .ForMember(destinationMember: qqdto => qqdto.Score, memberOptions: opt => opt.MapFrom(qq => qq.QuestionScore.Score))

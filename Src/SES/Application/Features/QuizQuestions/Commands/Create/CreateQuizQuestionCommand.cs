@@ -73,6 +73,14 @@ public class CreateQuizQuestionCommand : IRequest<CreatedQuizQuestionResponse>, 
             quizQuestion.Lessons = [.. lessons];
             quizQuestion.Benefits = [.. benefits];
 
+            if (request.PreviousQuestionId.HasValue)
+            {
+                QuizQuestion? preQQ = await _quizQuestionRepository.GetAsync(qq => qq.Id == quizQuestion.PreviousQuestionId, cancellationToken: cancellationToken);
+                quizQuestion.QuestionImageURL = preQQ?.QuestionImageURL;
+            }
+
+
+
             await _quizQuestionRepository.AddAsync(quizQuestion, cancellationToken);
 
             CreatedQuizQuestionResponse response = _mapper.Map<CreatedQuizQuestionResponse>(quizQuestion);

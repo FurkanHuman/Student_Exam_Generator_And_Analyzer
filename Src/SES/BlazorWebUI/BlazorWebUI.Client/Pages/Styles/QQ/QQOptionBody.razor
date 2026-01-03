@@ -1,17 +1,25 @@
 ﻿@rendermode InteractiveAuto
+
 <div class="form-control">
-    <InputRadioGroup @bind-Value="selectedOption" TValue="byte" Name="inlineRadioOptions">
+    <InputRadioGroup @bind-Value="_selectedQType" TValue="byte" Name="inlineRadioOptions">
         @foreach (KeyValuePair<byte, string> radio in QQStatic.SelectTypeOptionsTUR)
         {
             <div class="form-check form-check-inline">
-                <InputRadio class="form-check-input" TValue="byte" type="radio" Name="inlineRadioOptions" id="@($"inlineRadio{radio.Key}")" value="@radio.Key" />
-                <label class="form-check-label" for="@($"inlineRadio{radio.Key}")">@radio.Value</label>
+                <InputRadio class="form-check-input" TValue="byte" type="radio"
+                            Name="inlineRadioOptions"
+                            id="@($"inlineRadio{radio.Key}")"
+                            value="@radio.Key" />
+                <label class="form-check-label" for="@($"inlineRadio{radio.Key}")">
+                    @radio.Value
+                </label>
             </div>
         }
     </InputRadioGroup>
 
-    <QQOption @ref="QQOption" SelectedOption="selectedOption" OnSelectedOptions="OnSelectedOptionHandler"></QQOption>
-
+    <QQOption @ref="QQOption"
+              SelectedOption="_selectedQType"
+              OnSelectedOptions="HandleOptionsChanged"
+              QuestionOptions="InitialOptions" />
 </div>
 
 @code {
@@ -22,17 +30,37 @@
     public EventCallback<byte> OnSelectedQType { get; set; }
 
     [Parameter]
-    public byte selectedOption { get; set; }
+    public ICollection<QuestionOptionDto>? InitialOptions { get; set; }
 
     [Parameter]
-    public bool isChecked { get; set; }
+    public byte SelectedQType { get; set; }
 
     public QQOption QQOption { get; set; } = new();
 
+    private byte _selectedQType;
 
-    private async Task OnSelectedOptionHandler(ICollection<QuestionOptionDto> questionOptions)
+    protected override void OnInitialized()
+    {
+        _selectedQType = SelectedQType;
+        base.OnInitialized();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_selectedQType != SelectedQType)
+        {
+            _selectedQType = SelectedQType;
+        }
+
+        if (InitialOptions != null && InitialOptions.Any())
+            StateHasChanged();
+
+        await base.OnParametersSetAsync();
+    }
+
+    private async Task HandleOptionsChanged(ICollection<QuestionOptionDto> questionOptions)
     {
         await OnSelectedOptions.InvokeAsync(questionOptions);
-        await OnSelectedQType.InvokeAsync(selectedOption);
+        await OnSelectedQType.InvokeAsync(_selectedQType);
     }
 }

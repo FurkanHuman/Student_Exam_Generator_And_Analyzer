@@ -3,14 +3,13 @@ using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.QuizQuestions.Queries.GetById;
 
 public class GetByIdQuizQuestionQuery : IRequest<GetByIdQuizQuestionResponse>
 {
     public int Id { get; set; }
-
-
 
     public class GetByIdQuizQuestionQueryHandler : IRequestHandler<GetByIdQuizQuestionQuery, GetByIdQuizQuestionResponse>
     {
@@ -27,7 +26,11 @@ public class GetByIdQuizQuestionQuery : IRequest<GetByIdQuizQuestionResponse>
 
         public async Task<GetByIdQuizQuestionResponse> Handle(GetByIdQuizQuestionQuery request, CancellationToken cancellationToken)
         {
-            QuizQuestion? quizQuestion = await _quizQuestionRepository.GetAsync(predicate: qq => qq.Id == request.Id, cancellationToken: cancellationToken);
+            QuizQuestion? quizQuestion = await _quizQuestionRepository.GetAsync(predicate: qq => qq.Id == request.Id,
+                                                                                include:   qq => qq.Include(qq => qq.Options)
+                                                                                                   .Include(qq => qq.QuestionScore)
+                                                                                                   .Include(qq => qq.Benefits),
+                                                                                cancellationToken: cancellationToken);
             await _quizQuestionBusinessRules.QuizQuestionShouldExistWhenSelected(quizQuestion);
 
             GetByIdQuizQuestionResponse response = _mapper.Map<GetByIdQuizQuestionResponse>(quizQuestion);
