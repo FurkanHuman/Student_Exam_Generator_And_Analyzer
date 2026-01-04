@@ -21,13 +21,16 @@
         <AuthorizeView Context="General">
             <Authorized>
 
-                @foreach (var item in navMenuItems)
+
+                @foreach (NavMenuItem item in navMenuItems)
                 {
+                    string text = ResolveText(item.Text, General);
+
                     <AuthorizeView Roles="@string.Join(',', item.Roles ?? [])"
                                    Policy="@item.Policy">
                         <div class="nav-item px-3">
                             <NavLink class="nav-link" href="@item.Link">
-                                <span class="@item.Icon"></span> @item.Text
+                                <span class="@item.Icon"></span> @text
                             </NavLink>
                         </div>
                     </AuthorizeView>
@@ -70,7 +73,7 @@
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
 
-        string url = new Uri(new(NavigationManager.BaseUri), "config/navmenu.json").ToString();
+        string url = new Uri(new(NavigationManager.BaseUri), "config/navMenu.json").ToString();
         navMenuItems = await Http.GetFromJsonAsync<List<NavMenuItem>>(url) ?? new();
     }
 
@@ -85,6 +88,18 @@
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
 
+    private static string ResolveText(string? text, AuthenticationState auth)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return string.Empty;
+
+        return text switch
+        {
+            "{{UserName}}" => auth.User.Identity?.Name ?? "Kullanıcı",
+            _ => text
+        };
+    }
+
     private sealed class NavMenuItem
     {
         public string? Text { get; set; }
@@ -92,5 +107,6 @@
         public string? Icon { get; set; }
         public List<string>? Roles { get; set; }
         public string? Policy { get; set; }
+        public bool IsDynamic => Text?.Contains("{{") == true;
     }
 }

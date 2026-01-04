@@ -84,7 +84,7 @@
     "policy": null
   },
   {
-    "text": "öğretmen kayıt",
+    "text": "Öğretmen kayıt",
     "link": "/TeacherAdd",
     "icon": "bi bi-plus-square-fill-nav-menu",
     "roles": [ "authorized" ],
@@ -108,6 +108,13 @@
     "text": "Dönem adı",
     "link": "/SemesterAdd",
     "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "{{UserName}}",
+    "link": "/Account/Manage",
+    "icon": "bi bi-person-fill-nav-menu",
     "roles": [ "authorized" ],
     "policy": null
   }
