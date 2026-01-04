@@ -1,152 +1,59 @@
-﻿@implements IDisposable
+﻿@using Microsoft.AspNetCore.Authorization
+@implements IDisposable
+@rendermode InteractiveServer
 
 @inject NavigationManager NavigationManager
+@inject HttpClient Http
 
 <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
     <div class="top-row ps-3 navbar navbar-dark">
         <div class="container-fluid">
             <div class="navbar-brand">Sınav Sistemi</div>
         </div>
-
     </div>
 </NavLink>
-
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
 
-        <AuthorizeView>
+        <AuthorizeView Context="General">
             <Authorized>
-                
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/Analysis/Trigger/AI">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Yapay Zeka Analizi Oluştur
-                    </NavLink>
-                </div>
 
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/Analysis/Hub">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Analizlere bak
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/ReadExam">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Sınav Oku
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/CreateExam">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Sınav oluştur
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/PoolList">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Havuzu görüntüle
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/Auto/DocumentQuestionExtraction">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Dosyadan soru çıkarma
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/Auto/AiQuizPoolAdd">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Otomatik Soru Ekle
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/QuizPoolAdd">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Manuel soru ekle
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/Auto/BenefitAdd">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Otomatik Kazanım ekle
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/LessonAdd">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Ders Ekle
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/Ghost/StudentAdd">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Hayalet Öğrenciler Ekle
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/Auto/MSAdd">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Otomatik Öğrenci Ekle
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3" hidden>
-                    <NavLink class="nav-link" href="StudentAdd">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Tekli Öğrenci Ekle
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="TeacherAdd">
-                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span>Öğretmen kayıt
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="FirstUp/SchoolName">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Okul Adı
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="SetPrincipal">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Müdür ayarları
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="SemesterAdd">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Dönem adı
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Manage">
-                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
-                    </NavLink>
-                </div>
+                @foreach (var item in navMenuItems)
+                {
+                    <AuthorizeView Roles="@string.Join(',', item.Roles ?? [])"
+                                   Policy="@item.Policy">
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="@item.Link">
+                                <span class="@item.Icon"></span> @item.Text
+                            </NavLink>
+                        </div>
+                    </AuthorizeView>
+                }
 
                 <div class="nav-item px-3">
                     <form action="Account/Logout" method="post">
                         <AntiforgeryToken />
                         <input type="hidden" name="ReturnUrl" value="@currentUrl" />
                         <button type="submit" class="nav-link">
-                            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+                            <span class="bi bi-arrow-bar-left-nav-menu"></span> Çıkış Yap
                         </button>
                     </form>
                 </div>
+
             </Authorized>
+
             <NotAuthorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Register">
-                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
+                        <span class="bi bi-person-nav-menu"></span> Kayıt
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Login">
-                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
+                        <span class="bi bi-person-badge-nav-menu"></span> Giriş
                     </NavLink>
                 </div>
             </NotAuthorized>
@@ -154,14 +61,17 @@
     </nav>
 </div>
 
-
 @code {
     private string? currentUrl;
+    private List<NavMenuItem> navMenuItems = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
+
+        string url = new Uri(new(NavigationManager.BaseUri), "config/navmenu.json").ToString();
+        navMenuItems = await Http.GetFromJsonAsync<List<NavMenuItem>>(url) ?? new();
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
@@ -173,5 +83,14 @@
     public void Dispose()
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+    private sealed class NavMenuItem
+    {
+        public string? Text { get; set; }
+        public string? Link { get; set; }
+        public string? Icon { get; set; }
+        public List<string>? Roles { get; set; }
+        public string? Policy { get; set; }
     }
 }

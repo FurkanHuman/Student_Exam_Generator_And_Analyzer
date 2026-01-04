@@ -1,0 +1,114 @@
+[
+  {
+    "text": "Yapay Zeka Analizi Oluştur",
+    "link": "/Analysis/Trigger/AI",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "Analizlere bak",
+    "link": "/Analysis/Hub",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "Sınav Oku",
+    "link": "/ReadExam",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "Sınav oluştur",
+    "link": "/CreateExam",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "Havuzu görüntüle",
+    "link": "/PoolList",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "Dosyadan soru çıkarma",
+    "link": "/Auto/DocumentQuestionExtraction",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "Otomatik Soru Ekle",
+    "link": "/Auto/AiQuizPoolAdd",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "Manuel soru ekle",
+    "link": "/QuizPoolAdd",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "Otomatik Kazanım ekle",
+    "link": "/Auto/BenefitAdd",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "Ders Ekle",
+    "link": "/LessonAdd",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "Hayalet öğrenciler Ekle",
+    "link": "/Ghost/StudentAdd",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "Otomatik öğrenci Ekle",
+    "link": "/Auto/MSAdd",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "öğretmen kayıt",
+    "link": "/TeacherAdd",
+    "icon": "bi bi-plus-square-fill-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "Okul Adı",
+    "link": "/FirstUp/SchoolName",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "Müdür ayarları",
+    "link": "/SetPrincipal",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  },
+  {
+    "text": "Dönem adı",
+    "link": "/SemesterAdd",
+    "icon": "bi bi-list-nested-nav-menu",
+    "roles": [ "authorized" ],
+    "policy": null
+  }
+]
