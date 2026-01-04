@@ -26,11 +26,12 @@
                 {
                     string text = ResolveText(item.Text, General);
 
-                    <AuthorizeView Roles="@string.Join(',', item.Roles ?? [])"
-                                   Policy="@item.Policy">
+                    <AuthorizeView Roles="@string.Join(',', item.Roles ?? [])" 
+                    Policy="@item.Policy">
                         <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="@item.Link">
-                                <span class="@item.Icon"></span> @text
+                            <NavLink class="nav-link nav-menu-item" href="@item.Link">
+                                <span class="nav-menu-icon @item.Icon"></span>
+                                <span class="nav-menu-text">@text</span>
                             </NavLink>
                         </div>
                     </AuthorizeView>
@@ -40,8 +41,9 @@
                     <form action="Account/Logout" method="post">
                         <AntiforgeryToken />
                         <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-                        <button type="submit" class="nav-link">
-                            <span class="bi bi-arrow-bar-left-nav-menu"></span> Çıkış Yap
+                        <button type="submit" class="nav-link nav-link-button">
+                            <span class="bi bi-box-arrow-right nav-icon"></span>
+                            <span>Çıkış Yap</span>
                         </button>
                     </form>
                 </div>
@@ -51,14 +53,18 @@
             <NotAuthorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Register">
-                        <span class="bi bi-person-nav-menu"></span> Kayıt
+                        <span class="bi bi-person-plus nav-icon"></span>
+                        <span>Kayıt</span>
                     </NavLink>
                 </div>
+
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Login">
-                        <span class="bi bi-person-badge-nav-menu"></span> Giriş
+                        <span class="bi bi-box-arrow-in-right nav-icon"></span>
+                        <span>Giriş</span>
                     </NavLink>
                 </div>
+
             </NotAuthorized>
         </AuthorizeView>
     </nav>

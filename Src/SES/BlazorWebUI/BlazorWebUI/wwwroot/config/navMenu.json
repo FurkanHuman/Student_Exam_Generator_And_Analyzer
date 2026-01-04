@@ -1,121 +1,128 @@
-[
-  {
-    "text": "Yapay Zeka Analizi Oluştur",
-    "link": "/Analysis/Trigger/AI",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Analizlere bak",
-    "link": "/Analysis/Hub",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Sınav Oku",
-    "link": "/ReadExam",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Sınav oluştur",
-    "link": "/CreateExam",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Havuzu görüntüle",
-    "link": "/PoolList",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Dosyadan soru çıkarma",
-    "link": "/Auto/DocumentQuestionExtraction",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Otomatik Soru Ekle",
-    "link": "/Auto/AiQuizPoolAdd",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Manuel soru ekle",
-    "link": "/QuizPoolAdd",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Otomatik Kazanım ekle",
-    "link": "/Auto/BenefitAdd",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Ders Ekle",
-    "link": "/LessonAdd",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Hayalet öğrenciler Ekle",
-    "link": "/Ghost/StudentAdd",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Otomatik öğrenci Ekle",
-    "link": "/Auto/MSAdd",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Öğretmen kayıt",
-    "link": "/TeacherAdd",
-    "icon": "bi bi-plus-square-fill-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Okul Adı",
-    "link": "/FirstUp/SchoolName",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Müdür ayarları",
-    "link": "/SetPrincipal",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "Dönem adı",
-    "link": "/SemesterAdd",
-    "icon": "bi bi-list-nested-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  },
-  {
-    "text": "{{UserName}}",
-    "link": "/Account/Manage",
-    "icon": "bi bi-person-fill-nav-menu",
-    "roles": [ "authorized" ],
-    "policy": null
-  }
-]
+  [
+    {
+      "text": "Yapay Zeka Analizi Oluştur",
+      "link": "/Analysis/Trigger/AI",
+      "icon": "bi bi-cpu",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Analizlere bak",
+      "link": "/Analysis/Hub",
+      "icon": "bi bi-graph-up",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Sınav Oku",
+      "link": "/ReadExam",
+      "icon": "bi bi-file-earmark-text",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Sınav oluştur",
+      "link": "/CreateExam",
+      "icon": "bi bi-pencil-square",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Havuzu görüntüle",
+      "link": "/PoolList",
+      "icon": "bi bi-collection",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Dosyadan soru çıkarma",
+      "link": "/Auto/DocumentQuestionExtraction",
+      "icon": "bi bi-file-earmark-arrow-up",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Otomatik Soru Ekle",
+      "link": "/Auto/AiQuizPoolAdd",
+      "icon": "bi bi-robot",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Manuel soru ekle",
+      "link": "/QuizPoolAdd",
+      "icon": "bi bi-plus-square",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Otomatik Kazanım ekle",
+      "link": "/Auto/BenefitAdd",
+      "icon": "bi bi-lightning-charge",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Ders Ekle",
+      "link": "/LessonAdd",
+      "icon": "bi bi-journal-plus",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Hayalet öğrenciler Ekle",
+      "link": "/Ghost/StudentAdd",
+      "icon": "bi bi-incognito",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Otomatik öğrenci Ekle",
+      "link": "/Auto/MSAdd",
+      "icon": "bi bi-people",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Öğretmen kayıt",
+      "link": "/TeacherAdd",
+      "icon": "bi bi-person-plus",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Okul Adı",
+      "link": "/FirstUp/SchoolName",
+      "icon": "bi bi-building",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Müdür ayarları",
+      "link": "/SetPrincipal",
+      "icon": "bi bi-person-badge",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Dönem adı",
+      "link": "/SemesterAdd",
+      "icon": "bi bi-calendar-range",
+      "roles": [ "authorized" ],
+      "policy": null
+    },
+    {
+      "text": "Admin Paneli",
+      "link": "/Admin/Panel",
+      "icon": "bi bi-shield-lock",
+      "roles": [ "admin", "director" ],
+      "policy": null
+    },
+    {
+      "text": "{{UserName}}",
+      "link": "/Account/Manage",
+      "icon": "bi bi-person-circle",
+      "roles": [ "authorized" ],
+      "policy": null
+    }
+  ]
