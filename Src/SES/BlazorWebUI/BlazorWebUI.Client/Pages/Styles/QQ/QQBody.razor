@@ -276,7 +276,7 @@
     private bool _isQQBenefitLoader;
     private bool? _showSuccessMessage;
 
-    private ICollection<QuestionOptionDto>? _initialOptions;
+    private ICollection<QuestionOptionDto> _initialOptions = [];
     private bool _hasExistingImage => IsVariantMode && VariantData?.FileData?.Id != null;
     private bool _hasNewImage => _bodyData.FileData?.MemoryStream != null;
 
@@ -324,11 +324,11 @@
 
         if (VariantData.FileData != null && VariantData.FileData.Id != null)
         {
-                _bodyData.FileData = new FileData
-                {
-                    Id = VariantData.FileData.Id,
-                    FileName = VariantData.FileData.FileName
-                };
+            _bodyData.FileData = new FileData
+            {
+                Id = VariantData.FileData.Id,
+                FileName = VariantData.FileData.FileName
+            };
         }
     }
 

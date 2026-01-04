@@ -141,6 +141,16 @@
     [Parameter]
     public EventCallback<ICollection<QuestionOptionDto>> OnSelectedOptions { get; set; }
 
+    protected override Task OnParametersSetAsync()
+    {
+        if (QuestionOptions == null)
+            QuestionOptions = new List<QuestionOptionDto>();
+
+        if (!IsViewMode && QuestionOptions.Count == 0)
+            InitializeDefaultOptions();
+        return base.OnParametersSetAsync();
+    }
+
     public async Task OnSelectedOptionHandler()
     {
         await OnSelectedOptions.InvokeAsync(QuestionOptions.ToList());
@@ -156,19 +166,8 @@
         QuestionOptions.Remove(option);
     }
 
-    protected override Task OnParametersSetAsync()
-    {
-        if (!IsViewMode && (QuestionOptions == null || QuestionOptions.Count == 0))
-            InitializeDefaultOptions();
-
-        return base.OnParametersSetAsync();
-    }
-
     private void InitializeDefaultOptions()
     {
-        QuestionOptions ??= new List<QuestionOptionDto>();
-        QuestionOptions.Clear();
-
         switch (SelectedOption)
         {
             case 1: // OpenEnded
@@ -186,7 +185,7 @@
 
             case 4: // True/False
                 for (int i = 0; i < QQStatic.DefaultTrueFalseOptions; i++)
-                    QuestionOptions.Add(new(){ IsCorrect = i % 2 == 0 });
+                    QuestionOptions.Add(new() { IsCorrect = i % 2 == 0 });
                 break;
 
             case 5: // FillInTheBlank

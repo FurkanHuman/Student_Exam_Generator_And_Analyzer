@@ -30,7 +30,7 @@
     public EventCallback<byte> OnSelectedQType { get; set; }
 
     [Parameter]
-    public ICollection<QuestionOptionDto>? InitialOptions { get; set; }
+    public ICollection<QuestionOptionDto> InitialOptions { get; set; } = [];
 
     [Parameter]
     public byte SelectedQType { get; set; }
