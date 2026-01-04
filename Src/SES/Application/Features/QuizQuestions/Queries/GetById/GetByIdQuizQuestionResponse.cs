@@ -14,5 +14,4 @@ public class GetByIdQuizQuestionResponse : IResponse
     public string QuestionImage { get; set; }
     public QuestionType QuestionType { get; set; }
     public ICollection<QuestionOption> Options { get; set; }
-    public ICollection<Benefit> Benefits { get; set; }
 }

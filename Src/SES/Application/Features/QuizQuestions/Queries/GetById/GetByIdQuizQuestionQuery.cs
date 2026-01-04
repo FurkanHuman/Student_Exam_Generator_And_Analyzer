@@ -28,8 +28,7 @@ public class GetByIdQuizQuestionQuery : IRequest<GetByIdQuizQuestionResponse>
         {
             QuizQuestion? quizQuestion = await _quizQuestionRepository.GetAsync(predicate: qq => qq.Id == request.Id,
                                                                                 include:   qq => qq.Include(qq => qq.Options)
-                                                                                                   .Include(qq => qq.QuestionScore)
-                                                                                                   .Include(qq => qq.Benefits),
+                                                                                                   .Include(qq => qq.QuestionScore),
                                                                                 cancellationToken: cancellationToken);
             await _quizQuestionBusinessRules.QuizQuestionShouldExistWhenSelected(quizQuestion);
 
