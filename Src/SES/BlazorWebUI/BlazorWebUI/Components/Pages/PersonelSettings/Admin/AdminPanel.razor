@@ -73,15 +73,20 @@
                 <h3 class="mb-0">
                     <i class="bi bi-shield-lock-fill me-2"></i>Kullanıcı Yönetim Paneli
                 </h3>
-                <button class="btn btn-light btn-sm" @onclick="RefreshData">
-                    <i class="bi bi-arrow-clockwise me-1"></i>Yenile
-                </button>
+                <div class="btn-group" role="group">
+                    <button class="btn btn-success btn-sm" @onclick="OpenAddPersonelModal">
+                        <i class="bi bi-person-plus-fill me-1"></i>Yeni Personel Ekle
+                    </button>
+                    <button class="btn btn-light btn-sm" @onclick="RefreshData">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Yenile
+                    </button>
+                </div>
             </div>
         </div>
         <div class="card-body">
             <div class="alert alert-danger" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <strong>DİKKAT!</strong> Bu panelde yapacağınız değişiklikler kullanıcıların sistem erişimini etkileyecektir. 
+                <strong>DİKKAT!</strong> Bu panelde yapacağınız değişiklikler kullanıcıların sistem erişimini etkileyecektir.
                 Lütfen dikkatli olun.
             </div>
 
@@ -92,8 +97,8 @@
                         <span class="input-group-text">
                             <i class="bi bi-search"></i>
                         </span>
-                        <input type="text" class="form-control" 
-                               placeholder="Ad, soyad veya email ile ara..." 
+                        <input type="text" class="form-control"
+                               placeholder="Ad, soyad veya email ile ara..."
                                @bind="_searchText"
                                @bind:event="oninput" />
                     </div>
@@ -101,9 +106,9 @@
                 <div class="col-md-3">
                     <select class="form-select" @bind="_filterRole">
                         <option value="">Tüm Roller</option>
-                        @foreach (var role in _availableRoles)
+                        @foreach (string? role in _availableRoles.Select(r => r.Name))
                         {
-                            <option value="@role.Name">@role.Name</option>
+                            <option value="@role">@role</option>
                         }
                     </select>
                 </div>
@@ -156,7 +161,7 @@
                                     </td>
                                     <td>
                                         <span class="text-break">@user?.Email</span>
-                                        @if (user.EmailConfirmed)
+                                        @if (user!.EmailConfirmed)
                                         {
                                             <i class="bi bi-check-circle-fill text-success ms-1" title="Email onaylı"></i>
                                         }
@@ -195,27 +200,27 @@
                                     </td>
                                     <td>
                                         <div class="btn-group-vertical btn-group-sm w-100" role="group">
-                                            <button class="btn btn-outline-primary" 
+                                            <button class="btn btn-outline-primary"
                                                     @onclick="() => OpenRoleModal(user)">
                                                 <i class="bi bi-shield-fill-check"></i> Rolleri Düzenle
                                             </button>
-                                            <button class="btn btn-outline-success" 
+                                            <button class="btn btn-outline-success"
                                                     @onclick="() => OpenTeacherModal(personel)">
                                                 <i class="bi bi-person-plus"></i> Öğretmen Ekle
                                             </button>
-                                            <button class="btn btn-outline-warning" 
+                                            <button class="btn btn-outline-warning"
                                                     @onclick="() => OpenPasswordResetModal(user)">
                                                 <i class="bi bi-key"></i> Şifre Sıfırla
                                             </button>
-                                            <button class="btn btn-outline-info" 
+                                            <button class="btn btn-outline-info"
                                                     @onclick="() => OpenEmailConfirmModal(user)">
                                                 <i class="bi bi-envelope-check"></i> Email Durumu
                                             </button>
-                                            <button class="btn btn-outline-secondary" 
+                                            <button class="btn btn-outline-secondary"
                                                     @onclick="() => OpenPersonelChangeModal(user, personel!)">
                                                 <i class="bi bi-person-fill-gear"></i> Personel Değiştir
                                             </button>
-                                            <button class="btn btn-outline-danger" 
+                                            <button class="btn btn-outline-danger"
                                                     @onclick="() => OpenDeleteModal(user, personel!)">
                                                 <i class="bi bi-trash"></i> Kullanıcı Sil
                                             </button>
@@ -225,7 +230,7 @@
                             }
                         </tbody>
                     </table>
-                    
+
                     @if (!GetFilteredUsers().Any())
                     {
                         <div class="text-center py-5 text-muted">
@@ -238,6 +243,95 @@
         </div>
     </div>
 </div>
+
+<!-- Modal: Yeni Personel Ekle -->
+<ModalDialog @ref="_modalDialogAddPersonel" Title="Yeni Personel Ekle">
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Bilgi:</strong> Eklediğiniz personel için kullanıcı hesabı ve şifre de oluşturulacaktır.
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Ad <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" @bind="_newPersonelName"
+                   placeholder="Personel adı" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Soyad <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" @bind="_newPersonelSurName"
+                   placeholder="Personel soyadı" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+            <input type="email" class="form-control" @bind="_newPersonelEmail"
+                   placeholder="ornek@email.com" />
+            <div class="form-text">
+                <i class="bi bi-info-circle me-1"></i>Bu email adresi kullanıcı adı olarak kullanılacaktır
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Doğum Tarihi <span class="text-danger">*</span></label>
+            <input type="date" class="form-control"
+                   value="@_newPersonelBirthDate.ToString("yyyy-MM-dd")"
+                   @onchange="@((ChangeEventArgs e) => NewPersonelBirthDate(e))" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Şifre <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" @bind="_newPersonelPassword"
+                   placeholder="Minimum 6 karakter" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Şifre Tekrar <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" @bind="_newPersonelPasswordConfirm"
+                   placeholder="Şifreyi tekrar girin" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Rol Seçimi</label>
+        <select class="form-select" @bind="_newPersonelRole">
+            <option value="">Rol seçiniz (opsiyonel)</option>
+            @foreach (string? role in _availableRoles.Select(r => r.Name))
+            {
+                <option value="@role">@role</option>
+            }
+        </select>
+        <div class="form-text">
+            <i class="bi bi-info-circle me-1"></i>Rol seçmezseniz varsayılan olarak "unauthorized" rolü atanacaktır
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(_addPersonelError))
+    {
+        <div class="alert alert-danger">
+            <i class="bi bi-x-circle me-2"></i>@_addPersonelError
+        </div>
+    }
+
+    @if (_addPersonelSuccess)
+    {
+        <div class="alert alert-success">
+            <i class="bi bi-check-circle me-2"></i>Personel başarıyla eklendi!
+        </div>
+    }
+
+    <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-secondary" @onclick="CloseAddPersonelModal">
+            <i class="bi bi-x-circle"></i> İptal
+        </button>
+        <button class="btn btn-success" @onclick="AddPersonelAsync"
+                disabled="@IsAddPersonelButtonEnabled">
+            <i class="bi bi-person-plus-fill"></i> Personel Ekle
+        </button>
+    </div>
+</ModalDialog>
 
 <!-- Modal: Rol Atama -->
 <ModalDialog @ref="_modalDialogRoleAssign" Title="Rol Yönetimi">
@@ -278,14 +372,14 @@
                         <td>
                             @if (hasRole)
                             {
-                                <button class="btn btn-danger btn-sm" 
+                                <button class="btn btn-danger btn-sm"
                                         @onclick="() => RemoveRoleAsync(_selectedUser, role)">
                                     <i class="bi bi-dash-circle"></i> Kaldır
                                 </button>
                             }
                             else
                             {
-                                <button class="btn btn-success btn-sm" 
+                                <button class="btn btn-success btn-sm"
                                         @onclick="() => AddRoleAsync(_selectedUser, role)">
                                     <i class="bi bi-plus-circle"></i> Ekle
                                 </button>
@@ -320,7 +414,7 @@
     </div>
     <div class="mb-3">
         <label class="form-label fw-semibold">Yeni Şifre</label>
-        <input type="password" class="form-control" @bind="_newPassword" 
+        <input type="password" class="form-control" @bind="_newPassword"
                placeholder="Yeni şifre giriniz (min 6 karakter)" />
         <div class="form-text">
             <i class="bi bi-info-circle me-1"></i>
@@ -329,7 +423,7 @@
     </div>
     <div class="mb-3">
         <label class="form-label fw-semibold">Şifre Tekrar</label>
-        <input type="password" class="form-control" @bind="_newPasswordConfirm" 
+        <input type="password" class="form-control" @bind="_newPasswordConfirm"
                placeholder="Şifreyi tekrar giriniz" />
     </div>
     @if (!string.IsNullOrEmpty(_passwordResetError))
@@ -348,8 +442,8 @@
         <button class="btn btn-secondary" @onclick="ClosePasswordResetModal">
             <i class="bi bi-x-circle"></i> İptal
         </button>
-        <button class="btn btn-warning" @onclick="ResetPasswordAsync" 
-                disabled="@(string.IsNullOrWhiteSpace(_newPassword))">
+        <button class="btn btn-warning" @onclick="ResetPasswordAsync"
+                disabled="@IsPasswordResetButtonEnabled">
             <i class="bi bi-key"></i> Şifre Sıfırla
         </button>
     </div>
@@ -360,7 +454,7 @@
     <div class="mb-3">
         <p><strong>Kullanıcı:</strong> @_selectedUser.Email</p>
         <p>
-            <strong>Email Durumu:</strong> 
+            <strong>Email Durumu:</strong>
             @if (_selectedUser.EmailConfirmed)
             {
                 <span class="badge bg-success">
@@ -425,7 +519,7 @@
             <i class="bi bi-x-circle"></i> İptal
         </button>
         <button class="btn btn-warning" @onclick="() => ChangeUserAndPersonelAsync(_selectedUser, _selectedPersonelGuid, _selectedPersonel!)"
-                disabled="@(_selectedPersonelGuid == Guid.Empty)">
+                disabled="@IsChangeUserAndPersonelButtonEnabled">
             <i class="bi bi-arrow-repeat"></i> Değiştir
         </button>
     </div>
@@ -456,7 +550,7 @@
             <i class="bi bi-x-circle"></i> İptal
         </button>
         <button class="btn btn-danger" @onclick="() => DeleteUserAsync(_selectedUser, _selectedPersonel!)"
-                disabled="@(!_deleteConfirmation)">
+                disabled="@IsUserDeleteConfirmButtonEnabled">
             <i class="bi bi-trash"></i> Kullanıcıyı Sil
         </button>
     </div>
@@ -491,6 +585,17 @@
     // Delete Confirmation
     private bool _deleteConfirmation = false;
 
+    // Add Personel
+    private string _newPersonelName = string.Empty;
+    private string _newPersonelSurName = string.Empty;
+    private DateOnly _newPersonelBirthDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-25));
+    private string _newPersonelEmail = string.Empty;
+    private string _newPersonelPassword = string.Empty;
+    private string _newPersonelPasswordConfirm = string.Empty;
+    private string _newPersonelRole = string.Empty;
+    private string _addPersonelError = string.Empty;
+    private bool _addPersonelSuccess = false;
+
     // Modals
     private ModalDialog _modalDialogRoleAssign { get; set; } = new();
     private ModalDialog _modalDialogDeleteUser { get; set; } = new();
@@ -498,6 +603,7 @@
     private ModalDialog _modalDialogPersonelChange { get; set; } = new();
     private ModalDialog _modalDialogPasswordReset { get; set; } = new();
     private ModalDialog _modalDialogEmailConfirm { get; set; } = new();
+    private ModalDialog _modalDialogAddPersonel { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -581,6 +687,20 @@
     }
 
     // Modal Açma Metodları
+    private void OpenAddPersonelModal()
+    {
+        _newPersonelName = string.Empty;
+        _newPersonelSurName = string.Empty;
+        _newPersonelBirthDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-25));
+        _newPersonelEmail = string.Empty;
+        _newPersonelPassword = string.Empty;
+        _newPersonelPasswordConfirm = string.Empty;
+        _newPersonelRole = string.Empty;
+        _addPersonelError = string.Empty;
+        _addPersonelSuccess = false;
+        _modalDialogAddPersonel.Open();
+    }
+
     private void OpenRoleModal(ApplicationUser user)
     {
         _selectedUser = user;
@@ -623,6 +743,124 @@
         _selectedPersonel = personel;
         _deleteConfirmation = false;
         _modalDialogDeleteUser.Open();
+    }
+
+    // Personel Ekleme
+    private async Task AddPersonelAsync()
+    {
+        _addPersonelError = string.Empty;
+        _addPersonelSuccess = false;
+
+        // Validasyon
+        if (string.IsNullOrWhiteSpace(_newPersonelName))
+        {
+            _addPersonelError = "Ad alanı zorunludur";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_newPersonelSurName))
+        {
+            _addPersonelError = "Soyad alanı zorunludur";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_newPersonelEmail))
+        {
+            _addPersonelError = "Email alanı zorunludur";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_newPersonelPassword))
+        {
+            _addPersonelError = "Şifre alanı zorunludur";
+            return;
+        }
+
+        if (_newPersonelPassword.Length < 6)
+        {
+            _addPersonelError = "Şifre en az 6 karakter olmalıdır";
+            return;
+        }
+
+        if (_newPersonelPassword != _newPersonelPasswordConfirm)
+        {
+            _addPersonelError = "Şifreler eşleşmiyor";
+            return;
+        }
+
+        // Email'in benzersiz olup olmadığını kontrol et
+        var existingUser = await _userManager.FindByEmailAsync(_newPersonelEmail);
+        if (existingUser != null)
+        {
+            _addPersonelError = "Bu email adresi zaten kullanılıyor";
+            return;
+        }
+
+        try
+        {
+            // Önce personeli oluştur
+            var personel = new Personel
+            {
+                Name = _newPersonelName,
+                SurName = _newPersonelSurName,
+                BirthDate = _newPersonelBirthDate,
+                UserId = Guid.Empty
+            };
+
+            var createdPersonel = await _personelService.AddAsync(personel);
+
+            // Kullanıcı oluştur
+            var user = new ApplicationUser
+            {
+                UserName = _newPersonelEmail,
+                Email = _newPersonelEmail,
+                EmailConfirmed = true,
+                PersonelId = createdPersonel.Id
+            };
+
+            var createResult = await _userManager.CreateAsync(user, _newPersonelPassword);
+
+            if (!createResult.Succeeded)
+            {
+                _addPersonelError = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                return;
+            }
+
+            // Personel ile kullanıcıyı ilişkilendir
+            createdPersonel.UserId = user.Id;
+            await _personelService.UpdateAsync(createdPersonel);
+
+            // Rol ata
+            var roleToAssign = string.IsNullOrWhiteSpace(_newPersonelRole) ? "unauthorized" : _newPersonelRole;
+            if (!await _roleManager.RoleExistsAsync(roleToAssign))
+            {
+                await _roleManager.CreateAsync(new IdentityRole<Guid>(roleToAssign));
+            }
+            await _userManager.AddToRoleAsync(user, roleToAssign);
+
+            _addPersonelSuccess = true;
+            await Task.Delay(1500);
+            CloseAddPersonelModal();
+            await RefreshData();
+        }
+        catch (Exception ex)
+        {
+            _addPersonelError = $"Hata: {ex.Message}";
+        }
+    }
+
+    private void CloseAddPersonelModal()
+    {
+        _newPersonelName = string.Empty;
+        _newPersonelSurName = string.Empty;
+        _newPersonelBirthDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-25));
+        _newPersonelEmail = string.Empty;
+        _newPersonelPassword = string.Empty;
+        _newPersonelPasswordConfirm = string.Empty;
+        _newPersonelRole = string.Empty;
+        _addPersonelError = string.Empty;
+        _addPersonelSuccess = false;
+        _modalDialogAddPersonel.Close();
     }
 
     // Rol İşlemleri
@@ -776,4 +1014,17 @@
         _modalDialogTeacherAdd.Close();
         await RefreshData();
     }
+
+    private bool IsUserDeleteConfirmButtonEnabled() => !_deleteConfirmation;
+
+    private bool IsChangeUserAndPersonelButtonEnabled() => _selectedPersonelGuid == Guid.Empty;
+
+    private bool IsPasswordResetButtonEnabled() => string.IsNullOrWhiteSpace(_newPassword);
+
+    private bool IsAddPersonelButtonEnabled() => (string.IsNullOrWhiteSpace(_newPersonelName) ||
+                                                  string.IsNullOrWhiteSpace(_newPersonelSurName) ||
+                                                  string.IsNullOrWhiteSpace(_newPersonelEmail) ||
+                                                  string.IsNullOrWhiteSpace(_newPersonelPassword));
+
+    private void NewPersonelBirthDate(ChangeEventArgs e) => _newPersonelBirthDate = DateOnly.Parse(e.Value?.ToString() ?? DateTime.Now.AddYears(-25).ToString("yyyy-MM-dd"), new System.Globalization.CultureInfo("tr-TR"));
 }
