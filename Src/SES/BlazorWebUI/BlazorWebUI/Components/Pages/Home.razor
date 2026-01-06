@@ -54,6 +54,9 @@
     {
         switch (personel, user)
         {
+            case (null, null) :
+                return string.Empty;
+
             case (Personel p, ApplicationUser u) when p.BirthDate == DateOnly.FromDateTime(DateTime.Now):
                 return $"Mutlu Yıllar, Merhaba {p.Name} {p.SurName}";
 
