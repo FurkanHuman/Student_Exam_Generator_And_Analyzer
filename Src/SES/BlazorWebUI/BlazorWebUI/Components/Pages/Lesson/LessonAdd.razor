@@ -1,7 +1,10 @@
 ﻿@page "/LessonAdd"
+@rendermode InteractiveServer
+@attribute [Authorize(policy: "LessonAdd")]
 
 @using Application.Features.Lessons.Commands.Create
 @using Application.Features.Semesters.Queries.GetList
+@using Microsoft.AspNetCore.Authorization
 @using NArchitecture.Core.Application.Responses
 
 <PageTitle>Ders Ekle</PageTitle>

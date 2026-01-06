@@ -6,9 +6,11 @@
 @using Application.Features.Students.Commands.MultiCreate
 @using Application.Features.Teachers.Queries.GetList
 @using BlazorWebUI.Client.Pages.Styles
+@using Microsoft.AspNetCore.Authorization
 @using NArchitecture.Core.Application.Responses
 @using MediatR
 @rendermode InteractiveServer
+@attribute [Authorize(policy: "AutoStudentAdd")]
 
 <PageTitle>Otomatik Öğrenci Ekle</PageTitle>
 

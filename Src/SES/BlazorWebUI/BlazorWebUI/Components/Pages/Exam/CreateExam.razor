@@ -12,11 +12,13 @@
 @using BlazorWebUI.Components.Account
 @using BlazorWebUI.Components.Pages.QuizQuestion
 @using Domain.Entities
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using NArchitecture.Core.Application.Requests
 @using NArchitecture.Core.Application.Responses
 @using System.Security.Claims
 @rendermode InteractiveServer
+@attribute [Authorize(policy: "CreateExam")]
 @inject IMediator _mediator
 @inject IMapper _mapper
 @inject IJSRuntime _jsRuntime

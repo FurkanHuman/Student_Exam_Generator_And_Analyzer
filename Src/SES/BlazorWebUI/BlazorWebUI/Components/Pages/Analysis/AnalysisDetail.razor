@@ -1,6 +1,7 @@
 ﻿@page "/Analysis/{Id:int}"
 @layout FullScreenLayout
 @rendermode InteractiveServer
+@attribute [Authorize(policy: "AnalysisDetail")]
 @using Application.Features.Analyses.Queries.GetByIdAnalysisAIResponse
 @using Application.Features.Analyses.Queries.GetByIdAnalysisGetResponsiblePersonnel
 @using Application.Features.Analyses.Queries.GetByIdAnalysisLessonPassingScore
@@ -9,6 +10,7 @@
 @using Application.Services.CalculatorFactory
 @using BlazorWebUI.Components.Layout
 @using BlazorWebUI.Components.Pages.Analysis.Charts
+@using Microsoft.AspNetCore.Authorization
 
 <PageTitle>Analiz Detayı - @Id</PageTitle>
 

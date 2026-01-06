@@ -12,6 +12,7 @@ using Persistence.Contexts;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 // add json files.
+builder.Configuration.AddJsonFile("PagePolicies.json", optional: false, reloadOnChange: true);
 builder.Configuration.AddJsonFile("NavMenu.json", optional: false, reloadOnChange: true);
 
 // Add services to the container.
@@ -46,7 +47,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddInfrastructureServices();
-builder.Services.AddBlazorWebUIServiceRegistration();
+builder.Services.AddBlazorWebUIServiceRegistration(builder.Configuration);
 builder.Services.AddDistributedMemoryCache();
 
 builder.WebHost.ConfigureKestrel(options =>

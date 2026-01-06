@@ -4,10 +4,12 @@
 @using Application.Features.Teachers.Queries.GetList
 @using Application.Features.Students.Commands.GhostCreate
 @using Application.Features.Students.Commands.Delete
+@using Microsoft.AspNetCore.Authorization
 @using NArchitecture.Core.Application.Responses
 @using MediatR
 @using System.Text
 @rendermode InteractiveServer
+@attribute [Authorize(policy: "GhostStudentAdd")]
 
 <PageTitle>Hayalet Öğrenci Ekle</PageTitle>
 

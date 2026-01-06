@@ -1,0 +1,23 @@
+{
+  "Policies": {
+    "AnalysisDetail": "admin,head_teacher&authorized",
+    "AnalysisHub": "admin,head_teacher&authorized",
+    "AnalysisManualAITrigger": "admin,head_teacher&authorized,assistant_director&authorized",
+    "CreateExam": "admin,head_teacher&authorized",
+    "ReadExam": "admin,teacher&authorized,head_teacher&authorized",
+    "LessonAdd": "admin,head_teacher&authorized",
+    "SetPrincipal": "admin,director&authorized,assistant_director&authorized",
+    "TeacherAdd": "admin,director&authorized,assistant_director&authorized",
+    "AdminPanel": "admin,director&authorized",
+    "AutoQuizPoolAdd": "admin,head_teacher&authorized,teacher&authorized",
+    "DocumentQuestionExtraction": "admin,teacher&authorized,head_teacher&authorized",
+    "QuizPoolAdd": "admin,teacher&authorized,head_teacher&authorized",
+    "QuizPoolList": "admin,teacher&authorized,head_teacher&authorized",
+    "AutoReferenceBenefitAdd": "admin,head_teacher&authorized",
+    "SchoolName": "admin,director&authorized",
+    "SemesterAdd": "admin,director&authorized,assistant_director&authorized",
+    "AutoStudentAdd": "admin,officer&authorized,director&authorized",
+    "GhostStudentAdd": "admin,head_teacher&authorized",
+    "StudentAdd": "admin,officer&authorized,head_teacher&authorized"
+  }
+}

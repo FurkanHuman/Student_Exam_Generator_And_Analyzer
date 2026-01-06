@@ -1,5 +1,6 @@
 ﻿@page "/Auto/AiQuizPoolAdd"
 @rendermode InteractiveServer
+@attribute [Authorize(policy: "AutoQuizPoolAdd")]
 
 @using Application.Features.Lessons.Queries.GetById
 @using Application.Features.ReferenceBenefits.Queries.GetListByIdReferenceBenefitBenefit
@@ -10,6 +11,7 @@
 @using Domain.Enums
 @using BlazorWebUI.Client.Pages.Styles.QQ
 @using BlazorWebUI.Client.Pages.Styles.Form
+@using Microsoft.AspNetCore.Authorization
 @using NArchitecture.Core.Application.Responses
 
 <PageTitle>AI Destekli Soru Oluşturma</PageTitle>

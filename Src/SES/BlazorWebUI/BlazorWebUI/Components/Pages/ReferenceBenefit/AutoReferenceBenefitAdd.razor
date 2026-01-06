@@ -7,9 +7,11 @@
 @using Application.Services.PdfFactory.PdfReaderService
 @using Application.Services.PdfFactory.PdfReaderService.Dtos
 @using BlazorWebUI.Client.Pages.Styles
+@using Microsoft.AspNetCore.Authorization
 @using NArchitecture.Core.Application.Responses
 @using static BlazorWebUI.Client.Pages.Styles.EditContentList
 @rendermode InteractiveServer
+@attribute [Authorize(policy: "AutoReferenceBenefitAdd")]
 
 <PageTitle>Otomatik Kazanım Ekleyici</PageTitle>
 

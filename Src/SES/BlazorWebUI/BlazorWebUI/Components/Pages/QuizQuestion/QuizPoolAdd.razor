@@ -6,9 +6,11 @@
 @using Application.Features.ReferenceBenefits.Queries.GetById
 @using Application.Services.ImageService;
 @using Domain.Enums
+@using Microsoft.AspNetCore.Authorization
 @using NArchitecture.Core.Application.Responses
 @using AutoMapper
 @rendermode InteractiveServer
+@attribute [Authorize(policy: "QuizPoolAdd")]
 
 <PageTitle>@(_isVariantMode ? "Soru Versiyonu Oluştur" : "Yeni Soru Ekle")</PageTitle>
 

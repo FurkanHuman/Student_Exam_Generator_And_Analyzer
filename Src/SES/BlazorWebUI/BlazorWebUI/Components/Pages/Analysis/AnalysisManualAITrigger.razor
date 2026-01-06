@@ -1,9 +1,11 @@
 ﻿@page "/Analysis/Trigger/AI"
 @rendermode InteractiveServer
+@attribute [Authorize(policy: "AnalysisManualAITrigger")]
 @using Application.Features.Analyses.Commands.UpdateAIRequest
 @using Application.Features.Analyses.Queries.GetList
 @using Application.Services.AIService
 @using BlazorWebUI.Components.Shared
+@using Microsoft.AspNetCore.Authorization
 @using NArchitecture.Core.Application.Requests
 @using NArchitecture.Core.Application.Responses
 

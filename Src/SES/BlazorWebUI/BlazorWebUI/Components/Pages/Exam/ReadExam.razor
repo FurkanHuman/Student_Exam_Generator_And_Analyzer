@@ -10,12 +10,14 @@
 @using BlazorWebUI.Client.Pages.Styles
 @using BlazorWebUI.Client.Pages.Styles.QQ
 @using Domain.Entities
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using NArchitecture.Core.Application.Responses
 @using System.Text.Json
 @using System.Security.Claims
 
 @rendermode InteractiveServer
+@attribute [Authorize(policy: "ReadExam")]
 @inject IMediator _mediator
 @inject IMapper _mapper
 @inject IPersonelService _personelService

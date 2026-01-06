@@ -1,12 +1,15 @@
 ﻿@page "/FirstUp/SchoolName"
 @rendermode InteractiveServer
+@* namespace? It seems to be the last example and the first place I used it. Should I place it on the other pages? *@
 @namespace BlazorWebUI.Components.Pages.FirstUp
+@attribute [Authorize(policy: "SchoolName")]
 @using Application.Features.Principals.Queries.GetList
 @using Application.Features.Personels.Queries.GetList
 @using Application.Features.Schools.Commands.Create
 @using Application.Features.Schools.Queries.GetList
 @using BlazorWebUI.Client.Pages.Styles
 @using Domain.Entities
+@using Microsoft.AspNetCore.Authorization
 @using NArchitecture.Core.Application.Requests
 @using NArchitecture.Core.Application.Responses
 

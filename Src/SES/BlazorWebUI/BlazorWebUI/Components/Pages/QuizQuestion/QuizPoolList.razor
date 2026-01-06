@@ -2,8 +2,9 @@
 @using Application.Features.QuizQuestions.Queries.GetByLessonId
 @using AutoMapper
 @using BlazorWebUI.Client.Pages.Styles.QQ
+@using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
-
+@attribute [Authorize(policy: "QuizPoolList")]
 <PageTitle>Soru Havuzu</PageTitle>
 
 <div class="pool-list-container">

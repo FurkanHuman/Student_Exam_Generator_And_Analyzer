@@ -1,8 +1,10 @@
 ﻿@page "/Analysis/Hub"
 @rendermode InteractiveServer
+@attribute [Authorize(policy: "AnalysisHub")]
 @inject IMediator _mediator
 @inject NavigationManager Nav
 @using Application.Features.Analyses.Queries.GetList
+@using Microsoft.AspNetCore.Authorization
 @using NArchitecture.Core.Application.Requests
 @using NArchitecture.Core.Application.Responses
 

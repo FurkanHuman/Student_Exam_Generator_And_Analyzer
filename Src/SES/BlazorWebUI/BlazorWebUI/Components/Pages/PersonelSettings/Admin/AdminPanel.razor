@@ -3,7 +3,7 @@
 @using Domain.Entities
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
-@attribute [Authorize(Roles = "admin,director")]
+@attribute [Authorize(policy: "AdminPanel")]
 @page "/Admin/Panel"
 @rendermode InteractiveServer
 
