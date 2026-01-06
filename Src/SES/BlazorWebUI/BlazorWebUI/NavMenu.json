@@ -1,122 +1,124 @@
-  [
+{
+  "NavMenuItems": [
+
     {
       "text": "Yapay Zeka Analizi Oluştur",
       "link": "/Analysis/Trigger/AI",
       "icon": "bi bi-cpu",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "AnalysisManualAITrigger"
     },
     {
       "text": "Analizlere bak",
       "link": "/Analysis/Hub",
       "icon": "bi bi-graph-up",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "AnalysisHub"
     },
     {
       "text": "Sınav Oku",
       "link": "/ReadExam",
       "icon": "bi bi-file-earmark-text",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "ReadExam"
     },
     {
       "text": "Sınav oluştur",
       "link": "/CreateExam",
       "icon": "bi bi-pencil-square",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "CreateExam"
     },
     {
       "text": "Havuzu görüntüle",
       "link": "/PoolList",
       "icon": "bi bi-collection",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "QuizPoolList"
     },
     {
       "text": "Dosyadan soru çıkarma",
       "link": "/Auto/DocumentQuestionExtraction",
       "icon": "bi bi-file-earmark-arrow-up",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "DocumentQuestionExtraction"
     },
     {
       "text": "Otomatik Soru Ekle",
       "link": "/Auto/AiQuizPoolAdd",
       "icon": "bi bi-robot",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "AutoQuizPoolAdd"
     },
     {
       "text": "Manuel soru ekle",
       "link": "/QuizPoolAdd",
       "icon": "bi bi-plus-square",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "QuizPoolAdd"
     },
     {
       "text": "Otomatik Kazanım ekle",
       "link": "/Auto/BenefitAdd",
       "icon": "bi bi-lightning-charge",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "AutoReferenceBenefitAdd"
     },
     {
       "text": "Ders Ekle",
       "link": "/LessonAdd",
       "icon": "bi bi-journal-plus",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "LessonAdd"
     },
     {
       "text": "Hayalet öğrenciler Ekle",
       "link": "/Ghost/StudentAdd",
       "icon": "bi bi-incognito",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "GhostStudentAdd"
     },
     {
       "text": "Otomatik öğrenci Ekle",
       "link": "/Auto/MSAdd",
       "icon": "bi bi-people",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "AutoStudentAdd"
     },
     {
       "text": "Öğretmen kayıt",
       "link": "/TeacherAdd",
       "icon": "bi bi-person-plus",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "TeacherAdd"
     },
     {
       "text": "Okul Adı",
       "link": "/FirstUp/SchoolName",
       "icon": "bi bi-building",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "SchoolName"
     },
     {
       "text": "Müdür ayarları",
       "link": "/SetPrincipal",
       "icon": "bi bi-person-badge",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "SetPrincipal"
     },
     {
       "text": "Dönem adı",
       "link": "/SemesterAdd",
       "icon": "bi bi-calendar-range",
       "roles": [ "authorized" ],
-      "policy": null
+      "policy": "SemesterAdd"
     },
     {
       "text": "Admin Paneli",
       "link": "/Admin/Panel",
       "icon": "bi bi-shield-lock",
       "roles": [ "admin", "director" ],
-      "policy": null
+      "policy": "AdminPanel"
     },
     {
       "text": "{{UserName}}",
@@ -126,3 +128,4 @@
       "policy": null
     }
   ]
+}

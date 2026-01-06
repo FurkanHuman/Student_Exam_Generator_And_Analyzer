@@ -11,6 +11,8 @@ using Persistence;
 using Persistence.Contexts;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+// add json files.
+builder.Configuration.AddJsonFile("NavMenu.json", optional: false, reloadOnChange: true);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

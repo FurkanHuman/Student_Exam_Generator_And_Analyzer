@@ -3,7 +3,7 @@
 @rendermode InteractiveServer
 
 @inject NavigationManager NavigationManager
-@inject HttpClient Http
+@inject IConfiguration Configuration
 
 <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
     <div class="top-row ps-3 navbar navbar-dark">
@@ -20,7 +20,6 @@
 
         <AuthorizeView Context="General">
             <Authorized>
-
 
                 @foreach (NavMenuItem item in navMenuItems)
                 {
@@ -79,8 +78,7 @@
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
 
-        string url = new Uri(new(NavigationManager.BaseUri), "config/navMenu.json").ToString();
-        navMenuItems = await Http.GetFromJsonAsync<List<NavMenuItem>>(url) ?? new();
+        navMenuItems = Configuration.GetSection("NavMenuItems").Get<List<NavMenuItem>>() ?? [];
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
