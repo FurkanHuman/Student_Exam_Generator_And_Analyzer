@@ -23,7 +23,7 @@
         Eğer projeye katkıda bulunmak ya da destek olmak isterseniz, yukarıdaki <strong>GitHub</strong> bağlantısı üzerinden projeye katılabilir veya <strong>Destek Ol</strong> butonunu kullanabilirsiniz. Küçük bir destek bile büyük bir fark yaratabilir.
     </p>
 </div>
- 
+
 <AuthorizeView>
     Hoş Geldiniz...
     <br />
@@ -52,16 +52,16 @@
 
     private string GetMessage()
     {
-        switch (personel)
+        switch (personel, user)
         {
-            case null:
-                return "Lütfen Giriş Yapınız";
+            case (Personel p, ApplicationUser u) when p.BirthDate == DateOnly.FromDateTime(DateTime.Now):
+                return $"Mutlu Yıllar, Merhaba {p.Name} {p.SurName}";
 
-            case Personel p when p.BirthDate == DateOnly.FromDateTime(DateTime.Now):
-                return $"Mutlu Yıllar Merhaba {p.Name} {p.SurName}";
+            case (Personel p, ApplicationUser u) when p == null && u != null:
+                return $"Merhaba {u.Email} Lütfen Sistem Yöneticiniz ile İletişime geçin. Personel Bilgisi Bulunamadı";
 
             default:
-                return $"Merhaba {personel.Name} {personel.SurName}";
+                return $"Merhaba {personel!.Name} {personel!.SurName}";
         }
     }
 }
