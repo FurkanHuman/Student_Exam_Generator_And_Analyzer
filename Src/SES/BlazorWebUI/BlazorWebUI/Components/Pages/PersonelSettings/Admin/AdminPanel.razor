@@ -97,10 +97,14 @@
                         <span class="input-group-text">
                             <i class="bi bi-search"></i>
                         </span>
-                        <input type="text" class="form-control"
+                        <input type="text"
+                               name="admin-user-search"
+                               class="form-control"
                                placeholder="Ad, soyad veya email ile ara..."
+                               autocomplete="off"
                                @bind="_searchText"
                                @bind:event="oninput" />
+
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -220,6 +224,22 @@
                                                     @onclick="() => OpenPersonelChangeModal(user, personel!)">
                                                 <i class="bi bi-person-fill-gear"></i> Personel Değiştir
                                             </button>
+                                            <button class="btn btn-outline-dark"
+                                                    @onclick="() => OpenLockoutModal(user, personel!)">
+                                                @if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTimeOffset.Now)
+                                                {
+                                                    <i class="bi bi-unlock"></i>
+
+                                                    <text> Kilidi Aç</text>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-lock"></i>
+
+                                                    <text> Hesabı Kilitle</text>
+                                                }
+                                            </button>
+
                                             <button class="btn btn-outline-danger"
                                                     @onclick="() => OpenDeleteModal(user, personel!)">
                                                 <i class="bi bi-trash"></i> Kullanıcı Sil
@@ -525,6 +545,58 @@
     </div>
 </ModalDialog>
 
+<!-- Modal: Hesap Kilitleme -->
+<ModalDialog @ref="_modalDialogLockout" Title="Hesap Kilitleme/Kilidi Açma">
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>DİKKAT!</strong> Bu işlem kullanıcının sisteme girişini engelleyecek/serbest bırakacaktır.
+    </div>
+    <div class="mb-3">
+        <p><strong>Kullanıcı:</strong> @_selectedUser.Email</p>
+        <p><strong>Personel:</strong> @_selectedPersonel?.Name @_selectedPersonel?.SurName</p>
+        <p>
+            <strong>Mevcut Durum:</strong>
+            @if (_selectedUser.LockoutEnd.HasValue && _selectedUser.LockoutEnd.Value > DateTimeOffset.Now)
+            {
+                <span class="badge bg-danger">
+                    <i class="bi bi-lock-fill"></i> Kilitli
+                </span>
+            }
+            else
+            {
+                <span class="badge bg-success">
+                    <i class="bi bi-unlock-fill"></i> Aktif
+                </span>
+            }
+        </p>
+    </div>
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" @bind="_lockoutConfirmation" id="lockoutCheck">
+        <label class="form-check-label" for="lockoutCheck">
+            Bu işlemi yapmak istediğimi onaylıyorum
+        </label>
+    </div>
+    <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-secondary" @onclick="CloseLockoutModal">
+            <i class="bi bi-x-circle"></i> İptal
+        </button>
+        @if (_selectedUser.LockoutEnd.HasValue && _selectedUser.LockoutEnd.Value > DateTimeOffset.Now)
+        {
+            <button class="btn btn-success" @onclick="UnlockUserAsync"
+                    disabled="@IsLockoutConfirmation">
+                <i class="bi bi-unlock"></i> Kilidi Aç
+            </button>
+        }
+        else
+        {
+            <button class="btn btn-danger" @onclick="LockUserAsync"
+                    disabled="@IsLockoutConfirmation">
+                <i class="bi bi-lock"></i> Hesabı Kilitle
+            </button>
+        }
+    </div>
+</ModalDialog>
+
 <!-- Modal: Kullanıcı Sil -->
 <ModalDialog @ref="_modalDialogDeleteUser" Title="Kullanıcı Silme Onayı">
     <div class="alert alert-danger">
@@ -582,6 +654,9 @@
     private string _passwordResetError = string.Empty;
     private bool _passwordResetSuccess = false;
 
+    //Lockout Confirmation
+    private bool _lockoutConfirmation = false;
+
     // Delete Confirmation
     private bool _deleteConfirmation = false;
 
@@ -604,6 +679,7 @@
     private ModalDialog _modalDialogPasswordReset { get; set; } = new();
     private ModalDialog _modalDialogEmailConfirm { get; set; } = new();
     private ModalDialog _modalDialogAddPersonel { get; set; } = new();
+    private ModalDialog _modalDialogLockout { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -635,46 +711,47 @@
             StateHasChanged();
         }
     }
-
     private IEnumerable<ApplicationUser> GetFilteredUsers()
     {
+        var personelByUserId = _personels
+            .GroupBy(p => p.UserId)
+            .ToDictionary(g => g.Key, g => g.First());
+
         var filtered = _users.AsEnumerable();
 
         if (!string.IsNullOrWhiteSpace(_searchText))
         {
             filtered = filtered.Where(u =>
             {
-                var personel = _personels.FirstOrDefault(p => p.UserId == u.Id);
-                return (personel?.Name?.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                       (personel?.SurName?.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                       (u.Email?.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ?? false);
+                personelByUserId.TryGetValue(u.Id, out var personel);
+
+                return (personel?.Name?.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ?? false)
+                    || (personel?.SurName?.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ?? false)
+                    || (u.Email?.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ?? false);
             });
         }
 
         if (!string.IsNullOrWhiteSpace(_filterRole))
         {
-            filtered = filtered.Where(u => _userRoles.GetValueOrDefault(u.Id, new List<string>()).Contains(_filterRole));
+            filtered = filtered.Where(u =>
+                _userRoles.TryGetValue(u.Id, out var roles) && roles.Contains(_filterRole));
         }
 
         if (_filterStatus == "active")
         {
             filtered = filtered.Where(u =>
-            {
-                var personel = _personels.FirstOrDefault(p => p.UserId == u.Id);
-                return personel?.DeletedDate == null;
-            });
+                personelByUserId.TryGetValue(u.Id, out var p) && p.DeletedDate == null);
         }
+
         else if (_filterStatus == "inactive")
         {
             filtered = filtered.Where(u =>
-            {
-                var personel = _personels.FirstOrDefault(p => p.UserId == u.Id);
-                return personel?.DeletedDate != null;
-            });
+                personelByUserId.TryGetValue(u.Id, out var p) && p.DeletedDate != null);
         }
 
         return filtered;
     }
+
 
     private IEnumerable<IdentityRole<Guid>> RemoveAdmin(IEnumerable<IdentityRole<Guid>> roles)
     {
@@ -736,6 +813,15 @@
         _selectedPersonelGuid = Guid.Empty;
         _modalDialogPersonelChange.Open();
     }
+
+    private void OpenLockoutModal(ApplicationUser user, Personel personel)
+    {
+        _selectedUser = user;
+        _selectedPersonel = personel;
+        _lockoutConfirmation = false;
+        _modalDialogLockout.Open();
+    }
+
 
     private void OpenDeleteModal(ApplicationUser user, Personel personel)
     {
@@ -863,6 +949,12 @@
         _modalDialogAddPersonel.Close();
     }
 
+    private void CloseLockoutModal()
+    {
+        _lockoutConfirmation = false;
+        _modalDialogLockout.Close();
+    }
+
     // Rol İşlemleri
     private async Task AddRoleAsync(ApplicationUser user, IdentityRole<Guid> role)
     {
@@ -879,6 +971,46 @@
         await _userManager.RemoveFromRoleAsync(user, role.Name!);
         _userRoles[user.Id] = await _userManager.GetRolesAsync(user);
         StateHasChanged();
+    }
+
+    // kullanıcı hesabı kilitleme işlevi
+    private async Task LockUserAsync()
+    {
+        if (!_lockoutConfirmation)
+            return;
+
+        try
+        {
+            _selectedUser.LockoutEnd = DateTimeOffset.UtcNow.AddYears(99); // maximum 99 yıl kilitle
+            _selectedUser.LockoutEnabled = true;
+            await _userManager.UpdateAsync(_selectedUser);
+
+            CloseLockoutModal();
+            await RefreshData();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Kilitleme hatası: {ex.Message}");
+        }
+    }
+
+    private async Task UnlockUserAsync()
+    {
+        if (!_lockoutConfirmation)
+            return;
+
+        try
+        {
+            _selectedUser.LockoutEnd = null;
+            await _userManager.UpdateAsync(_selectedUser);
+
+            CloseLockoutModal();
+            await RefreshData();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Kilit açma hatası: {ex.Message}");
+        }
     }
 
     // Şifre Sıfırlama
@@ -1025,6 +1157,8 @@
                                                   string.IsNullOrWhiteSpace(_newPersonelSurName) ||
                                                   string.IsNullOrWhiteSpace(_newPersonelEmail) ||
                                                   string.IsNullOrWhiteSpace(_newPersonelPassword));
+
+    private bool IsLockoutConfirmation() => !_lockoutConfirmation;
 
     private void NewPersonelBirthDate(ChangeEventArgs e) => _newPersonelBirthDate = DateOnly.Parse(e.Value?.ToString() ?? DateTime.Now.AddYears(-25).ToString("yyyy-MM-dd"), new System.Globalization.CultureInfo("tr-TR"));
 }
