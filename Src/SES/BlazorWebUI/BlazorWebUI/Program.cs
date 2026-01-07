@@ -31,6 +31,7 @@ builder.Services.AddAuthentication(options =>
     {
         options.ApplicationCookie?.Configure(cookieOptions =>
         {
+            cookieOptions.Events.OnRedirectToAccessDenied = UnauthorizedHandlerExtension.HandleAccessDenied();
             cookieOptions.Cookie.Name = "SES_Credential";
         });
     });
@@ -102,9 +103,8 @@ app.MapRazorComponents<App>()
 app.Use(async (context, next) =>
 {
     if (string.IsNullOrEmpty(context.Request.Headers.AcceptLanguage))
-    {
         context.Request.Headers.AcceptLanguage = "tr-TR";
-    }
+
     await next();
 });
 app.MapAdditionalIdentityEndpoints();
