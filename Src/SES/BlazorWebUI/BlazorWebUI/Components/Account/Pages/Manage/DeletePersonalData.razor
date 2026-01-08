@@ -1,6 +1,7 @@
 ﻿@page "/Account/Manage/DeletePersonalData"
 
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using Domain.Entities
 
@@ -9,6 +10,7 @@
 @inject IdentityUserAccessor UserAccessor
 @inject IdentityRedirectManager RedirectManager
 @inject ILogger<DeletePersonalData> Logger
+@attribute [Authorize(policy: "Account/Manage/DeletePersonalData")]
 
 <PageTitle>Delete Personal Data</PageTitle>
 

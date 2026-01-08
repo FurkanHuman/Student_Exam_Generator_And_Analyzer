@@ -20,26 +20,27 @@ internal static class BlazorWebUIServiceRegistrationPagePolicyHelpers
 
     private static bool EvaluateRoles(ClaimsPrincipal user, string expression)
     {
-        IEnumerable<string> orGroups = expression.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(g => g.Trim());
+        string[] orGroups = expression.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-        foreach (string group in orGroups)
+        return orGroups.Any(group => IsGroupSatisfied(user, group));
+    }
+
+    private static bool IsGroupSatisfied(ClaimsPrincipal user, string group)
+    {
+        string[] andRoles = group.Split('&', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        return andRoles.All(role => IsRoleConditionMet(user, role));
+    }
+
+    private static bool IsRoleConditionMet(ClaimsPrincipal user, string role)
+    {
+        if (role.StartsWith('!'))
         {
-            if (group.Contains('&'))
-            {
-                IEnumerable<string> andRoles = group.Split('&', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(r => r.Trim());
-
-                if (andRoles.All(role => user.IsInRole(role)))
-                    return true;
-            }
-
-            else
-            {
-                if (user.IsInRole(group))
-                    return true;
-            }
+            string excludedRole = role[1..];
+            return !user.IsInRole(excludedRole);
         }
 
-        return false;
+        return user.IsInRole(role);
     }
+
 }

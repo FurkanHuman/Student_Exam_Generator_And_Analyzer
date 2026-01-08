@@ -18,6 +18,7 @@
     "SemesterAdd": "admin,director&authorized,assistant_director&authorized",
     "AutoStudentAdd": "admin,officer&authorized,director&authorized",
     "GhostStudentAdd": "admin,head_teacher&authorized",
-    "StudentAdd": "admin,officer&authorized,head_teacher&authorized"
+    "StudentAdd": "admin,officer&authorized,head_teacher&authorized",
+    "Account/Manage/DeletePersonalData": "!admin"
   }
 }
