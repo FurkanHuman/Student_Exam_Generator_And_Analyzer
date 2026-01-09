@@ -1,5 +1,6 @@
 ﻿using ApexCharts;
 using BlazorWebUI.Components.Account;
+using BlazorWebUI.Extensions;
 using Domain.Entities;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;

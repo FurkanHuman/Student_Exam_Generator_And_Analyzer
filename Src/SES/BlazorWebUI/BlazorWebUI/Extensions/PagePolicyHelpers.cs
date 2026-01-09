@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
 
-namespace BlazorWebUI;
+namespace BlazorWebUI.Extensions;
 
-internal static class BlazorWebUIServiceRegistrationPagePolicyHelpers
+internal static class PagePolicyHelpers
 {
 
     public static IServiceCollection AddPoliciesFromJson(this IServiceCollection services, IConfiguration configuration)
