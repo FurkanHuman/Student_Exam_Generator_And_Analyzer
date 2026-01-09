@@ -2,7 +2,7 @@
 
 namespace BlazorWebUI.Extensions;
 
-internal static class PagePolicyHelpers
+internal static class AuthorizationPolicyExtensions
 {
 
     public static IServiceCollection AddPoliciesFromJson(this IServiceCollection services, IConfiguration configuration)
