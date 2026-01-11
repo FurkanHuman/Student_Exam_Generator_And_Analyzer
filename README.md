@@ -1,5 +1,10 @@
 # Student Exam System & Analyzer (S.E.S.)
 
+> ⚠️ **Notice**
+>
+> This project will undergo a significant architectural change in the near future.  
+> Please stay tuned for further details and updates.
+
 > **Short Name:** S.E.S.
 > **Status:** 🚧 Actively being developed — New features on the way!
 
