@@ -40,6 +40,7 @@ using NArchitecture.Core.Localization.Resource.Yaml.DependencyInjection;
 using NArchitecture.Core.Mailing;
 using NArchitecture.Core.Mailing.MailKit;
 using System.Reflection;
+using Application.Services.FeedBacks;
 
 namespace Application;
 
@@ -117,6 +118,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IExamPageGenerator, ExamPageRenderer>();
 
         QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+        services.AddScoped<IFeedBackService, FeedBackManager>();
         return services;
     }
 

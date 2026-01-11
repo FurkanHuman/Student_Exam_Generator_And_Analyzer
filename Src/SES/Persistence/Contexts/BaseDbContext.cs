@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Persistence.EntityConfigurations.Interfaces;
@@ -28,6 +28,7 @@ public class BaseDbContext(DbContextOptions dbContextOptions, IConfiguration con
     public DbSet<StudentAnswer> StudentAnswers { get; set; }
     public DbSet<Personel> Personels { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
+    public DbSet<FeedBack> FeedBacks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
