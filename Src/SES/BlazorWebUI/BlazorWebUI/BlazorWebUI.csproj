@@ -46,4 +46,11 @@
     <ProjectReference Include="..\BlazorWebUI.Client\BlazorWebUI.Client.csproj" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Content Update="wwwroot\robots.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
