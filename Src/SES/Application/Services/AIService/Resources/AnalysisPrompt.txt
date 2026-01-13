@@ -1,4 +1,0 @@
-﻿교육데이터분석→터키어JSON
-점수:0-4|구분:Çokİyi85+/İyi70+/Orta50+/Geçer(Pass)+/Başarısız
-난이도:Kolay70%+/Orta40-70/Zor40-
-**RESPONSE_LANGUAGE=TURKISH**
