@@ -1,0 +1,120 @@
+<Project>
+  <PropertyGroup>
+    <!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <!-- ===================================================== -->
+    <!-- CORE / APPLICATION FOUNDATION -->
+    <!-- ===================================================== -->
+    <PackageVersion Include="AutoMapper" Version="15.0.1" />
+    <PackageVersion Include="MediatR" Version="12.4.1" />
+    <PackageVersion Include="MathNet.Numerics" Version="5.0.0" />
+
+    <!-- ===================================================== -->
+    <!-- DOMAIN / IDENTITY / SECURITY -->
+    <!-- ===================================================== -->
+    <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="8.0.21" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.21" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.21" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.21" />
+
+    <!-- ===================================================== -->
+    <!-- PERSISTENCE / EF CORE -->
+    <!-- ===================================================== -->
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.21" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.21" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.21" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.21" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.21" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
+    <PackageVersion Include="EFCore.NamingConventions" Version="8.0.3" />
+
+    <!-- ===================================================== -->
+    <!-- CONFIGURATION / JSON -->
+    <!-- ===================================================== -->
+    <PackageVersion Include="System.Text.Json" Version="8.0.6" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+
+    <!-- ===================================================== -->
+    <!-- MICROSOFT EXTENSIONS -->
+    <!-- ===================================================== -->
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.21" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="8.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.1" />
+
+    <!-- ===================================================== -->
+    <!-- WEB / ASP.NET / BLAZOR -->
+    <!-- ===================================================== -->
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.21" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="8.0.21" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.21" />
+    <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.21" />
+    <PackageVersion Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+
+    <!-- ===================================================== -->
+    <!-- NARCHITECTURE FRAMEWORK -->
+    <!-- ===================================================== -->
+    <PackageVersion Include="NArchitecture.Core.Application" Version="1.0.6" />
+    <PackageVersion Include="NArchitecture.Core.Persistence" Version="1.1.5" />
+    <PackageVersion Include="NArchitecture.Core.Persistence.DependencyInjection" Version="1.0.2" />
+    <PackageVersion Include="NArchitecture.Core.ElasticSearch" Version="1.0.1" />
+    <PackageVersion Include="NArchitecture.Core.Mailing" Version="1.0.3" />
+    <PackageVersion Include="NArchitecture.Core.Mailing.Mailkit" Version="1.0.3" />
+    <PackageVersion Include="NArchitecture.Core.Security.DependencyInjection" Version="1.2.1" />
+    <PackageVersion Include="NArchitecture.Core.Localization.Abstraction" Version="1.0.1" />
+    <PackageVersion Include="NArchitecture.Core.Localization.Resource.Yaml.DependencyInjection" Version="1.0.2" />
+    <PackageVersion Include="NArchitecture.Core.Localization.WebApi" Version="1.0.1" />
+    <PackageVersion Include="NArchitecture.Core.CrossCuttingConcerns.Exception" Version="1.0.1" />
+    <PackageVersion Include="NArchitecture.Core.CrossCuttingConcerns.Exception.WebApi" Version="1.1.2" />
+    <PackageVersion Include="NArchitecture.Core.CrossCuttingConcerns.Logging.Serilog.File" Version="1.0.3" />
+    <PackageVersion Include="NArchitecture.Core.Persistence.WebApi" Version="1.0.2" />
+
+    <!-- ===================================================== -->
+    <!-- UI / ADD-ONS -->
+    <!-- ===================================================== -->
+    <PackageVersion Include="Blazor-ApexCharts" Version="6.0.2" />
+    <PackageVersion Include="Blazored.LocalStorage" Version="4.5.0" />
+    <PackageVersion Include="Net.Codecrete.QrCodeGenerator" Version="2.0.7" />
+
+    <!-- ===================================================== -->
+    <!-- DOCUMENT / PDF / OFFICE -->
+    <!-- ===================================================== -->
+    <PackageVersion Include="QuestPDF" Version="2025.7.3" />
+    <PackageVersion Include="itext7" Version="8.0.5" />
+    <PackageVersion Include="PdfPig" Version="0.1.13" />
+    <PackageVersion Include="ClosedXML" Version="0.105.0" />
+    <PackageVersion Include="DocumentFormat.OpenXml" Version="3.3.0" />
+
+    <!-- ===================================================== -->
+    <!-- INFRASTRUCTURE / EXTERNAL SERVICES -->
+    <!-- ===================================================== -->
+    <PackageVersion Include="Azure.Identity" Version="1.17.0" />
+    <PackageVersion Include="Microsoft.Identity.Client" Version="4.77.1" />
+    <PackageVersion Include="CloudinaryDotNet" Version="1.27.8" />
+    <PackageVersion Include="OpenAI" Version="2.8.0" />
+    <PackageVersion Include="Google.GenAI" Version="0.9.0" />
+    <PackageVersion Include="Newtonsoft.Json.Schema" Version="4.0.1" />
+    <PackageVersion Include="SimpleBase" Version="5.5.0" />
+
+    <!-- ===================================================== -->
+    <!-- TESTING -->
+    <!-- ===================================================== -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageVersion Include="xunit" Version="2.6.6" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.7" />
+    <PackageVersion Include="Xunit.DependencyInjection" Version="8.0.1" />
+    <PackageVersion Include="Moq" Version="4.20.70" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
+    <PackageVersion Include="NArchitecture.Core.Test" Version="1.0.1" />
+
+  </ItemGroup>
+
+</Project>

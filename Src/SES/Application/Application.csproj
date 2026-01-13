@@ -8,23 +8,23 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="15.0.1" />
-    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
-    <PackageReference Include="MediatR" Version="12.4.1" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
-    <PackageReference Include="NArchitecture.Core.Application" Version="1.0.6" />
-    <PackageReference Include="NArchitecture.Core.Mailing" Version="1.0.3" />
-    <PackageReference Include="NArchitecture.Core.Mailing.Mailkit" Version="1.0.3" />
-    <PackageReference Include="NArchitecture.Core.CrossCuttingConcerns.Exception" Version="1.0.1" />
-    <PackageReference Include="NArchitecture.Core.CrossCuttingConcerns.Logging.Serilog.File" Version="1.0.3" />
-    <PackageReference Include="NArchitecture.Core.Localization.Abstraction" Version="1.0.1" />
-    <PackageReference Include="NArchitecture.Core.Localization.Resource.Yaml.DependencyInjection" Version="1.0.2" />
-    <PackageReference Include="NArchitecture.Core.ElasticSearch" Version="1.0.1" />
-    <PackageReference Include="NArchitecture.Core.Security.DependencyInjection" Version="1.2.1" />
-    <PackageReference Include="itext7" Version="8.0.5" />
-    <PackageReference Include="QuestPDF" Version="2025.7.3" />
-    <PackageReference Include="SimpleBase" Version="5.5.0" />
+    <PackageReference Include="AutoMapper" />
+    <PackageReference Include="MathNet.Numerics" />
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+    <PackageReference Include="NArchitecture.Core.Application" />
+    <PackageReference Include="NArchitecture.Core.Mailing" />
+    <PackageReference Include="NArchitecture.Core.Mailing.Mailkit" />
+    <PackageReference Include="NArchitecture.Core.CrossCuttingConcerns.Exception" />
+    <PackageReference Include="NArchitecture.Core.CrossCuttingConcerns.Logging.Serilog.File" />
+    <PackageReference Include="NArchitecture.Core.Localization.Abstraction" />
+    <PackageReference Include="NArchitecture.Core.Localization.Resource.Yaml.DependencyInjection" />
+    <PackageReference Include="NArchitecture.Core.ElasticSearch" />
+    <PackageReference Include="NArchitecture.Core.Security.DependencyInjection" />
+    <PackageReference Include="itext7" />
+    <PackageReference Include="QuestPDF" />
+    <PackageReference Include="SimpleBase" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Features\**\Resources\Locales\*.*.yaml">
