@@ -1,0 +1,87 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+# -------------------------
+# C# – General
+# -------------------------
+[*.cs]
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = true
+
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_indent_labels = one_less_than_current
+
+# -------------------------
+# Naming
+# -------------------------
+
+# Interfaces → IPascalCase
+dotnet_naming_rule.interfaces_should_be_prefixed.severity = warning
+dotnet_naming_rule.interfaces_should_be_prefixed.symbols = interface_symbols
+dotnet_naming_rule.interfaces_should_be_prefixed.style = interface_style
+
+dotnet_naming_symbols.interface_symbols.applicable_kinds = interface
+dotnet_naming_symbols.interface_symbols.applicable_accessibilities = public, internal
+dotnet_naming_style.interface_style.required_prefix = I
+dotnet_naming_style.interface_style.capitalization = pascal_case
+
+# Private fields → _camelCase
+dotnet_naming_rule.private_fields_underscore.severity = warning
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_underscore.style = underscore_style
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.underscore_style.required_prefix = _
+dotnet_naming_style.underscore_style.capitalization = camel_case
+
+# Constants → PascalCase
+dotnet_naming_rule.constants_pascal_case.severity = warning
+dotnet_naming_rule.constants_pascal_case.symbols = constants
+dotnet_naming_rule.constants_pascal_case.style = pascal_style
+
+dotnet_naming_symbols.constants.applicable_kinds = field
+dotnet_naming_symbols.constants.required_modifiers = const
+dotnet_naming_style.pascal_style.capitalization = pascal_case
+
+# -------------------------
+# Domain correctness
+# -------------------------
+dotnet_style_readonly_field = true:suggestion
+dotnet_style_require_accessibility_modifiers = always:suggestion
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+
+# -------------------------
+# Nullability
+# -------------------------
+dotnet_diagnostic.CS8618.severity = warning
+dotnet_diagnostic.CS8602.severity = warning
+dotnet_diagnostic.CS8604.severity = warning
+
+# -------------------------
+# Expression / modern C#
+# -------------------------
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+
+# -------------------------
+# use of var – strict policy
+# -------------------------
+csharp_style_var_for_built_in_types = false:error
+csharp_style_var_when_type_is_apparent = false:error
+csharp_style_var_elsewhere = false:error

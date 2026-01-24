@@ -1,7 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Domain.Common;
 
 public abstract class Entity<TId> where TId : notnull
@@ -16,8 +12,14 @@ public abstract class Entity<TId> where TId : notnull
         if (ReferenceEquals(this, other))
             return true;
 
+        if (EqualityComparer<TId>.Default.Equals(Id, default) || EqualityComparer<TId>.Default.Equals(other.Id, default))
+            return false;
+
         return EqualityComparer<TId>.Default.Equals(Id, other.Id);
     }
 
-    public override int GetHashCode() => Id?.GetHashCode() ?? 0;
+    public override int GetHashCode()
+    {
+        return Id?.GetHashCode() ?? throw new InvalidOperationException("Cannot get hash code of transient entity.");
+    }
 }
