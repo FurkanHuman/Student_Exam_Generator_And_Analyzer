@@ -19,19 +19,19 @@ public abstract class EntityEvent<TId> : Entity<TId> where TId : notnull
         Hash = EntityHash.Compute(initialEntityHash);
     }
 
-    protected void RecordUpdate(string newEntityHash, Guid? modifiedBy = null)
+    public void RecordUpdate(string newEntityHash, Guid? modifiedBy = null)
     {
         Audit = Audit.MarkUpdated(modifiedBy);
         Hash = EntityHash.Compute(newEntityHash);
     }
 
-    protected void RecordDeletion(string finalEntityHash, Guid? deletedBy = null)
+    public void RecordDeletion(string finalEntityHash, Guid? deletedBy = null)
     {
         Audit = Audit.MarkDeleted(deletedBy);
         Hash = EntityHash.Compute(finalEntityHash);
     }
 
-    protected void RecordRestoration(string restoredEntityHash, Guid? restoredBy = null)
+    public void RecordRestoration(string restoredEntityHash, Guid? restoredBy = null)
     {
         Audit = Audit.Restore(restoredBy);
         Hash = EntityHash.Compute(restoredEntityHash);

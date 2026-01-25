@@ -12,7 +12,7 @@ public sealed class QuizQuestion : Entity<int>
     public float[]? Embedding { get; private set; }
 
     private readonly List<QuestionOption> _options = [];
-    public IReadOnlyCollection<QuestionOption> Options => _options;
+    public IReadOnlyList<QuestionOption> Options => _options;
 
     private QuizQuestion()
     {

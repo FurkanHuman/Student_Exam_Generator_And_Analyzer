@@ -8,7 +8,7 @@ public sealed class LearningArea : Entity<int>
     public CodeDescription Info { get; private set; }
 
     private readonly List<SubLearningArea> _subAreas = [];
-    public IReadOnlyCollection<SubLearningArea> SubAreas => _subAreas;
+    public IReadOnlyList<SubLearningArea> SubAreas => _subAreas;
 
     private LearningArea()
     {

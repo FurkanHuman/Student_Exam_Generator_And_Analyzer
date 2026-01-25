@@ -13,7 +13,7 @@ public sealed class StudentExamAnswer : Entity<Guid>
     public ExamEvaluationStatus EvaluationStatus { get; private set; }
 
     private readonly List<StudentAnswer> _answers = [];
-    public IReadOnlyCollection<StudentAnswer> Answers => _answers;
+    public IReadOnlyList<StudentAnswer> Answers => _answers;
 
     private StudentExamAnswer() { }
 
